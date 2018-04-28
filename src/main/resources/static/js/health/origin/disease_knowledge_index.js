@@ -10,6 +10,38 @@ var selectedKnowledgeId;
 
 function initCatalog(data) {
     catalog = data;
+    var dataList = {
+        value : []
+    };
+    if($.isArray(catalog)) {
+        catalog.forEach(function(disease) {
+            dataList.value.push({
+
+                疾病Key : disease.nameKey,
+                疾病名称 : disease.name
+            });
+
+        })
+    }
+    $("#diseaseInput").bsSuggest({
+        keyField: '疾病Key',
+        data: dataList,
+        clearable: true,
+        autoSelect: false,
+        autoDropup: true,
+        ignorecase: true,
+        showBtn: false,
+        showHeader: true
+    }).on('onDataRequestSuccess', function (e, result) {
+        console.log('从 json.data 参数中获取，不会触发 onDataRequestSuccess 事件', result);
+    }).on('onSetSelectValue', function (e, keyword, data) {
+        $("section  h1").empty().text("疾病数据管理");
+        var  test = $("section  h1").text() + "——" + data.疾病名称;
+        $("section  h1").text(test);
+        getDiseaseKnowledge();
+    }).on('onUnsetSelectValue', function () {
+        console.log("onUnsetSelectValue");
+    });
 }
 
 function getDiseaseKnowledge() {
@@ -52,7 +84,6 @@ function initKnowledgeTree(data) {
     });
 
     var treedata = g(roots, data);
-
     knowledgeTree.treeview({ data: treedata });
     knowledgeTree.on('nodeSelected', function(event, node) {
         getKnowledge(node.data, true);

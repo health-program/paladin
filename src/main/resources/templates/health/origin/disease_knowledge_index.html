@@ -8,11 +8,27 @@
         <h1>疾病数据管理<small></small></h1>
     </section>
     <section>
-        <div class="row">
+        <!--<div class="row">
             <div class="col-md-6">
                 <div class="input-group">
                     <input type="text" id="diseaseInput" placeholder="请输入疾病名称或拼音" class="form-control" />
                     <span class="input-group-btn"><button class="btn btn-default" id="searchBtn" type="button">查找</button></span>
+                </div>
+            </div>
+        </div>-->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="diseaseInput"  placeholder="请输入疾病名称或拼音" >
+                    <div class="input-group-btn">
+                      <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <!--<button class="btn btn-default" id="searchBtn" type="button">查找</button>-->
+                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                        </ul>
+                    </div>
+                    <!-- /btn-group -->
                 </div>
             </div>
         </div>
@@ -33,6 +49,7 @@
     <div th:include="health/footer" />
     <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
     <script type="text/javascript" src="/static/js/health/origin/disease_knowledge_index.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
 </body>
 
 </html>
