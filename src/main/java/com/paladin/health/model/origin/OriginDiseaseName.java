@@ -5,6 +5,8 @@ import javax.persistence.Id;
 public class OriginDiseaseName {
 
 	public static final String COLUMN_FIELD_TYPE = "type";	
+	public static final String COLUMN_FIELD_NAME_KEY = "nameKey";	
+
 	
 	public static final int TYPE_DISEASE = 1;
 	public static final int TYPE_SYMPTOM = 2;

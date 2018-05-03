@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.QueryType;
+import com.paladin.framework.utils.StringParser;
 import com.paladin.health.data.parser.KnowledgePageParser;
 import com.paladin.health.data.parser.KnowledgePageParser.ArticleElement;
 import com.paladin.health.data.parser.KnowledgePageParser.ArticleTitle;
@@ -185,7 +186,7 @@ public class OriginDiseaseKnowledgeReader {
 		int[] ids = new int[] { kbase, cbase };
 		boolean isNew = false;
 
-		for (int x = 0; x <= names.size(); x++) {
+		for (int x = 0; x < names.size(); x++) {
 			OriginDiseaseName name = names.get(x);
 			String disease = name.getNameKey();
 			String diseaseName = name.getName();
@@ -237,6 +238,82 @@ public class OriginDiseaseKnowledgeReader {
 		}
 
 		logger.info("成功读取" + names.size() + "条疾病知识");
+	}
+
+	public void readDiseaseKnowledgeSingle(int base, String... diseases) {
+
+		logger.info("开始读取疾病知识数据");
+
+		int baseEffect = 1000000;
+		int kbase = base * baseEffect;
+		int cbase = kbase;
+		int underId = kbase + baseEffect;
+
+		Integer kmax = diseaseKnowledgeMapper.getMaxId(underId);
+		Integer cmax = diseaseKnowledgeMapper.getContentMaxId(underId);
+
+		if (cmax != null && cmax > cbase) {
+			cbase = cmax;
+		}
+
+		if (kmax != null && kmax > kbase) {
+			kbase = kmax;
+		}
+
+		int[] ids = new int[] { kbase, cbase };
+
+		for (int x = 0; x < diseases.length; x++) {
+			String disease = diseases[x];
+			OriginDiseaseName name = diseaseNameService.getDiseaseName(disease);
+			String diseaseName = name.getName();
+
+			if (diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease)).size() > 0) {
+				diseaseKnowledgeMapper.deleteDiseaseContent(disease);
+				diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
+				logger.info("疾病[" + disease + "]数据已经存在，进行删除操作");
+			}
+
+			for (String[] category : categories) {
+				String categoryKey = category[0];
+
+				List<List<ArticleElement>> know = null;
+				try {
+					try {
+						know = knowledgePageParser.parse(disease, categoryKey);
+					} catch (IOException e) {
+						logger.error("从网络获取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]，尝试再次获取", e);
+						try {
+							know = knowledgePageParser.parse(disease, categoryKey);
+						} catch (IOException e1) {
+							logger.error("从网络获取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]，放弃尝试", e);
+							diseaseKnowledgeMapper.deleteDiseaseContent(disease);
+							diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
+							logger.info("删除疾病[" + disease + "]数据");
+							break;
+						}
+					}
+				} catch (Exception e2) {
+					logger.error("解析第" + x + "条数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e2);
+					diseaseKnowledgeMapper.deleteDiseaseContent(disease);
+					diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
+					logger.info("删除疾病[" + disease + "]数据");
+					break;
+				}
+
+				try {
+					ArticleItem articleItem = doCategory(categoryKey, diseaseName, know);
+					save(articleItem, disease, categoryKey, null, ids);
+				} catch (Exception e) {
+					logger.error("读取第" + x + "条数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e);
+					diseaseKnowledgeMapper.deleteDiseaseContent(disease);
+					diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
+					logger.info("删除疾病[" + disease + "]数据");
+					break;
+				}
+			}
+		}
+
+		logger.info("成功读取" + StringParser.toString(diseases) + "条疾病知识");
 	}
 
 	private void save(ArticleItem articleItem, String diseaseKey, String categoryKey, Integer parentId, int[] ids) {

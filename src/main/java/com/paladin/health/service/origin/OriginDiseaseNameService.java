@@ -14,6 +14,19 @@ import com.paladin.framework.core.ServiceSupport;
 @Service
 public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> {
 
+	public OriginDiseaseName getDiseaseName(String diseaseKey) {
+
+		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
+				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE),
+				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, diseaseKey) });
+
+		if (names == null || names.size() == 0) {
+			return null;
+		}
+
+		return names.get(0);
+	}
+
 	public List<OriginDiseaseName> findAllDiseaseName() {
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE));
 	}
