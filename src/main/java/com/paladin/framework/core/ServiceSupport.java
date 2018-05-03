@@ -60,6 +60,8 @@ public abstract class ServiceSupport<Model> {
 		modelType = (Class<Model>) clazz;
 	}
 
+	private static int maxPageSize = 100; // 最大分页大小，防止恶意分页
+
 	// -------------------------- 初始化配置 --------------------------
 
 	List<Condition> commonConditions = new ArrayList<>(); // 通用查询条件
@@ -393,6 +395,10 @@ public abstract class ServiceSupport<Model> {
 	 */
 	public Page<Model> findPage(int offset, int limit, boolean simple) {
 
+		if (limit > maxPageSize) {
+			limit = maxPageSize;
+		}
+
 		Page<Model> page = PageHelper.offsetPage(offset, limit);
 		try {
 			List<Model> result = findAll(simple);
@@ -532,6 +538,16 @@ public abstract class ServiceSupport<Model> {
 	}
 
 	/**
+	 * 条件过滤分页查询（非简单模式）
+	 * @param searchParam
+	 * @param page
+	 * @return
+	 */
+	public Page<Model> searchPage(Object searchParam, OffsetPage page) {
+		return searchPage(searchParam, page.getOffset(), page.getLimit(), false);
+	}
+
+	/**
 	 * 条件过滤分页查询（简单模式下将不会考虑通用条件和动态条件）
 	 * 
 	 * @param searchParam
@@ -542,6 +558,11 @@ public abstract class ServiceSupport<Model> {
 	 * @return
 	 */
 	public Page<Model> searchPage(Object searchParam, int offset, int limit, boolean simple) {
+
+		if (limit > maxPageSize) {
+			limit = maxPageSize;
+		}
+
 		Page<Model> page = PageHelper.offsetPage(offset, limit);
 		try {
 			List<Model> result = searchAll(searchParam, simple);

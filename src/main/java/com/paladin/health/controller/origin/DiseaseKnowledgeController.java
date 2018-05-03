@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.paladin.framework.common.OffsetPage;
+import com.paladin.framework.common.PageResult;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.origin.OriginDiseaseKnowledgeContentService;
 import com.paladin.health.service.origin.OriginDiseaseKnowledgeService;
@@ -35,6 +37,12 @@ public class DiseaseKnowledgeController {
 		return CommonResponse.getSuccessResponse(diseaseNameService.findAllDiseaseName());
 	}
 
+	@RequestMapping("/pagelist/disease")
+	@ResponseBody
+	public Object diseasePageList(OffsetPage page) {
+		return CommonResponse.getSuccessResponse(new PageResult(diseaseNameService.findPageDiseaseName(page)));
+	}
+
 	@RequestMapping("/list/knowledge")
 	@ResponseBody
 	public Object knowledgeList(@RequestParam String diseaseKey) {
@@ -52,5 +60,5 @@ public class DiseaseKnowledgeController {
 	public Object diseaseContent(@RequestParam String diseaseKey) {
 		return CommonResponse.getSuccessResponse(diseaseKnowledgeContentService.findDiseaseContent(diseaseKey));
 	}
-	
+
 }

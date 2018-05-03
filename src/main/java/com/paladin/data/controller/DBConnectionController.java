@@ -213,7 +213,7 @@ public class DBConnectionController extends ControllerSupport {
 		String mapperContent = connectionService.buildJavaClass(tableOption, GenerateType.MAPPER);
 		String serviceContent = connectionService.buildJavaClass(tableOption, GenerateType.SERVICE);
 		String controllerContent = connectionService.buildJavaClass(tableOption, GenerateType.CONTROLLER);
-
+		String sqlMapperContent = connectionService.buildJavaClass(tableOption, GenerateType.SQLMAPPER);
 		
 		String projectPath = option.getProjectPath();
 		
@@ -226,7 +226,8 @@ public class DBConnectionController extends ControllerSupport {
 		connectionService.buildBootProjectFile(tableOption, GenerateType.SERVICE, projectPath, serviceContent);
 		connectionService.buildBootProjectFile(tableOption, GenerateType.CONTROLLER, projectPath, controllerContent);
 	
-		connectionService.buildBootProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath, "");
+		connectionService.buildBootProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath, sqlMapperContent);
+		connectionService.buildBootProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath, "");
 		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_INDEX, projectPath, "");
 		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_VIEW, projectPath, "");
 		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_EDIT, projectPath, "");

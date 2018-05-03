@@ -1,6 +1,6 @@
 $(function() {
     $.getAjax("/health/knowledge/list/disease", initCatalog);
-    $("#searchBtn").click(getDiseaseKnowledge);
+    initTable();
 });
 
 var catalog;
@@ -11,42 +11,67 @@ var selectedKnowledgeId;
 function initCatalog(data) {
     catalog = data;
     var dataList = {
-        value : []
+        value: catalog
     };
-    if($.isArray(catalog)) {
-        catalog.forEach(function(disease) {
-            dataList.value.push({
 
-                疾病Key : disease.nameKey,
-                疾病名称 : disease.name
-            });
-
-        })
-    }
     $("#diseaseInput").bsSuggest({
-        keyField: '疾病Key',
+        idField: "diseaseKey",
+        keyField: "diseaseName",
+        effectiveFields: ["name", "nameKey"],
+        effectiveFieldsAlias: { name: "疾病名称", nameKey: "拼音关键字" },
         data: dataList,
-        clearable: true,
+        clearable: false,
         autoSelect: false,
         autoDropup: true,
         ignorecase: true,
         showBtn: false,
         showHeader: true
-    }).on('onDataRequestSuccess', function (e, result) {
-        console.log('从 json.data 参数中获取，不会触发 onDataRequestSuccess 事件', result);
-    }).on('onSetSelectValue', function (e, keyword, data) {
-        $("section  h1").empty().text("疾病数据管理");
-        var  test = $("section  h1").text() + "——" + data.疾病名称;
-        $("section  h1").text(test);
+    }).on('onDataRequestSuccess', function(e, result) {
+
+    }).on('onSetSelectValue', function(e, keyword, data) {
+        currentDisease = data.nameKey;
         getDiseaseKnowledge();
-    }).on('onUnsetSelectValue', function () {
-        console.log("onUnsetSelectValue");
+        setDiseaseSummary(data);
+    }).on('onUnsetSelectValue', function(a, b, c) {
+        console.log("onUnsetSelectValue", a);
     });
 }
 
+var table;
+
+function initTable() {
+    table = $.createTable("#dataGrid", {
+        idField: "nameKey",
+        columns: [
+            [
+                { radio: true },
+                { title: "疾病关键字", field: "nameKey" },
+                { title: "疾病名称", field: "name" },
+            ]
+        ],
+        url: "/health/knowledge/pagelist/disease",
+        clickToSelect: true,
+        pagination: true,
+        pageSize: 20,
+        onClickRow: function(row) {
+            currentDisease = row.nameKey;
+            getDiseaseKnowledge();
+            setDiseaseSummary(row);
+        }
+    });
+}
+
+var currentDisease;
+
+function setDiseaseSummary(data) {
+    var html = '<dl><dd><i>疾病名称：</i>' + data.name + '</dd><dd><i>疾病关键字：</i>' + data.nameKey + '</dd></dl>';
+    $("#diseaseSummary").html(html);
+}
+
 function getDiseaseKnowledge() {
-    var disease = $("#diseaseInput").val();
-    $.postAjax("/health/knowledge/list/knowledge", { diseaseKey: disease }, initKnowledgeTree);
+    if (currentDisease) {
+        $.postAjax("/health/knowledge/list/knowledge", { diseaseKey: currentDisease }, initKnowledgeTree);
+    }
 }
 
 var g = function(nodeItems, data) {
@@ -84,10 +109,12 @@ function initKnowledgeTree(data) {
     });
 
     var treedata = g(roots, data);
-    knowledgeTree.treeview({ data: treedata });
+    knowledgeTree.treeview({ data: treedata, levels: 1 });
     knowledgeTree.on('nodeSelected', function(event, node) {
         getKnowledge(node.data, true);
     });
+
+    initCategoryDetailContent(treedata);
 }
 
 function getKnowledge(knowledge) {
@@ -108,8 +135,46 @@ function getKnowledge(knowledge) {
 function initKnowledgeContent(content) {
     knowledgeContentMap[selectedKnowledgeId] = content;
     var html = "";
-    content.forEach(function(a){
+    content.forEach(function(a) {
         html += '<p style="text-indent:2em;">' + a.content + "</p>";
     });
     $("#contents").html(html);
+}
+
+
+var gg = function(knowledge, data) {
+
+    var html = knowledge.data.parentId ? '<p style="text-indent:2em;"><b>' + knowledge.text + "</b></p>" : "";
+
+    var contents = $.grep(data, function(row, index) {
+        return knowledge.data.id == row.knowledgeId;
+    });
+
+    if (contents) {
+        for (var i = 0; i < contents.length; i++) {
+            html += '<p style="text-indent:2em;">' + contents[i].content + "</p>";
+        }
+    }
+
+    if (knowledge.nodes) {
+        for (var i = 0; i < knowledge.nodes.length; i++) {
+            html += gg(knowledge.nodes[i], data);
+        }
+    }
+
+    return html;
+}
+
+function initCategoryDetailContent(treedata) {
+    if (!currentDisease) {
+        return;
+    }
+
+    $.postAjax("/health/knowledge/disease/content", { diseaseKey: currentDisease }, function(data) {
+        treedata.forEach(function(n) {
+            var id = n.data.categoryKey;
+            var html = gg(n, data)
+            $("#" + id).html(html);
+        });
+    });
 }

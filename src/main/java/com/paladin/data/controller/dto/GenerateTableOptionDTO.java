@@ -23,6 +23,8 @@ public class GenerateTableOptionDTO {
 	
 	private List<GenerateColumnOptionDTO> columnOptions;
 	
+	
+	
 	public String getDbName() {
 		return dbName;
 	}

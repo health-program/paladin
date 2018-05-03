@@ -18,7 +18,15 @@ public class ReaderContainer implements SpringContainer{
 	@Override
 	public boolean initialize() {
 		//diseaseSummaryReader.readDiseaseSummary();
-		//diseaseKnowledgeReader.readDiseaseKnowledge();
+		
+		
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				//diseaseKnowledgeReader.readDiseaseKnowledgeSingle(0);
+			}		
+		}).start();
+		
 		return true;
 	}
 

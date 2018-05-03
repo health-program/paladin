@@ -7,6 +7,7 @@ public enum GenerateType {
 	MODEL("model", ".java"), 
 	CONTROLLER("controller", "Controller.java"), 
 	SQLMAPPER("mapper", "_mapper.xml"), 
+	JAVASCRIPT("static/js", ".js"),
 	PAGE_INDEX("templates", "_index.html"), 
 	PAGE_VIEW("templates", "_view.html"), 
 	PAGE_EDIT("templates", "_edit.html");

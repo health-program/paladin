@@ -7,14 +7,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Tag;
 import org.jsoup.select.Elements;
-
-import com.paladin.framework.utils.StringUtil;
 
 public class KnowledgePageParser extends PageParser {
 
@@ -69,16 +66,20 @@ public class KnowledgePageParser extends PageParser {
 
 		startMap.add("(");
 		startMap.add("（");
+		startMap.add("【");
 
 		endMap.add(")");
 		endMap.add("）");
 		endMap.add(",");
+		endMap.add("，");
 		endMap.add(".");
 		endMap.add("、");
 		endMap.add("】");
+		endMap.add("。");
+		endMap.add("．");
 	}
 
-	public Knowledge parse(String disease, String category) throws IOException {
+	public List<List<ArticleElement>> parse(String disease, String category) throws IOException {
 
 		Document doc = getDocument("http://jbk.39.net/" + disease + "/" + category);
 
@@ -98,84 +99,7 @@ public class KnowledgePageParser extends PageParser {
 			articleElements.add(myElements);
 		}
 
-		Knowledge data = new Knowledge();
-		data.articleElements = articleElements;
-
-		return data;
-	}
-
-	public List<DietElement> parse(String disease) throws IOException {
-
-		Document doc = getDocument("http://jbk.39.net/" + disease + "/ysbj/");
-
-		Elements yinshiElements = doc.getElementsByClass("yinshi_table");
-		if (yinshiElements == null || yinshiElements.size() == 0) {
-			System.out.println("找不到疾病[" + disease + "]的饮食数据");
-			return new ArrayList<>();
-		}
-
-		List<DietElement> dietElements = parseDietElement(yinshiElements);
-		return dietElements;
-	}
-
-	private List<DietElement> parseDietElement(Elements yinshiElements) {
-
-		List<DietElement> dietElements = new ArrayList<>();
-		for (Element element : yinshiElements) {
-
-			DietElement suitable = new DietElement(true);
-			DietElement taboo = new DietElement(false);
-
-			Elements children = element.children();
-			if (children == null || children.size() == 0) {
-				continue;
-			}
-
-			boolean suit = false;
-
-			for (Element child : children) {
-				String tagName = child.tag().getName();
-				if ("div".equals(tagName)) {
-					suit = child.text().startsWith("饮食适宜");
-					if (suit) {
-						suitable.setContent(child.text());
-					} else {
-						taboo.setContent(child.text());
-					}
-				} else if ("table".equals(tagName)) {
-
-					List<DietUnit> units = parseDietUnit(child);
-					if (suit) {
-						suitable.dietUnits = units;
-					} else {
-						taboo.dietUnits = units;
-					}
-				}
-			}
-
-			dietElements.add(suitable);
-			dietElements.add(taboo);
-		}
-
-		return dietElements;
-	}
-
-	private List<DietUnit> parseDietUnit(Element table) {
-
-		Elements trElements = table.child(0).children();
-		List<DietUnit> units = new ArrayList<>();
-
-		for (int i = 1; i < trElements.size(); i++) {
-			Element tr = trElements.get(i);
-			DietUnit unit = new DietUnit();
-			unit.setFood(tr.child(0).text());
-			unit.setReason(tr.child(1).text());
-			unit.setSuggestion(tr.child(2).text());
-
-			units.add(unit);
-		}
-
-		return units;
+		return articleElements;
 	}
 
 	private List<ArticleElement> parseArticleElement(Elements elements) {
@@ -188,27 +112,12 @@ public class KnowledgePageParser extends PageParser {
 			Tag tag = element.tag();
 
 			if ("p".equals(tag.getName())) {
-
-				/*
-				 * if (element.html().startsWith("<span")) { Element child = element.child(0);
-				 * if (child != null) {
-				 * 
-				 * String style = child.attr("style"); if ("span".equals(child.tag().getName())
-				 * && style != null && style.contains("bold")) { String text = child.text();
-				 * ArticleTitle title = getTitle(text); if (title != null) { myElements.add(new
-				 * ArticleElement(ElementType.TYPE_TITLE, title.index, title.title)); } else {
-				 * myElements.add(new ArticleElement(ElementType.TYPE_TITLE, null, text)); }
-				 * myElements.add(new ArticleElement(ElementType.TYPE_CONTENT, element.text()));
-				 * continue; } } }
-				 */
-
 				String text = element.text();
 				if (text == null || text.length() == 0) {
 					continue;
 				}
-				
-				text = StringUtil.strongTrim(text);
-				
+
+				text = repairHtmlText(text);
 				String style = element.attr("style");
 
 				if (style != null && style.contains("bold")) {
@@ -232,6 +141,7 @@ public class KnowledgePageParser extends PageParser {
 				if ("links".equals(clazz)) {
 					Element dt = element.child(0);
 					String content = dt == null ? element.text() : dt.text();
+					content = repairHtmlText(content);
 					myElements.add(new ArticleElement(ElementType.TYPE_CATEGORY, content));
 				} else if ("intro".equals(clazz)) {
 					break;
@@ -352,9 +262,6 @@ public class KnowledgePageParser extends PageParser {
 		TYPE_TITLE, TYPE_CATEGORY, TYPE_CONTENT;
 	}
 
-	
-	static Pattern pattern = Pattern.compile("(&nbsp;)|(&amp;)|(&quot;)|(&lt;)|(&gt;)|(&#039;)");
-
 	public static class ArticleElement {
 		ElementType type;
 		String content;
@@ -377,18 +284,24 @@ public class KnowledgePageParser extends PageParser {
 
 		private void repair() {
 
-			content = StringUtil.strongTrim(content);
-			content.replaceAll("&ldquo;", "“");
-			content.replaceAll("&rdquo;", "”");
+			if (title != null) {
+				if (content.startsWith(".") || content.startsWith("．")) {
+					content = content.substring(1);
+				}
+
+				char c = content.charAt(content.length() - 1);
+				if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0x4E00 && c <= 0x9FA5)) {
+
+				} else {
+					content = content.substring(0, content.length() - 1);
+				}
+
+				title.title = content;
+			}
 
 			if (type == ElementType.TYPE_TITLE && (content.endsWith("：") || content.endsWith(":"))) {
 				content = content.substring(0, content.length() - 1);
 			}
-
-			if (pattern.matcher(content).find()) {
-				System.out.println("发现转义字符：" + content);
-			}
-
 		}
 
 		public ElementType getType() {
@@ -414,7 +327,7 @@ public class KnowledgePageParser extends PageParser {
 
 		ArticleTitle(Integer index, String title, String style, int titleLevel) {
 			this.index = index;
-			this.title = StringUtil.strongTrim(title);
+			this.title = title;
 			this.style = style;
 			this.titleLevel = titleLevel;
 		}
@@ -435,86 +348,6 @@ public class KnowledgePageParser extends PageParser {
 			return titleLevel;
 		}
 
-	}
-
-	public static class DietUnit {
-
-		String food;
-		String reason;
-		String suggestion;
-
-		public String getFood() {
-			return food;
-		}
-
-		public void setFood(String food) {
-			this.food = StringUtil.strongTrim(food);
-		}
-
-		public String getReason() {
-			return reason;
-		}
-
-		public void setReason(String reason) {
-			this.reason = StringUtil.strongTrim(reason);
-		}
-
-		public String getSuggestion() {
-			return suggestion;
-		}
-
-		public void setSuggestion(String suggestion) {
-			this.suggestion = StringUtil.strongTrim(suggestion);
-		}
-
-	}
-
-	public static class DietElement {
-
-		boolean suitable;
-		String content;
-		List<DietUnit> dietUnits;
-
-		public DietElement(boolean suitable) {
-			this.suitable = suitable;
-		}
-
-		public boolean isTaboo() {
-			return !suitable;
-		}
-
-		public boolean isSuitable() {
-			return suitable;
-		}
-
-		public String getContent() {
-			return content;
-		}
-
-		public void setContent(String content) {
-			this.content = StringUtil.strongTrim(content);
-		}
-
-		public List<DietUnit> getDietUnits() {
-			return dietUnits;
-		}
-
-		public void setDietUnits(List<DietUnit> dietUnits) {
-			this.dietUnits = dietUnits;
-		}
-	}
-
-	public static class Knowledge {
-
-		List<List<ArticleElement>> articleElements;
-
-		public List<List<ArticleElement>> getArticleElements() {
-			return articleElements;
-		}
-
-		public void setArticleElements(List<List<ArticleElement>> articleElements) {
-			this.articleElements = articleElements;
-		}
 	}
 
 }

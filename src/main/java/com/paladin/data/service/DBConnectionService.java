@@ -24,6 +24,7 @@ import com.paladin.data.generate.GenerateType;
 import com.paladin.data.generate.GenerateUtil;
 import com.paladin.data.generate.GenerateControllerClassUtil;
 import com.paladin.data.generate.GenerateMapperClassUtil;
+import com.paladin.data.generate.GenerateMapperXMLClassUtil;
 import com.paladin.data.generate.GenerateModelClassUtil;
 import com.paladin.data.generate.GenerateServiceClassUtil;
 import com.paladin.data.model.DBConnection;
@@ -152,7 +153,11 @@ public class DBConnectionService extends ServiceSupport<DBConnection> {
 			return GenerateServiceClassUtil.createClassContent(tableOption);
 		} else if (generateType == GenerateType.CONTROLLER) {
 			return GenerateControllerClassUtil.createClassContent(tableOption);
-		}
+		} else if (generateType == GenerateType.SQLMAPPER) {
+			return GenerateMapperXMLClassUtil.createXMLContent(tableOption);
+		} else if (generateType == GenerateType.PAGE_INDEX) {
+			return GenerateMapperXMLClassUtil.createXMLContent(tableOption);
+		} 
 
 		return null;
 	}
