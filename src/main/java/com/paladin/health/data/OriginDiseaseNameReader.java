@@ -23,6 +23,7 @@ public class OriginDiseaseNameReader {
 
 	public void readDiseaseName() {
 
+		// 查看 http://jbk.39.net/bw 末页页码，例如http://jbk.39.net/bw_p1519#ps 为末页。
 		int pageCount = 1519;
 
 		int i = 0;

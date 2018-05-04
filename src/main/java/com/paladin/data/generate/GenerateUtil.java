@@ -37,7 +37,7 @@ public class GenerateUtil {
 
 	public static String getRequestPath(GenerateTableOption tableOption) {
 
-		String path = null;
+		String path = "";
 
 		String model = tableOption.getModel();
 		String subModel = tableOption.getSubModel();
@@ -55,7 +55,7 @@ public class GenerateUtil {
 			}
 		}
 
-		return path == null ? "/" : path;
+		return path.length() == 0 ? "/" : path;
 	}
 
 	/**

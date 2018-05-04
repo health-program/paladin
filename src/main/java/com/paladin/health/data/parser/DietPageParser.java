@@ -8,8 +8,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.paladin.framework.utils.StringUtil;
-
 public class DietPageParser extends PageParser {
 
 	public List<DietElement> parse(String disease) throws IOException {
@@ -45,9 +43,10 @@ public class DietPageParser extends PageParser {
 
 				String tagName = child.tag().getName();
 				String text = child.text();
+				text = repairHtmlText(text);
 
 				if ("div".equals(tagName)) {
-					suit = child.text().startsWith("饮食适宜");
+					suit = text.startsWith("饮食适宜");
 					if (suit) {
 						suitable.setContent(text);
 					} else {
@@ -80,9 +79,9 @@ public class DietPageParser extends PageParser {
 			Element tr = trElements.get(i);
 			DietUnit unit = new DietUnit();
 
-			unit.setFood(tr.child(0).text());
-			unit.setReason(tr.child(1).text());
-			unit.setSuggestion(tr.child(2).text());
+			unit.setFood(repairHtmlText(tr.child(0).text()));
+			unit.setReason(repairHtmlText(tr.child(1).text()));
+			unit.setSuggestion(repairHtmlText(tr.child(2).text()));
 			units.add(unit);
 		}
 
@@ -100,7 +99,7 @@ public class DietPageParser extends PageParser {
 		}
 
 		public void setFood(String food) {
-			this.food = StringUtil.strongTrim(food);
+			this.food = food;
 		}
 
 		public String getReason() {
@@ -108,7 +107,7 @@ public class DietPageParser extends PageParser {
 		}
 
 		public void setReason(String reason) {
-			this.reason = StringUtil.strongTrim(reason);
+			this.reason = reason;
 		}
 
 		public String getSuggestion() {
@@ -116,7 +115,7 @@ public class DietPageParser extends PageParser {
 		}
 
 		public void setSuggestion(String suggestion) {
-			this.suggestion = StringUtil.strongTrim(suggestion);
+			this.suggestion = suggestion;
 		}
 
 	}
@@ -125,7 +124,7 @@ public class DietPageParser extends PageParser {
 
 		boolean suitable;
 		String content;
-		List<DietUnit> dietUnits;
+		List<DietUnit> dietUnits = new ArrayList<>();
 
 		public DietElement(boolean suitable) {
 			this.suitable = suitable;
@@ -144,7 +143,7 @@ public class DietPageParser extends PageParser {
 		}
 
 		public void setContent(String content) {
-			this.content = StringUtil.strongTrim(content);
+			this.content = content;
 		}
 
 		public List<DietUnit> getDietUnits() {

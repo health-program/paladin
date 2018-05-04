@@ -99,28 +99,23 @@ public class KnowledgePageParser extends PageParser {
 			articleElements.add(myElements);
 		}
 
-		/* 更新时间
-		 * Elements i3 = doc.getElementsByClass("i3");
-		if (i3 != null && i3.size() > 0) {
-			Elements i3spans = i3.get(0).children();
-			if (i3spans != null && i3spans.size() > 0) {
-				String time = i3spans.get(0).text();
-
-				int yearIndex = time.indexOf("年");
-				// int monthIndex = time.indexOf("月");
-				// int dayIndex = time.indexOf("日");
-
-				String year = time.substring(0, yearIndex);
-				// String month = time.substring(yearIndex + 1, monthIndex);
-				// String day = time.substring(monthIndex + 1, dayIndex);
-
-				int y = Integer.valueOf(year);
-				if (y > 2017) {
-					System.out.println("[" + disease + ":" + category + "]更新时间大于2017年");
-				}
-
-			}
-		}*/
+		/*
+		 * 更新时间 Elements i3 = doc.getElementsByClass("i3"); if (i3 != null && i3.size()
+		 * > 0) { Elements i3spans = i3.get(0).children(); if (i3spans != null &&
+		 * i3spans.size() > 0) { String time = i3spans.get(0).text();
+		 * 
+		 * int yearIndex = time.indexOf("年"); // int monthIndex = time.indexOf("月"); //
+		 * int dayIndex = time.indexOf("日");
+		 * 
+		 * String year = time.substring(0, yearIndex); // String month =
+		 * time.substring(yearIndex + 1, monthIndex); // String day =
+		 * time.substring(monthIndex + 1, dayIndex);
+		 * 
+		 * int y = Integer.valueOf(year); if (y > 2017) { System.out.println("[" +
+		 * disease + ":" + category + "]更新时间大于2017年"); }
+		 * 
+		 * } }
+		 */
 
 		return articleElements;
 	}
@@ -320,7 +315,9 @@ public class KnowledgePageParser extends PageParser {
 				if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0x4E00 && c <= 0x9FA5)) {
 
 				} else {
-					content = content.substring(0, content.length() - 1);
+					if (c != ')' && c != '）' && c != '】' && c != ']') {
+						content = content.substring(0, content.length() - 1);
+					}
 				}
 
 				title.title = content;

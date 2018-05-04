@@ -1,5 +1,5 @@
 $(function() {
-    $.getAjax("/health/knowledge/list/disease", initCatalog);
+    $.getAjax("/health/disease/list", initCatalog);
     initTable();
 });
 
@@ -49,7 +49,7 @@ function initTable() {
                 { title: "疾病名称", field: "name" },
             ]
         ],
-        url: "/health/knowledge/pagelist/disease",
+        url: "/health/disease/pagelist",
         clickToSelect: true,
         pagination: true,
         pageSize: 20,
@@ -70,7 +70,7 @@ function setDiseaseSummary(data) {
 
 function getDiseaseKnowledge() {
     if (currentDisease) {
-        $.postAjax("/health/knowledge/list/knowledge", { diseaseKey: currentDisease }, initKnowledgeTree);
+        $.postAjax("/health/knowledge/list/disease", { diseaseKey: currentDisease }, initKnowledgeTree);
     }
 }
 
@@ -129,7 +129,7 @@ function getKnowledge(knowledge) {
         }
     }
 
-    $.postAjax("/health/knowledge/knowledge/content", { knowledgeId: selectedKnowledgeId }, initKnowledgeContent);
+    $.postAjax("/health/knowledge/content", { knowledgeId: selectedKnowledgeId }, initKnowledgeContent);
 }
 
 function initKnowledgeContent(content) {
@@ -170,7 +170,7 @@ function initCategoryDetailContent(treedata) {
         return;
     }
 
-    $.postAjax("/health/knowledge/disease/content", { diseaseKey: currentDisease }, function(data) {
+    $.postAjax("/health/knowledge/content/disease", { diseaseKey: currentDisease }, function(data) {
         treedata.forEach(function(n) {
             var id = n.data.categoryKey;
             var html = gg(n, data)

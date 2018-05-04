@@ -168,8 +168,4 @@ public class OriginDiseaseSummaryReader {
 		}
 	}
 
-	public static void main(String[] args) {
-
-	}
-
 }

@@ -14,18 +14,11 @@ public class ReaderContainer implements SpringContainer{
 	OriginDiseaseSummaryReader diseaseSummaryReader;
 	@Autowired
 	OriginDiseaseKnowledgeReader diseaseKnowledgeReader;
+	@Autowired
+	OriginDiseaseDietReader diseaseDietReader;
 	
 	@Override
 	public boolean initialize() {
-		//diseaseSummaryReader.readDiseaseSummary();
-		
-		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				//diseaseKnowledgeReader.readDiseaseKnowledgeSingle(0);
-			}		
-		}).start();
 		
 		return true;
 	}
