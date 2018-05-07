@@ -88,69 +88,66 @@ public class OriginDiseaseKnowledgeReader {
 			final int e = end - 1;
 			final int ti = ++threadCount;
 
-			if (ti == 8 || ti == 5) {
+			Thread th = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					logger.info("开始读取第" + s + "条到第" + e + "条疾病知识");
 
-				Thread th = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						logger.info("开始读取第" + s + "条到第" + e + "条疾病知识");
+					int d = 1000000;
 
-						int d = 1000000;
+					int kbase = ti * d;
+					int cbase = kbase;
 
-						int kbase = ti * d;
-						int cbase = kbase;
+					int underId = kbase + d;
 
-						int underId = kbase + d;
+					Integer kmax = diseaseKnowledgeMapper.getMaxId(underId);
+					Integer cmax = diseaseKnowledgeMapper.getContentMaxId(underId);
 
-						Integer kmax = diseaseKnowledgeMapper.getMaxId(underId);
-						Integer cmax = diseaseKnowledgeMapper.getContentMaxId(underId);
-
-						if (cmax != null && cmax > cbase) {
-							cbase = cmax;
-						}
-
-						if (kmax != null && kmax > kbase) {
-							kbase = kmax;
-						}
-
-						int[] ids = new int[] { kbase, cbase };
-						boolean isNew = false;
-
-						for (int x = s; x <= e; x++) {
-							OriginDiseaseName name = names.get(x);
-							String disease = name.getNameKey();
-							String diseaseName = name.getName();
-							if (!isNew && diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease))
-									.size() > 0) {
-								continue;
-							} else {
-								isNew = true;
-							}
-
-							for (String[] category : categories) {
-								String categoryKey = category[0];
-								try {
-									List<List<ArticleElement>> know = knowledgePageParser.parse(disease, categoryKey);
-									ArticleItem articleItem = doCategory(categoryKey, diseaseName, know);
-									save(articleItem, disease, categoryKey, null, ids);
-								} catch (Exception e) {
-									logger.error("读取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "][序号:" + x + "]", e);
-									logger.info("删除疾病[" + disease + "]数据");
-									diseaseKnowledgeMapper.deleteDiseaseContent(disease);
-									diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
-									logger.info("退出读取第" + s + "条到第" + e + "条疾病知识");
-									return;
-								}
-							}
-
-						}
-						logger.info("成功读取第" + s + "条到第" + e + "条疾病知识");
-						endThread();
+					if (cmax != null && cmax > cbase) {
+						cbase = cmax;
 					}
-				});
 
-				th.start();
-			}
+					if (kmax != null && kmax > kbase) {
+						kbase = kmax;
+					}
+
+					int[] ids = new int[] { kbase, cbase };
+					boolean isNew = false;
+
+					for (int x = s; x <= e; x++) {
+						OriginDiseaseName name = names.get(x);
+						String disease = name.getNameKey();
+						String diseaseName = name.getName();
+						if (!isNew
+								&& diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease)).size() > 0) {
+							continue;
+						} else {
+							isNew = true;
+						}
+
+						for (String[] category : categories) {
+							String categoryKey = category[0];
+							try {
+								List<List<ArticleElement>> know = knowledgePageParser.parse(disease, categoryKey);
+								ArticleItem articleItem = doCategory(categoryKey, diseaseName, know);
+								save(articleItem, disease, categoryKey, null, ids);
+							} catch (Exception e) {
+								logger.error("读取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "][序号:" + x + "]", e);
+								logger.info("删除疾病[" + disease + "]数据");
+								diseaseKnowledgeMapper.deleteDiseaseContent(disease);
+								diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
+								logger.info("退出读取第" + s + "条到第" + e + "条疾病知识");
+								return;
+							}
+						}
+					}
+					logger.info("成功读取第" + s + "条到第" + e + "条疾病知识");
+					endThread();
+				}
+			});
+
+			th.start();
+
 			i = end;
 		}
 	}

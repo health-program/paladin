@@ -596,6 +596,11 @@ public abstract class ServiceSupport<Model> {
 		updateModelWrap(model);
 		return getSqlMapper().updateByPrimaryKeySelective(model);
 	}
+	
+	public int update(Model model) {
+		updateModelWrap(model);
+		return getSqlMapper().updateByPrimaryKey(model);
+	}
 
 	public int removeByPrimaryKey(Object pk) {
 		if (isUnDelete) {
