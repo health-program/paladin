@@ -42,5 +42,5 @@ public class DiseaseKnowledgeController {
 	public Object diseaseContent(@RequestParam String diseaseKey) {
 		return CommonResponse.getSuccessResponse(diseaseKnowledgeContentService.findDiseaseContent(diseaseKey));
 	}
-
+	
 }

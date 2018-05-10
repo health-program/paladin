@@ -2,11 +2,9 @@ package com.paladin.health.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,7 +91,6 @@ public class OriginDiseaseKnowledgeRepairer {
 	private void endThread() {
 		if (--threadCount == 0) {
 			logger.info("结束修复疾病知识数据");
-			showCount();
 		}
 	}
 
@@ -106,12 +103,14 @@ public class OriginDiseaseKnowledgeRepairer {
 
 		List<DiseaseKnowledge> diseaseKnowledges = assemble(originDiseaseKnowledges, originDiseaseContents);
 
-		repaireKnowledge(diseaseKnowledges, disease);
-
-		persistence(diseaseKnowledges, disease);
+		repaireKnowledge(diseaseKnowledges, diseaseName);
+		persistence(diseaseKnowledges, diseaseName);
 	}
 
-	private void persistence(List<DiseaseKnowledge> knowledges, String disease) {
+	private void persistence(List<DiseaseKnowledge> knowledges, OriginDiseaseName name) {
+
+		// String disease = name.getNameKey();
+		// String diseaseName = name.getName();
 
 		for (DiseaseKnowledge k : knowledges) {
 
@@ -133,14 +132,11 @@ public class OriginDiseaseKnowledgeRepairer {
 				}
 
 				diseaseKnowledgeService.removeByPrimaryKey(k.origin.getId());
-
+				
 				for (DiseaseKnowledgeContent c : k.contents) {
 					c.origin.setKnowledgeId(id);
 					c.changed = true;
 				}
-
-				// logger.info("需要删除重复标题[" + k.origin.getName() + "][" + disease + ":" +
-				// k.origin.getCategoryKey() + "]");
 			} else if (k.changed) {
 				diseaseKnowledgeMapper.updateByPrimaryKey(k.origin);
 			}
@@ -153,11 +149,24 @@ public class OriginDiseaseKnowledgeRepairer {
 				}
 			}
 
-			persistence(k.children, disease);
+			persistence(k.children, name);
 		}
 	}
 
-	private void repaireKnowledge(List<DiseaseKnowledge> knowledges, String disease) {
+	private void repaireKnowledge(List<DiseaseKnowledge> knowledges, OriginDiseaseName name) {
+
+		String disease = name.getNameKey();
+		String diseaseName = name.getName();
+		String jx = diseaseName.replaceAll("-", "");
+
+		HashSet<String> names = new HashSet<>(3);
+		names.add(diseaseName);
+		names.add(jx);
+
+		if (!diseaseName.endsWith("病")) {
+			names.add(diseaseName + "病");
+			names.add(jx + "病");
+		}
 
 		for (DiseaseKnowledge k : knowledges) {
 
@@ -165,7 +174,6 @@ public class OriginDiseaseKnowledgeRepairer {
 			String title = originTitle;
 
 			if (title == null || title.length() == 0) {
-				//putInfo("空标题", disease);
 				k.deleted = true;
 			} else {
 
@@ -209,7 +217,7 @@ public class OriginDiseaseKnowledgeRepairer {
 
 					title = ((st > 0) || (len < val.length)) ? title.substring(st, len) : title;
 					if (title.length() == 0) {
-						
+
 					} else {
 						for (int m = 0; m < kuohaoCounts.length; m++) {
 							if (kuohaoCounts[m][0] != kuohaoCounts[m][1]) {
@@ -228,7 +236,7 @@ public class OriginDiseaseKnowledgeRepairer {
 									if (last == kuohaoChars[m][1]) {
 										title = title.substring(1, title.length() - 1);
 									} else {
-										
+
 									}
 								}
 							}
@@ -236,36 +244,40 @@ public class OriginDiseaseKnowledgeRepairer {
 					}
 
 					first = title.charAt(0);
-					
-					if(first>='0' && first<='9') {
+
+					if (first >= '0' && first <= '9') {
 						logger.info("数字开头[" + String.valueOf(first) + "][" + disease + ":" + k.origin.getCategoryKey() + "]");
 					}
 
-					if (first == '的') {
-						logger.info("的开头[" + String.valueOf(first) + "][" + disease + ":" + k.origin.getCategoryKey() + "]");
+					if (isSpecial(first)) {
+						// logger.info("其他特殊字符[" + String.valueOf(first) + "][" + disease + ":" +
+						// k.origin.getCategoryKey() + "]");
 					}
 
-					if (isSpecial(first)) {
-						//logger.info("其他特殊字符[" + String.valueOf(first) + "][" + disease + ":" + k.origin.getCategoryKey() + "]");
+					// 删除疾病名称
+					for (String na : names) {
+						if (title.startsWith(na)) {
+							title = title.substring(na.length());
+							break;
+						}
 					}
 
 					if (!originTitle.equals(title)) {
 						k.origin.setName(title);
 						k.changed = true;
 					}
-					
-					if("".equals(title)) {
+
+					if ("".equals(title)) {
 						k.deleted = true;
 					}
 				}
 
 				repaireContent(k, disease);
-				repaireKnowledge(k.children, disease);
+				repaireKnowledge(k.children, name);
 
 				if (k.parent == null) {
 					repairRepeat(k);
 					repairTop(k);
-					count(k);
 				}
 			}
 		}
@@ -281,7 +293,21 @@ public class OriginDiseaseKnowledgeRepairer {
 				String content = orginContent;
 				content = StringUtil.strongTrim(content);
 
-				if (content.length() < 2) {
+				if (content.length() == 0) {
+					dkc.deleted = true;
+					continue;
+				}
+
+				boolean hasCh = false;
+				char[] cs = content.toCharArray();
+				for (char c : cs) {
+					if (isChinese(c)) {
+						hasCh = true;
+						break;
+					}
+				}
+
+				if (!hasCh && i == contents.size() - 1) {
 					dkc.deleted = true;
 					continue;
 				}
@@ -305,7 +331,7 @@ public class OriginDiseaseKnowledgeRepairer {
 						content = content.substring(1);
 						content = StringUtil.strongTrim(content);
 					} else if (isSpecial(first)) {
-						
+
 					}
 				}
 
@@ -313,7 +339,7 @@ public class OriginDiseaseKnowledgeRepairer {
 					if (content.length() < 25) {
 						dkc.deleted = true;
 					} else {
-						
+
 					}
 				}
 
@@ -331,7 +357,7 @@ public class OriginDiseaseKnowledgeRepairer {
 		if (x.children.size() == 1 && x.contents.size() == 0) {
 			DiseaseKnowledge y = x.children.get(0);
 			if (y.origin.getName().equals(x.origin.getName())) {
-				x.deleted = true;
+				y.deleted = true;
 			}
 		}
 
@@ -339,91 +365,30 @@ public class OriginDiseaseKnowledgeRepairer {
 			repairRepeat(ck);
 		}
 	}
-	
-	static String[][] categories = new String[][] { { "yyzl", "治疗" }, { "zztz", "典型症状", "症状" }, { "blby", "发病原因", "病因", "原因","疾病病因" }, { "yfhl", "预防" }, { "jcjb", "临床检查", "检查" },
-		{ "jb", "鉴别", "鉴别诊断" }, { "hl", "护理" }, { "ysbj", "饮食保健", "饮食" }, { "bfbz", "并发症" } };
-	
-	static Map<String, String[]> categoryNameMap = new HashMap<>();
-	
-	static {
-		for (String[] ss : categories) {
-			String[] v = new String[ss.length - 1];
-			System.arraycopy(ss, 1, v, 0, ss.length - 1);
-			categoryNameMap.put(ss[0], v);
-		}
-	}
-			
-	private void repairTop(DiseaseKnowledge k) {
 
-		if(k.children.size() == 1) {
+	private void repairTop(DiseaseKnowledge k) {
+		
+		if (k.children.size() == 1) {
 			DiseaseKnowledge ck = k.children.get(0);
 			OriginDiseaseKnowledge odk = ck.origin;
 			String title = odk.getName();
 			String cate = odk.getCategoryKey();
-			
-			String[] strs = categoryNameMap.get(cate);
-			for(String str : strs) {
-				if(str.equals(title)) {
+
+			String[] strs = OriginDiseaseKnowledgeReader.categoryNameMap.get(cate);
+			for (String str : strs) {
+				if (str.equals(title)) {
 					ck.deleted = true;
 					break;
 				}
 			}
-			
+
 			repairTop(ck);
 		}
 	}
 
-	Map<String, Map<String, AtomicInteger>> countMap = new HashMap<>();
-
-	private void count(DiseaseKnowledge k) {
-		String category = k.origin.getCategoryKey();
-		Map<String, AtomicInteger> map = countMap.get(category);
-		if (map == null) {
-			synchronized (countMap) {
-				map = countMap.get(k.origin.getCategoryKey());
-				if (map == null) {
-					map = new ConcurrentHashMap<>();
-				}
-				countMap.put(category, map);
-			}
-		}
-
-		for (DiseaseKnowledge ck : k.children) {
-			String name = ck.origin.getName();
-			AtomicInteger ai = map.get(name);
-			if (ai == null) {
-				synchronized (map) {
-					ai = map.get(name);
-					if (ai == null) {
-						ai = new AtomicInteger();
-					}
-					map.put(name, ai);
-				}
-			}
-
-			ai.incrementAndGet();
-		}
-	}
-
-	private void showCount() {
-
-		StringBuilder sb = new StringBuilder();
-
-		for (Entry<String, Map<String, AtomicInteger>> entry : countMap.entrySet()) {
-			String key = entry.getKey();
-			Map<String, AtomicInteger> values = entry.getValue();
-			sb.append(key).append(":\r\n");
-			for (Entry<String, AtomicInteger> en : values.entrySet()) {
-				sb.append("\t").append(en.getKey()).append(":").append(en.getValue().get()).append("\r\n");
-			}
-		}
-
-		System.out.println(sb.toString());
-	}
-	
 	static char[][] kuohaoChars = new char[][] { { '(', ')' }, { '（', '）' }, { '[', ']' }, { '【', '】' } };
 
-	static char[] invalidChars = new char[] { ' ', '　', '、', '.', '．', '。', ':', '：', '？', '?' };
+	static char[] invalidChars = new char[] { ' ', '　', '、', '.', '．', '。', ':', '：', '？', '?', '●', '◆', ')', ';', '·', '☆', '⊙', '▲' };
 
 	private boolean isInvalidChar(char ch) {
 		for (char c : invalidChars) {
@@ -434,6 +399,9 @@ public class OriginDiseaseKnowledgeRepairer {
 		return false;
 	}
 
+	private boolean isChinese(char c) {
+		return c >= 0x4E00 && c <= 0x9FA5;
+	}
 
 	private boolean isSpecial(char c) {
 		return !((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= 0x4E00 && c <= 0x9FA5));

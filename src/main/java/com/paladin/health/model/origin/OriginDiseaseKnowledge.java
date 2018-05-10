@@ -1,5 +1,7 @@
 package com.paladin.health.model.origin;
 
+import java.util.Date;
+
 import javax.persistence.Id;
 
 public class OriginDiseaseKnowledge {
@@ -18,6 +20,8 @@ public class OriginDiseaseKnowledge {
 	private String name;
 
 	private Integer parentId;
+	
+	private Date updateTime;
 
 	public Integer getId() {
 		return id;
@@ -57,6 +61,14 @@ public class OriginDiseaseKnowledge {
 
 	public void setCategoryKey(String categoryKey) {
 		this.categoryKey = categoryKey;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 }

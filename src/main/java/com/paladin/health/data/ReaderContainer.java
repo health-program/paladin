@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import com.paladin.framework.spring.SpringContainer;
 
 @Component
-public class ReaderContainer implements SpringContainer{
+public class ReaderContainer implements SpringContainer {
 
 	@Autowired
 	OriginDiseaseNameReader diseaseNameReader;
@@ -16,10 +16,11 @@ public class ReaderContainer implements SpringContainer{
 	OriginDiseaseKnowledgeReader diseaseKnowledgeReader;
 	@Autowired
 	OriginDiseaseDietReader diseaseDietReader;
-	
+	@Autowired
+	OriginDiseaseKnowledgeRepairer diseaseKnowledgeRepairer;
+
 	@Override
 	public boolean initialize() {
-		
 		return true;
 	}
 
