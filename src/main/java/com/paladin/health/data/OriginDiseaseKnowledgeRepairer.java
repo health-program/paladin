@@ -262,6 +262,10 @@ public class OriginDiseaseKnowledgeRepairer {
 						}
 					}
 
+					if(title.startsWith("的")) {
+						title = title.substring(1);
+					}
+
 					if (!originTitle.equals(title)) {
 						k.origin.setName(title);
 						k.changed = true;
@@ -388,7 +392,7 @@ public class OriginDiseaseKnowledgeRepairer {
 
 	static char[][] kuohaoChars = new char[][] { { '(', ')' }, { '（', '）' }, { '[', ']' }, { '【', '】' } };
 
-	static char[] invalidChars = new char[] { ' ', '　', '、', '.', '．', '。', ':', '：', '？', '?', '●', '◆', ')', ';', '·', '☆', '⊙', '▲' };
+	static char[] invalidChars = new char[] { ' ', '　',  '，',',','、', '.', '．', '。', ':', '：', '？', '?', '●', '◆', ')', ';', '·', '☆', '⊙', '▲' };
 
 	private boolean isInvalidChar(char ch) {
 		for (char c : invalidChars) {

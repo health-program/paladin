@@ -4,6 +4,8 @@ import javax.persistence.Id;
 
 public class OriginDiseaseSummary {
 
+	public static final String COLUMN_FIELD_DISEASE_KEY = "diseaseKey";
+
 	@Id
 	private String diseaseKey;
 
