@@ -18,9 +18,13 @@ public class ReaderContainer implements SpringContainer {
 	OriginDiseaseDietReader diseaseDietReader;
 	@Autowired
 	OriginDiseaseKnowledgeRepairer diseaseKnowledgeRepairer;
-
+	@Autowired
+	OriginSymptomKnowledgeReader symptomKnowledgeReader;
+	@Autowired
+	OriginSymptomKnowledgeRepairer symptomKnowledgeRepairer;
+	
 	@Override
-	public boolean initialize() {
+	public boolean initialize() {		
 		return true;
 	}
 

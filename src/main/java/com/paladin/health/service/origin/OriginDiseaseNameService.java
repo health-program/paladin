@@ -26,6 +26,19 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 
 		return names.get(0);
 	}
+	
+	public OriginDiseaseName getSymptomName(String symptomKey) {
+
+		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
+				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM),
+				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, symptomKey) });
+
+		if (names == null || names.size() == 0) {
+			return null;
+		}
+
+		return names.get(0);
+	}
 
 	public List<OriginDiseaseName> findAllDiseaseName() {
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE));
@@ -35,6 +48,10 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE), page);
 	}
 
+	public Page<OriginDiseaseName> findPageSymptomName(OffsetPage page) {
+		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM), page);
+	}
+	
 	public List<OriginDiseaseName> findAllSymptomName() {
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM));
 	}

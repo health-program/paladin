@@ -22,15 +22,16 @@ public class DiseaseNameController {
 	@Autowired
 	OriginDiseaseSummaryService diseaseSummaryService;
 
-	@RequestMapping("/index")
-	public String index() {
-		return "/health/origin/disease_name_index";
-	}
-
 	@RequestMapping("/list")
 	@ResponseBody
 	public Object diseaseList() {
 		return CommonResponse.getSuccessResponse(diseaseNameService.findAllDiseaseName());
+	}
+	
+	@RequestMapping("/symptom/list")
+	@ResponseBody
+	public Object symptomList() {
+		return CommonResponse.getSuccessResponse(diseaseNameService.findAllSymptomName());
 	}
 
 	@RequestMapping("/pagelist")

@@ -31,7 +31,6 @@ function initCatalog(data) {
         currentDisease = data.nameKey;
         getDiseaseKnowledge();
         getDiseaseSummary();
-
         $("#diseaseInput").val(data.name);
     }).on('onUnsetSelectValue', function(a, b, c) {
 
@@ -79,6 +78,25 @@ function getDiseaseSummary() {
         }
         html += "</dl>";
         $("#diseaseBaseKnow").html(html);
+    });
+}
+
+function getDiseaseDiet() {
+    $.postAjax("/health/diet/dietInfo", { diseaseKey: currentDisease }, function(dietList) {
+        var html = "";
+        if (dietList && dietList.length > 0) {
+            dietList.forEach(function(diet) {
+                if (diet.type == 3 || diet.type == 4) {
+                    html += '<thead><tr style="background-color:#94c17c"><th colspan="3">' + diet.summary + '</th></tr>'
+                    html = diet.type == 3 ? html += '<tr class="text-center success"><td  class="col-md-2">' + "宜吃食物" + '</td>' + '<td class="col-md-3>">' + "宜吃理由" + '</td>' + '<td class="col-md-3">' + "食用建议" + '</td></tr></thead>' :
+                        html += '<tr style="text-align: center" class="success"><td>' + "忌吃食物" + '</td>' + '<td>' + "忌吃理由" + '</td>' + '<td>' + "忌吃建议" + '</td></tr></thead>'
+                    return;
+                }
+                html += '<tbody><tr ><td class="text-center" style="vertical-align: middle">' + diet.food + '</td>' + '<td style="vertical-align: middle">' + diet.reason + '</td>' + '<td class="text-center">' + diet.suggestion + '</td></tr></tbody>'
+            });     
+        }
+
+        $("#diet").html(html);
     });
 }
 
@@ -138,24 +156,6 @@ function getKnowledge(knowledge) {
     selectedKnowledgeId = knowledge.id;
 
     // 指向内容 TODO
-
-    // if (knowledgeContentMap) {
-    //     var content = knowledgeContentMap[selectedKnowledgeId];
-    //     if (content) {
-    //         initKnowledgeContent(content);
-    //         return;
-    //     }
-    // }
-
-    //$.postAjax("/health/knowledge/content", { knowledgeId: selectedKnowledgeId }, initKnowledgeContent);
-}
-
-function initKnowledgeContent(content) {
-    // knowledgeContentMap[selectedKnowledgeId] = content;
-    // var html = "";
-    // content.forEach(function(a) {
-    //     html += '<p style="text-indent:2em;">' + a.content + "</p>";
-    // });
 }
 
 var chineseNumber = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九"];
@@ -220,6 +220,11 @@ function initCategoryDetailContent(treedata) {
         treedata.forEach(function(n) {
             var id = n.data.categoryKey;
             var html = gg(n, data, 1);
+            if (id == 'ysbj') {
+                html = '<table id="diet" class="table"></table>' + html;
+                getDiseaseDiet();
+            }
+
             $("#" + id).html(html);
         });
     });
