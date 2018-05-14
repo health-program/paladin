@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+
+<body>
+<section class="content-header">
+    <h1>饮食宜忌<small></small></h1>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-lg-2">
+            <div class="input-group">
+                <input type="text" class="form-control" id="diseaseInput" placeholder="请输入疾病名称或拼音">
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                    </ul>
+                </div>
+            </div>
+            <div id="diseaseSummary">
+            </div>
+        </div>
+
+
+        <div class="col-lg-5">
+            <table id="diet" class="table"></table>
+        </div>
+    </div>
+</section>
+<div th:include="health/footer" />
+<script type="text/javascript" src="/static/js/health/origin/origin_disease_diet.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
+</body>
+
+</html>

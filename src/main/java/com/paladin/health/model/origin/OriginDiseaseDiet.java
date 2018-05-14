@@ -4,6 +4,8 @@ import javax.persistence.Id;
 
 public class OriginDiseaseDiet {
 
+    public static final String COLUMN_FIELD_DISEASE_KEY = "diseaseKey";
+
 	public static final int TYPE_SUITABLE = 1;
 	public static final int TYPE_TABOO = 2;
 	public static final int TYPE_SUITABLE_SUMMARY = 3;
