@@ -1,5 +1,6 @@
 $(function() {
     $.getAjax("/health/disease/list", initCatalog);
+	
 });
 
 var catalog;
@@ -150,19 +151,26 @@ function initKnowledgeTree(data) {
 
     initCategoryDetailContent(treedata);
 }
-
 function getKnowledge(knowledge) {
-
-    selectedKnowledgeId = knowledge.id;
-
-    // 指向内容 TODO
+	// 指向内容 TODO
+	selectedKnowledgeId = knowledge.id;
+	var categoryKey = knowledge.categoryKey;
+	
+	$("." + categoryKey).click();
+	
+	if (knowledge.parentId != null) {
+		var container = $('#' + categoryKey), scrollTo = $('#'
+				+ selectedKnowledgeId);
+		container.scrollTop(scrollTo.offset().top - container.offset().top
+				+ container.scrollTop());
+	}
 }
+
 
 var chineseNumber = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十", "十一", "十二", "十三", "十四", "十五", "十六", "十七", "十八", "十九"];
 var littleNumber = ["①", "②", "③", "④", "⑤", "⑥", "⑦", "⑧", "⑨", "⑩", "⑪", "⑫", "⑬", "⑭", "⑮", "⑯", "⑰", "⑱", "⑲"];
 
-function getArticleTitle(level, index, text) {
-
+function getArticleTitle(level, index, text,id) {
     var fontsize = 14;
     var number = "";
 
@@ -185,12 +193,11 @@ function getArticleTitle(level, index, text) {
         number = littleNumber[index - 1];
     }
 
-    return '<p style="text-indent:2em;font-size:' + fontsize + 'px;font-weight:bold">' + number + text + "</p>";
+    return '<p id='+id+' style="text-indent:2em;font-size:' + fontsize + 'px;font-weight:bold">' + number + text + "</p>";
 }
 
 var gg = function(knowledge, data, index) {
-
-    var html = knowledge.data.parentId ? getArticleTitle(knowledge.level, index, knowledge.text) : "";
+    var html = knowledge.data.parentId ? getArticleTitle(knowledge.level, index, knowledge.text,knowledge.data.id) : "";
 
     var contents = $.grep(data, function(row, index) {
         return knowledge.data.id == row.knowledgeId;

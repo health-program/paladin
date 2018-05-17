@@ -2,7 +2,6 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="health/header" />
 <link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
-
 <body>
     <section class="content">
         <div>
@@ -44,7 +43,7 @@
                             <i class="fa fa-info-circle"></i>
                             <h3 class="box-title">内容</h3>
                         </div>
-                        <div class="box-body">
+                        <div  class="box-body">
                             <div class="col-md-3">
                                 <div id="tree">
                                 </div>
@@ -52,34 +51,34 @@
                             <div class="col-md-9">
                                 <div class="nav-tabs-custom">
                                     <ul class="nav nav-tabs">
-                                        <li class="active"><a href="#zztz" data-toggle="tab" aria-expanded="true">典型症状</a></li>
-                                        <li class=""><a href="#blby" data-toggle="tab" aria-expanded="false">病理病因</a></li>
-                                        <li class=""><a href="#yfhl" data-toggle="tab" aria-expanded="false">预防</a></li>
-                                        <li class=""><a href="#jcjb" data-toggle="tab" aria-expanded="false">检查</a></li>
-                                        <li class=""><a href="#jb" data-toggle="tab" aria-expanded="false">鉴别</a></li>
-                                        <li class=""><a href="#yyzl" data-toggle="tab" aria-expanded="false">治疗</a></li>
-                                        <li class=""><a href="#hl" data-toggle="tab" aria-expanded="false">护理</a></li>
-                                        <li class=""><a href="#ysbj" data-toggle="tab" aria-expanded="false">饮食保健</a></li>
-                                        <li class=""><a href="#bfbz" data-toggle="tab" aria-expanded="false">并发病症</a></li>
+                                        <li class="active"><a href="#zztz" class="zztz" data-toggle="tab" aria-expanded="true">典型症状</a></li>
+                                        <li class=""><a href="#blby" class="blby" data-toggle="tab" aria-expanded="false">病理病因</a></li>
+                                        <li class=""><a href="#yfhl" class="yfhl" data-toggle="tab" aria-expanded="false">预防</a></li>
+                                        <li class=""><a href="#jcjb" class="jcjb" data-toggle="tab" aria-expanded="false">检查</a></li>
+                                        <li class=""><a href="#jb" class="jb" data-toggle="tab" aria-expanded="false">鉴别</a></li>
+                                        <li class=""><a href="#yyzl" class="yyzl" data-toggle="tab" aria-expanded="false">治疗</a></li>
+                                        <li class=""><a href="#hl" class="hl" data-toggle="tab" aria-expanded="false">护理</a></li>
+                                        <li class=""><a href="#ysbj" class="ysbj" data-toggle="tab" aria-expanded="false">饮食保健</a></li>
+                                        <li class=""><a href="#bfbz" class="bfbz" data-toggle="tab" aria-expanded="false">并发病症</a></li>
                                     </ul>
-                                    <div class="tab-content">
-                                        <div class="tab-pane active" id="zztz">
+                                    <div  class="tab-content">
+                                        <div class="tab-pane active" id="zztz" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="blby">
+                                        <div class="tab-pane" id="blby" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="yfhl">
+                                        <div class="tab-pane" id="yfhl" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="jcjb">
+                                        <div class="tab-pane" id="jcjb" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="jb">
+                                        <div class="tab-pane" id="jb" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="yyzl">
+                                        <div class="tab-pane" id="yyzl" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="hl">
+                                        <div class="tab-pane" id="hl" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="ysbj">
+                                        <div class="tab-pane" id="ysbj" style="max-height: 700px;overflow: auto;">
                                         </div>
-                                        <div class="tab-pane" id="bfbz">
+                                        <div class="tab-pane" id="bfbz" style="max-height: 700px;overflow: auto;">
                                         </div>
                                     </div>
                                 </div>
@@ -91,8 +90,9 @@
         </div>
     </section>
     <div th:include="health/footer" />
-    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
     <script type="text/javascript" src="/static/js/health/origin/disease_knowledge_index.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    
     <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
 </body>
 
