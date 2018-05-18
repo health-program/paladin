@@ -6,6 +6,19 @@ public class OriginDiseaseSummary {
 
 	public static final String COLUMN_FIELD_DISEASE_KEY = "diseaseKey";
 
+	public static final String SFSYYB_YES = "医保疾病";
+	public static final String SFSYYB_NO = "非医保疾病";
+	
+	public static final String CRX_YES = "有传染性";
+	public static final String CRX_NO = "无传染性";
+	
+	public static final String SFYC_YES = "会";
+	public static final String SFYC_NO = "不会";
+	
+	public static final String CRBZL_A = "甲类";
+	public static final String CRBZL_B = "乙类";
+	public static final String CRBZL_C = "丙类";
+
 	@Id
 	private String diseaseKey;
 
@@ -20,21 +33,21 @@ public class OriginDiseaseSummary {
 	private String fbbw;
 
 	private String crx;
-	
+
 	private String sfyc;
-	
+
 	private String cbtj;
-	
-	private String crbzl;	
-	
+
+	private String crbzl;
+
 	private String qfq;
-	
-	private String qfqbx;	
+
+	private String qfqbx;
 
 	private String dfrq;
 
 	private String xgzz;
-	
+
 	private String ycfs;
 
 	private String bfjb;

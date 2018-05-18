@@ -106,13 +106,9 @@ public class KnowledgePageParser extends PageParser {
 					if (title != null) {
 						myElements.add(new ArticleElement(title));
 					} else {
-						String clazz = element.attr("class");
-						if ("target".equals(clazz)) {
-							myElements.add(new ArticleElement(text, style, "p"));
-						} else {
-							myElements.add(new ArticleElement(text));
-						}
+						myElements.add(new ArticleElement(text, style, "p"));
 					}
+					
 				} else {
 					myElements.add(new ArticleElement(text));
 				}

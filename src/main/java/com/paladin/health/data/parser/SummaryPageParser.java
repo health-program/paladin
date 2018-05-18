@@ -9,13 +9,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paladin.framework.utils.PinyinUtil;
 import com.paladin.framework.utils.StringUtil;
 
 public class SummaryPageParser extends PageParser {
 
-	private static HashMap<String, Point> pointMap = new HashMap<>();
+	public final static HashMap<String, Point> pointMap = new HashMap<>();
 
 	static {
 
@@ -56,12 +55,12 @@ public class SummaryPageParser extends PageParser {
 		}
 
 	}
-
 	public static void main(String[] args) throws IOException {
 		SummaryPageParser p = new SummaryPageParser();
-
-		System.out.println(new ObjectMapper().writeValueAsString(p.parse("tnb")));
+		String c = p.parse("tnb").getSummary();
+		System.out.println(c);
 	}
+	
 
 	public Summary parse(String disease) throws IOException {
 

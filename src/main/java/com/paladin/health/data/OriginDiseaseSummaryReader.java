@@ -1,7 +1,6 @@
 package com.paladin.health.data;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -94,18 +93,17 @@ public class OriginDiseaseSummaryReader {
 						try {
 							summary = summaryPageParser.parse(key);
 						} catch (IOException e1) {
-							logger.error("无法读取页面数据[disease_key:" + key + "]");
-							e1.printStackTrace();
+							logger.error("无法读取页面数据[disease_key:" + key + "]", e1);
 						} catch (Exception e) {
-							e.printStackTrace();
+							logger.error("无法解析页面数据[disease_key:" + key + "]", e);
 						}
 
 						OriginDiseaseSummary diseaseSummary = new OriginDiseaseSummary();
 
-						if(summary == null) {
+						if (summary == null) {
 							continue;
 						}
-						
+
 						diseaseSummary.setDiseaseKey(key);
 						diseaseSummary.setDiseaseName(name.getName());
 						diseaseSummary.setSummary(summary.getSummary());
@@ -142,12 +140,16 @@ public class OriginDiseaseSummaryReader {
 
 							try {
 								setMethod.invoke(diseaseSummary, content);
-							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e1) {
-								logger.error("无法插入值" + point.getName() + ":" + content);
-								e1.printStackTrace();
+							} catch (Exception e1) {
+								logger.error("无法插入值" + point.getName() + ":" + content, e1);
 							}
 						}
-						diseaseSummaryMapper.insert(diseaseSummary);
+
+						try {
+							diseaseSummaryMapper.insert(diseaseSummary);
+						} catch (Exception e) {
+							logger.error("插入疾病简介[" + key + "]数据错误", e);
+						}
 					}
 
 					logger.info("成功读取第" + s + "条到第" + e + "条疾病简介");

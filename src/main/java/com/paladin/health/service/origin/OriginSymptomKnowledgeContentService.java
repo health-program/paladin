@@ -12,12 +12,21 @@ import com.paladin.framework.core.ServiceSupport;
 @Service
 public class OriginSymptomKnowledgeContentService extends ServiceSupport<OriginSymptomKnowledgeContent>{
 	
+	
+	
 	public List<OriginSymptomKnowledgeContent> findKnowledgeContent(String knowledgeId) {
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_KNOWLEDGE_ID, QueryType.EQUAL, knowledgeId));
 	}
 
 	public List<OriginSymptomKnowledgeContent> findSymptomContent(String symptomKey) {
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_SYMPTOM_KEY, QueryType.EQUAL, symptomKey));
+	}
+
+	public String findRelatedDisease(String[] symptomKeys) {
+		
+		
+		
+		return null;
 	}
 	
 }

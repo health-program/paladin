@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +64,7 @@ public class OriginDiseaseKnowledgeReader {
 
 	volatile int threadCount;
 
-	public void readDiseaseKnowledge() {
+	public void readDiseaseKnowledge(Map<String, Set<String>> ignoreMap) {
 
 		logger.info("开始读取疾病知识数据");
 
@@ -96,7 +98,7 @@ public class OriginDiseaseKnowledgeReader {
 				public void run() {
 					logger.info("开始读取第" + s + "条到第" + e + "条疾病知识");
 					List<OriginDiseaseName> subnames = names.subList(s, e);
-					readDiseaseKnowledge(ti, subnames);
+					readDiseaseKnowledge(ti, subnames, ignoreMap);
 					logger.info("成功读取第" + s + "条到第" + e + "条疾病知识");
 					endThread();
 				}
@@ -169,7 +171,7 @@ public class OriginDiseaseKnowledgeReader {
 				}
 
 				try {
-					ArticleItem articleItem = doCategory(categoryKey, know == null ? new ArrayList<>() : know.getArticles());
+					ArticleItem articleItem = doCategory(disease, categoryKey, know == null ? new ArrayList<>() : know.getArticles());
 					saveDiseaseKnowledge(articleItem, disease, categoryKey, know == null ? null : know.getUpdateTime(), null, ids);
 				} catch (Exception e) {
 					logger.error("读取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e);
@@ -232,7 +234,7 @@ public class OriginDiseaseKnowledgeReader {
 			}
 
 			try {
-				ArticleItem articleItem = doCategory(categoryKey, know == null ? new ArrayList<>() : know.getArticles(), true);
+				ArticleItem articleItem = doCategory(disease, categoryKey, know == null ? new ArrayList<>() : know.getArticles(), true);
 				saveDiseaseKnowledge(articleItem, disease, categoryKey, know == null ? null : know.getUpdateTime(), null, ids);
 			} catch (Exception e) {
 				logger.error("读取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e);
@@ -246,7 +248,7 @@ public class OriginDiseaseKnowledgeReader {
 		}
 
 	}
-	
+
 	public void readModifiedDiseaseKnowledge(int base, List<String[]> params) {
 
 		int baseEffect = 1000000;
@@ -277,15 +279,15 @@ public class OriginDiseaseKnowledgeReader {
 
 			OriginDiseaseName name = diseaseNameService.getDiseaseName(disease);
 			String diseaseName = name.getName();
-			
-			if(diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition[] {
-					new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease),
-					new GeneralCriteriaBuilder.Condition("categoryKey", QueryType.EQUAL, categoryKey)
-			}).size() > 0 ) {				
+
+			if (diseaseKnowledgeService
+					.searchAll(new GeneralCriteriaBuilder.Condition[] { new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease),
+							new GeneralCriteriaBuilder.Condition("categoryKey", QueryType.EQUAL, categoryKey) })
+					.size() > 0) {
 				logger.info("已经存在数据[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]");
 				continue;
 			}
-						
+
 			Knowledge know = null;
 			try {
 				try {
@@ -307,7 +309,7 @@ public class OriginDiseaseKnowledgeReader {
 			}
 
 			try {
-				ArticleItem articleItem = doCategory(categoryKey, know == null ? new ArrayList<>() : know.getArticles(), true);
+				ArticleItem articleItem = doCategory(disease, categoryKey, know == null ? new ArrayList<>() : know.getArticles(), true);
 				saveDiseaseKnowledge(articleItem, disease, categoryKey, know == null ? null : know.getUpdateTime(), null, ids);
 			} catch (Exception e) {
 				logger.error("读取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e);
@@ -400,7 +402,7 @@ public class OriginDiseaseKnowledgeReader {
 		return diseases;
 	}
 
-	public void readDiseaseKnowledge(int base, List<OriginDiseaseName> names) {
+	public void readDiseaseKnowledge(int base, List<OriginDiseaseName> names, Map<String, Set<String>> ignoreMap) {
 
 		int baseEffect = 1000000;
 		int kbase = base * baseEffect;
@@ -419,21 +421,23 @@ public class OriginDiseaseKnowledgeReader {
 		}
 
 		int[] ids = new int[] { kbase, cbase };
-		boolean isNew = false;
+		List<String[]> errors = new ArrayList<>();
 
 		for (int x = 0; x < names.size(); x++) {
 			OriginDiseaseName name = names.get(x);
 			String disease = name.getNameKey();
 			String diseaseName = name.getName();
 
-			if (!isNew && diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease)).size() > 0) {
-				continue;
-			} else {
-				isNew = true;
-			}
-
 			for (String[] category : categories) {
 				String categoryKey = category[0];
+
+				if (ignoreMap != null) {
+					Set<String> cates = ignoreMap.get(disease);
+					if (cates != null && cates.contains(categoryKey)) {
+						logger.info("忽略爬取数据[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]");
+						continue;
+					}
+				}
 
 				Knowledge know = null;
 				try {
@@ -445,34 +449,31 @@ public class OriginDiseaseKnowledgeReader {
 							know = knowledgePageParser.parse(disease, categoryKey);
 						} catch (IOException e1) {
 							logger.error("从网络获取数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]，放弃尝试", e);
-							diseaseKnowledgeMapper.deleteDiseaseContent(disease);
-							diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
-							logger.info("删除疾病[" + disease + "]数据");
-							break;
+							errors.add(new String[] { disease, diseaseName });
+							continue;
 						}
 					}
 				} catch (Exception e2) {
 					logger.error("解析第" + x + "条数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e2);
-					diseaseKnowledgeMapper.deleteDiseaseContent(disease);
-					diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
-					logger.info("删除疾病[" + disease + "]数据");
-					break;
+					errors.add(new String[] { disease, diseaseName });
+					continue;
 				}
 
 				try {
-					ArticleItem articleItem = doCategory(categoryKey, know == null ? new ArrayList<>() : know.getArticles());
+					ArticleItem articleItem = doCategory(disease, categoryKey, know == null ? new ArrayList<>() : know.getArticles(), true);
 					saveDiseaseKnowledge(articleItem, disease, categoryKey, know == null ? null : know.getUpdateTime(), null, ids);
 				} catch (Exception e) {
 					logger.error("读取第" + x + "条数据异常[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]", e);
-					diseaseKnowledgeMapper.deleteDiseaseContent(disease);
-					diseaseKnowledgeMapper.deleteDiseaseKnowledge(disease);
-					logger.info("删除疾病[" + disease + "]数据");
-					break;
+					errors.add(new String[] { disease, diseaseName });
+					continue;
 				}
 			}
 		}
-	}
 
+		for (String[] error : errors) {
+			logger.info(error[0] + "/" + error[1]);
+		}
+	}
 
 	public void saveDiseaseKnowledge(ArticleItem articleItem, String diseaseKey, String categoryKey, Date updateTime, Integer parentId, int[] ids) {
 		OriginDiseaseKnowledge k = new OriginDiseaseKnowledge();
@@ -508,11 +509,11 @@ public class OriginDiseaseKnowledgeReader {
 		}
 	}
 
-	public ArticleItem doCategory(String category, List<List<ArticleElement>> knowledge) {
-		return doCategory(category, knowledge, false);
+	public ArticleItem doCategory(String disease, String category, List<List<ArticleElement>> knowledge) {
+		return doCategory(disease, category, knowledge, false);
 	}
 
-	public ArticleItem doCategory(String category, List<List<ArticleElement>> knowledge, boolean ignoreError) {
+	public ArticleItem doCategory(String disease, String category, List<List<ArticleElement>> knowledge, boolean ignoreError) {
 		ArticleItem item = new ArticleItem();
 		item.title = categoryNameMap.get(category)[0];
 
@@ -525,7 +526,7 @@ public class OriginDiseaseKnowledgeReader {
 				Cursor cursor = new Cursor();
 				cursor.setList(list);
 
-				doContent(cursor, item, item, ignoreError);
+				doContent(disease, category, cursor, item, item, ignoreError);
 
 				if (cursor.hasNext()) {
 					throw new RuntimeException("处理章节错误，无法完整解析");
@@ -534,11 +535,12 @@ public class OriginDiseaseKnowledgeReader {
 		}
 
 		repair(item);
-
 		return item;
 	}
 
-	private void doContent(Cursor cursor, ArticleItem item, ArticleItem main, boolean ignoreError) {
+	private void doContent(String disease, String category, Cursor cursor, ArticleItem item, ArticleItem main, boolean ignoreError) {
+
+		Set<String> maybe = new HashSet<>();
 
 		while (cursor.hasNext()) {
 			ArticleElement element = cursor.next();
@@ -547,10 +549,10 @@ public class OriginDiseaseKnowledgeReader {
 			if (type == ElementType.TYPE_CONTENT) {
 				item.contents.add(element.getContent());
 			} else if (type == ElementType.TYPE_TITLE) {
-
+				
 				ArticleTitle title = element.getTitle();
 				int index = title.getIndex();
-
+				
 				if (ignoreError && item.isCategory && item.islink) {
 					title.setIndex(1);
 				} else {
@@ -574,89 +576,54 @@ public class OriginDiseaseKnowledgeReader {
 				item.articleTitle = title;
 				item.currentIndex++;
 
-				doContent(cursor, child, main, ignoreError);
-
+				doContent(disease, category, cursor, child, main, ignoreError);
 			} else {
 
 				if (element.isLink()) {
-
 					if (item.level > 1) {
 						cursor.back();
 						break;
 					}
-
 				} else {
-					if (item.islink) {
 
-						if (item.children.size() == 0) {
+					ArticleItem p = item;
+					boolean isChild = false;
 
-						} else {
-							item.contents.add(element.getContent());
-							continue;
+					if (p.children.size() > 0) {
+						ArticleItem c = p.getChildren().get(0);
+						if (c.isCategory && !c.islink && c.fontSize == element.getFontSize()) {
+							isChild = true;
 						}
+					}
 
+					boolean hasParent = false;
+					boolean hasTitleParent = false;
+
+					if (!isChild) {
+						while (p != null) {
+							if (p.isCategory && !p.islink && p.fontSize == element.getFontSize()) {
+								hasParent = true;
+								break;
+							}
+							p = p.parent;
+						}
 					} else {
-						boolean iscontent = false;
-
-						if (item.level == 1) {
-
-							if (item.children.size() > 0) {
-								ArticleItem c = item.children.get(0);
-								if (!c.isCategory || c.islink || c.fontSize != element.getFontSize()) {
-									iscontent = true;
-								}
+						while (p != null) {
+							if (!p.isCategory) {
+								hasTitleParent = true;
+								break;
 							}
-
-						} else if (item.level == 2) {
-
-							if (item.isCategory && item.islink) {
-								if (item.children.size() > 0) {
-									ArticleItem c = item.children.get(0);
-									if (!c.isCategory || c.islink || c.fontSize != element.getFontSize()) {
-										iscontent = true;
-									}
-								}
-							} else {
-								iscontent = true;
-							}
-
-						} else {
-
-							ArticleItem l2 = null;
-							ArticleItem l3 = null;
-							ArticleItem p = item;
-
-							while (p != null) {
-								if (p.level == 3) {
-									l3 = p;
-								}
-								if (p.level == 2) {
-									l2 = p;
-								}
-								p = p.parent;
-							}
-
-							if (l2.isCategory) {
-								if (l2.islink) {
-									if (l3 != null && l3.isCategory && l3.fontSize == element.getFontSize()) {
-										cursor.back();
-										break;
-									}
-								} else {
-									if (l2.fontSize == element.getFontSize()) {
-										cursor.back();
-										break;
-									}
-								}
-							}
-
-							iscontent = true;
+							p = p.parent;
 						}
+					}
 
-						if (iscontent) {
-							item.contents.add(element.getContent());
-							continue;
-						}
+					if (hasParent) {
+						cursor.back();
+						break;
+					}
+
+					if (hasTitleParent || item.level > 3) {
+						maybe.add(disease + ":" + category);
 					}
 				}
 
@@ -677,8 +644,12 @@ public class OriginDiseaseKnowledgeReader {
 					item.currentIndex++;
 				}
 
-				doContent(cursor, child, main, ignoreError);
+				doContent(disease, category, cursor, child, main, ignoreError);
 			}
+		}
+
+		for (String str : maybe) {
+			logger.info("可能存在数据解析问题[" + str + "]");
 		}
 	}
 
@@ -824,9 +795,10 @@ public class OriginDiseaseKnowledgeReader {
 
 	public static void main(String[] args) throws IOException {
 		OriginDiseaseKnowledgeReader r = new OriginDiseaseKnowledgeReader();
-		Knowledge k = knowledgePageParser.parse("http://localhost:8080/error/bljb-jcjb.html", "bljb", "jcjb");
-		System.out.println(new ObjectMapper().writeValueAsString(k));
-		ArticleItem a = r.doCategory("jcjb", k == null ? new ArrayList<>() : k.getArticles(), true);
+		Knowledge k = knowledgePageParser.parse("http://localhost:8080/error/gxb-jb.html", "gxb", "jb");
+		//Knowledge k = knowledgePageParser.parse("yfxqgtzdz", "yfhl");
+		//System.out.println(new ObjectMapper().writeValueAsString(k));
+		ArticleItem a = r.doCategory("gxb", "jb", k == null ? new ArrayList<>() : k.getArticles(), true);
 		System.out.println(new ObjectMapper().writeValueAsString(a));
 	}
 

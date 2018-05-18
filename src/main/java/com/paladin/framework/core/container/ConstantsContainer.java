@@ -80,9 +80,4 @@ public class ConstantsContainer implements VersionContainer{
 			return value;
 		}
 	}
-
-
-	
-
-	
 }

@@ -33,6 +33,7 @@ public class ArticleElement {
 			int e = style.indexOf("px;");
 
 			String d = style.substring(s + 10, e);
+			d = d.trim();
 			fontSize = Integer.valueOf(d);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -24,7 +24,7 @@ public class ArticleTitle {
 
 	private ArticleTitle() {
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
@@ -32,7 +32,7 @@ public class ArticleTitle {
 	public Integer getIndex() {
 		return index;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
@@ -41,20 +41,28 @@ public class ArticleTitle {
 		this.index = index;
 	}
 
+	public boolean isSpecial() {
+		return type == TYPE_SPECIAL;
+	}
 
 	public boolean isNext(ArticleTitle at) {
-		if(at.index == index + 1) {			
-			if(at.type == type && at.prefix == prefix && at.suffix == suffix) {
+		if (at.index == index + 1) {
+			if (at.type == type && at.prefix == prefix && at.suffix == suffix) {
 				return true;
-			}			
+			}
 		}
+
+		if (at.type == TYPE_SPECIAL && type == TYPE_SPECIAL) {
+			return true;
+		}
+
 		return false;
 	}
-	
-	private static Map<String, Integer> indexMap = new HashMap<>();
-	private static Set<String> startMap = new HashSet<>();
-	private static Set<String> kuohaoEndMap = new HashSet<>();
-	private static Set<String> otherEndMap = new HashSet<>();
+
+	public static Map<String, Integer> indexMap = new HashMap<>();
+	public static Set<String> startMap = new HashSet<>();
+	public static Set<String> kuohaoEndMap = new HashSet<>();
+	public static Set<String> otherEndMap = new HashSet<>();
 
 	public static ArticleTitle getTitle(String text) {
 
@@ -110,7 +118,7 @@ public class ArticleTitle {
 			at.suffix = SUFFIX_OTHER;
 		} else if (c >= '１' && c <= '９') {
 			at.type = TYPE_NUMBER;
-		} else if (c >= '1' && c <= '9') {
+		} else if ((c >= '1' && c <= '9') || c == 'l') {
 			at.type = TYPE_NUMBER;
 		} else {
 			throw new RuntimeException("??????");
@@ -134,15 +142,18 @@ public class ArticleTitle {
 				return null;
 			}
 		}
-		
+
 		start += 1;
-		
+
 		at.index = index;
 		at.title = text.substring(start);
 		return at;
 	}
 
 	static {
+
+		indexMap.put("l", 1);
+
 		indexMap.put("一", 1);
 		indexMap.put("二", 2);
 		indexMap.put("三", 3);
@@ -242,17 +253,17 @@ public class ArticleTitle {
 		kuohaoEndMap.add("】");
 		kuohaoEndMap.add("〗");
 		kuohaoEndMap.add("]");
-				
+
 		otherEndMap.add(",");
 		otherEndMap.add("，");
 		otherEndMap.add(".");
 		otherEndMap.add("、");
 		otherEndMap.add("。");
 		otherEndMap.add("．");
+		otherEndMap.add(":");
+		otherEndMap.add("：");
 		otherEndMap.add(" ");
 		otherEndMap.add("　");
 	}
 
-
-	
 }

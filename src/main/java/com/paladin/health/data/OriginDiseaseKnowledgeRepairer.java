@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.paladin.framework.utils.StringUtil;
+import com.paladin.health.data.parser.knowledge.ArticleTitle;
 import com.paladin.health.mapper.origin.OriginDiseaseKnowledgeMapper;
 import com.paladin.health.model.origin.OriginDiseaseKnowledge;
 import com.paladin.health.model.origin.OriginDiseaseKnowledgeContent;
@@ -132,7 +133,7 @@ public class OriginDiseaseKnowledgeRepairer {
 				}
 
 				diseaseKnowledgeService.removeByPrimaryKey(k.origin.getId());
-				
+
 				for (DiseaseKnowledgeContent c : k.contents) {
 					c.origin.setKnowledgeId(id);
 					c.changed = true;
@@ -163,10 +164,10 @@ public class OriginDiseaseKnowledgeRepairer {
 		names.add(diseaseName);
 		names.add(jx);
 
-		if (!diseaseName.endsWith("病")) {
-			names.add(diseaseName + "病");
-			names.add(jx + "病");
-		}
+		// if (!diseaseName.endsWith("病")) {
+		// names.add(diseaseName + "病");
+		// names.add(jx + "病");
+		// }
 
 		for (DiseaseKnowledge k : knowledges) {
 
@@ -245,9 +246,10 @@ public class OriginDiseaseKnowledgeRepairer {
 
 					first = title.charAt(0);
 
-					if (first >= '0' && first <= '9') {
-						logger.info("数字开头[" + String.valueOf(first) + "][" + disease + ":" + k.origin.getCategoryKey() + "]");
-					}
+					// if (first >= '0' && first <= '9') {
+					// logger.info("数字开头[" + String.valueOf(first) + "][" + disease + ":" +
+					// k.origin.getCategoryKey() + "]");
+					// }
 
 					if (isSpecial(first)) {
 						// logger.info("其他特殊字符[" + String.valueOf(first) + "][" + disease + ":" +
@@ -257,21 +259,44 @@ public class OriginDiseaseKnowledgeRepairer {
 					// 删除疾病名称
 					for (String na : names) {
 						if (title.startsWith(na)) {
-							title = title.substring(na.length());
+							String t = title.substring(na.length());
+							if (t.startsWith("病")) {
+								if (!t.equals("病因") && !t.equals("病理")) {
+									logger.info("可能多出一个病的标题[" + disease + ":" + k.origin.getCategoryKey() + "]");
+								}
+							}
+
+							if (t.equals("因")) {
+								title = "病因";
+							} else if (t.equals("病预") || t.equals("预")) {
+								title = "预防";
+							} else if (!t.equals("期") && !t.equals("病期")) {
+								title = t;
+							} 
+
 							break;
 						}
 					}
 
-					if(title.startsWith("的")) {
+					if (title.startsWith("的")) {
 						title = title.substring(1);
 					}
-
+					
+					if(first == 'l') {
+						if(title.length() >1) {
+							String sec = title.substring(1,2);
+							if(ArticleTitle.otherEndMap.contains(sec) || ArticleTitle.kuohaoEndMap.contains(sec)) {
+								title = "1" + title.substring(1);
+							}
+						}						
+					}
+									
 					if (!originTitle.equals(title)) {
 						k.origin.setName(title);
 						k.changed = true;
 					}
 
-					if ("".equals(title)) {
+					if ("".equals(title) || ".".endsWith(title) || "、".equals(title)) {
 						k.deleted = true;
 					}
 				}
@@ -339,13 +364,7 @@ public class OriginDiseaseKnowledgeRepairer {
 					}
 				}
 
-				if (content.contains("仅供参考") && content.contains("咨询医生")) {
-					if (content.length() < 25) {
-						dkc.deleted = true;
-					} else {
-
-					}
-				}
+				content = content.replaceAll("", "");
 
 				if (!orginContent.equals(content)) {
 					dkc.changed = true;
@@ -371,7 +390,7 @@ public class OriginDiseaseKnowledgeRepairer {
 	}
 
 	private void repairTop(DiseaseKnowledge k) {
-		
+
 		if (k.children.size() == 1) {
 			DiseaseKnowledge ck = k.children.get(0);
 			OriginDiseaseKnowledge odk = ck.origin;
@@ -392,7 +411,8 @@ public class OriginDiseaseKnowledgeRepairer {
 
 	static char[][] kuohaoChars = new char[][] { { '(', ')' }, { '（', '）' }, { '[', ']' }, { '【', '】' } };
 
-	static char[] invalidChars = new char[] { ' ', '　',  '，',',','、', '.', '．', '。', ':', '：', '？', '?', '●', '◆', ')', ';', '·', '☆', '⊙', '▲' };
+	static char[] invalidChars = new char[] { ' ', '　', '，', ',', '、', '.', '．', '。', ':', '：', '？', '?', '●', '◆', ')', ';', '·', '☆', '⊙', '▲', '；', ';',
+			'' };
 
 	private boolean isInvalidChar(char ch) {
 		for (char c : invalidChars) {
