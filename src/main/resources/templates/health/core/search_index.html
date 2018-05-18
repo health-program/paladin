@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+
+<body>
+    <div>
+        <input id="search" />
+        <button onclick="search()">搜索</button>
+    </div>
+    <ul id="result">
+    </ul>
+    <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <script type="text/javascript" src="/static/js/health/index/index_item_index.js"></script>
+    <script type="text/javascript">
+    function search() {
+
+        var arg = $("#search").val();
+        var args = arg.split(" ");
+        var url = "/health/search?";
+
+        args.forEach(function(i) {
+            url += "args=" + i + "&";
+        });
+
+        $.getAjax(url, function(result) {
+
+            var ds = result.diseases;
+            var html = "";
+            if (ds) {
+                ds.forEach(function(x) {
+                    html += "<li>" + x + "</li>";
+                });
+            }
+
+            $("#result").html(html);
+        });
+    }
+    </script>
+</body>
+
+</html>

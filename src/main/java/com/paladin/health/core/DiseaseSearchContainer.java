@@ -56,8 +56,9 @@ public class DiseaseSearchContainer implements SpringContainer {
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化疾病搜索服务功能-------------");
+				
 		try {
-			String path = ResourceUtils.getURL("classpath:lucene").getPath();
+			String path = ResourceUtils.getFile("classpath:lucene").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));
 			reader = DirectoryReader.open(dir);
 			searcher = new IndexSearcher(reader);
@@ -97,7 +98,8 @@ public class DiseaseSearchContainer implements SpringContainer {
 					writer.addDocument(doc);
 				}
 			}
-
+			
+			writer.commit();
 			long t2 = System.currentTimeMillis();
 			logger.info("生成索引结束，共花费" + (t2 - t1) + "毫秒");
 		} catch (IOException e) {

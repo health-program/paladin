@@ -15,7 +15,12 @@ public class DiseaseSearchController {
 
 	@Autowired
 	DiseaseSearchContainer diseaseSearchContainer;
-
+	
+	@RequestMapping("/index")
+	public String index() {
+		return "/health/core/search";
+	}
+	
 	@RequestMapping("/")
 	@ResponseBody
 	public Object search(@RequestParam String[] args) {
