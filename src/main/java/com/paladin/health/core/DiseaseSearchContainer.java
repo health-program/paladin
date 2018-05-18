@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.StringParser;
@@ -48,7 +49,6 @@ public class DiseaseSearchContainer implements SpringContainer {
 	static final String FIELD_KEY = "key";
 
 	static final int MAX_SEARCH_RESULT_COUNT = 1000;
-	static final String DIRECTORY_FILE_NAME = "lucene_health";
 
 	IndexReader reader = null;
 	IndexSearcher searcher = null;
@@ -56,9 +56,9 @@ public class DiseaseSearchContainer implements SpringContainer {
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化疾病搜索服务功能-------------");
-
 		try {
-			Directory dir = FSDirectory.open(Paths.get("/lucene"));
+			String path = ResourceUtils.getURL("classpath:lucene").getPath();
+			Directory dir = FSDirectory.open(Paths.get(path));
 			reader = DirectoryReader.open(dir);
 			searcher = new IndexSearcher(reader);
 		} catch (IOException e) {
@@ -83,11 +83,14 @@ public class DiseaseSearchContainer implements SpringContainer {
 			for (OriginDiseaseName name : names) {
 				String diseaseKey = name.getNameKey();
 				String diseaseName = name.getName();
+
+				Document doc = new Document();
+				doc.add(new StringField(FIELD_KEY, diseaseKey, Store.YES));
+				doc.add(new StringField(FIELD_NAME, diseaseName, Store.YES));
+				doc.add(new StringField(FIELD_SEARCH, diseaseName, Store.NO));
+
 				List<OriginDiseaseTag> tags = diseaseTagService.findAllDiseaseTag(diseaseKey);
 				if (tags != null && tags.size() > 0) {
-					Document doc = new Document();
-					doc.add(new StringField(FIELD_KEY, diseaseKey, Store.YES));
-					doc.add(new StringField(FIELD_NAME, diseaseName, Store.YES));
 					for (OriginDiseaseTag tag : tags) {
 						doc.add(new StringField(FIELD_SEARCH, tag.getName(), Store.NO));
 					}
@@ -107,6 +110,15 @@ public class DiseaseSearchContainer implements SpringContainer {
 					e.printStackTrace();
 				}
 			}
+
+			if (dir != null) {
+				try {
+					dir.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
 		}
 
 		return dir;
@@ -154,7 +166,7 @@ public class DiseaseSearchContainer implements SpringContainer {
 		} catch (IOException e1) {
 			logger.error("搜索疾病异常:" + StringParser.toString(args), e1);
 		}
-		
+
 		return null;
 	}
 
