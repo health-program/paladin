@@ -1,42 +1,203 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="health/header" />
-<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+<link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
 
 <body>
-    <div>
-        <input id="search" />
-        <button onclick="search()">搜索</button>
-    </div>
-    <ul id="result">
-    </ul>
+    <section class="content">
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-search"></i>
+                <h3 class="box-title">查询</h3>
+            </div>
+            <div class="box-body">
+                <form id="searchbar" class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-8">
+                            <label for="xgzz" style="width:130px" class="col-md-2 control-label">相关症状</label>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="symptomInput" placeholder="请输入症状名称或拼音" />
+                                    <span class="input-group-btn">
+                                <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()"><i class="fa fa-search"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                </ul>
+                             </span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <input type="text" id="xgzz" class="form-control" data-role="tagsinput"></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <label for="fbbw" style="width:130px" class="col-md-4 control-label">发病部位</label>
+                            <div class="col-md-6">
+                                <select id="fbbw" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sfyc" style="width:130px" class="col-md-4 control-label">是否遗传</label>
+                            <div class="col-md-6">
+                                <select id="sfyc" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="crx" style="width:130px" class="col-md-4 control-label">传染性</label>
+                            <div class="col-md-6">
+                                <select id="crx" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-4">
+                            <label for="cbtj" style="width:130px" class="col-md-4 control-label">传播途径</label>
+                            <div class="col-md-6">
+                                <select id="cbtj" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="sfsyyb" style="width:130px" class="col-md-4 control-label">是否医保疾病</label>
+                            <div class="col-md-6">
+                                <select id="sfsyyb" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <button type="button" style="width:100px" class="btn btn-primary" onclick="search()">查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="reset()">重置</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">结果</h3>
+            </div>
+            <div id="result" class="box-body">
+            </div>
+        </div>
+    </section>
     <div th:include="health/footer" />
-    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
-    <script type="text/javascript" src="/static/js/health/index/index_item_index.js"></script>
+    <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
     <script type="text/javascript">
+    $(function() {
+        $.getAjax("/health/disease/symptom/list", init);
+    });
+
+    var symptoms;
+    var xgzzInput;
+
+    function init(data) {
+        symptoms = data;
+
+        $("#symptomInput").bsSuggest({
+            idField: "nameKey",
+            keyField: "name",
+            effectiveFields: ["name"],
+            effectiveFieldsAlias: { name: "症状名称" },
+            searchFields: ["name", "nameKey"],
+            data: {
+                value: data
+            },
+            clearable: false,
+            autoSelect: false,
+            autoDropup: true,
+            ignorecase: true,
+            //showBtn: false,        
+            showHeader: true
+        }).on('onSetSelectValue', function(e, keyword, data) {
+            $("#xgzz").tagsinput('add', data.name);
+        });
+
+        $('#xgzz').on('beforeItemAdd', function(event) {
+            var val = event.item;
+            for (var i = 0; i < symptoms.length; i++) {
+                var obj = symptoms[i];
+                if (obj.name == val) {
+                    return;
+                }
+            }
+            $.errorMessage("不存在症状：" + val);
+            event.cancel = true;
+        });
+
+        initSelect("fbbw", fbbw);
+        initSelect("sfyc", sfyc);
+        initSelect("crbzl", crbzl);
+        initSelect("sfsyyb", sfsyyb);
+        initSelect("crx", crx);
+        initSelect("cbtj", cbtj);
+    }
+
+    function initSelect(id, arr) {
+        var html = "<option value=''>请选择</option>";
+        arr.forEach(function(i) {
+            html += '<option value=' + i + '>' + i + '</option>';
+        });
+        $("#" + id).html(html);
+    }
+
     function search() {
 
-        var arg = $("#search").val();
-        var args = arg.split(" ");
-        var url = "/health/search?";
+        var arr1 = $("#xgzz").tagsinput("items");
+        var arr2 = [$("#fbbw").val(), $("#sfyc").val(), $("#crbzl").val(), $("#sfsyyb").val(), $("#crx").val(), $("#cbtj").val()];
 
+        var args = [];
+
+        if (arr1) {
+            arr1.forEach(function(i) {
+                args.push(i);
+            });
+        }
+
+        arr2.forEach(function(i) {
+            if (i) args.push(i);
+        });
+
+        if (args.length == 0) {
+            $.errorMessage("请选择查询条件");
+            return;
+        }
+
+        var url = "/health/search/?";
         args.forEach(function(i) {
             url += "args=" + i + "&";
         });
 
         $.getAjax(url, function(result) {
-
             var ds = result.diseases;
             var html = "";
-            if (ds) {
+            if (ds && ds.length > 0) {
                 ds.forEach(function(x) {
-                    html += "<li>" + x + "</li>";
+                    html += "<div class='col-md-3'><a href='/health/knowledge/index?diseaseKey=" + x[0] + "'>" + x[1] + "</div>";
                 });
+            } else {
+                $.infoMessage("没有符合条件的疾病");
             }
 
             $("#result").html(html);
         });
     }
+
+    function reset() {
+        $("#xgzz").tagsinput('removeAll');
+        $("select").val("");
+        $("#symptomInput").val("");
+    }
+
+    var fbbw = ["上肢", "上肢骨", "上臂", "下肢", "下肢骨", "乳房", "会阴部", "免疫系统", "全身", "关节", "其他", "其他骨", "前列腺", "前臂", "卵巢", "口", "周围神经系统", "咽喉", "外阴", "大腿", "头部", "女性生殖", "子宫", "小腿", "尿道", "心理", "心脏", "手部", "气管", "淋巴", "甲状腺", "男性生殖", "皮肤", "盆腔", "盆骨", "眼", "睾丸", "纵膈", "耳", "肋骨", "肌肉", "肘部", "肛门", "肝", "肠", "肠系膜", "肩部", "肺", "肾", "肾上腺", "胃", "胆", "胰腺", "胸部", "脊柱", "脊髓", "脾", "腰部", "腹膜", "腹部", "膀胱", "膈肌", "膝部", "臀部", "血液血管", "足部", "输卵管", "输尿管", "输精管", "阑尾", "阴囊", "阴茎", "阴道", "面部", "颅脑", "颅骨", "颈部", "食管", "骨", "骨髓", "鼻"];
+    var sfyc = ["不会遗传", "会遗传"];
+    var crbzl = ["甲类", "乙类", "丙类"];
+    var sfsyyb = ["医保疾病", "非医保疾病"];
+    var crx = ["无传染性", "有传染性"];
+    var cbtj = ["其他", "垂直传播", "性传播", "接触传播", "空气传播", "粪口传播", "虫媒传播", "血液传播", "飞沫传播"];
     </script>
 </body>
 

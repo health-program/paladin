@@ -47,6 +47,7 @@ public class DiseaseBaseAnalysis {
 			analyzeAndSave(disease, diseaseName, summary.getSfyc(), OriginDiseaseTag.TYPE_SFYC, false);
 			analyzeAndSave(disease, diseaseName, summary.getCbtj(), OriginDiseaseTag.TYPE_CBTJ, true);
 			analyzeAndSave(disease, diseaseName, summary.getCrbzl(), OriginDiseaseTag.TYPE_CRBZL, false);
+			
 		}
 	}
 
@@ -62,7 +63,7 @@ public class DiseaseBaseAnalysis {
 			HashSet<String> names = new HashSet<>();
 			int count = 1;
 			if (needSplit) {
-				String[] ss = content.split(",");
+				String[] ss = content.split(",|，");
 				count = ss.length;
 				for (String s : ss) {
 					names.add(s);

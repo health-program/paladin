@@ -16,8 +16,9 @@ function initCatalog(data) {
     $("#symptomInput").bsSuggest({
         idField: "nameKey",
         keyField: "name",
-        effectiveFields: ["name", "nameKey"],
-        effectiveFieldsAlias: { name: "症状名称", nameKey: "拼音关键字" },
+        effectiveFields: ["name"],
+        effectiveFieldsAlias: { name: "症状名称"},
+        searchFields: ["name","nameKey"],
         data: dataList,
         clearable: false,
         autoSelect: false,
@@ -28,11 +29,19 @@ function initCatalog(data) {
 
     }).on('onSetSelectValue', function(e, keyword, data) {
         currentSymptom = data.nameKey;
-        getSymptomKnowledge();
+        getSymptomKnowledge();     
         $("#symptomInput").val(data.name);
     }).on('onUnsetSelectValue', function(a, b, c) {
 
     });
+    
+    var symptomKey = $("#symptomKey").val();
+    if(symptomKey){
+    	var symptomName = $("#symptomName").val();
+    	currentDisease = diseaseKey;
+    	getSymptomKnowledge();     
+        $("#symptomInput").val(symptomName);
+    }
 }
 
 var currentSymptom;

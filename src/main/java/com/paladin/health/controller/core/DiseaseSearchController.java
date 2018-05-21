@@ -18,7 +18,7 @@ public class DiseaseSearchController {
 	
 	@RequestMapping("/index")
 	public String index() {
-		return "/health/core/search";
+		return "/health/core/search_index";
 	}
 	
 	@RequestMapping("/")

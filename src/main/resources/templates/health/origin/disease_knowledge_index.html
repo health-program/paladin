@@ -3,8 +3,10 @@
 <head th:include="health/header" />
 <link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
 <body>
-    <section class="content">
+    <section class="content">   	
         <div>
+        <input type="hidden" id="diseaseKey" th:value="${diseaseKey}"/>
+        <input type="hidden" id="diseaseName" th:value="${diseaseName}"/>        
             <div class="col-md-12">
             	<div class="col-md-4">
                     <div class="input-group">

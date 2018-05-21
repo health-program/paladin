@@ -1,6 +1,5 @@
 $(function() {
     $.getAjax("/health/disease/list", initCatalog);
-	
 });
 
 var catalog;
@@ -15,10 +14,11 @@ function initCatalog(data) {
     };
 
     $("#diseaseInput").bsSuggest({
-        idField: "diseaseKey",
-        keyField: "diseaseName",
-        effectiveFields: ["name", "nameKey"],
-        effectiveFieldsAlias: { name: "疾病名称", nameKey: "拼音关键字" },
+        idField: "name_key",
+        keyField: "name",
+        effectiveFields: ["name"],
+        effectiveFieldsAlias: { name: "疾病名称"},
+        searchFields: ["name","nameKey"],
         data: dataList,
         clearable: false,
         autoSelect: false,
@@ -36,6 +36,15 @@ function initCatalog(data) {
     }).on('onUnsetSelectValue', function(a, b, c) {
 
     });
+    
+    var diseaseKey = $("#diseaseKey").val();
+    if(diseaseKey){
+    	var diseaseName = $("#diseaseName").val();
+    	currentDisease = diseaseKey;
+    	getDiseaseKnowledge();
+        getDiseaseSummary();
+        $("#diseaseInput").val(diseaseName);
+    }
 }
 
 var currentDisease;

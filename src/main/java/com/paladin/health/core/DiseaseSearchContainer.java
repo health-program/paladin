@@ -65,7 +65,7 @@ public class DiseaseSearchContainer implements SpringContainer {
 		} catch (IOException e) {
 			logger.error("初始化失败", e);
 		}
-
+		
 		logger.info("-------------结束初始化疾病搜索服务功能-------------");
 		return true;
 	}
