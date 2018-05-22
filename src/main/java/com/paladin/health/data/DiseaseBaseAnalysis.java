@@ -28,11 +28,11 @@ public class DiseaseBaseAnalysis {
 	@Autowired
 	OriginDiseaseNameService diseaseNameService;
 
-	public void analysis() {
+	public void analyzeTag() {
 		List<OriginDiseaseSummary> summaries = diseaseSummaryService.findAll();
 		analyzeTag(summaries);
 	}
-
+	
 	public void analyzeTag(List<OriginDiseaseSummary> summaries) {
 		for (OriginDiseaseSummary summary : summaries) {
 			String disease = summary.getDiseaseKey();
@@ -46,8 +46,7 @@ public class DiseaseBaseAnalysis {
 			analyzeAndSave(disease, diseaseName, summary.getXgzz(), OriginDiseaseTag.TYPE_XGZZ, true);
 			analyzeAndSave(disease, diseaseName, summary.getSfyc(), OriginDiseaseTag.TYPE_SFYC, false);
 			analyzeAndSave(disease, diseaseName, summary.getCbtj(), OriginDiseaseTag.TYPE_CBTJ, true);
-			analyzeAndSave(disease, diseaseName, summary.getCrbzl(), OriginDiseaseTag.TYPE_CRBZL, false);
-			
+			analyzeAndSave(disease, diseaseName, summary.getCrbzl(), OriginDiseaseTag.TYPE_CRBZL, false);		
 		}
 	}
 

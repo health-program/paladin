@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+
+<body>
+    <section class="content">
+        <div>
+            <input type="hidden" id="symptomKey" th:value="${symptomKey}" />
+            <input type="hidden" id="symptomName" th:value="${symptomName}" />
+            <div>
+                <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">简介</h3>
+                        </div>
+                        <div id="symptomSummary" class="box-body">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">内容</h3>
+                        </div>
+                        <div class="box-body">
+                            <div class="nav-tabs-custom">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#zzqy" data-toggle="tab" aria-expanded="true">症状起因</a></li>
+                                    <li class=""><a href="#zdxs" data-toggle="tab" aria-expanded="false">诊断详情</a></li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="zzqy">
+                                    </div>
+                                    <div class="tab-pane" id="zdxs">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <script type="text/javascript" src="/static/js/health/origin/symptom_knowledge_index.js"></script>
+</body>
+
+</html>

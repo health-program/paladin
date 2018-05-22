@@ -22,18 +22,26 @@ public class DiseaseKnowledgeController {
 
 	@Autowired
 	OriginDiseaseNameService diseaseNameService;
-	
+
 	@Autowired
 	OriginDiseaseKnowledgeContentService diseaseKnowledgeContentService;
 
 	@RequestMapping("/index")
-	public String index(@RequestParam(required = false) String diseaseKey, Model model) {	
-		if(diseaseKey != null && diseaseKey.length() !=0) {
+	public String index(@RequestParam(required = false) String diseaseKey, @RequestParam(required = false) String diseaseName, Model model) {
+		if (diseaseKey != null && diseaseKey.length() != 0) {
 			OriginDiseaseName name = diseaseNameService.getDiseaseName(diseaseKey);
 			model.addAttribute("diseaseKey", diseaseKey);
 			model.addAttribute("diseaseName", name.getName());
+			return "/health/origin/disease_knowledge";
 		}
-		
+
+		if (diseaseName != null && diseaseName.length() != 0) {
+			diseaseKey = diseaseNameService.getDiseaseByName(diseaseName);
+			model.addAttribute("diseaseKey", diseaseKey);
+			model.addAttribute("diseaseName", diseaseName);
+			return "/health/origin/disease_knowledge";
+		}
+
 		return "/health/origin/disease_knowledge_index";
 	}
 

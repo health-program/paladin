@@ -46,5 +46,15 @@ public class DiseaseNameController {
 		return CommonResponse.getSuccessResponse(diseaseSummaryService.getDiseaseSummary(disease));
 	}
 	
+	@RequestMapping("/key")
+	@ResponseBody
+	public Object getDiseaseKeyByName(@RequestParam String diseaseName) {
+		return CommonResponse.getSuccessResponse(diseaseNameService.getDiseaseByName(diseaseName));
+	}
 	
+	@RequestMapping("/symptom/key")
+	@ResponseBody
+	public Object getSymptomKeyByName(@RequestParam String symptomName) {
+		return CommonResponse.getSuccessResponse(diseaseNameService.getSymptomByName(symptomName));
+	}
 }

@@ -19,20 +19,29 @@ public class SymptomKnowledgeController {
 
 	@Autowired
 	OriginSymptomKnowledgeService symptomKnowledgeService;
-	
+
 	@Autowired
 	OriginDiseaseNameService diseaseNameService;
-	
+
 	@Autowired
 	OriginSymptomKnowledgeContentService symptomKnowledgeContentService;
 
 	@RequestMapping("/index")
-	public String index(@RequestParam(required = false) String symptomKey, Model model) {	
-		if(symptomKey != null && symptomKey.length() !=0) {
+	public String index(@RequestParam(required = false) String symptomKey, @RequestParam(required = false) String symptomName, Model model) {
+		if (symptomKey != null && symptomKey.length() != 0) {
 			OriginDiseaseName name = diseaseNameService.getSymptomName(symptomKey);
 			model.addAttribute("symptomKey", symptomKey);
 			model.addAttribute("symptomName", name.getName());
-		}		
+			return "/health/origin/symptom_knowledge";
+		}
+
+		if (symptomName != null && symptomName.length() != 0) {
+			symptomKey = diseaseNameService.getSymptomByName(symptomName);
+			model.addAttribute("symptomKey", symptomKey);
+			model.addAttribute("symptomName", symptomName);
+			return "/health/origin/symptom_knowledge";
+		}
+
 		return "/health/origin/symptom_knowledge_index";
 	}
 
@@ -53,5 +62,5 @@ public class SymptomKnowledgeController {
 	public Object symptomContent(@RequestParam String symptomKey) {
 		return CommonResponse.getSuccessResponse(symptomKnowledgeContentService.findSymptomContent(symptomKey));
 	}
-	
+
 }

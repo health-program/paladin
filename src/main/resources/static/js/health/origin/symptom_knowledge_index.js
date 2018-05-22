@@ -1,5 +1,14 @@
 $(function() {
-    $.getAjax("/health/disease/symptom/list", initCatalog);
+    if ($("#symptomInput").length > 0) {
+        $.getAjax("/health/disease/symptom/list", initCatalog);
+    }
+    var symptomKey = $("#symptomKey").val();
+    if (symptomKey) {
+        var symptomName = $("#symptomName").val();
+        currentSymptom = symptomKey;
+        getSymptomKnowledge();
+        $("#symptomInput").val(symptomName);
+    }
 });
 
 var catalog;
@@ -17,31 +26,20 @@ function initCatalog(data) {
         idField: "nameKey",
         keyField: "name",
         effectiveFields: ["name"],
-        effectiveFieldsAlias: { name: "症状名称"},
-        searchFields: ["name","nameKey"],
+        effectiveFieldsAlias: { name: "症状名称" },
+        searchFields: ["name", "nameKey"],
         data: dataList,
         clearable: false,
         autoSelect: false,
         autoDropup: true,
         ignorecase: true,
-        //showBtn: false,        showHeader: true
-    }).on('onDataRequestSuccess', function(e, result) {
-
+        //showBtn: false,        
+        showHeader: true
     }).on('onSetSelectValue', function(e, keyword, data) {
         currentSymptom = data.nameKey;
-        getSymptomKnowledge();     
+        getSymptomKnowledge();
         $("#symptomInput").val(data.name);
-    }).on('onUnsetSelectValue', function(a, b, c) {
-
     });
-    
-    var symptomKey = $("#symptomKey").val();
-    if(symptomKey){
-    	var symptomName = $("#symptomName").val();
-    	currentDisease = diseaseKey;
-    	getSymptomKnowledge();     
-        $("#symptomInput").val(symptomName);
-    }
 }
 
 var currentSymptom;
@@ -93,10 +91,12 @@ function initKnowledgeTree(data) {
     });
 
     var treedata = g(roots, data);
-    knowledgeTree.treeview({ data: treedata, levels: 1 });
-    knowledgeTree.on('nodeSelected', function(event, node) {
-        getKnowledge(node.data, true);
-    });
+    if(knowledgeTree.length > 0){
+	    knowledgeTree.treeview({ data: treedata, levels: 1 });
+	    knowledgeTree.on('nodeSelected', function(event, node) {
+	        getKnowledge(node.data, true);
+	    });
+    }
 
     initCategoryDetailContent(treedata);
 }

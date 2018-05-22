@@ -176,7 +176,7 @@
             var html = "";
             if (ds && ds.length > 0) {
                 ds.forEach(function(x) {
-                    html += "<div class='col-md-3'><a href='/health/knowledge/index?diseaseKey=" + x[0] + "'>" + x[1] + "</div>";
+                    html += "<div class='col-md-3'><a href='javascript:showDisease(\"" + x[0] + "\",\"" + x[1] + "\")'>" + x[1] + "</div>";
                 });
             } else {
                 $.infoMessage("没有符合条件的疾病");
@@ -190,6 +190,20 @@
         $("#xgzz").tagsinput('removeAll');
         $("select").val("");
         $("#symptomInput").val("");
+    }
+
+    function showDisease(disease, diseaseName) {
+
+        var w = $(document.body).width() * 0.8 + "px";
+        var h = $(document).height() * 0.9 + "px";
+
+        layer.open({
+            type: 2,
+            title: diseaseName,
+            maxmin: true, //开启最大化最小化按钮
+            area: [w, h],
+            content: '/health/knowledge/index?diseaseKey=' + disease
+        });
     }
 
     var fbbw = ["上肢", "上肢骨", "上臂", "下肢", "下肢骨", "乳房", "会阴部", "免疫系统", "全身", "关节", "其他", "其他骨", "前列腺", "前臂", "卵巢", "口", "周围神经系统", "咽喉", "外阴", "大腿", "头部", "女性生殖", "子宫", "小腿", "尿道", "心理", "心脏", "手部", "气管", "淋巴", "甲状腺", "男性生殖", "皮肤", "盆腔", "盆骨", "眼", "睾丸", "纵膈", "耳", "肋骨", "肌肉", "肘部", "肛门", "肝", "肠", "肠系膜", "肩部", "肺", "肾", "肾上腺", "胃", "胆", "胰腺", "胸部", "脊柱", "脊髓", "脾", "腰部", "腹膜", "腹部", "膀胱", "膈肌", "膝部", "臀部", "血液血管", "足部", "输卵管", "输尿管", "输精管", "阑尾", "阴囊", "阴茎", "阴道", "面部", "颅脑", "颅骨", "颈部", "食管", "骨", "骨髓", "鼻"];
