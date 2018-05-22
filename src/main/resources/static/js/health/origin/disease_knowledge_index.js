@@ -119,8 +119,8 @@ function showDisease(disease) {
         window.location = '/health/knowledge/index?diseaseName=' + disease;
     }
 
-    var w = $(document.body).width() * 0.8 + "px";
-    var h = $(document).height() * 0.9 + "px";
+    var w = $(window).width() * 0.8 + "px";
+    var h = $(window).height() * 0.9 + "px";
 
     layer.open({
         type: 2,
@@ -137,8 +137,8 @@ function showSymptom(symptom) {
         window.location = '/health/symptom/index?symptomName=' + symptom;
     }
 
-    var w = $(document.body).width() * 0.8 + "px";
-    var h = $(document).height() * 0.9 + "px";
+    var w = $(window).width() * 0.8 + "px";
+    var h = $(window).height() * 0.9 + "px";
 
     layer.open({
         type: 2,

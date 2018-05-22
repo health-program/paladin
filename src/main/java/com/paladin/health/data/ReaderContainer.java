@@ -39,9 +39,10 @@ public class ReaderContainer implements SpringContainer {
 	OriginDiseaseKnowledgeMapper diseaseKnowledgeMapper;
 	@Autowired
 	OriginDiseaseKnowledgeContentMapper diseaseKnowledgeContentMapper;
-
 	@Autowired
 	DiseaseBaseAnalysis diseaseBaseAnalysis;
+	@Autowired
+	OriginDiseaseKnowledgeImprover diseaseKnowledgeImprover;
 
 	@Override
 	public boolean initialize() {
