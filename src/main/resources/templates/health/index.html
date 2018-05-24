@@ -15,20 +15,19 @@
     html {
         overflow: hidden;
     }
-    
-    body{
-		font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
-	    color: #2f2f2f;	
-	    text-size-adjust: 100%;
-	    word-wrap: break-word;
-	    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-	}
+
+    body {
+        font-family: -apple-system, SF UI Text, Arial, PingFang SC, Hiragino Sans GB, Microsoft YaHei, WenQuanYi Micro Hei, sans-serif;
+        color: #2f2f2f;
+        text-size-adjust: 100%;
+        word-wrap: break-word;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
     </style>
 </head>
 
 <body class="hold-transition skin-green-light sidebar-mini fixed">
     <div class="wrapper">
-    
         <header class="main-header">
             <a href="index2.html" class="logo">
                 <span class="logo-mini"><b>宣</b>教</span>
@@ -88,7 +87,6 @@
                 </div>
             </nav>
         </header>
-        
         <aside class="main-sidebar">
             <section class="sidebar">
                 <div class="user-panel">
@@ -113,7 +111,6 @@
                 <ul class="sidebar-menu"></ul>
             </section>
         </aside>
-        
         <div class="content-wrapper" id="content-wrapper" style="min-height: 421px;">
             <div class="content-tabs">
                 <button class="roll-nav roll-left tabLeft" onclick="scrollTabLeft()">
@@ -144,14 +141,12 @@
                 </div>
             </div>
         </div>
-        
         <footer class="main-footer">
             <div class="pull-right hidden-xs">
                 <b>Version</b> 1.0.0
             </div>
             <strong>Copyright &copy; 2017 <a href="http://www.netintech.cn">网进科技</a>.</strong> All rights reserved.
         </footer>
-        
         <aside class="control-sidebar control-sidebar-dark">
             <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
                 <li class="active"><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
@@ -241,15 +236,15 @@
         //App.setbasePath("/");
         //App.setGlobalImgPath("/static/image/");
 
-        /* addTabs({
-            id: '10008',
-            title: '主页面',
-            close: false,
-            url: 'main',
-            urlType: "relative"
-        });*/
-
         App.fixIframeCotent();
+        
+/*         addTabs({
+            id: "90011",
+            text: "疾病查询",
+            icon: "fa fa-circle-o",
+            url: "search/index",
+            targetType: "iframe-tab"
+        }); */
 
         var menus = [{
                 id: "9000",
@@ -263,9 +258,9 @@
                 icon: "fa fa-laptop",
                 children: [{
                         id: "90011",
-                        text: "标准管理",
+                        text: "疾病查询",
                         icon: "fa fa-circle-o",
-                        url: "index/index",
+                        url: "search/index",
                         targetType: "iframe-tab"
                     },
                     {
@@ -284,9 +279,9 @@
                     },
                     {
                         id: "90014",
-                        text: "疾病查询",
+                        text: "标准管理",
                         icon: "fa fa-circle-o",
-                        url: "search/index",
+                        url: "index/index",
                         targetType: "iframe-tab"
                     }
                 ]
@@ -294,6 +289,9 @@
         ];
 
         $('.sidebar-menu').sidebarMenu({ data: menus });
+
+        
+
 
         // 动态创建菜单后，可以重新计算 SlimScroll
         // $.AdminLTE.layout.fixSidebar();

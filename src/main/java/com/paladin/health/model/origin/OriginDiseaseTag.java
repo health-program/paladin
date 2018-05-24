@@ -4,6 +4,10 @@ import javax.persistence.Id;
 
 public class OriginDiseaseTag {
 	
+	/*
+	 * 基础类型，来自39网简介中数据
+	 */
+	
 	/**是否属于医保*/
 	public final static String TYPE_SFSYYB = "SFSYYB";
 	/**别名*/
@@ -23,7 +27,18 @@ public class OriginDiseaseTag {
 	/**传播途径*/
 	public final static String TYPE_CBTJ = "CBTJ";
 	
+	/*
+	 * 分类，来自趣医网中数据
+	 */
+	
+	/**疾病分类：常见慢性病|常见病|常见男性病等*/
+	public final static String TYPE_CATEGORY = "CATEGORY";
+	
+	
 	public static final String COLUMN_FIELD_DISEASE_KEY = "diseaseKey";
+	
+	
+	
 
 	@Id
 	private String name;

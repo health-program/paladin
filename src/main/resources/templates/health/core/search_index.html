@@ -15,7 +15,7 @@
                     <div class="form-group">
                         <div class="col-md-8">
                             <label for="xgzz" style="width:130px" class="col-md-2 control-label">相关症状</label>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="symptomInput" placeholder="请输入症状名称或拼音" />
                                     <span class="input-group-btn">
@@ -26,7 +26,7 @@
                              </span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <input type="text" id="xgzz" class="form-control" data-role="tagsinput"></input>
                             </div>
                         </div>
@@ -56,6 +56,12 @@
                             <label for="cbtj" style="width:130px" class="col-md-4 control-label">传播途径</label>
                             <div class="col-md-6">
                                 <select id="cbtj" class="form-control"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="category" style="width:130px" class="col-md-4 control-label">分类</label>
+                            <div class="col-md-6">
+                                <select id="category" class="form-control"></select>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -133,6 +139,7 @@
         initSelect("crbzl", crbzl);
         initSelect("sfsyyb", sfsyyb);
         initSelect("crx", crx);
+        initSelect("category", category);
         initSelect("cbtj", cbtj);
     }
 
@@ -147,7 +154,7 @@
     function search() {
 
         var arr1 = $("#xgzz").tagsinput("items");
-        var arr2 = [$("#fbbw").val(), $("#sfyc").val(), $("#crbzl").val(), $("#sfsyyb").val(), $("#crx").val(), $("#cbtj").val()];
+        var arr2 = [$("#fbbw").val(), $("#sfyc").val(), $("#crbzl").val(), $("#sfsyyb").val(), $("#crx").val(), $("#cbtj").val(),$("#category").val()];
 
         var args = [];
 
@@ -211,6 +218,7 @@
     var crbzl = ["甲类", "乙类", "丙类"];
     var sfsyyb = ["医保疾病", "非医保疾病"];
     var crx = ["无传染性", "有传染性"];
+    var category = ["儿童","孕妇","女性","男性","老年人"];
     var cbtj = ["其他", "垂直传播", "性传播", "接触传播", "空气传播", "粪口传播", "虫媒传播", "血液传播", "飞沫传播"];
     </script>
 </body>

@@ -1,5 +1,7 @@
 package com.paladin.health.data;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,6 +12,9 @@ import org.springframework.stereotype.Component;
 
 import com.paladin.framework.utils.StringUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
+import com.paladin.health.data.parser.DiseaseNameParser;
+import com.paladin.health.data.parser.DiseaseNameParser.DiseaseName;
+import com.paladin.health.model.origin.OriginDiseaseName;
 import com.paladin.health.model.origin.OriginDiseaseSummary;
 import com.paladin.health.model.origin.OriginDiseaseTag;
 import com.paladin.health.service.origin.OriginDiseaseNameService;
@@ -28,16 +33,58 @@ public class DiseaseBaseAnalysis {
 	@Autowired
 	OriginDiseaseNameService diseaseNameService;
 
+	static DiseaseNameParser diseaseNameParser = new DiseaseNameParser();
+
+	public void analyzeCategory() {
+
+		Object[][] params = { { "erke", 107, "儿童" }, { "chanke", 15, "孕妇" }, { "fuke", 39, "女性" }, { "nanke", 12, "男性" }, { "laonianke", 22, "老年人" } };
+
+		for (Object[] param : params) {
+			String type = (String) param[0];
+			int pageSize = (int) param[1];
+			String categoryName = (String) param[2];
+
+			List<DiseaseName> result = new ArrayList<>();
+			for (int i = 0; i < pageSize; i++) {
+				try {
+					result.addAll(diseaseNameParser.parseDisease(type, i));
+				} catch (IOException e) {
+					logger.error("解析类型疾病错误[type:" + type + ",page:" + i + "]", e);
+					continue;
+				}
+			}
+
+			for (DiseaseName dname : result) {
+				String name = dname.getName();
+				String pinyin = dname.getPinyin();
+
+				OriginDiseaseName odname = diseaseNameService.getDiseaseName(pinyin);
+				if (odname != null && odname.getName().equals(name)) {
+
+					OriginDiseaseTag tag = new OriginDiseaseTag();
+					tag.setDiseaseKey(pinyin);
+					tag.setType(OriginDiseaseTag.TYPE_CATEGORY);
+					tag.setDiseaseName(name);
+					tag.setName(categoryName);
+
+					diseaseTagService.save(tag);
+				} else {
+					logger.error("找不到相应疾病[name:" + name + ",key:" + pinyin + "]");
+				}
+			}
+		}
+	}
+
 	public void analyzeTag() {
 		List<OriginDiseaseSummary> summaries = diseaseSummaryService.findAll();
 		analyzeTag(summaries);
 	}
-	
+
 	public void analyzeTag(List<OriginDiseaseSummary> summaries) {
 		for (OriginDiseaseSummary summary : summaries) {
 			String disease = summary.getDiseaseKey();
 			String diseaseName = diseaseNameService.getDiseaseName(disease).getName();
-			
+
 			analyzeAndSave(disease, diseaseName, summary.getBfjb(), OriginDiseaseTag.TYPE_BFJB, true);
 			analyzeAndSave(disease, diseaseName, summary.getSfsyyb(), OriginDiseaseTag.TYPE_SFSYYB, false);
 			analyzeAndSave(disease, diseaseName, summary.getBm(), OriginDiseaseTag.TYPE_BM, true);
@@ -46,7 +93,7 @@ public class DiseaseBaseAnalysis {
 			analyzeAndSave(disease, diseaseName, summary.getXgzz(), OriginDiseaseTag.TYPE_XGZZ, true);
 			analyzeAndSave(disease, diseaseName, summary.getSfyc(), OriginDiseaseTag.TYPE_SFYC, false);
 			analyzeAndSave(disease, diseaseName, summary.getCbtj(), OriginDiseaseTag.TYPE_CBTJ, true);
-			analyzeAndSave(disease, diseaseName, summary.getCrbzl(), OriginDiseaseTag.TYPE_CRBZL, false);		
+			analyzeAndSave(disease, diseaseName, summary.getCrbzl(), OriginDiseaseTag.TYPE_CRBZL, false);
 		}
 	}
 
@@ -101,7 +148,7 @@ public class DiseaseBaseAnalysis {
 						continue;
 					}
 				}
-								
+
 				tag.setName(name);
 				diseaseTagService.save(tag);
 			}
