@@ -1,8 +1,15 @@
-package com.paladin.data.generate;
+package com.paladin.data.generate.build;
 
-public class GenerateMapperXMLClassUtil {
+import org.springframework.stereotype.Component;
 
-	public static String createXMLContent(GenerateTableOption tableOption) {
+import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.GenerateUtil;
+
+@Component
+public class MapperXMLBuilder extends SpringBootResourceBuilder{
+
+	public String buildContent(GenerateTableOption tableOption) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -14,5 +21,9 @@ public class GenerateMapperXMLClassUtil {
 
 		return sb.toString();
 	}
-
+	
+	@Override
+	public GenerateType getGenerateType() {
+		return GenerateType.SQLMAPPER;
+	}
 }

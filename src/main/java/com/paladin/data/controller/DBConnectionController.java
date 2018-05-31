@@ -29,6 +29,7 @@ import com.paladin.data.generate.GenerateTableOption;
 import com.paladin.data.generate.GenerateType;
 import com.paladin.data.model.DBConnection;
 import com.paladin.data.service.DBConnectionService;
+import com.paladin.data.service.GenerateService;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
@@ -41,7 +42,10 @@ import com.paladin.framework.web.response.CommonResponse;
 public class DBConnectionController extends ControllerSupport {
 
 	@Autowired
-	DBConnectionService connectionService;
+	private DBConnectionService connectionService;
+	
+	@Autowired
+	private GenerateService generateService;
 
 	@RequestMapping(value = "/index")
 	public String index(HttpServletRequest request) {
@@ -173,9 +177,9 @@ public class DBConnectionController extends ControllerSupport {
 		BeanCopyUtil.simpleCopy(option, tableOption);
 		
 		HashMap<String,String> contentMap = new HashMap<>();
-		contentMap.put("model", connectionService.buildJavaClass(tableOption, GenerateType.MODEL));
-		contentMap.put("mapper", connectionService.buildJavaClass(tableOption, GenerateType.MAPPER));
-		contentMap.put("service", connectionService.buildJavaClass(tableOption, GenerateType.SERVICE));
+		contentMap.put("model", generateService.buildFileContent(tableOption, GenerateType.MODEL));
+		contentMap.put("mapper", generateService.buildFileContent(tableOption, GenerateType.MAPPER));
+		contentMap.put("service", generateService.buildFileContent(tableOption, GenerateType.SERVICE));
 		
 		return CommonResponse.getSuccessResponse(null, contentMap);
 	}
@@ -209,29 +213,23 @@ public class DBConnectionController extends ControllerSupport {
 		
 		BeanCopyUtil.simpleCopy(option, tableOption);
 		
-		String modelContent = connectionService.buildJavaClass(tableOption, GenerateType.MODEL);
-		String mapperContent = connectionService.buildJavaClass(tableOption, GenerateType.MAPPER);
-		String serviceContent = connectionService.buildJavaClass(tableOption, GenerateType.SERVICE);
-		String controllerContent = connectionService.buildJavaClass(tableOption, GenerateType.CONTROLLER);
-		String sqlMapperContent = connectionService.buildJavaClass(tableOption, GenerateType.SQLMAPPER);
-		
 		String projectPath = option.getProjectPath();
 		
 		if(projectPath == null || projectPath.length() == 0) {
 			throw new BusinessException("项目路径不能为空" );
 		}
 		
-		connectionService.buildBootProjectFile(tableOption, GenerateType.MODEL, projectPath, modelContent);
-		connectionService.buildBootProjectFile(tableOption, GenerateType.MAPPER, projectPath, mapperContent);
-		connectionService.buildBootProjectFile(tableOption, GenerateType.SERVICE, projectPath, serviceContent);
-		connectionService.buildBootProjectFile(tableOption, GenerateType.CONTROLLER, projectPath, controllerContent);
+		generateService.buildProjectFile(tableOption, GenerateType.MODEL, projectPath);
+		generateService.buildProjectFile(tableOption, GenerateType.MAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, GenerateType.SERVICE, projectPath);
+		generateService.buildProjectFile(tableOption, GenerateType.CONTROLLER, projectPath);
 	
-		connectionService.buildBootProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath, sqlMapperContent);
-		connectionService.buildBootProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath, "");
-		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_INDEX, projectPath, "");
-		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_VIEW, projectPath, "");
-		connectionService.buildBootProjectFile(tableOption, GenerateType.PAGE_EDIT, projectPath, "");
-		
+		generateService.buildProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath);
+//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_INDEX, projectPath);
+//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_VIEW, projectPath);
+//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_EDIT, projectPath);
+	
 		visitCacheService.putCache(request, CACHE_PROJECT_PATH, projectPath);
 		
 		return CommonResponse.getSuccessResponse();

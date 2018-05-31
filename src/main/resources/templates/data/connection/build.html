@@ -1,84 +1,91 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="data/header" />
+<head th:include="data/header"/>
 
 <body class="layout-boxed sidebar-mini">
-    <input type="hidden" id="dbName" th:value="${dbName}" />
-    <input type="hidden" id="tableName" th:value="${tableName}" />
-    <div class="wrapper curtain">
-        <section class="content-header">
-            <h1>
-                <span th:text="${dbName}"></span>
-                <small th:text="${tableName}"/>
-            </h1>
-            <ol class="breadcrumb">
-                <li><a href="/data/index"><i class="fa fa-home"></i> 主页</a></li>
-                <li><a href="/data/connection/index"> 数据库管理</a></li>
-                <li><a th:href="@{'/data/connection/db/index?dbName='+${dbName}}" th:text="${dbName}"></a></li>
-                <li class="active" th:text="${tableName}" />
-            </ol>
-        </section>
-        <section class="content">
-            <div class="box box-solid">
-                <div class="box-body">
-                    <ul class="products-list product-list-in-box">
-                        <li class="item">
-                            <table id="dataGrid"></table>
-                        </li>
-                        <li class="item">
-                            <form class="form-horizontal tonto-form-validate">
-                                <div class="form-group">
-                                    <label for="basePackage" class="col-md-2 control-label">基础包路径</label>
-                                    <div class="col-md-5">
-                                        <input type="text" name="basePackage" class="form-control" required="required" placeholder="请输入基础包路径" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="model" class="col-md-2 control-label">主模块</label>
-                                    <div class="col-md-2">
-                                        <input type="text" name="model" class="form-control" placeholder="请输入主模块" />
-                                    </div>
-                                    <label for="subModel" class="col-md-1 control-label">子模块</label>
-                                    <div class="col-md-2">
-                                        <input type="text" name="subModel" class="form-control" placeholder="请输入子模块" />
-                                    </div>
-                                </div>
-                            </form>
-                        </li>
-                        <li class="item">
-                            <button onclick="build()" type="button" class="btn btn-primary btn-block submitBtn">预览</button>
-                        </li>
-                        <li class="item">
-                            <form class="form-horizontal tonto-form-validate">
-                                <div class="form-group">
-                                    <label for="projectPath" class="col-md-2 control-label">Boot项目路径</label>
-                                    <div class="col-md-5">
-                                        <input type="text" name="projectPath" th:value="${projectPath}" class="form-control" required="required" placeholder="请输入基础包路径" />
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="checkbox-inline">
-								        <input type="checkbox" id="inlineCheckbox1" value="option1">新增·编辑HTML
-								    </label>
-								    <label class="checkbox-inline">
-								        <input type="checkbox" id="inlineCheckbox3" value="option3">查看HTML
-								    </label>
-                                </div>
-                            </form>
-                        </li>
-                        <li class="item">
-                            <button onclick="build2boot()" type="button" class="btn btn-primary btn-block submitBtn">SPRING BOOT项目生成</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-    </div>
-    </div>
-    </div>
+<input type="hidden" id="dbName" th:value="${dbName}"/>
+<input type="hidden" id="tableName" th:value="${tableName}"/>
+<div class="wrapper curtain">
+    <section class="content-header">
+        <h1>
+            <span th:text="${dbName}"></span>
+            <small th:text="${tableName}"/>
+        </h1>
+        <ol class="breadcrumb">
+            <li><a href="/data/index"><i class="fa fa-home"></i> 主页</a></li>
+            <li><a href="/data/connection/index"> 数据库管理</a></li>
+            <li><a th:href="@{'/data/connection/db/index?dbName='+${dbName}}" th:text="${dbName}"></a></li>
+            <li class="active" th:text="${tableName}"/>
+        </ol>
     </section>
-    <div th:include="data/footer"></div>
-    <link rel="stylesheet" href="/static/assets/highlight/styles/dark.css">
-    <style>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-body">
+                <ul class="products-list product-list-in-box">
+                    <li class="item">
+                        <table id="dataGrid"></table>
+                    </li>
+                    <li class="item">
+                        <form class="form-horizontal tonto-form-validate">
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <div class="checkbox">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" id="inlineCheckbox1" value="option1">新增·编辑HTML
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" id="inlineCheckbox3" value="option3">查看HTML
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="basePackage" class="col-md-2 control-label">基础包路径</label>
+                                <div class="col-md-5">
+                                    <input type="text" name="basePackage" class="form-control" required="required"
+                                           placeholder="请输入基础包路径"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="model" class="col-md-2 control-label">主模块</label>
+                                <div class="col-md-2">
+                                    <input type="text" name="model" class="form-control" placeholder="请输入主模块"/>
+                                </div>
+                                <label for="subModel" class="col-md-1 control-label">子模块</label>
+                                <div class="col-md-2">
+                                    <input type="text" name="subModel" class="form-control" placeholder="请输入子模块"/>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="item">
+                        <button onclick="build()" type="button" class="btn btn-primary btn-block submitBtn">预览</button>
+                    </li>
+                    <li class="item">
+                        <form class="form-horizontal tonto-form-validate">
+                            <div class="form-group">
+                                <label for="projectPath" class="col-md-2 control-label">Boot项目路径</label>
+                                <div class="col-md-5">
+                                    <input type="text" name="projectPath" th:value="${projectPath}" class="form-control"
+                                           required="required" placeholder="请输入基础包路径"/>
+                                </div>
+                            </div>
+                        </form>
+                    </li>
+                    <li class="item">
+                        <button onclick="build2boot()" type="button" class="btn btn-primary btn-block submitBtn">SPRING
+                            BOOT项目生成
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div th:include="data/footer"></div>
+<link rel="stylesheet" href="/static/assets/highlight/styles/dark.css">
+<style>
     pre {
         padding: 0;
         margin: 0;
@@ -104,8 +111,9 @@
         margin: 0;
         padding: 0;
     }
-    </style>
-    <script type="text/javascript" src="/static/assets/highlight/highlight.pack.js"></script>
+
+</style>
+<script type="text/javascript" src="/static/assets/highlight/highlight.pack.js"></script>
 </body>
 <script type="text/javascript">
 var table;
@@ -262,6 +270,7 @@ function show(result) {
         }
     });
 }
+
 </script>
 
 </html>

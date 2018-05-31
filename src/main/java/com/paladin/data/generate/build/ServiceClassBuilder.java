@@ -1,12 +1,18 @@
-package com.paladin.data.generate;
+package com.paladin.data.generate.build;
 
+import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.GenerateUtil;
+
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.paladin.framework.core.ServiceSupport;
 
-public class GenerateServiceClassUtil {
+@Component
+public class ServiceClassBuilder extends SpringBootClassBuilder{
 
-	public static String createClassContent(GenerateTableOption tableOption) {
+	public String buildContent(GenerateTableOption tableOption) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -23,5 +29,9 @@ public class GenerateServiceClassUtil {
 
 		return sb.toString();
 	}
-
+	
+	@Override
+	public GenerateType getGenerateType() {
+		return GenerateType.SERVICE;
+	}
 }

@@ -34,6 +34,9 @@ import com.paladin.health.model.origin.OriginDiseaseTag;
 import com.paladin.health.service.origin.OriginDiseaseNameService;
 import com.paladin.health.service.origin.OriginDiseaseTagService;
 
+/**
+ * 疾病搜索容器
+ */
 @Component
 public class DiseaseSearchContainer implements SpringContainer {
 
@@ -126,8 +129,7 @@ public class DiseaseSearchContainer implements SpringContainer {
 	}
 
 	/**
-	 * 搜索可能疾病
-	 * 
+	 * 搜索疾病
 	 * @param args
 	 * @return
 	 */

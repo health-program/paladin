@@ -10,10 +10,10 @@ import com.paladin.framework.common.BaseModel;
 import com.paladin.framework.common.UnDeleteBaseModel;
 import com.paladin.framework.common.UnDeleteModel;
 
-public class GenerateConfig {
+public class GenerateEnvironment {
 	
-	static final Map<Class<?>, String> regularTypeMap = new HashMap<>();
-	static final Set<Class<?>> baseModelTypeMap = new HashSet<>();
+	public static final Map<Class<?>, String> regularTypeMap = new HashMap<>();
+	public static final Set<Class<?>> baseModelTypeMap = new HashSet<>();
 	
 	
 	static {

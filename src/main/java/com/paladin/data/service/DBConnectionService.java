@@ -1,8 +1,5 @@
 package com.paladin.data.service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,14 +16,6 @@ import com.paladin.data.database.DataBaseType;
 import com.paladin.data.database.model.Column;
 import com.paladin.data.database.model.DataBase;
 import com.paladin.data.database.model.Table;
-import com.paladin.data.generate.GenerateTableOption;
-import com.paladin.data.generate.GenerateType;
-import com.paladin.data.generate.GenerateUtil;
-import com.paladin.data.generate.GenerateControllerClassUtil;
-import com.paladin.data.generate.GenerateMapperClassUtil;
-import com.paladin.data.generate.GenerateMapperXMLClassUtil;
-import com.paladin.data.generate.GenerateModelClassUtil;
-import com.paladin.data.generate.GenerateServiceClassUtil;
 import com.paladin.data.model.DBConnection;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.exception.BusinessException;
@@ -136,69 +125,6 @@ public class DBConnectionService extends ServiceSupport<DBConnection> {
 		return table.getChildren();
 	}
 
-	/**
-	 * 创建java class内容
-	 * 
-	 * @param tableOption
-	 * @param generateType
-	 * @return
-	 */
-	public String buildJavaClass(GenerateTableOption tableOption, GenerateType generateType) {
 
-		if (generateType == GenerateType.MAPPER) {
-			return GenerateMapperClassUtil.createClassContent(tableOption);
-		} else if (generateType == GenerateType.MODEL) {
-			return GenerateModelClassUtil.createClassContent(tableOption);
-		} else if (generateType == GenerateType.SERVICE) {
-			return GenerateServiceClassUtil.createClassContent(tableOption);
-		} else if (generateType == GenerateType.CONTROLLER) {
-			return GenerateControllerClassUtil.createClassContent(tableOption);
-		} else if (generateType == GenerateType.SQLMAPPER) {
-			return GenerateMapperXMLClassUtil.createXMLContent(tableOption);
-		} else if (generateType == GenerateType.PAGE_INDEX) {
-			return GenerateMapperXMLClassUtil.createXMLContent(tableOption);
-		} 
-
-		return null;
-	}
-
-	/**
-	 * 创建spring boot项目文件
-	 * 
-	 * @param tableOption
-	 * @param generateType
-	 * @param content
-	 */
-	public void buildBootProjectFile(GenerateTableOption tableOption, GenerateType generateType, String projectPath, String content) {
-		
-		Path path = null;
-		
-		if (generateType == GenerateType.MAPPER || generateType == GenerateType.MODEL || generateType == GenerateType.SERVICE
-				|| generateType == GenerateType.CONTROLLER) {
-			// java class
-			try {
-				path = GenerateUtil.getBootProjectJavaPath(projectPath, tableOption, generateType);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new BusinessException("创建文件[" + generateType + "]失败");
-			}
-		} else {
-			
-			try {
-				path = GenerateUtil.getBootProjectResourcesPath(projectPath, tableOption, generateType);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new BusinessException("创建文件[" + generateType + "]失败");
-			}
-		}
-		
-		try {
-			Files.write(path,content.getBytes());
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new BusinessException("创建文件[" + generateType + "]失败");
-		}
-		
-	}
 
 }

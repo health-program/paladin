@@ -6,10 +6,67 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.paladin.framework.utils.reflect.NameUtil;
+import java.util.HashMap;
 
 public class GenerateUtil {
+
+	public static String getFileName(GenerateTableOption tableOption, GenerateType generateType) {
+
+		if (GenerateType.SERVICE == generateType) {
+			return tableOption.getModelName() + "Service.java";
+		} else if (GenerateType.MAPPER == generateType) {
+			return tableOption.getModelName() + "Mapper.java";
+		} else if (GenerateType.MODEL == generateType) {
+			return tableOption.getModelName() + ".java";
+		} else if (GenerateType.CONTROLLER == generateType) {
+			return tableOption.getModelName() + "Controller.java";
+		} else if (GenerateType.QUERY == generateType) {
+			return tableOption.getModelName() + "Query.java";
+		} else if (GenerateType.SQLMAPPER == generateType) {
+			return tableOption.getTable().getName() + "_mapper.xml";
+		} else if (GenerateType.JAVASCRIPT == generateType) {
+			return tableOption.getTable().getName() + ".js";
+		} else if (GenerateType.PAGE_INDEX == generateType) {
+			return tableOption.getTable().getName() + "_index.html";
+		} else if (GenerateType.PAGE_VIEW == generateType) {
+			return tableOption.getTable().getName() + "_view.html";
+		} else if (GenerateType.PAGE_EDIT == generateType) {
+			return tableOption.getTable().getName() + "_edit.html";
+		}
+		return null;
+	}
+	
+	public static String getClassName(GenerateTableOption tableOption, GenerateType generateType) {
+
+		if (GenerateType.SERVICE == generateType) {
+			return tableOption.getModelName() + "Service";
+		} else if (GenerateType.MAPPER == generateType) {
+			return tableOption.getModelName() + "Mapper";
+		} else if (GenerateType.MODEL == generateType) {
+			return tableOption.getModelName() + "";
+		} else if (GenerateType.CONTROLLER == generateType) {
+			return tableOption.getModelName() + "Controller";
+		} else if (GenerateType.QUERY == generateType) {
+			return tableOption.getModelName() + "Query";
+		} 
+		
+		return null;
+	}
+
+	private static final HashMap<GenerateType, String> packageMap = new HashMap<>();
+
+	static {
+		packageMap.put(GenerateType.SERVICE, "service");
+		packageMap.put(GenerateType.MAPPER, "mapper");
+		packageMap.put(GenerateType.MODEL, "model");
+		packageMap.put(GenerateType.CONTROLLER, "controller");
+		packageMap.put(GenerateType.QUERY, "controller");
+		packageMap.put(GenerateType.SQLMAPPER, "mapper");
+		packageMap.put(GenerateType.JAVASCRIPT, "static/js");
+		packageMap.put(GenerateType.PAGE_INDEX, "templates");
+		packageMap.put(GenerateType.PAGE_VIEW, "templates");
+		packageMap.put(GenerateType.PAGE_EDIT, "templates");
+	}
 
 	public static String getClassPackage(GenerateTableOption tableOption, GenerateType generateType) {
 
@@ -21,7 +78,7 @@ public class GenerateUtil {
 			basePackage += "." + model;
 		}
 
-		basePackage += "." + generateType.getName();
+		basePackage += "." + packageMap.get(generateType);
 
 		if (subModel != null && subModel.length() != 0) {
 			String[] subModels = subModel.split("\\.");
@@ -31,31 +88,16 @@ public class GenerateUtil {
 				}
 			}
 		}
+		
+		if(generateType == GenerateType.QUERY) {
+			basePackage += ".pojo";
+		}
 
 		return basePackage;
 	}
-
-	public static String getRequestPath(GenerateTableOption tableOption) {
-
-		String path = "";
-
-		String model = tableOption.getModel();
-		String subModel = tableOption.getSubModel();
-
-		if (model != null && model.length() != 0) {
-			path += "/" + model;
-		}
-
-		if (subModel != null && subModel.length() != 0) {
-			String[] subModels = subModel.split("\\.");
-			if (subModels.length > 0) {
-				for (String sm : subModels) {
-					path += "/" + sm;
-				}
-			}
-		}
-
-		return path.length() == 0 ? "/" : path;
+	
+	public static String getClassFullName(GenerateTableOption tableOption, GenerateType generateType) {
+		return getClassPackage(tableOption,generateType) + "." + getClassName(tableOption,generateType);
 	}
 
 	/**
@@ -68,11 +110,12 @@ public class GenerateUtil {
 	 * @throws IOException
 	 */
 	public static Path getBootProjectJavaPath(String projectPath, GenerateTableOption tableOption, GenerateType generateType) throws IOException {
-		return getBootProjectClassPath(projectPath, getClassPackage(tableOption, generateType), tableOption.getModelName() + generateType.getFileSuffix());
+		return getBootProjectClassPath(projectPath, getClassPackage(tableOption, generateType), getFileName(tableOption, generateType));
 	}
-	
+
 	/**
 	 * 获取spring boot资源地址
+	 * 
 	 * @param projectPath
 	 * @param tableOption
 	 * @param generateType
@@ -80,24 +123,24 @@ public class GenerateUtil {
 	 * @throws IOException
 	 */
 	public static Path getBootProjectResourcesPath(String projectPath, GenerateTableOption tableOption, GenerateType generateType) throws IOException {
-		
+
 		if (projectPath != null && projectPath.length() > 0) {
 			projectPath = projectPath.replaceAll("\\\\", "/");
 			projectPath += projectPath.endsWith("/") ? "src/main/resources" : "/src/main/resources";
 		} else {
 			throw new IOException("项目路径不能为空");
 		}
-		
+
 		String model = tableOption.getModel();
 		String subModel = tableOption.getSubModel();
-		
+
 		ArrayList<String> subPaths = new ArrayList<>();
-		subPaths.add(generateType.getName());		
-		
+		subPaths.add(packageMap.get(generateType));
+
 		if (model != null && model.length() != 0) {
 			subPaths.add(model);
 		}
-		
+
 		if (subModel != null && subModel.length() != 0) {
 			String[] subModels = subModel.split("\\.");
 			if (subModels.length > 0) {
@@ -107,12 +150,12 @@ public class GenerateUtil {
 			}
 		}
 
-		subPaths.add(NameUtil.hump2underline(NameUtil.firstLowerCase(tableOption.getModelName())) + generateType.getFileSuffix());
-			
-		String[] subPathArray = new String[subPaths.size()];	
+		subPaths.add(getFileName(tableOption, generateType));
+
+		String[] subPathArray = new String[subPaths.size()];
 		subPathArray = subPaths.toArray(subPathArray);
-		
-		String[] dirPath = Arrays.copyOf(subPathArray, subPathArray.length -1);	
+
+		String[] dirPath = Arrays.copyOf(subPathArray, subPathArray.length - 1);
 		Files.createDirectories(Paths.get(projectPath, dirPath));
 		return Paths.get(projectPath, subPathArray);
 	}

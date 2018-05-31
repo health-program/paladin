@@ -3,6 +3,7 @@ package com.paladin.data.generate;
 import com.paladin.data.database.DataBaseType;
 import com.paladin.data.database.DataTypeUtil;
 import com.paladin.data.database.model.Column;
+import com.paladin.framework.common.QueryType;
 import com.paladin.framework.utils.reflect.NameUtil;
 
 public class GenerateColumnOption {
@@ -56,6 +57,21 @@ public class GenerateColumnOption {
 	 * 可新增
 	 */
 	private boolean addable;
+	
+	/**
+	 * 可查询
+	 */
+	private boolean queryable;
+	
+	/**
+	 * 查询类型
+	 */
+	private QueryType queryType; 
+	
+	/**
+	 * 常量类型
+	 */
+	private String constantType;
 
 	/**
 	 * 最大长度
@@ -81,7 +97,7 @@ public class GenerateColumnOption {
 		this.fieldType = DataTypeUtil.getJavaType(column, dataBaseType);
 		this.fieldName = NameUtil.underline2hump(column.getName());
 		
-		this.regularType = GenerateConfig.getRegularType(fieldType);
+		this.regularType = GenerateEnvironment.getRegularType(fieldType);
 		
 		if(fieldType == String.class) {
 			Integer length = column.getDataLength(); 
@@ -181,6 +197,30 @@ public class GenerateColumnOption {
 
 	public void setGeneratedType(String generatedType) {
 		this.generatedType = generatedType;
+	}
+
+	public boolean isQueryable() {
+		return queryable;
+	}
+
+	public void setQueryable(boolean queryable) {
+		this.queryable = queryable;
+	}
+
+	public QueryType getQueryType() {
+		return queryType;
+	}
+
+	public void setQueryType(QueryType queryType) {
+		this.queryType = queryType;
+	}
+
+	public String getConstantType() {
+		return constantType;
+	}
+
+	public void setConstantType(String constantType) {
+		this.constantType = constantType;
 	}
 
 }

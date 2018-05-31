@@ -1,10 +1,16 @@
-package com.paladin.data.generate;
+package com.paladin.data.generate.build;
 
+import org.springframework.stereotype.Component;
+
+import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.GenerateUtil;
 import com.paladin.framework.mybatis.CustomMapper;
 
-public class GenerateMapperClassUtil {
+@Component
+public class MapperClassBuilder extends SpringBootClassBuilder{
 
-	public static String createClassContent(GenerateTableOption tableOption) {
+	public String buildContent(GenerateTableOption tableOption) {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -17,5 +23,9 @@ public class GenerateMapperClassUtil {
 
 		return sb.toString();
 	}
-
+	
+	@Override
+	public GenerateType getGenerateType() {
+		return GenerateType.MAPPER;
+	}
 }

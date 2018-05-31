@@ -85,16 +85,8 @@ public class GenerateTableOption {
 		return new ArrayList<>(columnOptions.values());
 	}
 
-	public String getModelPackage() {
-		return GenerateUtil.getClassPackage(this, GenerateType.MODEL);
-	}
-
 	public String getModelFullName() {
 		return GenerateUtil.getClassPackage(this, GenerateType.MODEL) + "." + modelName;
-	}
-
-	public String getModelRequestPath() {
-		return GenerateUtil.getRequestPath(this);
 	}
 
 	public String getModelName() {

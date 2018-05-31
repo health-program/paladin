@@ -1,4 +1,4 @@
-package com.paladin.data.generate;
+package com.paladin.data.generate.build;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -13,17 +13,25 @@ import java.util.Map.Entry;
 
 import javax.persistence.Id;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Set;
 
+import com.paladin.data.generate.GenerateColumnOption;
+import com.paladin.data.generate.GenerateEnvironment;
+import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.GenerateUtil;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
-public class GenerateModelClassUtil {
+@Component
+public class ModelClassBuilder extends SpringBootClassBuilder {
 
 	private static Map<Class<?>, Set<String>> modelFieldMap = new HashMap<>();
 
 	static {
-		for (Class<?> type : GenerateConfig.baseModelTypeMap) {
+		for (Class<?> type : GenerateEnvironment.baseModelTypeMap) {
 			Set<String> fieldNames = new HashSet<>();
 			Method[] methods = type.getMethods();
 			for (Method method : methods) {
@@ -42,10 +50,11 @@ public class GenerateModelClassUtil {
 
 	/**
 	 * 获得基础实体类
+	 * 
 	 * @param tableOption
 	 * @return
 	 */
-	public static Class<?> getBaseModelType(GenerateTableOption tableOption) {
+	private Class<?> getBaseModelType(GenerateTableOption tableOption) {
 
 		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
 
@@ -69,17 +78,17 @@ public class GenerateModelClassUtil {
 				}
 			}
 		}
-		
+
 		return clazz;
 	}
-	
-	private static List<GenerateColumnOption> getNeedColumnOption(GenerateTableOption tableOption, Class<?> baseModelType) {	
+
+	private List<GenerateColumnOption> getNeedColumnOption(GenerateTableOption tableOption, Class<?> baseModelType) {
 		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
-		if(baseModelType != null) {
+		if (baseModelType != null) {
 			ArrayList<GenerateColumnOption> result = new ArrayList<>(columnOptions.size());
-			Set<String> baseModelFields = modelFieldMap.get(baseModelType);			
-			for(GenerateColumnOption columnOption : columnOptions) {
-				if(!baseModelFields.contains(columnOption.getFieldName())) {
+			Set<String> baseModelFields = modelFieldMap.get(baseModelType);
+			for (GenerateColumnOption columnOption : columnOptions) {
+				if (!baseModelFields.contains(columnOption.getFieldName())) {
 					result.add(columnOption);
 				}
 			}
@@ -88,27 +97,27 @@ public class GenerateModelClassUtil {
 			return columnOptions;
 		}
 	}
-	
-	public static String createClassContent(GenerateTableOption tableOption) {
-		
+
+	public String buildContent(GenerateTableOption tableOption) {
+
 		Set<Class<?>> importClassSet = new HashSet<>();
-		Class<?> baseModelType = getBaseModelType(tableOption);		
+		Class<?> baseModelType = getBaseModelType(tableOption);
 		List<GenerateColumnOption> columnOptions = getNeedColumnOption(tableOption, baseModelType);
-				
+
 		Collections.sort(columnOptions, new Comparator<GenerateColumnOption>() {
 
 			@Override
 			public int compare(GenerateColumnOption o1, GenerateColumnOption o2) {
 				return o1.getColumn().getOrderIndex() - o2.getColumn().getOrderIndex();
 			}
-			
+
 		});
-		
+
 		importClassSet.add(Id.class);
-		if(baseModelType!=null) {
+		if (baseModelType != null) {
 			importClassSet.add(baseModelType);
 		}
-		
+
 		for (GenerateColumnOption columnOption : columnOptions) {
 			Class<?> clazz = columnOption.getFieldType();
 
@@ -118,12 +127,12 @@ public class GenerateModelClassUtil {
 			if (!clazz.isPrimitive() && !clazz.getName().matches("^java.lang.[^.]"))
 				importClassSet.add(clazz);
 		}
-				
+
 		String tab = "\t";
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("package ").append(tableOption.getModelPackage()).append(";\n\n");
+		sb.append("package ").append(GenerateUtil.getClassPackage(tableOption, GenerateType.MODEL)).append(";\n\n");
 
 		String[] classNames = new String[importClassSet.size()];
 
@@ -137,43 +146,46 @@ public class GenerateModelClassUtil {
 			if (!className.matches("^java\\.lang\\.\\w+$"))
 				sb.append("import ").append(className).append(";\n");
 		}
-		
+
 		sb.append("\npublic class ").append(tableOption.getModelName());
-		if(baseModelType != null) {
+		if (baseModelType != null) {
 			sb.append(" extends ").append(baseModelType.getSimpleName());
 		}
-		
+
 		sb.append(" {\n\n");
 
 		for (GenerateColumnOption columnOption : columnOptions) {
-			
-			if(columnOption.isPrimary()) {
+
+			if (columnOption.isPrimary()) {
 				sb.append(tab).append("@Id").append("\n");
 			}
-			
-			sb.append(tab).append("private ").append(columnOption.getFieldType().getSimpleName()).append(" ").append(columnOption.getFieldName()).append(";\n\n");
+
+			sb.append(tab).append("private ").append(columnOption.getFieldType().getSimpleName()).append(" ").append(columnOption.getFieldName())
+					.append(";\n\n");
 		}
 
 		for (GenerateColumnOption columnOption : columnOptions) {
 
 			String fieldName = columnOption.getFieldName();
 			String className = columnOption.getFieldType().getSimpleName();
-			
+
 			// getMethod
-			sb.append(tab).append("public ").append(className).append(" ").append(NameUtil.addGet(fieldName))
-					.append("() {\n").append(tab).append(tab).append("return ").append(fieldName).append(";\n").append(tab).append("}\n\n");
+			sb.append(tab).append("public ").append(className).append(" ").append(NameUtil.addGet(fieldName)).append("() {\n").append(tab).append(tab)
+					.append("return ").append(fieldName).append(";\n").append(tab).append("}\n\n");
 
 			// setMethod
-			sb.append(tab).append("public void ").append(NameUtil.addSet(fieldName)).append("(").append(className)
-					.append(" ").append(fieldName).append(") {\n").append(tab).append(tab).append("this.").append(fieldName)
-					.append(" = ").append(fieldName).append(";\n").append(tab).append("}\n\n");
+			sb.append(tab).append("public void ").append(NameUtil.addSet(fieldName)).append("(").append(className).append(" ").append(fieldName).append(") {\n")
+					.append(tab).append(tab).append("this.").append(fieldName).append(" = ").append(fieldName).append(";\n").append(tab).append("}\n\n");
 		}
 
 		sb.append("}");
 
 		return sb.toString();
 	}
-	
-	
-	
+
+	@Override
+	public GenerateType getGenerateType() {
+		return GenerateType.MODEL;
+	}
+
 }
