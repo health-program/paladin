@@ -51,6 +51,19 @@ public class IndexItemController {
 	public Object itemList() {
 		return CommonResponse.getSuccessResponse(itemService.findAll());
 	}
+	
+	@RequestMapping("/item/detail/list")
+	@ResponseBody
+	public Object itemDetailList() {
+		
+		HashMap<String, Object> result = new HashMap<>();
+		result.put("item", itemService.findAll());
+		result.put("itemValueDefinition", itemValueDefinitionService.findAll());
+		result.put("itemStandard", itemStandardService.findAll());
+		result.put("itemDependenceDetail", itemDependenceService.findAll());
+
+		return CommonResponse.getSuccessResponse(result);
+	}
 
 	@RequestMapping("/item/detail")
 	@ResponseBody
