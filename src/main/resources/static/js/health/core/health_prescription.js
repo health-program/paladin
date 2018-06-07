@@ -1,6 +1,80 @@
 $(function() {
-    $.getAjax("/health/index/item/detail/list", init);
+    $.getAjax("/health/prescription/factor/list", initFactor);
+    $.getAjax("/health/index/item/detail/list", initReport);
 });
+
+//---------------- 危险因素部分 -----------------
+var factors;
+
+function initFactor(data) {
+    factors = data;
+    $("#factorInput").bsSuggest({
+        idField: "code",
+        keyField: "name",
+        effectiveFields: ["name"],
+        effectiveFieldsAlias: { name: "危险因素" },
+        searchFields: ["name", "code"],
+        data: {
+            value: data
+        },
+        clearable: false,
+        autoSelect: false,
+        autoDropup: true,
+        ignorecase: true,
+        //showBtn: false,        
+        showHeader: true
+    }).on('onSetSelectValue', function(e, keyword, data) {
+        $("#factor").tagsinput('add', data.name);
+    });
+
+    $('#factor').on('beforeItemAdd', function(event) {
+        var val = event.item;
+        for (var i = 0; i < factors.length; i++) {
+            var obj = factors[i];
+            if (obj.name == val) {
+                return;
+            }
+        }
+        $.errorMessage("不存在危险因素：" + val);
+        event.cancel = true;
+    });
+}
+
+function findPrescription() {
+    var args = $("#factor").tagsinput("items");
+
+    if (args && args.length == 0) {
+        $.errorMessage("请选择查询条件");
+        return;
+    }
+
+    var url = "/health/prescription/find?";
+    args.forEach(function(i) {
+        url += "args=" + i + "&";
+    });
+
+    $.getAjax(url, function(result) {
+        var html = "<ul>";
+        if (result && result.length > 0) {
+            result.forEach(function(x) {
+                html += "<li>" + x + "</li>";
+            });
+
+            html += "</ul>"
+        } else {
+            $.infoMessage("没有有用的健康处方");
+        }
+
+        $.openPageLayer(html);
+    });
+}
+
+function clearInput() {
+	$("#factor").tagsinput('removeAll');
+    $("#factorInput").val("");
+}
+
+//---------------- 健康报告部分 -----------------
 
 var items = [];
 var itemList;
@@ -57,7 +131,7 @@ var g = function(nodeItems, depth) {
     return nodes;
 }
 
-function init(result) {
+function initReport(result) {
 
     itemList = result.item;
     itemValueDefinitionList = result.itemValueDefinition;

@@ -222,10 +222,10 @@ public class DBConnectionController extends ControllerSupport {
 		generateService.buildProjectFile(tableOption, GenerateType.MODEL, projectPath);
 		generateService.buildProjectFile(tableOption, GenerateType.MAPPER, projectPath);
 		generateService.buildProjectFile(tableOption, GenerateType.SERVICE, projectPath);
-		generateService.buildProjectFile(tableOption, GenerateType.CONTROLLER, projectPath);
+//		generateService.buildProjectFile(tableOption, GenerateType.CONTROLLER, projectPath);
 	
 		generateService.buildProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath);
-		generateService.buildProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath);
+//		generateService.buildProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath);
 //		generateService.buildProjectFile(tableOption, GenerateType.PAGE_INDEX, projectPath);
 //		generateService.buildProjectFile(tableOption, GenerateType.PAGE_VIEW, projectPath);
 //		generateService.buildProjectFile(tableOption, GenerateType.PAGE_EDIT, projectPath);

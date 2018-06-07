@@ -140,6 +140,88 @@
         },
         infoAlert: function(msg, fun) {
             layer.alert(msg, { icon: 6 }, fun);
+        },
+        isLayer: function() {
+            if (parent && parent.layer && parent.layer.getFrameIndex(window.name)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        openPageLayer: function(content, options) {
+            var default_options = {
+                widthPercent: 0.8,
+                heightPercent: 0.9,
+                title: " "
+            };
+
+            if (typeof options == "string") {
+                default_options.title = options;
+                options = default_options;
+            } else if (typeof options == "function") {
+                default_options.success = options;
+                options = default_options;
+            } else {
+                options = $.extend(default_options, options);
+            }
+
+            var w = options.widthPercent > 1 ? options.widthPercent : $(window).width() * options.widthPercent;
+            var h = options.heightPercent > 1 ? options.heightPercent : $(window).height() * options.heightPercent;
+
+            w += "px";
+            h += "px";
+
+            content = '<div style="padding:15px">' + content + '</div>';
+
+            layer.open({
+                type: 1,
+                title: options.title,
+                maxmin: true, //开启最大化最小化按钮
+                area: [w, h],
+                content: content,
+                success: options.success
+            });
+        },
+        openUrlLayerOrLocate: function(url, options) {
+
+            if (options && options.data) {
+                url = $.wrapGetUrl(url, options.data);
+            }
+
+            if ($.isLayer()) {
+                window.location = url;
+            }
+
+            var default_options = {
+                widthPercent: 0.8,
+                heightPercent: 0.9,
+                title: " "
+            };
+
+            if (typeof options == "string") {
+                default_options.title = options;
+                options = default_options;
+            } else if (typeof options == "function") {
+                default_options.success = options;
+                options = default_options;
+            } else {
+                options = $.extend(default_options, options);
+            }
+
+            var w = options.widthPercent > 1 ? options.widthPercent : $(window).width() * options.widthPercent;
+            var h = options.heightPercent > 1 ? options.heightPercent : $(window).height() * options.heightPercent;
+
+            w += "px";
+            h += "px";
+
+            layer.open({
+                type: 2,
+                title: options.title,
+                maxmin: true, //开启最大化最小化按钮
+                area: [w, h],
+                content: url,
+                success: options.success
+            });
         }
     })
 
@@ -257,6 +339,23 @@
             form.appendTo(document.body);
             form.submit();
             document.body.removeChild(form[0]);
+        },
+        wrapGetUrl: function(url, data) {
+            if (data) {
+                var i = url.indexOf("?");
+                if (i > 0) {
+                    if (i < (url.length - 1)) {
+                        url += "&";
+                    }
+                } else {
+                    url += "?";
+                }
+
+                for (var o in data) {
+                    url += o + "=" + data[o] + "&";
+                }
+            }
+            return url;
         }
     });
 
@@ -1221,7 +1320,7 @@ function _showInfoDescription(items, container, isHorizontal) {
     var dl = $('<dl ' + (isHorizontal ? 'class="dl-horizontal"' : '') + '></dl>');
 
     items.forEach(function(i) {
-        if(i.content instanceof jQuery){
+        if (i.content instanceof jQuery) {
             dl.append("<dt>" + i.title + ":</dt>");
             var k = $("<dd></dd>");
             k.append(i.content);

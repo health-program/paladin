@@ -1,9 +1,45 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="health/header" />
+<link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
 
 <body>
     <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-search"></i>
+                <h3 class="box-title">查询健康处方</h3>
+            </div>
+            <div class="box-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-md-8">
+                            <label for="xgzz" style="width:130px" class="col-md-2 control-label">相关症状</label>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="factorInput" placeholder="请输入危险因素名称或拼音" />
+                                    <span class="input-group-btn">
+                                <button type="button" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                </ul>
+                             </span>
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" id="factor" class="form-control" data-role="tagsinput"></input>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <button type="button" style="width:100px" class="btn btn-primary" onclick="findPrescription()">查询</button>
+                            <button type="button" style="width:100px" class="btn btn-default" onclick="clearInput()">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="box box-solid">
             <div class="box-header with-border">
                 <i class="fa fa-search"></i>
@@ -15,6 +51,8 @@
         </div>
     </section>
     <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
     <script type="text/javascript" src="/static/js/health/core/health_prescription.js"></script>
 </body>
 
