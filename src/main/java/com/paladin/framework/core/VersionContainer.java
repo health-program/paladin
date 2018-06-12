@@ -13,7 +13,9 @@ public interface VersionContainer {
 	 * 执行顺序
 	 * @return
 	 */
-	public int order();
+	default public int order() {
+		return 0;
+	};
 	
 	/**
 	 * 版本改变处理

@@ -3,11 +3,15 @@ package com.paladin.health.model.prescription;
 import javax.persistence.Id;
 
 public class PrescriptionItem {
+	
+	public static final String COLUMN_FIELD_TYPE = "type";
 
 	@Id
 	private Integer id;
 
 	private String content;
+	
+	private String detail;
 
 	private Integer type;
 
@@ -53,6 +57,14 @@ public class PrescriptionItem {
 
 	public void setMutexPriority(Integer mutexPriority) {
 		this.mutexPriority = mutexPriority;
+	}
+
+	public String getDetail() {
+		return detail;
+	}
+
+	public void setDetail(String detail) {
+		this.detail = detail;
 	}
 
 }

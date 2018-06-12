@@ -164,7 +164,7 @@ function getDiseaseDiet() {
             dietList.forEach(function(diet) {
                 if (diet.type == 3 || diet.type == 4) {
                     html += '<thead><tr style="background-color:#94c17c"><th colspan="3">' + diet.summary + '</th></tr>'
-                    html = diet.type == 3 ? html += '<tr class="text-center success"><td width="20%">' + "宜吃食物" + '</td>' + '<td width="45%">">' + "宜吃理由" + '</td width="35%">' + '<td>' + "食用建议" + '</td></tr></thead>' :
+                    html = diet.type == 3 ? html += '<tr class="text-center success"><td width="20%">' + "宜吃食物" + '</td>' + '<td width="45%">' + "宜吃理由" + '</td width="35%">' + '<td>' + "食用建议" + '</td></tr></thead>' :
                         html += '<tr style="text-align:center" class="success"><td width="20%">' + "忌吃食物" + '</td>' + '<td width="45%">' + "忌吃理由" + '</td>' + '<td width="35%">' + "忌吃建议" + '</td></tr></thead>'
                     return;
                 }

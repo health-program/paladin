@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+
+<body>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">健康处方</h3>
+                <div class="pull-right box-tools">
+                    <button type="button" class="btn btn-block btn-social btn-dropbox" onclick="saveFactorItem()"><i class="fa fa-save"></i>保存</button>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="col-md-3">
+                    <div id="tree">
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="nav-tabs-custom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#type1" data-toggle="tab" aria-expanded="true">日常生活</a></li>
+                            <li class=""><a href="#type3" data-toggle="tab" aria-expanded="false">饮食适宜</a></li>
+                            <li class=""><a href="#type4" data-toggle="tab" aria-expanded="false">饮食禁忌</a></li>
+                            <li class=""><a href="#type5" data-toggle="tab" aria-expanded="false">饮食原则</a></li>
+                            <li class=""><a href="#type6" data-toggle="tab" aria-expanded="false">心理健康</a></li>
+                            <li class=""><a href="#type7" data-toggle="tab" aria-expanded="false">运动锻炼</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="type1" style="max-height: 700px;overflow: auto;">
+                            </div>
+                            <div class="tab-pane" id="type3" style="max-height: 700px;overflow: auto;">
+                            </div>
+                            <div class="tab-pane" id="type4" style="max-height: 700px;overflow: auto;">
+                            </div>
+                            <div class="tab-pane" id="type5" style="max-height: 700px;overflow: auto;">
+                            </div>
+                            <div class="tab-pane" id="type6" style="max-height: 700px;overflow: auto;">
+                            </div>
+                            <div class="tab-pane" id="type7" style="max-height: 700px;overflow: auto;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+    <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <script type="text/javascript">
+    var tree;
+    var currentCode;
+    $(function() {
+        tree = $("#tree");
+        $.getAjax("/health/prescription/index/data", initData);
+    });
+
+    var factors;
+    var types;
+    var items;
+
+    function initData(result) {
+
+        factors = result.factors;
+        types = result.types;
+        items = result.items;
+
+        initFactor();
+        initItem();
+    }
+
+    function initFactor() {
+        var treedata = [];
+
+        var map = {};
+
+        if (factors) {
+            for (var i = 0; i < factors.length; i++) {
+                var factor = factors[i];
+                map[factor.code] = factor;
+            }
+
+            for (var i = 0; i < factors.length; i++) {
+                var factor = factors[i];
+                var text = "";
+
+                if (factor.parentFactor) {
+                    var fs = factor.parentFactor.split(",");
+                    if(fs && fs.length > 0) {
+                        text = "（";
+
+                        fs.forEach(function(i) {
+                            text += map[i].name + "，";
+                        });
+                        text = text.substring(0, text.length - 1);
+                        text += "）";
+                    }                    
+                }
+
+                treedata[i] = {
+                    text: factor.name + text,
+                    code: factor.code
+                }
+            }
+
+        }
+
+        tree.treeview({ data: treedata, levels: 1 });
+        tree.on('nodeSelected', function(event, node) {
+            selectItem(node.code);
+        });
+    }
+
+    function selectItem(code) {
+        currentCode = code;
+        $.getAjax("/health/prescription/factor/item?code=" + code, function(result) {
+            $("input[type='checkbox']").prop("checked", false);
+            if (result) {
+                result.forEach(function(item) {
+                    $("input[type='checkbox'][value='" + item.id + "']").prop("checked", true);
+                });
+            }
+        });
+    }
+
+    function initItem() {
+        initItemByType(1);
+        initItemByType(3);
+        initItemByType(4);
+        initItemByType(5);
+        initItemByType(6);
+        initItemByType(7);
+    }
+
+    function initItemByType(type) {
+        var typeItems = $.grep(items, function(row, index) {
+            return row.type == type;
+        });
+
+        var html = "";
+        typeItems.forEach(function(item) {
+            html += '<div class="checkbox"><label><input type="checkbox" value="' + item.id + '">' + item.content + '</label></div>';
+            if (item.detail) {
+                html += '<div class="checkbox"><label style="color:#999">' + item.detail + '</label></div>';
+            }
+        });
+
+        $("#type" + type).html(html);
+    }
+
+    function saveFactorItem() {
+
+        var ids = "";
+        $("input[type='checkbox']:checked").each(function() {
+            ids += $(this).val() + ",";
+        })
+
+        var param = {
+            factorCode: currentCode,
+            itemId: ids
+        }
+
+        $.postAjax("/health/prescription/factor/item/save", param, function() {
+            $.successMessage("保存成功");
+        });
+    }
+    </script>
+</body>
+
+</html>

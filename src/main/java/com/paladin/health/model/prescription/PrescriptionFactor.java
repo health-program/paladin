@@ -10,6 +10,8 @@ public class PrescriptionFactor {
 	private String name;
 
 	private String type;
+	
+	private String parentFactor;
 
 	public String getCode() {
 		return code;
@@ -33,6 +35,14 @@ public class PrescriptionFactor {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getParentFactor() {
+		return parentFactor;
+	}
+
+	public void setParentFactor(String parentFactor) {
+		this.parentFactor = parentFactor;
 	}
 
 }

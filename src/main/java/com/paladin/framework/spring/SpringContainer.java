@@ -14,19 +14,26 @@ public interface SpringContainer {
 	 * 
 	 * @return
 	 */
-	public boolean initialize();
+	default public boolean initialize() {
+		return true;
+	};
 
 	/**
 	 * 所有{@link SpringContainer}的实例的{@code initialize()}方法执行后执行
 	 * 
 	 * @return
 	 */
-	public boolean afterInitialize();
-	
+	default public boolean afterInitialize() {
+		return true;
+	};
+
 	/**
 	 * 执行顺序
+	 * 
 	 * @return
 	 */
-	public int order();
+	default public int order() {
+		return 0;
+	}
 
 }

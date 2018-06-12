@@ -2,4 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.prescription.PrescriptionItemMapper">
 
+	<select id="findItemOfFactor" resultType="com.paladin.health.model.prescription.PrescriptionItem" parameterType="String">
+		SELECT 
+			b.id AS id,b.content AS content,b.type AS type,b.mutex AS mutex,b.mutex_priority AS mutexPriority 
+		FROM prescription_factor_item a 
+		INNER JOIN prescription_item b ON a.item_id = b.id AND a.factor_code = #{code};
+	</select>
+	
 </mapper>

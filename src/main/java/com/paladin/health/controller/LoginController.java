@@ -33,7 +33,7 @@ public class LoginController extends ControllerSupport {
 
 	@RequestMapping(value = "/main")
 	public Object main(HttpServletRequest request) {
-		return "/health/main";
+		return "/health/index";
 	}
 	
 	/**

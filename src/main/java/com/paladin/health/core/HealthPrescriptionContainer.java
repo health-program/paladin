@@ -2,7 +2,10 @@ package com.paladin.health.core;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +56,11 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	@Autowired
 	private PrescriptionItemService prescriptionItemService;
 
-	static final String FIELD_CONTENT = "content";
-	static final String FIELD_FACTOR = "factor";
-	static final String FIELD_MUTEX = "mutex";
-	static final String FIELD_MUTEX_PRIORITY = "mutex_priority";
+	private static final String FIELD_ID = "id";
+	private static final String FIELD_CONTENT = "content";
+	private static final String FIELD_FACTOR = "factor";
+	private static final String FIELD_MUTEX = "mutex";
+	private static final String FIELD_MUTEX_PRIORITY = "mutex_priority";
 
 	private static final int MAX_SEARCH_RESULT_COUNT = 1000;
 
@@ -65,16 +69,34 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	private List<PrescriptionFactor> prescriptionFactor;
 	private Map<String, String> factorNameMap;
+	private Map<String, Factor> factorCodeMap;
 
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化健康处方搜索服务功能-------------");
 
 		prescriptionFactor = prescriptionFactorService.findAll();
+		prescriptionFactor = Collections.unmodifiableList(prescriptionFactor);
 
 		factorNameMap = new HashMap<>();
+		factorCodeMap = new HashMap<>();
+
 		for (PrescriptionFactor factor : prescriptionFactor) {
 			factorNameMap.put(factor.getName(), factor.getCode());
+			factorCodeMap.put(factor.getCode(), new Factor(factor));
+		}
+
+		for (Factor factor : factorCodeMap.values()) {
+			String parentFactor = factor.source.getParentFactor();
+			if (parentFactor != null && parentFactor.length() != 0) {
+				String[] parents = parentFactor.split(",");
+				for (String parent : parents) {
+					Factor f = factorCodeMap.get(parent);
+					if (f != null) {
+						factor.parents.add(f);
+					}
+				}
+			}
 		}
 
 		try {
@@ -90,6 +112,173 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		return true;
 	}
 
+	private static class Factor {
+
+		PrescriptionFactor source;
+
+		String code;
+
+		HashSet<Factor> parents = new HashSet<>();
+
+		Factor(PrescriptionFactor prescriptionFactor) {
+			source = prescriptionFactor;
+			code = prescriptionFactor.getCode();
+		}
+
+		public void getFactorAndParent(HashSet<String> codes) {
+			codes.add(this.code);
+			if (parents.size() > 0) {
+				for (Factor f : parents) {
+					f.getFactorAndParent(codes);
+				}
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return code.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+
+			if (obj == null)
+				return false;
+
+			if (obj instanceof Factor) {
+				Factor f = (Factor) obj;
+				if (code == null) {
+					return f.code == null;
+				}
+				return code.equals(f.code);
+			}
+			return false;
+		}
+
+	}
+
+	private static class Prescription {
+
+		@SuppressWarnings("unused")
+		String id;
+		String content;
+		@SuppressWarnings("unused")
+		String type;
+		String[] mutexIds;
+		int mutexPriority;
+
+		Prescription(Document doc) {
+			id = doc.get(FIELD_ID);
+			content = doc.get(FIELD_CONTENT);
+			String mutex = doc.get(FIELD_MUTEX);
+			if (mutex != null && mutex.length() > 0) {
+				mutexIds = mutex.split(",");
+				String mutexPriorityStr = doc.get(FIELD_MUTEX_PRIORITY);
+				if (mutexPriorityStr != null && mutexPriorityStr.length() > 0) {
+					mutexPriority = Integer.valueOf(mutexPriorityStr);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 搜索健康处方
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public List<String> search(String... args) {
+
+		if (args == null || args.length == 0) {
+			return null;
+		}
+
+		HashSet<String> codes = new HashSet<>();
+		for (int i = 0; i < args.length; i++) {
+			String arg = args[i];
+			String code = factorNameMap.get(arg);
+			if (code == null) {
+				code = arg;
+			}
+			Factor factor = factorCodeMap.get(code);
+			factor.getFactorAndParent(codes);
+		}
+
+		if (codes.size() > 0) {
+			BooleanQuery.Builder builder = new BooleanQuery.Builder();
+			for (String code : codes) {
+				builder.add(new TermQuery(new Term(FIELD_FACTOR, code)), Occur.SHOULD);
+			}
+			Query query = builder.build();
+
+			try {
+				TopDocs topDocs = searcher.search(query, MAX_SEARCH_RESULT_COUNT);
+
+				// 提取TopDocs对象中的文档ID，如何找出对应的文档
+				ScoreDoc[] scoreDocs = topDocs.scoreDocs;
+				Prescription[] result = new Prescription[scoreDocs.length];
+
+				for (int i = 0; i < scoreDocs.length; i++) {
+					ScoreDoc scoreDoc = scoreDocs[i];
+					int docId = scoreDoc.doc;
+					Document doc = searcher.doc(docId);
+					result[i] = new Prescription(doc);
+				}
+				return filterPrescription(result);
+			} catch (IOException e1) {
+				logger.error("搜索健康处方异常:" + StringParser.toString(args), e1);
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * 过滤，去除重复无效处方
+	 * @param prescriptions
+	 * @return
+	 */
+	private List<String> filterPrescription(Prescription[] prescriptions) {
+		HashMap<String, Prescription> mutexPriorityMap = new HashMap<>();
+		List<String> result = new ArrayList<>(prescriptions.length);
+		for (Prescription p : prescriptions) {
+			if (p.mutexIds != null) {
+				for (String id : p.mutexIds) {
+					Prescription pp = mutexPriorityMap.get(id);
+					if (pp == null || p.mutexPriority > pp.mutexPriority) {
+						mutexPriorityMap.put(id, p);
+					}
+				}
+			} else {
+				result.add(p.content);
+			}
+		}
+		for (Prescription p : mutexPriorityMap.values()) {
+			result.add(p.content);
+		}
+
+		return result;
+	}
+
+	public List<PrescriptionFactor> getPrescriptionFactor() {
+		return prescriptionFactor;
+	}
+
+	public String getCodeByName(String name) {
+		return factorNameMap.get(name);
+	}
+
+	public PrescriptionFactor getFactorByCode(String code) {
+		Factor factor = factorCodeMap.get(code);
+		return factor == null ? null : factor.source;
+	}
+
+	/**
+	 * 创建索引
+	 * 
+	 * @param path
+	 * @return
+	 */
 	public Directory writeDirectory(String path) {
 		Directory dir = null;
 		IndexWriter writer = null;
@@ -113,6 +302,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					Integer mutexPriority = item.getMutexPriority();
 
 					Document doc = new Document();
+					doc.add(new StringField(FIELD_ID, item.getId().toString(), Store.YES));
 					doc.add(new StringField(FIELD_CONTENT, content, Store.YES));
 					doc.add(new StringField(FIELD_MUTEX, mutex == null ? "" : mutex, Store.YES));
 					doc.add(new StringField(FIELD_MUTEX_PRIORITY, mutexPriority == null ? "" : mutexPriority.toString(), Store.YES));
@@ -145,84 +335,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					e.printStackTrace();
 				}
 			}
-
 		}
-
 		return dir;
 	}
-
-	/**
-	 * 搜索健康处方
-	 * 
-	 * @param args
-	 * @return
-	 */
-	public String[] search(String... args) {
-
-		if (args == null || args.length == 0) {
-			return null;
-		}
-
-		Query query = null;
-
-		if (args.length == 1) {
-			String code = factorNameMap.get(args[0]);
-			if (code == null) {
-				code = args[0];
-			}
-			query = new TermQuery(new Term(FIELD_FACTOR, code));
-		} else {
-			BooleanQuery.Builder builder = new BooleanQuery.Builder();
-			for (String arg : args) {
-				String code = factorNameMap.get(arg);
-				if (code == null) {
-					code = arg;
-				}
-				builder.add(new TermQuery(new Term(FIELD_FACTOR, code)), Occur.SHOULD);
-			}
-			query = builder.build();
-		}
-
-		try {
-			TopDocs topDocs = searcher.search(query, MAX_SEARCH_RESULT_COUNT);
-
-			// 提取TopDocs对象中的文档ID，如何找出对应的文档
-			ScoreDoc[] scoreDocs = topDocs.scoreDocs;
-			String[] result = new String[scoreDocs.length];
-
-			for (int i = 0; i < scoreDocs.length; i++) {
-				ScoreDoc scoreDoc = scoreDocs[i];
-				int docId = scoreDoc.doc;
-				Document doc = searcher.doc(docId);
-				result[i] = doc.get(FIELD_CONTENT);
-			}
-
-			return result;
-		} catch (IOException e1) {
-			logger.error("搜索健康处方异常:" + StringParser.toString(args), e1);
-		}
-
-		return null;
-	}
-	
-	
-
-	@Override
-	public boolean afterInitialize() {
-		return true;
-	}
-
-	@Override
-	public int order() {
-		return 0;
-	}
-
-	public List<PrescriptionFactor> getPrescriptionFactor() {
-		return prescriptionFactor;
-	}
-
-	public String getCode(String name) {
-		return factorNameMap.get(name);
-	}
-
 }

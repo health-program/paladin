@@ -7,7 +7,6 @@ import javax.persistence.Transient;
 
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
-import com.paladin.health.model.index.IndexItemStandard;
 
 public class SelectUtil {
 
@@ -53,10 +52,4 @@ public class SelectUtil {
 
 		return "";
 	}
-
-	
-	public static void main(String[] args) {
-		System.out.println(getSelectSql(IndexItemStandard.class, "a", true));
-	}
-
 }

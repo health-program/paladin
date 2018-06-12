@@ -200,15 +200,4 @@ public class DiseaseSearchContainer implements SpringContainer {
 		}
 
 	}
-
-	@Override
-	public boolean afterInitialize() {
-		return true;
-	}
-
-	@Override
-	public int order() {
-		return 0;
-	}
-
 }

@@ -28,8 +28,20 @@ public class ConstantsContainer implements VersionContainer{
 		booleanTypes.add(new KeyValue("0", "否"));
 		enumConstantMap.put("boolean-type", booleanTypes);
 		
-		constantMap = enumConstantMap;
 		
+		List<KeyValue> prescriptionItemTypes = new ArrayList<>();
+		prescriptionItemTypes.add(new KeyValue("1", "日常生活"));
+		prescriptionItemTypes.add(new KeyValue("3", "饮食适宜"));
+		prescriptionItemTypes.add(new KeyValue("4", "饮食禁忌"));
+		prescriptionItemTypes.add(new KeyValue("5", "饮食行为"));
+		prescriptionItemTypes.add(new KeyValue("6", "心理"));
+		prescriptionItemTypes.add(new KeyValue("7", "运动"));
+		prescriptionItemTypes.add(new KeyValue("9", "容易引发的疾病或状态"));
+		prescriptionItemTypes.add(new KeyValue("10", "容易引发的问题"));
+
+		enumConstantMap.put("prescription-item-type", prescriptionItemTypes);
+				
+		constantMap = enumConstantMap;		
 		return true;
 	}
 	
@@ -43,11 +55,6 @@ public class ConstantsContainer implements VersionContainer{
 	public boolean versionChangedHandle(long version) {
 		initialize();
 		return true;
-	}
-
-	@Override
-	public int order() {
-		return 0;
 	}
 
 	public static Map<String, List<KeyValue>> getTypeChildren(String... typeCodes) {

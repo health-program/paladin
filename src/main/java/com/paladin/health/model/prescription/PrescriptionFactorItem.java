@@ -10,7 +10,7 @@ public class PrescriptionFactorItem {
 	private String factorCode;
 
 	@Id
-	private String itemId;
+	private Integer itemId;
 
 	public String getFactorCode() {
 		return factorCode;
@@ -20,12 +20,13 @@ public class PrescriptionFactorItem {
 		this.factorCode = factorCode;
 	}
 
-	public String getItemId() {
+	public Integer getItemId() {
 		return itemId;
 	}
 
-	public void setItemId(String itemId) {
+	public void setItemId(Integer itemId) {
 		this.itemId = itemId;
 	}
+
 
 }
