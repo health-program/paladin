@@ -59,6 +59,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_CONTENT = "content";
 	private static final String FIELD_FACTOR = "factor";
+	private static final String FIELD_TYPE = "type";
 	private static final String FIELD_MUTEX = "mutex";
 	private static final String FIELD_MUTEX_PRIORITY = "mutex_priority";
 
@@ -98,7 +99,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				}
 			}
 		}
-
+				
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/prescription").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));
@@ -157,19 +158,16 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	}
 
-	private static class Prescription {
+	public static class Prescription {
 
-		@SuppressWarnings("unused")
-		String id;
 		String content;
-		@SuppressWarnings("unused")
-		String type;
+		int type;
 		String[] mutexIds;
 		int mutexPriority;
 
 		Prescription(Document doc) {
-			id = doc.get(FIELD_ID);
 			content = doc.get(FIELD_CONTENT);
+			type = Integer.valueOf(doc.get(FIELD_TYPE));
 			String mutex = doc.get(FIELD_MUTEX);
 			if (mutex != null && mutex.length() > 0) {
 				mutexIds = mutex.split(",");
@@ -179,6 +177,39 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				}
 			}
 		}
+		
+		Prescription(String content, int type) {
+			this.content = content;
+			this.type = type;
+		}
+
+		public String getContent() {
+			return content;
+		}
+
+		public int getType() {
+			return type;
+		}
+	}
+
+	public static class PrescriptionResult {
+
+		List<PrescriptionFactor> factors;
+		List<Prescription> prescriptions;
+
+		PrescriptionResult(List<Prescription> prescriptions, List<PrescriptionFactor> factors) {
+			this.factors = factors;
+			this.prescriptions = prescriptions;
+		}
+
+		public List<PrescriptionFactor> getFactors() {
+			return factors;
+		}
+
+		public List<Prescription> getPrescriptions() {
+			return prescriptions;
+		}
+
 	}
 
 	/**
@@ -187,7 +218,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	 * @param args
 	 * @return
 	 */
-	public List<String> search(String... args) {
+	public PrescriptionResult search(String... args) {
 
 		if (args == null || args.length == 0) {
 			return null;
@@ -205,9 +236,11 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		}
 
 		if (codes.size() > 0) {
+			List<PrescriptionFactor> factors = new ArrayList<>();
 			BooleanQuery.Builder builder = new BooleanQuery.Builder();
 			for (String code : codes) {
 				builder.add(new TermQuery(new Term(FIELD_FACTOR, code)), Occur.SHOULD);
+				factors.add(factorCodeMap.get(code).source);
 			}
 			Query query = builder.build();
 
@@ -224,7 +257,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					Document doc = searcher.doc(docId);
 					result[i] = new Prescription(doc);
 				}
-				return filterPrescription(result);
+
+				return new PrescriptionResult(filterPrescription(result), factors);
 			} catch (IOException e1) {
 				logger.error("搜索健康处方异常:" + StringParser.toString(args), e1);
 			}
@@ -235,12 +269,17 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	/**
 	 * 过滤，去除重复无效处方
+	 * 
 	 * @param prescriptions
 	 * @return
 	 */
-	private List<String> filterPrescription(Prescription[] prescriptions) {
+	private List<Prescription> filterPrescription(Prescription[] prescriptions) {
 		HashMap<String, Prescription> mutexPriorityMap = new HashMap<>();
-		List<String> result = new ArrayList<>(prescriptions.length);
+		List<Prescription> result = new ArrayList<>(prescriptions.length);
+
+		HashSet<String> shouldEat = new HashSet<>();
+		HashSet<String> notShouldEat = new HashSet<>();
+
 		for (Prescription p : prescriptions) {
 			if (p.mutexIds != null) {
 				for (String id : p.mutexIds) {
@@ -250,11 +289,42 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					}
 				}
 			} else {
-				result.add(p.content);
+
+				if (p.type == 3) {
+					shouldEat.add(p.content);
+				} else if (p.type == 4) {
+					notShouldEat.add(p.content);
+				} else {
+					result.add(p);
+				}	
 			}
 		}
+
 		for (Prescription p : mutexPriorityMap.values()) {
-			result.add(p.content);
+			result.add(p);
+		}
+		
+		if(notShouldEat.size() >0) {
+			StringBuilder notEatContent = new StringBuilder("忌吃");
+			for (String notEat :notShouldEat) {		
+				notEatContent.append(notEat).append("、");
+			}		
+			notEatContent.deleteCharAt(notEatContent.length() - 1);
+			result.add(new Prescription(notEatContent.toString(), 4));
+		}
+		
+		if(shouldEat.size() >0) {
+			StringBuilder eatContent = new StringBuilder("宜吃");
+			for (String eat :shouldEat) {		
+				if(!notShouldEat.contains(eat)) {
+					eatContent.append(eat).append("、");
+				}
+			}
+			
+			if(eatContent.length() > 2) {
+				eatContent.deleteCharAt(eatContent.length() - 1);
+				result.add(new Prescription(eatContent.toString(), 3));
+			}
 		}
 
 		return result;
@@ -304,6 +374,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					Document doc = new Document();
 					doc.add(new StringField(FIELD_ID, item.getId().toString(), Store.YES));
 					doc.add(new StringField(FIELD_CONTENT, content, Store.YES));
+					doc.add(new StringField(FIELD_TYPE, item.getType().toString(), Store.YES));
 					doc.add(new StringField(FIELD_MUTEX, mutex == null ? "" : mutex, Store.YES));
 					doc.add(new StringField(FIELD_MUTEX_PRIORITY, mutexPriority == null ? "" : mutexPriority.toString(), Store.YES));
 

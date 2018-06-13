@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.paladin.framework.core.container.ConstantsContainer;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.service.prescription.PrescriptionFactorItemService;
+import com.paladin.health.service.prescription.PrescriptionFactorService;
 import com.paladin.health.service.prescription.PrescriptionItemService;
 
 @Controller
@@ -24,6 +24,8 @@ public class HeathPrescriptionController {
 	PrescriptionFactorItemService prescriptionFactorItemService;
 	@Autowired
 	PrescriptionItemService prescriptionItemService;
+	@Autowired
+	PrescriptionFactorService prescriptionFactorService;
 
 	@RequestMapping("/index")
 	public String index() {
@@ -34,8 +36,7 @@ public class HeathPrescriptionController {
 	@ResponseBody
 	public Object indexData() {
 		HashMap<String, Object> result = new HashMap<>();
-		result.put("factors", healthPrescriptionContainer.getPrescriptionFactor());
-		result.put("types", ConstantsContainer.getTypeChildren("prescription-item-type"));
+		result.put("factors", prescriptionFactorService.findAll());
 		result.put("items", prescriptionItemService.findAll());
 		return CommonResponse.getSuccessResponse(result);
 	}
@@ -44,8 +45,8 @@ public class HeathPrescriptionController {
 	@ResponseBody
 	public Object saveFactorItem(@RequestParam String factorCode, @RequestParam(required = false) String itemId) {
 		Integer[] ids = null;
-		if (itemId != null && itemId.length() >0) {
-			String[] itemIds = itemId.split(",");			
+		if (itemId != null && itemId.length() > 0) {
+			String[] itemIds = itemId.split(",");
 			ids = new Integer[itemIds.length];
 			for (int i = 0; i < itemIds.length; i++) {
 				ids[i] = Integer.valueOf(itemIds[i]);

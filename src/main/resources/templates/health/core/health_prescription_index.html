@@ -27,19 +27,22 @@
                             <li class=""><a href="#type5" data-toggle="tab" aria-expanded="false">饮食原则</a></li>
                             <li class=""><a href="#type6" data-toggle="tab" aria-expanded="false">心理健康</a></li>
                             <li class=""><a href="#type7" data-toggle="tab" aria-expanded="false">运动锻炼</a></li>
+                            <li class=""><a href="#type8" data-toggle="tab" aria-expanded="false">应急就医</a></li>                           
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane active" id="type1" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane active" id="type1" >
                             </div>
-                            <div class="tab-pane" id="type3" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane" id="type3">
                             </div>
-                            <div class="tab-pane" id="type4" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane" id="type4" >
                             </div>
-                            <div class="tab-pane" id="type5" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane" id="type5" >
                             </div>
-                            <div class="tab-pane" id="type6" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane" id="type6" >
                             </div>
-                            <div class="tab-pane" id="type7" style="max-height: 700px;overflow: auto;">
+                            <div class="tab-pane" id="type7" >
+                            </div>
+                            <div class="tab-pane" id="type8" >
                             </div>
                         </div>
                     </div>
@@ -73,7 +76,7 @@
     }
 
     function initFactor() {
-        var treedata = [];
+        var data = [];
 
         var map = {};
 
@@ -89,7 +92,7 @@
 
                 if (factor.parentFactor) {
                     var fs = factor.parentFactor.split(",");
-                    if(fs && fs.length > 0) {
+                    if (fs && fs.length > 0) {
                         text = "（";
 
                         fs.forEach(function(i) {
@@ -97,16 +100,31 @@
                         });
                         text = text.substring(0, text.length - 1);
                         text += "）";
-                    }                    
+                    }
                 }
 
-                treedata[i] = {
+                data[i] = {
                     text: factor.name + text,
-                    code: factor.code
+                    code: factor.code,
+                    type: factor.type
                 }
             }
-
         }
+
+
+        var treedata = [{
+                text: "疾病",
+                nodes: $.grep(data, function(row, index) {
+                    return row.type == 1;
+                })
+            },
+            {
+                text: "危险因素",
+                nodes: $.grep(data, function(row, index) {
+                    return row.type == 2;
+                })
+            }
+        ]
 
         tree.treeview({ data: treedata, levels: 1 });
         tree.on('nodeSelected', function(event, node) {
@@ -115,6 +133,10 @@
     }
 
     function selectItem(code) {
+        if(!code) {
+            return;
+        }
+
         currentCode = code;
         $.getAjax("/health/prescription/factor/item?code=" + code, function(result) {
             $("input[type='checkbox']").prop("checked", false);
@@ -133,6 +155,7 @@
         initItemByType(5);
         initItemByType(6);
         initItemByType(7);
+        initItemByType(8);
     }
 
     function initItemByType(type) {

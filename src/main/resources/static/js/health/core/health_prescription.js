@@ -54,23 +54,45 @@ function findPrescription() {
     });
 
     $.getAjax(url, function(result) {
-        var html = "<ul>";
-        if (result && result.length > 0) {
-            result.forEach(function(x) {
-                html += "<li>" + x + "</li>";
-            });
 
-            html += "</ul>"
+        var fs = result.factors;
+        var ps = result.prescriptions;
+
+        var html = '<table class="table table-bordered">';
+        if (fs && fs.length > 0) {
+            html += "<tr><td>危险因素：</td><td>";
+            html += "<ul>";
+            fs.forEach(function(y) {
+                if (y.type != 3) {
+                    html += "<li>" + y.name + "</li>";
+                }
+            });
+            html += "</ul></td>";
         } else {
             $.infoMessage("没有有用的健康处方");
+            return;
         }
 
+        if (ps && ps.length > 0) {
+            html += "<tr><td>健康处方：</td><td>";
+            html += "<ul>";
+            ps.forEach(function(x) {
+                html += "<li>" + x.content + "</li>";
+            });
+
+            html += "</ul><td>";
+        } else {
+            $.infoMessage("没有有用的健康处方");
+            return;
+        }
+        html += "</table>";
         $.openPageLayer(html);
     });
 }
 
+
 function clearInput() {
-	$("#factor").tagsinput('removeAll');
+    $("#factor").tagsinput('removeAll');
     $("#factorInput").val("");
 }
 
