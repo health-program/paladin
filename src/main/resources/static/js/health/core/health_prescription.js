@@ -48,12 +48,17 @@ function findPrescription() {
         return;
     }
 
-    var url = "/health/prescription/find?";
+    var url = "/health/prescription/find/factor?";
     args.forEach(function(i) {
         url += "args=" + i + "&";
     });
 
     $.getAjax(url, function(result) {
+
+        if (!result) {
+            $.infoMessage("没有有用的健康处方");
+            return;
+        }
 
         var fs = result.factors;
         var ps = result.prescriptions;
@@ -94,6 +99,57 @@ function findPrescription() {
 function clearInput() {
     $("#factor").tagsinput('removeAll');
     $("#factorInput").val("");
+}
+
+
+function findPrescription2() {
+    var data = $("#tableForm").serializeObject();
+
+    $.postJsonAjax("/health/prescription/find/condition", data, function(result) {
+
+        if (!result) {
+            $.infoMessage("没有有用的健康处方");
+            return;
+        }
+
+        var fs = result.factors;
+        var ps = result.prescriptions;
+
+        var html = '<table class="table table-bordered">';
+        if (fs && fs.length > 0) {
+            html += "<tr><td>危险因素：</td><td>";
+            html += "<ul>";
+            fs.forEach(function(y) {
+                if (y.type != 3) {
+                    html += "<li>" + y.name + "</li>";
+                }
+            });
+            html += "</ul></td>";
+        } else {
+            $.infoMessage("没有有用的健康处方");
+            return;
+        }
+
+        if (ps && ps.length > 0) {
+            html += "<tr><td>健康处方：</td><td>";
+            html += "<ul>";
+            ps.forEach(function(x) {
+                html += "<li>" + x.content + "</li>";
+            });
+
+            html += "</ul><td>";
+        } else {
+            $.infoMessage("没有有用的健康处方");
+            return;
+        }
+        html += "</table>";
+        $.openPageLayer(html);
+    });
+}
+
+
+function clearInput2() {
+
 }
 
 //---------------- 健康报告部分 -----------------
@@ -281,7 +337,7 @@ function buildContent(item, value) {
     var vd = item.valueDefinition;
     var html;
     if (vd.inputType == 'INPUT') {
-        var input = '<input type="text" name="' + item.key + '" value="' + (value ? value : '') + '" />'
+        var input = '<input type="text" class="index-item-text" name="' + item.key + '" value="' + (value ? value : '') + '" />'
         html = vd.template ? vd.template.replace("{?}", input) : input;
         if (vd.unit) {
             html += vd.unit;
@@ -291,9 +347,9 @@ function buildContent(item, value) {
         if (item.standards) {
             item.standards.forEach(function(s) {
                 if (vd.isSingle) {
-                    html += '<label class="radio-inline"> <input type="radio" name=' + item.key + ' value=' + s.standardKey + '>' + s.name + '</label>';
+                    html += '<label class="radio-inline"> <input type="radio" class="index-item-radio" name=' + item.key + ' value=' + s.standardKey + '>' + s.name + '</label>';
                 } else {
-                    html += '<label class="checkbox-inline"> <input type="checkbox" name=' + item.key + ' value=' + s.standardKey + '>' + s.name + '</label>';
+                    html += '<label class="checkbox-inline"> <input type="checkbox" class="index-item-checkbox" name=' + item.key + ' value=' + s.standardKey + '>' + s.name + '</label>';
                 }
             });
         }

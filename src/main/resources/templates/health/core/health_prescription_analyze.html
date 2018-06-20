@@ -46,7 +46,15 @@
                 <h3 class="box-title">查询健康处方</h3>
             </div>
             <div class="box-body">
-                <table id="datagrid" class="table table-bordered"></table>
+                <form class="form-horizontal" id="tableForm">
+                    <table id="datagrid" class="table table-bordered"></table>
+                </form>
+                <div class="col-md-12" style="margin-top:20px">
+                    <div class="pull-right">
+                        <button type="button" style="width:100px" class="btn btn-primary" onclick="findPrescription2()">查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="clearInput2()">重置</button>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

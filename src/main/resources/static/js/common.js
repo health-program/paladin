@@ -88,7 +88,31 @@
         });
     };
 
+    $.fn.serializeObject = function() {
+        var obj = {};
+        $(this).each(function() {
+            var a = $(this).serializeArray();
+            a.forEach(function(i) {
+                if (i.value) {
+                    var v = obj[i.name];
+                    if (v) {
+                        if (v instanceof Array) {
+                            v.push(i.value);
+                        } else {
+                            var arr = [];
+                            arr.push(v, i.value);
+                            obj[i.name] = arr;
+                        }
+                    } else {
+                        obj[i.name] = i.value;
+                    }
+                }
+            });
 
+        });
+
+        return obj;
+    };
 
 
 

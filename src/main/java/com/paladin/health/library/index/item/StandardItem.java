@@ -16,11 +16,11 @@ import com.paladin.health.library.index.item.ItemValueDefinition.InputType;
  */
 public class StandardItem extends Item {
 
-	String key;
+	protected String key;
 
-	ItemValueDefinition itemValueDefinition;
+	protected ItemValueDefinition itemValueDefinition;
 
-	List<ItemDependence> itemDependence = new ArrayList<>();
+	protected List<ItemDependence> itemDependence = new ArrayList<>();
 
 	public StandardItem(String key) {
 		this.key = key;
@@ -124,20 +124,11 @@ public class StandardItem extends Item {
 			for(int i = 0;i<values.length;i++) {
 				
 				if(relation == Relation.EQUAL) {
-					
-				}
-				
-				
+					//TODO
+				}				
 			}
-			
-			
-			
-			
-			
+							
 			if (itemValueDefinition.template != null) {
-
-				
-				
 				
 				if (values != null && values.length > 0) {
 					sb.append(itemValueDefinition.template.replace("{?}", values[0]));

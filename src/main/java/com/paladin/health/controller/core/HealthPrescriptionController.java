@@ -4,29 +4,31 @@ import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.core.HealthPrescriptionContainer;
+import com.paladin.health.core.factor.PeopleCondition;
+import com.paladin.health.service.core.HealthPrescriptionService;
 import com.paladin.health.service.prescription.PrescriptionFactorItemService;
 import com.paladin.health.service.prescription.PrescriptionFactorService;
 import com.paladin.health.service.prescription.PrescriptionItemService;
 
 @Controller
 @RequestMapping("/health/prescription")
-public class HeathPrescriptionController {
+public class HealthPrescriptionController {
 
-	@Autowired
-	HealthPrescriptionContainer healthPrescriptionContainer;
 	@Autowired
 	PrescriptionFactorItemService prescriptionFactorItemService;
 	@Autowired
 	PrescriptionItemService prescriptionItemService;
 	@Autowired
 	PrescriptionFactorService prescriptionFactorService;
-
+	@Autowired
+	HealthPrescriptionService healthPrescriptionService;
+	
 	@RequestMapping("/index")
 	public String index() {
 		return "/health/core/health_prescription_index";
@@ -63,13 +65,7 @@ public class HeathPrescriptionController {
 	@RequestMapping("/factor/list")
 	@ResponseBody
 	public Object factorList() {
-		return CommonResponse.getSuccessResponse(healthPrescriptionContainer.getPrescriptionFactor());
-	}
-
-	@RequestMapping("/find")
-	@ResponseBody
-	public Object search(@RequestParam String[] args) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionContainer.search(args));
+		return CommonResponse.getSuccessResponse(prescriptionFactorService.findAll());
 	}
 
 	@RequestMapping("/factor/item")
@@ -77,5 +73,21 @@ public class HeathPrescriptionController {
 	public Object findItemOfFactor(@RequestParam String code) {
 		return CommonResponse.getSuccessResponse(prescriptionItemService.findItemOfFactor(code));
 	}
-
+	
+	//----------------------------------------
+	// 对外健康处方接口
+	//----------------------------------------
+	
+	@RequestMapping("/find/factor")
+	@ResponseBody
+	public Object findByFactor(@RequestParam String[] args) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(args));
+	}
+	
+	@RequestMapping("/find/condition")
+	@ResponseBody
+	public Object findByCondition(@RequestBody PeopleCondition condition) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(condition));
+	}
+	
 }

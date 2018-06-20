@@ -99,7 +99,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				}
 			}
 		}
-				
+						
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/prescription").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));

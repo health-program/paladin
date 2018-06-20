@@ -12,4 +12,16 @@ public class EnumUtil {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <T extends Enum<T>> T getEnum(String name, Class<T> enumClass) {
+		if (name != null && name.length() > 0) {
+			Enum<T>[] enums = enumClass.getEnumConstants();
+			for (Enum<T> e : enums) {
+				if (e.name().equals(name)) {
+					return (T) e;
+				}
+			}
+		}
+		return null;
+	}
 }

@@ -7,13 +7,15 @@ public class PrescriptionFactorCondition {
 	@Id
 	private String id;
 
-	private String itemId;
+	private String itemKey;
 
 	private String relation;
 
 	private String value;
 
 	private String factorCode;
+	
+	private String conditionArrayId;
 
 	public String getId() {
 		return id;
@@ -21,14 +23,6 @@ public class PrescriptionFactorCondition {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getItemId() {
-		return itemId;
-	}
-
-	public void setItemId(String itemId) {
-		this.itemId = itemId;
 	}
 
 	public String getRelation() {
@@ -53,6 +47,22 @@ public class PrescriptionFactorCondition {
 
 	public void setFactorCode(String factorCode) {
 		this.factorCode = factorCode;
+	}
+
+	public String getConditionArrayId() {
+		return conditionArrayId;
+	}
+
+	public void setConditionArrayId(String conditionArrayId) {
+		this.conditionArrayId = conditionArrayId;
+	}
+
+	public String getItemKey() {
+		return itemKey;
+	}
+
+	public void setItemKey(String itemKey) {
+		this.itemKey = itemKey;
 	}
 
 }

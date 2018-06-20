@@ -10,13 +10,13 @@ import java.util.List;
  */
 public abstract class Item {
 	
-	String id;
+	protected String id;
 	
-	String name;
+	protected String name;
 	
-	Item parent;
+	protected Item parent;
 	
-	List<Item> children = new ArrayList<>();
+	protected List<Item> children = new ArrayList<>();
 	 
 	public abstract ItemType getItemType() ;
 		
