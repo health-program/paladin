@@ -4,4 +4,6 @@ public interface FactorAnalyzer {
 	
 	public String analyseFactor(PeopleCondition peopleCondition) ;
 	
+	public String getFactor();
+	
 }

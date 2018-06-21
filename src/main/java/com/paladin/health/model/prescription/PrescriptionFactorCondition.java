@@ -15,6 +15,8 @@ public class PrescriptionFactorCondition {
 
 	private String factorCode;
 	
+	private String disease;
+	
 	private String conditionArrayId;
 
 	public String getId() {
@@ -63,6 +65,14 @@ public class PrescriptionFactorCondition {
 
 	public void setItemKey(String itemKey) {
 		this.itemKey = itemKey;
+	}
+
+	public String getDisease() {
+		return disease;
+	}
+
+	public void setDisease(String disease) {
+		this.disease = disease;
 	}
 
 }

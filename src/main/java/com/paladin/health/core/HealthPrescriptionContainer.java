@@ -3,10 +3,13 @@ package com.paladin.health.core;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -204,8 +207,10 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		int type;
 		String[] mutexIds;
 		int mutexPriority;
+		int id;
 
 		Prescription(Document doc) {
+			id = Integer.valueOf(doc.get(FIELD_ID));
 			content = doc.get(FIELD_CONTENT);
 			type = Integer.valueOf(doc.get(FIELD_TYPE));
 			String mutex = doc.get(FIELD_MUTEX);
@@ -250,6 +255,20 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			return prescriptions;
 		}
 
+	}
+
+	/**
+	 * 搜索健康处方
+	 * 
+	 * @param args
+	 * @return
+	 */
+	public PrescriptionResult search(Collection<String> args) {
+		if (args == null) {
+			return null;
+		}
+
+		return search(args.toArray(new String[args.size()]));
 	}
 
 	/**
@@ -316,6 +335,15 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		return null;
 	}
 
+	private Comparator<Prescription> prescriptionComparator =  new Comparator<Prescription>() {
+
+		@Override
+		public int compare(Prescription o1, Prescription o2) {
+			return o1.id - o2.id;
+		}
+		
+	};
+	
 	/**
 	 * 过滤，去除重复无效处方
 	 * 
@@ -323,11 +351,14 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	 * @return
 	 */
 	private List<Prescription> filterPrescription(Prescription[] prescriptions) {
+		
+		Arrays.sort(prescriptions, prescriptionComparator);
+		
 		HashMap<String, Prescription> mutexPriorityMap = new HashMap<>();
 		List<Prescription> result = new ArrayList<>(prescriptions.length);
 
-		HashSet<String> shouldEat = new HashSet<>();
-		HashSet<String> notShouldEat = new HashSet<>();
+		LinkedHashSet<String> shouldEat = new LinkedHashSet<>();
+		LinkedHashSet<String> notShouldEat = new LinkedHashSet<>();
 
 		for (Prescription p : prescriptions) {
 			if (p.mutexIds != null) {
@@ -375,7 +406,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				result.add(new Prescription(eatContent.toString(), 3));
 			}
 		}
-
+		
+		Collections.sort(result, prescriptionComparator);
 		return result;
 	}
 

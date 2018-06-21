@@ -53,46 +53,7 @@ function findPrescription() {
         url += "args=" + i + "&";
     });
 
-    $.getAjax(url, function(result) {
-
-        if (!result) {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-
-        var fs = result.factors;
-        var ps = result.prescriptions;
-
-        var html = '<table class="table table-bordered">';
-        if (fs && fs.length > 0) {
-            html += "<tr><td>危险因素：</td><td>";
-            html += "<ul>";
-            fs.forEach(function(y) {
-                if (y.type != 3) {
-                    html += "<li>" + y.name + "</li>";
-                }
-            });
-            html += "</ul></td>";
-        } else {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-
-        if (ps && ps.length > 0) {
-            html += "<tr><td>健康处方：</td><td>";
-            html += "<ul>";
-            ps.forEach(function(x) {
-                html += "<li>" + x.content + "</li>";
-            });
-
-            html += "</ul><td>";
-        } else {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-        html += "</table>";
-        $.openPageLayer(html);
-    });
+    $.getAjax(url, showPrescription);
 }
 
 
@@ -104,52 +65,68 @@ function clearInput() {
 
 function findPrescription2() {
     var data = $("#tableForm").serializeObject();
-
-    $.postJsonAjax("/health/prescription/find/condition", data, function(result) {
-
-        if (!result) {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-
-        var fs = result.factors;
-        var ps = result.prescriptions;
-
-        var html = '<table class="table table-bordered">';
-        if (fs && fs.length > 0) {
-            html += "<tr><td>危险因素：</td><td>";
-            html += "<ul>";
-            fs.forEach(function(y) {
-                if (y.type != 3) {
-                    html += "<li>" + y.name + "</li>";
-                }
-            });
-            html += "</ul></td>";
-        } else {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-
-        if (ps && ps.length > 0) {
-            html += "<tr><td>健康处方：</td><td>";
-            html += "<ul>";
-            ps.forEach(function(x) {
-                html += "<li>" + x.content + "</li>";
-            });
-
-            html += "</ul><td>";
-        } else {
-            $.infoMessage("没有有用的健康处方");
-            return;
-        }
-        html += "</table>";
-        $.openPageLayer(html);
-    });
+    $.postJsonAjax("/health/prescription/find/condition", data, showPrescription);
 }
 
 
 function clearInput2() {
+    $("#tableForm")[0].reset();
+}
 
+function buildPrescriptionContent(prescriptions) {
+    var result = [];
+    for (var i = 1; i < arguments.length; i++) {
+        var x = arguments[i];
+        prescriptions.forEach(function(row) {
+            if (x == row.type) {
+                result.push(row);
+            }
+        });
+    }
+
+    var html = "<ul>";
+    result.forEach(function(a) {
+        html += "<li>" + a.content + "</li>";
+    });
+    html += "</ul>";
+    return html;
+}
+
+function showPrescription(result) {
+    if (!result) {
+        $.infoMessage("没有有用的健康处方");
+        return;
+    }
+
+    var fs = result.factors;
+    var ps = result.prescriptions;
+
+    var html = '<table class="table table-bordered">';
+    if (fs && fs.length > 0) {
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>危险因素</td><td colspan='2'>";
+        html += "<ul>";
+        fs.forEach(function(y) {
+            if (y.type != 3) {
+                html += "<li>" + y.name + "</li>";
+            }
+        });
+        html += "</ul></td>";
+    } else {
+        $.infoMessage("没有有用的健康处方");
+        return;
+    }
+
+    if (ps && ps.length > 0) {
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle' rowspan='4'>健康处方</td><td valign='middle' align='center' style='width:140px;vertical-align:middle'>日常生活</td><td>" + buildPrescriptionContent(ps, 1, 8) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>饮食习惯</td><td>" + buildPrescriptionContent(ps, 3, 4, 5) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>运动锻炼</td><td>" + buildPrescriptionContent(ps, 7) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>心理活动</td><td>" + buildPrescriptionContent(ps, 6) + "</td></tr>";
+    } else {
+        $.infoMessage("没有有用的健康处方");
+        return;
+    }
+    html += "</table>";
+    $.openPageLayer(html);
 }
 
 //---------------- 健康报告部分 -----------------

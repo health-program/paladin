@@ -5,9 +5,15 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 import com.paladin.framework.utils.time.DateTimeUtil;
 
+/**
+ * 线程非安全
+ * @author TontoZhou
+ * @since 2018年6月21日
+ */
 public class PeopleCondition extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = 1829527723448405253L;
@@ -36,11 +42,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		if (!has("bmi")) {
 			Double sg = getDouble("sg");
 			Double tz = getDouble("tz");
-			if (sg != null && tz != null) {				
-				if(sg >5) {
+			if (sg != null && tz != null) {
+				if (sg > 5) {
 					// 化作米单位
 					sg = sg / 100;
-				}				
+				}
 				Double b = tz / sg / sg;
 				put("bmi", b);
 			}
@@ -73,8 +79,38 @@ public class PeopleCondition extends HashMap<String, Object> {
 			}
 		}
 
+		factors = new HashSet<>();
+
+		String[] disease = getStringArray("disease");
+		String[] factor = getStringArray("factor");
+		
+		if(disease != null) {
+			for(String d : disease) {
+				factors.add(d);
+			}
+		}
+		
+		if(factor != null) {
+			for(String f : factor) {
+				factors.add(f);
+			}
+		}
 	}
 
+	private Collection<String> factors;
+
+	public Collection<String> getFactors() {
+		return factors;
+	}
+	
+	public void addFactor(String factor) {
+		factors.add(factor);
+	}
+	
+	public boolean hasFactor(String factor) {
+		return factors.contains(factor);
+	}
+	
 	public boolean has(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -271,4 +307,5 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 		return values;
 	}
+
 }

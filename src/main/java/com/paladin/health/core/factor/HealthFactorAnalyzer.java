@@ -2,6 +2,7 @@ package com.paladin.health.core.factor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 	@Autowired
 	private IndexContainer indexContainer;
 
-	private List<FactorAnalyzer> factorAnalyzers = new ArrayList<>();
+	private List<FactorAnalyzer> factorAnalyzers;
 
 	@Override
 	public boolean initialize() {
@@ -55,6 +56,8 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			array.add(condition);
 		}
 
+		List<FactorAnalyzer> factorAnalyzers = new ArrayList<>();
+
 		for (List<PrescriptionFactorCondition> array : map.values()) {
 			factorAnalyzers.add(new ConditionFactorAnalyzer(array));
 		}
@@ -62,26 +65,35 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		Map<String, FactorAnalyzer> springBeans = SpringBeanHelper.getBeansByType(FactorAnalyzer.class);
 
 		factorAnalyzers.addAll(springBeans.values());
+
+		List<FactorAnalyzer> analyzers1 = new ArrayList<>(factorAnalyzers.size());
+		List<FactorAnalyzer> analyzers2 = new ArrayList<>(factorAnalyzers.size());
+
+		for (FactorAnalyzer factorAnalyzer : factorAnalyzers) {
+			if (factorAnalyzer instanceof ConditionFactorAnalyzer) {
+				if (((ConditionFactorAnalyzer) factorAnalyzer).hasDiseaseJudger()) {
+					analyzers2.add(factorAnalyzer);
+					continue;
+				}
+			}
+			analyzers1.add(factorAnalyzer);
+		}
+
+		analyzers1.addAll(analyzers2);
+		this.factorAnalyzers = analyzers1;
 		return true;
 	}
 
-	public String[] analyzeFactor(PeopleCondition peopleCondition) {
-		ArrayList<String> result = new ArrayList<>(factorAnalyzers.size());
+	public void analyzeFactor(PeopleCondition peopleCondition) {
 		for (FactorAnalyzer analyzer : factorAnalyzers) {
-			String factor = analyzer.analyseFactor(peopleCondition);
-			if (factor != null) {
-				result.add(factor);
+			String target = analyzer.getFactor();
+			if (!peopleCondition.hasFactor(target)) {
+				String factor = analyzer.analyseFactor(peopleCondition);
+				if (factor != null) {
+					peopleCondition.addFactor(factor);
+				}
 			}
 		}
-
-		String[] diseases = peopleCondition.getStringArray("disease");
-
-		if (diseases != null && diseases.length > 0) {
-			for (String dis : diseases) {
-				result.add(dis);
-			}
-		}
-		return result.toArray(new String[result.size()]);
 	}
 
 	private class ConditionFactorAnalyzer implements FactorAnalyzer {
@@ -110,6 +122,20 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			}
 			return factorCode;
 		}
+
+		private boolean hasDiseaseJudger() {
+			for (ConditionJudger judger : judgers) {
+				if (judger.diseases != null) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public String getFactor() {
+			return factorCode;
+		}
 	}
 
 	private class ConditionJudger {
@@ -121,6 +147,8 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		private boolean isSingle = false;
 		private String[] stringValues;
 		private Double[] numberValues;
+
+		private String[] diseases;
 
 		private ConditionJudger(PrescriptionFactorCondition condition) {
 			key = condition.getItemKey();
@@ -148,9 +176,24 @@ public class HealthFactorAnalyzer implements SpringContainer {
 					numberValues[1] = a;
 				}
 			}
+
+			String disease = condition.getDisease();
+			if (disease != null && disease.length() != 0) {
+				diseases = disease.split(",");
+			}
 		}
 
 		private boolean judge(PeopleCondition peopleCondition) {
+
+			if (diseases != null) {
+				Collection<String> factors = peopleCondition.getFactors();
+				for (String disease : diseases) {
+					if (!factors.contains(disease)) {
+						return false;
+					}
+				}
+			}
+
 			if (isNumber) {
 				Double[] values = peopleCondition.getDoubleArray(key);
 				if (values == null) {

@@ -95,4 +95,9 @@ public class ObesityFactorAnalyzer implements FactorAnalyzer {
 		return null;
 	}
 
+	@Override
+	public String getFactor() {
+		return factor;
+	}
+
 }
