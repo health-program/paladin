@@ -20,12 +20,12 @@ public class PeopleCondition extends HashMap<String, Object> {
 	public void initialize() {
 
 		// 年龄
-		if (!has("dcnl")) {
+		if (!has("dqnl")) {
 			String csrq = getString("csrq");
 			if (csrq != null && csrq.length() > 0) {
 				try {
 					Integer age = DateTimeUtil.getAge(formatter.parse(csrq));
-					put("dcnl", age);
+					put("dqnl", age);
 				} catch (ParseException e) {
 					throw new RuntimeException("出生日期格式不正确，格式应如1988.06.11");
 				}

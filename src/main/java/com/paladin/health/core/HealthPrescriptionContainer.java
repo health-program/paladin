@@ -3,11 +3,13 @@ package com.paladin.health.core;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
@@ -72,6 +74,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	private Map<String, String> factorNameMap;
 	private Map<String, Factor> factorCodeMap;
 
+	private Set<Factor> hasParentFactorList;
+
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化健康处方搜索服务功能-------------");
@@ -87,6 +91,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			factorCodeMap.put(factor.getCode(), new Factor(factor));
 		}
 
+		hasParentFactorList = new HashSet<>();
+
 		for (Factor factor : factorCodeMap.values()) {
 			String parentFactor = factor.source.getParentFactor();
 			if (parentFactor != null && parentFactor.length() != 0) {
@@ -95,11 +101,16 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					Factor f = factorCodeMap.get(parent);
 					if (f != null) {
 						factor.parents.add(f);
+						hasParentFactorList.add(factor);
 					}
 				}
 			}
 		}
-						
+
+		for (Factor factor : hasParentFactorList) {
+			factor.initChildParam();
+		}
+
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/prescription").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));
@@ -133,6 +144,35 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					f.getFactorAndParent(codes);
 				}
 			}
+		}
+
+		List<String> parentCodes;
+		boolean initParentCodes;
+
+		private void initChildParam() {
+			if (!initParentCodes) {
+				parentCodes = new ArrayList<>(parents.size());
+				for (Factor f : parents) {
+					if (f.parents.size() > 0) {
+						f.initChildParam();
+						for (String c : f.parentCodes) {
+							parentCodes.add(c);
+						}
+					} else {
+						parentCodes.add(f.code);
+					}
+				}
+				initParentCodes = true;
+			}
+		}
+
+		private boolean isChild(Collection<String> codes) {
+			for (String code : parentCodes) {
+				if (!codes.contains(code)) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		@Override
@@ -177,7 +217,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				}
 			}
 		}
-		
+
 		Prescription(String content, int type) {
 			this.content = content;
 			this.type = type;
@@ -233,6 +273,15 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			}
 			Factor factor = factorCodeMap.get(code);
 			factor.getFactorAndParent(codes);
+		}
+
+		for (Factor factor : hasParentFactorList) {
+			String code = factor.code;
+			if (!codes.contains(code)) {
+				if (factor.isChild(codes)) {
+					codes.add(code);
+				}
+			}
 		}
 
 		if (codes.size() > 0) {
@@ -296,32 +345,32 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					notShouldEat.add(p.content);
 				} else {
 					result.add(p);
-				}	
+				}
 			}
 		}
 
 		for (Prescription p : mutexPriorityMap.values()) {
 			result.add(p);
 		}
-		
-		if(notShouldEat.size() >0) {
+
+		if (notShouldEat.size() > 0) {
 			StringBuilder notEatContent = new StringBuilder("忌吃");
-			for (String notEat :notShouldEat) {		
+			for (String notEat : notShouldEat) {
 				notEatContent.append(notEat).append("、");
-			}		
+			}
 			notEatContent.deleteCharAt(notEatContent.length() - 1);
 			result.add(new Prescription(notEatContent.toString(), 4));
 		}
-		
-		if(shouldEat.size() >0) {
+
+		if (shouldEat.size() > 0) {
 			StringBuilder eatContent = new StringBuilder("宜吃");
-			for (String eat :shouldEat) {		
-				if(!notShouldEat.contains(eat)) {
+			for (String eat : shouldEat) {
+				if (!notShouldEat.contains(eat)) {
 					eatContent.append(eat).append("、");
 				}
 			}
-			
-			if(eatContent.length() > 2) {
+
+			if (eatContent.length() > 2) {
 				eatContent.deleteCharAt(eatContent.length() - 1);
 				result.add(new Prescription(eatContent.toString(), 3));
 			}
