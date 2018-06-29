@@ -367,8 +367,6 @@ public class JoinSelectProvider extends MapperTemplate {
 	private static class EntityColumnWrap {
 
 		EntityColumn entityColumn;
-
-		@SuppressWarnings("unused")
 		String property;
 
 		EntityColumnWrap(String property, EntityColumn entityColumn) {

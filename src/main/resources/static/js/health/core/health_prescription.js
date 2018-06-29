@@ -86,10 +86,10 @@ function buildPrescriptionContent(prescriptions) {
 
     var html = "<ul>";
     result.forEach(function(a) {
-        html += "<li><p>" + a.content + "</p>";
-        if (a.detail) {
-            html += "<p style='color:#999'>" + a.detail + "</p>";
-        }
+        html += "<li>" + a.content + "";
+//        if (a.detail) {
+//            html += "<br /><font color='#999'>" + a.detail + "</font>";
+//        }
         html += "</li>";
     });
     html += "</ul>";

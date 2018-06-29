@@ -109,7 +109,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			for (PrescriptionFactorCondition condition : conditions) {
 				if (first) {
 					factorCode = condition.getFactorCode();
-					isSpeculateFactor = condition.getType() == PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE; 
+					isSpeculateFactor = condition.getType() == PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE;
 					illustration = condition.getIllustration();
 					first = false;
 				}
@@ -125,9 +125,9 @@ public class HealthFactorAnalyzer implements SpringContainer {
 					return null;
 				}
 			}
-			
-			if(isSpeculateFactor) {
-				return new FactorResult(factorCode, PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE, illustration) ;
+
+			if (isSpeculateFactor) {
+				return new FactorResult(factorCode, PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE, illustration);
 			}
 			return new FactorResult(factorCode);
 		}
@@ -156,6 +156,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		private boolean isSingle = false;
 		private String[] stringValues;
 		private Double[] numberValues;
+		private boolean nullable;
 
 		private String[] diseases;
 
@@ -163,6 +164,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			key = condition.getItemKey();
 			relation = EnumUtil.getEnum(condition.getRelation(), Relation.class);
 			stringValues = condition.getValue().split(",");
+			nullable = condition.getNullable() == 1;
 
 			StandardItem standardItem = indexContainer.getStandardItem(key);
 			ItemValueDefinition valueDefinition = standardItem.getItemValueDefinition();
@@ -206,8 +208,9 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			if (isNumber) {
 				Double[] values = peopleCondition.getDoubleArray(key);
 				if (values == null) {
-					return false;
+					return nullable ? true : false;
 				}
+
 				if (isSingle) {
 					try {
 						if (relation == Relation.EQUAL || relation == Relation.IN) {
@@ -305,7 +308,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			} else {
 				String[] values = peopleCondition.getStringArray(key);
 				if (values == null) {
-					return false;
+					return nullable ? true : false;
 				}
 
 				if (isSingle) {

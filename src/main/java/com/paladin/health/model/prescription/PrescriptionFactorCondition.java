@@ -10,7 +10,6 @@ public class PrescriptionFactorCondition {
 	/** 推测是疾病 */
 	public static final Integer TYPE_SPECULATE_DISEASE = 2;
 
-
 	@Id
 	private Integer id;
 
@@ -25,6 +24,8 @@ public class PrescriptionFactorCondition {
 	private String disease;
 	
 	private Integer type;
+	
+	private Integer nullable;
 	
 	private String illustration;
 	
@@ -101,6 +102,14 @@ public class PrescriptionFactorCondition {
 
 	public void setConditionArrayId(Integer conditionArrayId) {
 		this.conditionArrayId = conditionArrayId;
+	}
+
+	public Integer getNullable() {
+		return nullable;
+	}
+
+	public void setNullable(Integer nullable) {
+		this.nullable = nullable;
 	}
 
 }

@@ -116,7 +116,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		for (Factor factor : hasParentFactorList) {
 			factor.initChildParam();
 		}
-
+		
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/prescription").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));
