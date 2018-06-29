@@ -14,6 +14,7 @@ import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.EnumUtil;
 import com.paladin.health.core.IndexContainer;
+import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
 import com.paladin.health.library.Relation;
 import com.paladin.health.library.index.item.ItemValueDefinition;
 import com.paladin.health.library.index.item.ItemValueDefinition.InputType;
@@ -38,12 +39,12 @@ public class HealthFactorAnalyzer implements SpringContainer {
 
 		List<PrescriptionFactorCondition> conditions = prescriptionFactorConditionService.findAll();
 
-		HashMap<String, List<PrescriptionFactorCondition>> map = new HashMap<>();
+		HashMap<Integer, List<PrescriptionFactorCondition>> map = new HashMap<>();
 
 		for (PrescriptionFactorCondition condition : conditions) {
 
-			String arrayId = condition.getConditionArrayId();
-			if (arrayId == null || arrayId.length() == 0) {
+			Integer arrayId = condition.getConditionArrayId();
+			if (arrayId == null) {
 				arrayId = condition.getId();
 			}
 
@@ -88,7 +89,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		for (FactorAnalyzer analyzer : factorAnalyzers) {
 			String target = analyzer.getFactor();
 			if (!peopleCondition.hasFactor(target)) {
-				String factor = analyzer.analyseFactor(peopleCondition);
+				FactorResult factor = analyzer.analyseFactor(peopleCondition);
 				if (factor != null) {
 					peopleCondition.addFactor(factor);
 				}
@@ -99,6 +100,8 @@ public class HealthFactorAnalyzer implements SpringContainer {
 	private class ConditionFactorAnalyzer implements FactorAnalyzer {
 
 		private String factorCode;
+		private boolean isSpeculateFactor = false;
+		private String illustration;
 		private List<ConditionJudger> judgers = new ArrayList<>();
 
 		private ConditionFactorAnalyzer(List<PrescriptionFactorCondition> conditions) {
@@ -106,6 +109,8 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			for (PrescriptionFactorCondition condition : conditions) {
 				if (first) {
 					factorCode = condition.getFactorCode();
+					isSpeculateFactor = condition.getType() == PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE; 
+					illustration = condition.getIllustration();
 					first = false;
 				}
 				judgers.add(new ConditionJudger(condition));
@@ -113,14 +118,18 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		}
 
 		@Override
-		public String analyseFactor(PeopleCondition peopleCondition) {
+		public FactorResult analyseFactor(PeopleCondition peopleCondition) {
 
 			for (ConditionJudger judger : judgers) {
 				if (!judger.judge(peopleCondition)) {
 					return null;
 				}
 			}
-			return factorCode;
+			
+			if(isSpeculateFactor) {
+				return new FactorResult(factorCode, PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE, illustration) ;
+			}
+			return new FactorResult(factorCode);
 		}
 
 		private boolean hasDiseaseJudger() {

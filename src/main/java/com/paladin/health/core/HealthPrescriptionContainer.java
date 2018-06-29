@@ -39,6 +39,8 @@ import org.springframework.util.ResourceUtils;
 
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.StringParser;
+import com.paladin.health.core.factor.PeopleCondition;
+import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
 import com.paladin.health.model.prescription.PrescriptionFactor;
 import com.paladin.health.model.prescription.PrescriptionFactorItem;
 import com.paladin.health.model.prescription.PrescriptionItem;
@@ -63,6 +65,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_CONTENT = "content";
+	private static final String FIELD_DETAIL = "detail";
 	private static final String FIELD_FACTOR = "factor";
 	private static final String FIELD_TYPE = "type";
 	private static final String FIELD_MUTEX = "mutex";
@@ -204,6 +207,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	public static class Prescription {
 
 		String content;
+		String detail;
 		int type;
 		String[] mutexIds;
 		int mutexPriority;
@@ -212,6 +216,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		Prescription(Document doc) {
 			id = Integer.valueOf(doc.get(FIELD_ID));
 			content = doc.get(FIELD_CONTENT);
+			detail = doc.get(FIELD_DETAIL);
 			type = Integer.valueOf(doc.get(FIELD_TYPE));
 			String mutex = doc.get(FIELD_MUTEX);
 			if (mutex != null && mutex.length() > 0) {
@@ -234,6 +239,10 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 		public int getType() {
 			return type;
+		}
+
+		public String getDetail() {
+			return detail;
 		}
 	}
 
@@ -267,8 +276,24 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		if (args == null) {
 			return null;
 		}
-
 		return search(args.toArray(new String[args.size()]));
+	}
+
+	/**
+	 * 搜索健康处方
+	 * 
+	 * @param peopleCondition
+	 * @return
+	 */
+	public PrescriptionResult search(PeopleCondition peopleCondition) {
+		PrescriptionResult result = search(peopleCondition.getFactors());
+		List<FactorResult> factors = peopleCondition.getSpeculateFactors();
+		if (factors != null) {
+			for (FactorResult fr : factors) {
+				result.prescriptions.add(new Prescription(fr.getIllustration(), 10));
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -335,15 +360,15 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		return null;
 	}
 
-	private Comparator<Prescription> prescriptionComparator =  new Comparator<Prescription>() {
+	private Comparator<Prescription> prescriptionComparator = new Comparator<Prescription>() {
 
 		@Override
 		public int compare(Prescription o1, Prescription o2) {
 			return o1.id - o2.id;
 		}
-		
+
 	};
-	
+
 	/**
 	 * 过滤，去除重复无效处方
 	 * 
@@ -351,9 +376,9 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	 * @return
 	 */
 	private List<Prescription> filterPrescription(Prescription[] prescriptions) {
-		
+
 		Arrays.sort(prescriptions, prescriptionComparator);
-		
+
 		HashMap<String, Prescription> mutexPriorityMap = new HashMap<>();
 		List<Prescription> result = new ArrayList<>(prescriptions.length);
 
@@ -406,7 +431,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				result.add(new Prescription(eatContent.toString(), 3));
 			}
 		}
-		
+
 		Collections.sort(result, prescriptionComparator);
 		return result;
 	}
@@ -449,12 +474,14 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				if (factorItems != null && factorItems.size() > 0) {
 
 					String content = item.getContent();
+					String detail = item.getDetail();
 					String mutex = item.getMutex();
 					Integer mutexPriority = item.getMutexPriority();
 
 					Document doc = new Document();
 					doc.add(new StringField(FIELD_ID, item.getId().toString(), Store.YES));
 					doc.add(new StringField(FIELD_CONTENT, content, Store.YES));
+					doc.add(new StringField(FIELD_DETAIL, detail == null ? "" : detail, Store.YES));
 					doc.add(new StringField(FIELD_TYPE, item.getType().toString(), Store.YES));
 					doc.add(new StringField(FIELD_MUTEX, mutex == null ? "" : mutex, Store.YES));
 					doc.add(new StringField(FIELD_MUTEX_PRIORITY, mutexPriority == null ? "" : mutexPriority.toString(), Store.YES));
@@ -490,4 +517,5 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		}
 		return dir;
 	}
+
 }

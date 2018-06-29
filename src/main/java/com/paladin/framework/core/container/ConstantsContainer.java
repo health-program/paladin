@@ -36,8 +36,6 @@ public class ConstantsContainer implements VersionContainer{
 		prescriptionItemTypes.add(new KeyValue("5", "饮食行为"));
 		prescriptionItemTypes.add(new KeyValue("6", "心理"));
 		prescriptionItemTypes.add(new KeyValue("7", "运动"));
-		prescriptionItemTypes.add(new KeyValue("9", "容易引发的疾病或状态"));
-		prescriptionItemTypes.add(new KeyValue("10", "容易引发的问题"));
 
 		enumConstantMap.put("prescription-item-type", prescriptionItemTypes);
 				

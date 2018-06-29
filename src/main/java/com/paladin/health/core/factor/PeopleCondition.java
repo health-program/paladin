@@ -3,14 +3,19 @@ package com.paladin.health.core.factor;
 import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import com.paladin.framework.utils.time.DateTimeUtil;
+import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
+import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 
 /**
  * 线程非安全
+ * 
  * @author TontoZhou
  * @since 2018年6月21日
  */
@@ -83,34 +88,85 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 		String[] disease = getStringArray("disease");
 		String[] factor = getStringArray("factor");
-		
-		if(disease != null) {
-			for(String d : disease) {
+
+		if (disease != null) {
+			for (String d : disease) {
 				factors.add(d);
 			}
 		}
-		
-		if(factor != null) {
-			for(String f : factor) {
+
+		if (factor != null) {
+			for (String f : factor) {
 				factors.add(f);
 			}
 		}
+
+		speculate_factors = new ArrayList<>();
+
 	}
 
 	private Collection<String> factors;
 
+	private List<FactorResult> speculate_factors;
+
 	public Collection<String> getFactors() {
 		return factors;
 	}
-	
+
+	/**
+	 * 获取可能的因素，需要去除已经确定的因素
+	 * 
+	 * @return
+	 */
+	public List<FactorResult> getSpeculateFactors() {
+		if (speculate_factors.size() == 0) {
+			return null;
+		}
+
+		List<FactorResult> list = new ArrayList<>(speculate_factors.size());
+		for (FactorResult fr : speculate_factors) {
+			if (!factors.contains(fr.getFactor())) {
+				list.add(fr);
+			}
+		}
+		return list;
+	}
+
+	/**
+	 * 添加一个因素
+	 * @param factor
+	 */
 	public void addFactor(String factor) {
 		factors.add(factor);
 	}
-	
+
+	/**
+	 * 添加一个分析因素结果
+	 * @param result
+	 */
+	public void addFactor(FactorResult result) {
+		Integer type = result.getType();
+		if (type == PrescriptionFactorCondition.TYPE_DEFAULT) {
+			factors.add(result.getFactor());
+		} else if (type == PrescriptionFactorCondition.TYPE_SPECULATE_DISEASE) {
+			speculate_factors.add(result);
+		}
+	}
+
+	/**
+	 * 是否存在因素
+	 * @param factor
+	 * @return
+	 */
 	public boolean hasFactor(String factor) {
 		return factors.contains(factor);
 	}
-	
+
+	/**
+	 * 是否存在属性
+	 * @param key	属性关键字
+	 * @return
+	 */
 	public boolean has(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -122,6 +178,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return false;
 	}
 
+	/**
+	 * 获取属性值（字符串形式）
+	 * @param key
+	 * @return
+	 */
 	public String getString(String key) {
 		Object value = get(key);
 		if (value != null && value instanceof String) {
@@ -130,6 +191,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return null;
 	}
 
+	/**
+	 * 获取属性值（含小数形式）
+	 * @param key
+	 * @return
+	 */
 	public Double getDouble(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -145,6 +211,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return null;
 	}
 
+	/**
+	 * 获取属性值（整数形式）
+	 * @param key
+	 * @return
+	 */
 	public Integer getInteger(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -160,6 +231,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return null;
 	}
 
+	/**
+	 * 获取属性值（字符串数组形式）
+	 * @param key
+	 * @return
+	 */
 	public String[] getStringArray(String key) {
 		Object value = this.get(key);
 
@@ -223,6 +299,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return values;
 	}
 
+	/**
+	 * 获取属性值（小数数组形式）
+	 * @param key
+	 * @return
+	 */
 	public Double[] getDoubleArray(String key) {
 		Object value = this.get(key);
 

@@ -246,8 +246,29 @@
                 content: url,
                 success: options.success
             });
+        },
+        getOpenLayerSize: function(w, h) {
+            w = w || 0.8;
+            h = h || 0.9;
+
+            var ww = $(window).width();
+            var wh = $(window).height();
+
+            if (w > ww) {
+                w = ww * 0.8;
+            } else if (w <= 1) {
+                w = ww * w;
+            }
+
+            if (h > wh) {
+                h = wh * 0.9;
+            } else if (h <= 1) {
+                h = wh * h;
+            }
+
+            return [w + "px", h + "px"];
         }
-    })
+    });
 
 
     // --------------------------------------

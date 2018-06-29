@@ -86,7 +86,11 @@ function buildPrescriptionContent(prescriptions) {
 
     var html = "<ul>";
     result.forEach(function(a) {
-        html += "<li>" + a.content + "</li>";
+        html += "<li><p>" + a.content + "</p>";
+        if (a.detail) {
+            html += "<p style='color:#999'>" + a.detail + "</p>";
+        }
+        html += "</li>";
     });
     html += "</ul>";
     return html;
@@ -117,10 +121,11 @@ function showPrescription(result) {
     }
 
     if (ps && ps.length > 0) {
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle' rowspan='4'>健康处方</td><td valign='middle' align='center' style='width:140px;vertical-align:middle'>日常生活</td><td>" + buildPrescriptionContent(ps, 1, 8) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle' rowspan='5'>健康处方</td><td valign='middle' align='center' style='width:140px;vertical-align:middle'>日常生活</td><td>" + buildPrescriptionContent(ps, 1, 8) + "</td></tr>";
         html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>饮食习惯</td><td>" + buildPrescriptionContent(ps, 3, 4, 5) + "</td></tr>";
         html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>运动锻炼</td><td>" + buildPrescriptionContent(ps, 7) + "</td></tr>";
         html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>心理活动</td><td>" + buildPrescriptionContent(ps, 6) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>其他</td><td>" + buildPrescriptionContent(ps, 10) + "</td></tr>";
     } else {
         $.infoMessage("没有有用的健康处方");
         return;

@@ -23,6 +23,7 @@ public class HealthPrescriptionService {
 	public PrescriptionResult findPrescription(PeopleCondition peopleCondition) {
 		peopleCondition.initialize();
 		healthFactorAnalyzer.analyzeFactor(peopleCondition);
-		return healthPrescriptionContainer.search(peopleCondition.getFactors());
+		PrescriptionResult result =  healthPrescriptionContainer.search(peopleCondition);
+		return result;
 	}
 }

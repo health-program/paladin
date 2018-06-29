@@ -48,7 +48,7 @@ public class ObesityFactorAnalyzer implements FactorAnalyzer {
 	}
 
 	@Override
-	public String analyseFactor(PeopleCondition peopleCondition) {
+	public FactorResult analyseFactor(PeopleCondition peopleCondition) {
 
 		Double limitBmi = 28.0;
  
@@ -74,20 +74,20 @@ public class ObesityFactorAnalyzer implements FactorAnalyzer {
 		Double sg = peopleCondition.getDouble("sg");
 
 		if (bmi != null && bmi >= limitBmi) {
-			return factor;
+			return new FactorResult(factor);
 		}
 
 		if (yw != null) {
 			if (sg != null) {
 				double x = yw / sg;
 				if (x > 0.53 || (isGirl && x > 0.49)) {
-					return factor;
+					return new FactorResult(factor);
 				}
 			 } else if (bmi != null) {				
 				if(yw >=90 && (isGirl && yw >=85)) {
-					return factor;
+					return new FactorResult(factor);
 				} else if(bmi <24 && yw >=85 && (isGirl && yw >=80)) {
-					return factor;				
+					return new FactorResult(factor);
 				}				
 			}
 		}

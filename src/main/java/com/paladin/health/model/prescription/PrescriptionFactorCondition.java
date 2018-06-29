@@ -3,9 +3,16 @@ package com.paladin.health.model.prescription;
 import javax.persistence.Id;
 
 public class PrescriptionFactorCondition {
+	
+	/** 默认*/
+	public static final Integer TYPE_DEFAULT = 1;
+	
+	/** 推测是疾病 */
+	public static final Integer TYPE_SPECULATE_DISEASE = 2;
+
 
 	@Id
-	private String id;
+	private Integer id;
 
 	private String itemKey;
 
@@ -17,15 +24,12 @@ public class PrescriptionFactorCondition {
 	
 	private String disease;
 	
-	private String conditionArrayId;
+	private Integer type;
+	
+	private String illustration;
+	
+	private Integer conditionArrayId;
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getRelation() {
 		return relation;
@@ -51,14 +55,6 @@ public class PrescriptionFactorCondition {
 		this.factorCode = factorCode;
 	}
 
-	public String getConditionArrayId() {
-		return conditionArrayId;
-	}
-
-	public void setConditionArrayId(String conditionArrayId) {
-		this.conditionArrayId = conditionArrayId;
-	}
-
 	public String getItemKey() {
 		return itemKey;
 	}
@@ -73,6 +69,38 @@ public class PrescriptionFactorCondition {
 
 	public void setDisease(String disease) {
 		this.disease = disease;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public String getIllustration() {
+		return illustration;
+	}
+
+	public void setIllustration(String illustration) {
+		this.illustration = illustration;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getConditionArrayId() {
+		return conditionArrayId;
+	}
+
+	public void setConditionArrayId(Integer conditionArrayId) {
+		this.conditionArrayId = conditionArrayId;
 	}
 
 }
