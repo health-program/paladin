@@ -306,7 +306,7 @@ public class ShiroConfiguration {
 		// 登录成功后要跳转的链接
 		shiroFilterFactoryBean.setSuccessUrl("/health/index");
 		// 未授权界面;
-		shiroFilterFactoryBean.setUnauthorizedUrl("/no_permission.html");
+		shiroFilterFactoryBean.setUnauthorizedUrl("/static/html/error_401.html");
 
 		// 增加自定义过滤
 		Map<String, Filter> filters = new HashMap<>();
