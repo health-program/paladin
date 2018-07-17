@@ -64,11 +64,20 @@ public class JoinSelectProvider extends MapperTemplate {
 		final Class<?> entityClass = getEntityClass(ms);
 		// 修改返回值类型为实体类型
 		setResultType(ms, entityClass);
-		StringBuilder sql = new StringBuilder();
-		// edited by TontoZhou
-		sql.append(getBaseSql(entityClass));
-		sql.append(orderByDefault(entityClass));
-		return sql.toString();
+		return getBaseSql(entityClass, false);
+	}
+
+	/**
+	 * 根据Example查询
+	 *
+	 * @param ms
+	 * @return
+	 */
+	public String selectJoinByExample(MappedStatement ms) {
+		Class<?> entityClass = getEntityClass(ms);
+		// 将返回值修改为实体类型
+		setResultType(ms, entityClass);
+		return getBaseSql(entityClass, true);
 	}
 
 	/**
@@ -77,7 +86,7 @@ public class JoinSelectProvider extends MapperTemplate {
 	 * @param entityClass
 	 * @return
 	 */
-	private String getBaseSql(Class<?> entityClass) {
+	private String getBaseSql(Class<?> entityClass, boolean isExample) {
 
 		JoinEntityTable entityTable = entityTableMap.get(entityClass);
 		StringBuilder sql = new StringBuilder("SELECT ");
@@ -163,41 +172,50 @@ public class JoinSelectProvider extends MapperTemplate {
 			sql.delete(sql.length() - 4, sql.length());
 		}
 
-		return sql.toString();
+		if (isExample) {
 
-	}
+			// 只支持基础表字段查询（example必须与entity相对应，而连接表的entity不符合设定，可后续修改）
 
-	/**
-	 * 获取默认的orderBy，通过注解设置的
-	 *
-	 * @param entityClass
-	 * @return
-	 */
-	private String orderByDefault(Class<?> entityClass) {
-		JoinEntityTable entityTable = entityTableMap.get(entityClass);
-		StringBuilder sql = new StringBuilder();
+			String exampleWhereClause = "<if test=\"_parameter != null\">" + "<where>\n" + "  <foreach collection=\"oredCriteria\" item=\"criteria\">\n"
+					+ "    <if test=\"criteria.valid\">\n" + "      ${@tk.mybatis.mapper.util.OGNL@andOr(criteria)}"
+					+ "      <trim prefix=\"(\" prefixOverrides=\"and |or \" suffix=\")\">\n"
+					+ "        <foreach collection=\"criteria.criteria\" item=\"criterion\">\n" + "          <choose>\n"
+					+ "            <when test=\"criterion.noValue\">\n" + "              ${@tk.mybatis.mapper.util.OGNL@andOr(criterion)} " + baseTableAlias
+					+ ".${criterion.condition}\n" + "            </when>\n" + "            <when test=\"criterion.singleValue\">\n"
+					+ "              ${@tk.mybatis.mapper.util.OGNL@andOr(criterion)} " + baseTableAlias + ".${criterion.condition} #{criterion.value}\n"
+					+ "            </when>\n" + "            <when test=\"criterion.betweenValue\">\n"
+					+ "              ${@tk.mybatis.mapper.util.OGNL@andOr(criterion)} " + baseTableAlias
+					+ ".${criterion.condition} #{criterion.value} and #{criterion.secondValue}\n" + "            </when>\n"
+					+ "            <when test=\"criterion.listValue\">\n" + "              ${@tk.mybatis.mapper.util.OGNL@andOr(criterion)} " + baseTableAlias
+					+ ".${criterion.condition}\n"
+					+ "              <foreach close=\")\" collection=\"criterion.value\" item=\"listItem\" open=\"(\" separator=\",\">\n"
+					+ "                #{listItem}\n" + "              </foreach>\n" + "            </when>\n" + "          </choose>\n"
+					+ "        </foreach>\n" + "      </trim>\n" + "    </if>\n" + "  </foreach>\n" + "</where>" + "</if>";
 
-		EntityTable table = entityTable.baseEntityTable;
-		if (table.getOrderByClause() != null) {
-			return table.getOrderByClause();
-		}
+			sql.append(exampleWhereClause);
 
-		StringBuilder orderBy = new StringBuilder();
-		for (EntityColumn column : table.getEntityClassColumns()) {
-			if (column.getOrderBy() != null) {
-				if (orderBy.length() != 0) {
-					orderBy.append(",");
-				}
-				orderBy.append(column.getColumn()).append(" ").append(column.getOrderBy());
+			sql.append("<if test=\"orderByClause != null\">");
+			sql.append("ORDER BY ${orderByClause}");
+			sql.append("</if>");
+			String orderByClause = EntityHelper.getOrderByClause(baseEntityTable.getEntityClass());
+			if (orderByClause.length() > 0) {
+				sql.append("<if test=\"orderByClause == null\">");
+				sql.append("ORDER BY " + orderByClause);
+				sql.append("</if>");
+			}
+
+			sql.append("<if test=\"@tk.mybatis.mapper.util.OGNL@hasForUpdate(_parameter)\">");
+			sql.append("FOR UPDATE");
+			sql.append("</if>");
+
+		} else {
+			String orderByClause = EntityHelper.getOrderByClause(baseEntityTable.getEntityClass());
+			if (orderByClause.length() > 0) {
+				sql.append(" ORDER BY ");
+				sql.append(orderByClause);
 			}
 		}
 
-		table.setOrderByClause(orderBy.toString());
-		String orderByClause = table.getOrderByClause();
-		if (orderByClause.length() > 0) {
-			sql.append(" ORDER BY ");
-			sql.append(orderByClause);
-		}
 		return sql.toString();
 	}
 
@@ -491,6 +509,7 @@ public class JoinSelectProvider extends MapperTemplate {
 	}
 
 	private static final Map<Class<?>, JoinEntityTable> entityTableMap = new ConcurrentHashMap<Class<?>, JoinEntityTable>();
+	private static final Map<String, JoinEntityTable> entityTableNameMap = new ConcurrentHashMap<String, JoinEntityTable>();
 
 	/**
 	 * 初始化连接查询对应实体
@@ -550,9 +569,7 @@ public class JoinSelectProvider extends MapperTemplate {
 					if (column.foreignProperty().length != 0) {
 						foreignProperty = column.foreignProperty();
 					}
-
 				}
-				entityType = entityType.getSuperclass();
 
 				if (joinClass != null) {
 					EntityHelper.initEntityNameMap(joinClass, config);
@@ -567,7 +584,9 @@ public class JoinSelectProvider extends MapperTemplate {
 				}
 			}
 
-			if (entityType == baseEntityType) {
+			entityType = entityType.getSuperclass();
+
+			if (entityType == baseEntityType || entityType == Object.class) {
 				break;
 			}
 		}
@@ -579,6 +598,7 @@ public class JoinSelectProvider extends MapperTemplate {
 		// 需要在最好new JoinEntityTable，因为在new的过程中会处理joinEntityColumns
 		JoinEntityTable joinEntityTable = new JoinEntityTable(joinEntityType, baseEntityTable, joinEntityColumns);
 		entityTableMap.put(joinEntityType, joinEntityTable);
+		entityTableNameMap.put(joinEntityType.getCanonicalName(), joinEntityTable);
 	}
 
 }

@@ -13,6 +13,7 @@ import com.paladin.health.model.publicity.PublicityMessage;
 import com.paladin.health.model.publicity.PublicityMessageMore;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.exception.BusinessException;
 
@@ -89,11 +90,12 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return searchPage(query);
 	}
 
+	
 	public Page<PublicityMessageMore> findExamineMessage(MessageExamineQuery query) {
 		Page<PublicityMessageMore> pager = getPage(query);
-		publicityMessageMoreMapper.selectJoinAll();
+		
 		try {
-			List<PublicityMessageMore> result = publicityMessageMoreMapper.selectJoinAll();
+			List<PublicityMessageMore> result = publicityMessageMoreMapper.selectJoinByExample(GeneralCriteriaBuilder.buildQuery(PublicityMessage.class, query));
 			if (result == null || result.size() == 0) {
 				pager.setTotal(0L);
 			}
