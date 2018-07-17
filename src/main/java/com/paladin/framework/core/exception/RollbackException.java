@@ -1,4 +1,4 @@
-package com.paladin.framework.exception;
+package com.paladin.framework.core.exception;
 
 public class RollbackException extends RuntimeException {
 

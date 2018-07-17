@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.exception.BusinessException;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.WebUtil;
 import com.paladin.framework.web.response.CommonResponse;
+import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.service.sys.SysUserService;
 
 @Controller
@@ -28,12 +30,13 @@ public class LoginController extends ControllerSupport {
 
 	@RequestMapping(value = "/index")
 	public Object index(HttpServletRequest request) {
-		return "/health/index";
+		return new ModelAndView("/health/index","user", HealthUserSession.getCurrentUserSession());
 	}
 
 	@RequestMapping(value = "/main")
 	public Object main(HttpServletRequest request) {
-		return "/health/index";
+		return new ModelAndView("/health/index","user", HealthUserSession.getCurrentUserSession());
+
 	}
 	
 	/**
@@ -84,7 +87,7 @@ public class LoginController extends ControllerSupport {
 				return null;
 			} else {
 				model.addAttribute("isError", true);
-				return loginInput(request, response);
+				return "/health/login";
 			}
 		}
 	}

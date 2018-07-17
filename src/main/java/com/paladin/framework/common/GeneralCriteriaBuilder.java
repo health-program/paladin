@@ -262,6 +262,22 @@ public class GeneralCriteriaBuilder {
 				}
 
 				hasSort = true;
+			} else if (queryParam instanceof QuerySorts) {
+
+				QuerySorts sortQuerys = (QuerySorts) queryParam;
+				String[] orders = sortQuerys.getOrder();
+				String[] sorts = sortQuerys.getSort();
+
+				for (int i = 0; orders.length > i && sorts.length > i; i++) {
+					String order = orders[i];
+					String sort = sorts[i];
+					if ("asc".equals(order)) {
+						example.orderBy(sort).asc();
+					} else {
+						example.orderBy(sort).desc();
+					}
+					hasSort = true;
+				}
 			}
 
 			if (buildUnits.size() == 0 && !hasSort) {

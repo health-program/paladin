@@ -45,26 +45,14 @@
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <img src="/static/image/user.png" class="user-image" alt="User Image"/>
-                                <span class="hidden-xs">周旭武</span>
+                                <span class="hidden-xs" th:text="${user.userName}"></span>
                             </a>
                             <ul class="dropdown-menu">
                                 <!-- The user image in the menu -->
                                 <li class="user-header">
                                     <img src="/static/image/user.png" class="img-circle" alt="User Image" />
-                                    <p>周旭武 - Java Developer<small>Member since Nov. 2012</small></p>
-                                </li>
-                                <li class="user-body">
-                                    <div class="row">
-                                        <div class="col-xs-4 text-center">
-                                            <a href="#">Followers</a>
-                                        </div>
-                                        <div class="col-xs-4 text-center">
-                                            <a href="#">Sales</a>
-                                        </div>
-                                        <div class="col-xs-4 text-center">
-                                            <a href="#">Friends</a>
-                                        </div>
-                                    </div>
+                                    <p th:text="${user.userName}"></p>
+                                    <p><small th:text="${user.systemAdmin}? '系统管理员' : (${user.userAdmin}? '管理用户' : '普通用户')"></small></p>
                                 </li>
                                 <li class="user-footer">
                                     <div class="pull-left">
@@ -94,7 +82,7 @@
                         <img src="/static/image/user.png" class="img-circle" alt="User Image">
                     </div>
                     <div class="pull-left info">
-                        <p>周旭武</p>
+                        <p th:text="${user.userName}"></p>
                         <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
                     </div>
                 </div>
@@ -136,16 +124,14 @@
                 </div>
                 <button class="roll-nav roll-right fullscreen" onclick="App.handleFullScreen()"><i class="fa fa-arrows-alt"></i></button>
             </div>
-            <div class="content-iframe " style="background-color: #ecf0f5; ">
-                <div class="tab-content " id="tab-content">
+            <div class="content-iframe" style="background-color: #ecf0f5;">
+                <div class="tab-content" id="tab-content">
                 </div>
             </div>
         </div>
         <footer class="main-footer">
-            <div class="pull-right hidden-xs">
-                <b>Version</b> 1.0.0
-            </div>
-            <strong>Copyright &copy; 2017 <a href="http://www.netintech.cn">网进科技</a>.</strong> All rights reserved.
+            <div class="pull-right hidden-xs"><b>Version</b> 1.0.0</div>
+            <strong>Copyright &copy; 2018 <a href="http://www.netintech.cn">网进科技</a>.</strong> All rights reserved.
         </footer>
         <aside class="control-sidebar control-sidebar-dark">
             <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
@@ -237,14 +223,14 @@
         //App.setGlobalImgPath("/static/image/");
 
         App.fixIframeCotent();
-        
-/*         addTabs({
-            id: "90011",
-            text: "疾病查询",
-            icon: "fa fa-circle-o",
-            url: "search/index",
-            targetType: "iframe-tab"
-        }); */
+
+        /*         addTabs({
+                    id: "90011",
+                    text: "疾病查询",
+                    icon: "fa fa-circle-o",
+                    url: "search/index",
+                    targetType: "iframe-tab"
+                }); */
 
         var menus = [{
                 id: "9000",
@@ -305,13 +291,38 @@
                         targetType: "iframe-tab"
                     }
                 ]
+            },
+            {
+                id: "9003",
+                text: "后台管理",
+                icon: "fa fa-laptop",
+                children: [{
+                        id: "90031",
+                        text: "信息发布",
+                        icon: "fa fa-circle-o",
+                        url: "publicity/index",
+                        targetType: "iframe-tab"
+                    },
+                    {
+                        id: "90032",
+                        text: "信息审核",
+                        icon: "fa fa-circle-o",
+                        url: "publicity/examine/index",
+                        targetType: "iframe-tab"
+                    },
+                    {
+                        id: "90033",
+                        text: "用户管理",
+                        icon: "fa fa-circle-o",
+                        url: "system/user/index",
+                        targetType: "iframe-tab"
+                    }
+                ]
             }
-            
+
         ];
 
         $('.sidebar-menu').sidebarMenu({ data: menus });
-
-        
 
 
         // 动态创建菜单后，可以重新计算 SlimScroll

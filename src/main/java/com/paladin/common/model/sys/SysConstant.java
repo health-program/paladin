@@ -3,12 +3,16 @@ package com.paladin.common.model.sys;
 import javax.persistence.Id;
 
 public class SysConstant {
+	
+	public final static String  COLUMN_FIELD_ORDER_NO = "orderNo";
+	public final static String  COLUMN_FIELD_TYPE = "type";
 
 	@Id
 	private String code;
 
 	private String name;
 
+	@Id
 	private String type;
 
 	private Integer orderNo;

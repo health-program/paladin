@@ -47,4 +47,12 @@ public @interface ColumnType {
     JdbcType jdbcType() default JdbcType.UNDEFINED;
 
     Class<? extends TypeHandler<?>> typeHandler() default UnknownTypeHandler.class;
+    
+    Class<?> foreignClass() default Object.class;
+    
+    /**
+     * 如果只有一个主键时候不需要填写
+     * @return
+     */
+    String foreignProperty() default "";
 }

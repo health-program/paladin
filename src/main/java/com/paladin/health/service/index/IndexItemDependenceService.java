@@ -17,7 +17,7 @@ import com.paladin.health.service.index.pojo.ItemDependenceDetail;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
 import com.paladin.framework.core.ServiceSupport;
-import com.paladin.framework.exception.BusinessException;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.EnumUtil;
 
 @Service

@@ -10,7 +10,7 @@ import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.UserSession;
-import com.paladin.framework.exception.BusinessException;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.secure.SecureUtil;
 import com.paladin.health.config.BusinessConfig;
 import com.paladin.health.model.sys.SysUser;
@@ -28,7 +28,7 @@ public class SysUserService extends ServiceSupport<SysUser> {
 	 * @param type
 	 * @return
 	 */
-	public int createUserAccount(String account, String userId, Integer type) {
+	public int createUserAccount(String account, String userId) {
 
 		if (account == null || !validateAccount(account))
 			throw new BusinessException("账号不符合规则或者已经存在该账号");
@@ -43,7 +43,7 @@ public class SysUserService extends ServiceSupport<SysUser> {
 		user.setSalt(salt);
 		user.setUserId(userId);
 		user.setState(SysUser.STATE_ENABLED);
-		user.setType(type);
+		user.setType(SysUser.TYPE_ORG_USER);
 
 		return save(user);
 
@@ -140,5 +140,7 @@ public class SysUserService extends ServiceSupport<SysUser> {
 
 		return updateSelective(updateUser);
 	}
+
+
 
 }

@@ -1,32 +1,13 @@
 package com.paladin.framework.core;
 
-//import java.beans.PropertyEditorSupport;
-//import java.text.ParseException;
-//import java.text.SimpleDateFormat;
-//import java.util.Date;
 import java.util.List;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-//import org.springframework.web.bind.WebDataBinder;
-//import org.springframework.web.bind.annotation.InitBinder;
 
 import com.paladin.framework.web.response.CommonResponse;
 
-
 public class ControllerSupport {
-
-//	private static EmptyPropertyEditor emptyPropertyEditor = new EmptyPropertyEditor();
-//	private static DatePropertyEditor datePropertyEditor = new DatePropertyEditor();
-//
-//	@InitBinder
-//	public void bindingPreparation(WebDataBinder binder) {
-//		/*
-//		 * 设定String类型空字符串过滤，不一定是最好的方式？
-//		 */
-//		binder.registerCustomEditor(String.class, emptyPropertyEditor);
-//		binder.registerCustomEditor(Date.class, datePropertyEditor);
-//	}
 
 	/**
 	 * 验证异常处理
@@ -49,59 +30,30 @@ public class ControllerSupport {
 		return CommonResponse.getValidFailResponse(result);
 	}
 
-	
-//	private static class DatePropertyEditor extends PropertyEditorSupport {
-//
-//		private final static ThreadLocal<SimpleDateFormat> dateFormat = new ThreadLocal<SimpleDateFormat>() {
-//			public SimpleDateFormat initialValue() {
-//				return new SimpleDateFormat("yyyy-MM-dd");
-//			}
-//		};
-//
-//		private final static ThreadLocal<SimpleDateFormat> timeFormat = new ThreadLocal<SimpleDateFormat>() {
-//			public SimpleDateFormat initialValue() {
-//				return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//			}
-//		};
-//
-//		@Override
-//		public void setAsText(String text) {
-//			if (text != null) {
-//				text = text.trim();
-//				if (!text.equals("")) {
-//					if (text.length() > 10) {
-//						try {
-//							setValue(timeFormat.get().parse(text));
-//							return;
-//						} catch (ParseException e) {
-//						}
-//					} else {
-//						try {
-//							setValue(dateFormat.get().parse(text));
-//							return;
-//						} catch (ParseException e) {
-//						}
-//					}
-//				}
-//			}
-//			setValue(null);
-//		}
-//	}
-//
-//	private static class EmptyPropertyEditor extends PropertyEditorSupport {
-//		@Override
-//		public void setAsText(String text) {
-//			if (text == null) {
-//				setValue(null);
-//			} else {
-//
-//				text = text.trim();
-//
-//				if (text.equals(""))
-//					setValue(null);
-//				else
-//					setValue(text);
-//			}
-//		}
-//	}
+	protected <T> T beanCompleteCopy(Object source, T target) {
+		copier.simpleCopy(source, target);
+		return target;
+	}
+
+	protected <T> T beanIncompleteCopy(Object source, T target) {
+		copier.simpleCopy(source, target, true);
+		return target;
+	}
+
+	public <T> List<T> beanCopyList(List<?> sourceList, Class<T> targetType) {
+		return copier.simpleCopyList(sourceList, targetType);
+	}
+
+	private static SimpleBeanCopier copier = new SimpleBeanCopier() {
+		protected void setValue(CopyUnit copyUnit, Object target, Object source, boolean ignore) throws Exception {
+			if (!ignore || !copyUnit.ignoredIfNeed) {
+				Object value = copyUnit.getMethod.invoke(source);
+				if (value != null && value instanceof String && ((String) value).length() == 0) {
+					value = null;
+				}
+				copyUnit.setMethod.invoke(target, value);
+			}
+		}
+	};
+
 }

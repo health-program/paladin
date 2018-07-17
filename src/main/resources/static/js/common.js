@@ -58,38 +58,8 @@
         }
     });
 
-    $.fn.getFormParams = function(param) {
-
-        $(this).each(function() {
-            $(this).find(
-                    "input[type='text']:enabled," + "input[type='password']:enabled," +
-                    "input[type='hidden']:enabled," + "input[type='checkbox']:enabled:checked," +
-                    "input[type='radio']:enabled:checked," + "select:enabled," + "textarea:enabled")
-                .each(function() {
-                    var that = $(this);
-                    var name = that.attr("name");
-                    name = name || that.attr("id");
-                    if (!name)
-                        return;
-                    var value = that.val();
-                    if (value === null)
-                        return;
-
-                    var type = typeof(value);
-                    if (type === "string") {
-                        value = value.trim();
-                        if (value === "")
-                            return;
-                    } else if (type === "undefined")
-                        return;
-
-                    param[name] = value;
-                });
-        });
-    };
-
-    $.fn.serializeObject = function() {
-        var obj = {};
+    $.fn.serializeObject = function(param) {
+        var obj = param || {};
         $(this).each(function() {
             var a = $(this).serializeArray();
             a.forEach(function(i) {
@@ -443,7 +413,7 @@
     _initTable();
     _initEnumConstant();
     _initForm();
-
+    _initCommon();
 
     // ------------------------------------------
     //
@@ -475,6 +445,28 @@
 
 
 })(jQuery);
+
+
+function _initCommon() {
+    // 关键词搜索框添加绑定回车函数
+    $('.tonto-btn-search').each(function() {
+        var btn = $(this);
+        $("body").bind('keypress', function(event) {
+            if (event.keyCode == "13") {
+                btn.click();
+            }
+        });
+    });
+    
+    $('.tonto-select').each(function() {
+        var that = $(this);
+        var selected = that.attr("selectedvalue");
+        if(selected) {
+        	that.val(selected);
+        }
+    });
+    
+}
 
 
 function _initValidator() {
@@ -784,7 +776,7 @@ function _initTable() {
                     params = q(params);
                 }
 
-                $(options.searchbar).getFormParams(params);
+                $(options.searchbar).serializeObject(params);
 
                 return params;
             };
@@ -1010,7 +1002,15 @@ function _initTable() {
 }
 
 
-var _constant_cache = {};
+var _constant_cache = {
+    boolean: [{
+        key: "1",
+        value: "是"
+    }, {
+        key: "0",
+        value: "否"
+    }]
+};
 /**
  * 自动加载常量下拉框 <class = tonto-select-constant>
  */
@@ -1065,7 +1065,7 @@ function _initEnumConstant(container) {
 
             var targetCallbacks = [];
 
-            var url = "/system/constants/enum";
+            var url = "/common/constant";
             if (!$.isArray(enumcode)) {
                 var code;
                 if (typeof enumcode == 'string') {
@@ -1144,9 +1144,14 @@ function _initEnumConstant(container) {
     var _enumKeys = [];
 
     constants.each(function() {
-        var enumcode = $(this).attr("enumcode");
+        var a = $(this);
+        var enumcode = a.attr("enumcode");
         if (enumcode) {
-            _enumKeys.push(enumcode);
+            if (a.is('p')) {
+                _enumKeys.push({ code: enumcode, type: 'p', target: a });
+            } else {
+                _enumKeys.push(enumcode);
+            }
         }
     });
 
@@ -1154,17 +1159,19 @@ function _initEnumConstant(container) {
         $.getConstantEnum(_enumKeys, function(data) {
             constants.each(function() {
                 var $s = $(this);
-                var enumcode = $s.attr("enumcode");
-                if (enumcode) {
-                    var enumvalues = data[enumcode];
-                    if (enumvalues) {
-                        enumvalues.forEach(function(a) {
-                            $s.append("<option value='" + a.key + "'>" + a.value + "</option>");
-                        });
-                    }
-                    var selectedvalue = $s.attr("selectedvalue");
-                    if (selectedvalue) {
-                        $s.val(selectedvalue);
+                if ($s.is("select")) {
+                    var enumcode = $s.attr("enumcode");
+                    if (enumcode) {
+                        var enumvalues = data[enumcode];
+                        if (enumvalues) {
+                            enumvalues.forEach(function(a) {
+                                $s.append("<option value='" + a.key + "'>" + a.value + "</option>");
+                            });
+                        }
+                        var selectedvalue = $s.attr("selectedvalue");
+                        if (selectedvalue) {
+                            $s.val(selectedvalue);
+                        }
                     }
                 }
             });
@@ -1308,7 +1315,7 @@ function _initForm(container, formOptions) {
                                 error.forEach(function(item) {
                                     var el = item[1];
                                     var errorMsg = item[2];
-                                    $form.find("#" + el + ",[name='" + el + "']").each(function() {
+                                    form.find("#" + el + ",[name='" + el + "']").each(function() {
                                         layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
                                     });
                                 });

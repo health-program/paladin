@@ -575,6 +575,21 @@ public abstract class ServiceSupport<Model> {
 		}
 	}
 
+	/**
+	 * 获取一个分页
+	 * @param query
+	 * @return
+	 */
+	public <E> Page<E> getPage(OffsetPage query){	
+		int limit = query.getLimit();
+		int offset  =query.getOffset();
+		
+		if (limit > maxPageSize) {
+			limit = maxPageSize;
+		}
+		return PageHelper.offsetPage(offset, limit);	
+	}
+	
 	// -----------------------------------------------------
 	// 修改保存删除
 	// -----------------------------------------------------
@@ -586,7 +601,7 @@ public abstract class ServiceSupport<Model> {
 
 	public int saveOrUpdate(Model model) {
 		if (judgeHasPKValue(model)) {
-			return updateSelective(model);
+			return update(model);
 		} else {
 			return save(model);
 		}

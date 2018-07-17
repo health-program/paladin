@@ -1,4 +1,4 @@
-package com.paladin.framework.exception;
+package com.paladin.framework.core.exception;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,7 +17,7 @@ import com.paladin.framework.web.response.CommonResponse;
 public class ExceptionHandler implements HandlerExceptionResolver {
 
 	private static Logger logger = LoggerFactory.getLogger(ExceptionHandler.class);
-	
+
 	private String defaultErrorView;
 
 	public String getDefaultErrorView() {
@@ -46,24 +46,28 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 	@Override
 	public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
 		// 需要注释？
-		
+
 		String page = null;
 		CommonResponse responseObject = null;
 
+		String message = ex.getMessage();
+
 		if (ex instanceof BusinessException) {
-			responseObject = CommonResponse.getFailResponse(ex.getMessage());
-			page = "/business_error";
-		} else if (ex instanceof BusinessException) {
-			responseObject = CommonResponse.getErrorResponse(ex.getMessage());
-			page = "/system_error";
+			responseObject = CommonResponse.getFailResponse(message == null ? "业务异常" : message);
+			page = "/error_business";
+		} else if (ex instanceof BadRequestException) {
+			responseObject = CommonResponse.getErrorResponse(message == null ? "请求参数异常" : message);
+			page = "/error_bad_request";
+		} else if (ex instanceof SystemException) {
+			responseObject = CommonResponse.getErrorResponse(message == null ? "系统异常" : message);
+			page = "/error_system";
 		} else {
 			responseObject = CommonResponse.getErrorResponse("系统未知异常");
 			page = "/error";
-			
-			logger.error("系统未知异常",ex);
+			logger.error("系统未知异常", ex);
 		}
-		
-		if(logger.isDebugEnabled()) {
+
+		if (logger.isDebugEnabled()) {
 			ex.printStackTrace();
 		}
 
@@ -73,7 +77,7 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 			return new ModelAndView(page, "error", responseObject.getResult());
 		}
 
-		return null;
+		return new ModelAndView();
 	}
 
 }

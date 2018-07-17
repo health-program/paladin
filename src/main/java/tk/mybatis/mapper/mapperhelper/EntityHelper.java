@@ -75,6 +75,17 @@ public class EntityHelper {
         }
         return entityTable;
     }
+    
+    /**
+     * 获取表对象
+     *
+     * @param entityClass
+     * @return
+     */
+    public static boolean hasEntityTable(Class<?> entityClass) {
+        EntityTable entityTable = entityTableMap.get(entityClass);
+        return entityTable != null;
+    }
 
     /**
      * 获取默认的orderby语句
@@ -284,6 +295,14 @@ public class EntityHelper {
             if (columnType.typeHandler() != UnknownTypeHandler.class) {
                 entityColumn.setTypeHandler(columnType.typeHandler());
             }
+            
+            // code by TontoZhou
+            // 增加列外键描述
+            if (columnType.foreignClass() != Object.class) {
+            	entityColumn.setForeignClass(columnType.foreignClass());
+            	entityColumn.setForeignProperty(columnType.foreignProperty());
+            }
+            
         }
         //表名
         if (StringUtil.isEmpty(columnName)) {
@@ -358,4 +377,5 @@ public class EntityHelper {
             entityTable.getEntityClassPKColumns().add(entityColumn);
         }
     }
+    
 }

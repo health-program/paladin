@@ -5,40 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.paladin.common.model.sys.SysConstant;
+import com.paladin.common.service.sys.SysConstantService;
 import com.paladin.framework.core.VersionContainer;
 
 @Component
 public class ConstantsContainer implements VersionContainer{
 		
+	@Autowired
+	private SysConstantService constantService;
+	
 	private static Map<String, List<KeyValue>> constantMap = new HashMap<>();
 
-	public boolean initialize() {
+	public boolean initialize() {		
+		Map<String, List<KeyValue>> enumConstantMap = new HashMap<>();				
+		List<SysConstant> constants = constantService.findAll();	
+		for(SysConstant constant:constants) {			
+			String type = constant.getType();
+			List<KeyValue> kvList = enumConstantMap.get(type);
+			if(kvList ==null) {
+				kvList = new ArrayList<>();
+				enumConstantMap.put(type, kvList);
+			}
+			kvList.add(new KeyValue(constant.getCode(),constant.getName()));			
+		}
 		
-		Map<String, List<KeyValue>> enumConstantMap = new HashMap<>();
-		
-		List<KeyValue> sexTypes = new ArrayList<>();
-		sexTypes.add(new KeyValue("1", "男"));
-		sexTypes.add(new KeyValue("2", "女"));
-		enumConstantMap.put("sex-type", sexTypes);
-		
-		List<KeyValue> booleanTypes = new ArrayList<>();
-		booleanTypes.add(new KeyValue("1", "是"));
-		booleanTypes.add(new KeyValue("0", "否"));
-		enumConstantMap.put("boolean-type", booleanTypes);
-		
-		
-		List<KeyValue> prescriptionItemTypes = new ArrayList<>();
-		prescriptionItemTypes.add(new KeyValue("1", "日常生活"));
-		prescriptionItemTypes.add(new KeyValue("3", "饮食适宜"));
-		prescriptionItemTypes.add(new KeyValue("4", "饮食禁忌"));
-		prescriptionItemTypes.add(new KeyValue("5", "饮食行为"));
-		prescriptionItemTypes.add(new KeyValue("6", "心理"));
-		prescriptionItemTypes.add(new KeyValue("7", "运动"));
-
-		enumConstantMap.put("prescription-item-type", prescriptionItemTypes);
-				
 		constantMap = enumConstantMap;		
 		return true;
 	}

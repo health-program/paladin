@@ -1,13 +1,27 @@
 package com.paladin.framework.mybatis;
 
-import tk.mybatis.mapper.common.Mapper;
-import tk.mybatis.mapper.common.MySqlMapper;
+import tk.mybatis.mapper.common.Marker;
+import tk.mybatis.mapper.common.base.delete.DeleteByPrimaryKeyMapper;
+import tk.mybatis.mapper.common.base.insert.InsertMapper;
+import tk.mybatis.mapper.common.base.select.SelectAllMapper;
+import tk.mybatis.mapper.common.base.select.SelectByPrimaryKeyMapper;
+import tk.mybatis.mapper.common.base.update.UpdateByPrimaryKeyMapper;
+import tk.mybatis.mapper.common.base.update.UpdateByPrimaryKeySelectiveMapper;
+import tk.mybatis.mapper.common.example.SelectByExampleMapper;
+import tk.mybatis.mapper.common.example.SelectCountByExampleMapper;
 
 /**
  * 继承自己的MyMapper
  */
-public interface CustomMapper<T> extends Mapper<T>, MySqlMapper<T> {
-    //TODO
+public interface CustomMapper<T> extends 
+				SelectAllMapper<T>,
+				SelectByPrimaryKeyMapper<T>,
+				InsertMapper<T>,
+				UpdateByPrimaryKeyMapper<T>,
+				UpdateByPrimaryKeySelectiveMapper<T>,
+				DeleteByPrimaryKeyMapper<T>,
+				SelectByExampleMapper<T>,
+				SelectCountByExampleMapper<T>,
+				Marker {
     //FIXME 特别注意，该接口不能被扫描到，否则会出错
-
 }

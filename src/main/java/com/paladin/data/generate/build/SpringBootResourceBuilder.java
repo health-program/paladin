@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import com.paladin.data.generate.GenerateTableOption;
 import com.paladin.data.generate.GenerateType;
 import com.paladin.data.generate.GenerateUtil;
-import com.paladin.framework.exception.BusinessException;
+import com.paladin.framework.core.exception.BusinessException;
 
 public abstract class SpringBootResourceBuilder implements FileBuilder {
 

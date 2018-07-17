@@ -2,26 +2,32 @@ package com.paladin.framework.common;
 
 import java.util.Date;
 
+import com.paladin.health.model.sys.OrgUser;
+
+import tk.mybatis.mapper.annotation.ColumnType;
+
 public abstract class BaseModel {
 	
 	/**
 	 * 是
 	 */
-	public final static Integer BOOLEAN_YES = 1;
+	public final static int BOOLEAN_YES = 1;
 	/**
 	 * 否
 	 */
-	public final static Integer BOOLEAN_NO = 0;
+	public final static int BOOLEAN_NO = 0;
 	
 	
 	public final static String COLUMN_FIELD_CREATE_TIME = "createTime";
 
 	private Date createTime;
 
+	@ColumnType(foreignClass = OrgUser.class)
     private String createUserId;
 
     private Date updateTime;
-
+    
+	@ColumnType(foreignClass = OrgUser.class)
     private String updateUserId;
 
 	public Date getCreateTime() {

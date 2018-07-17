@@ -14,20 +14,20 @@ public class SysUser extends UnDeleteBaseModel implements Serializable {
 	/**
 	 * 启用状态
 	 */
-	public final static Integer STATE_ENABLED = 1;
+	public final static int STATE_ENABLED = 1;
 	/**
 	 * 停用状态
 	 */
-	public final static Integer STATE_DISABLED = 0;
+	public final static int STATE_DISABLED = 0;
 
 	/**
 	 * 管理员账号
 	 */
-	public final static Integer TYPE_ADMIN = 1;
+	public final static int TYPE_ADMIN = 1;
 	/**
 	 * 默认账号
 	 */
-	public final static Integer TYPE_ORG_USER = 0;
+	public final static int TYPE_ORG_USER = 0;
 
 	public final static String COLUMN_FIELD_ACCOUNT = "account";
 

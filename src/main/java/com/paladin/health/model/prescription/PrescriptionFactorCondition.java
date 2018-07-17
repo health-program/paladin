@@ -5,10 +5,10 @@ import javax.persistence.Id;
 public class PrescriptionFactorCondition {
 	
 	/** 默认*/
-	public static final Integer TYPE_DEFAULT = 1;
+	public static final int TYPE_DEFAULT = 1;
 	
 	/** 推测是疾病 */
-	public static final Integer TYPE_SPECULATE_DISEASE = 2;
+	public static final int TYPE_SPECULATE_DISEASE = 2;
 
 	@Id
 	private Integer id;

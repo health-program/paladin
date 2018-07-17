@@ -33,8 +33,7 @@ import com.paladin.data.service.GenerateService;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.exception.BusinessException;
-import com.paladin.framework.utils.convert.BeanCopyUtil;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.web.response.CommonResponse;
 
 @Controller
@@ -137,7 +136,7 @@ public class DBConnectionController extends ControllerSupport {
 	public Object tableList(@RequestParam String dbName, @RequestParam String tableName) {
 
 		Column[] columns = connectionService.getDBTableColumns(dbName, tableName);
-		List<ColumnDTO> columnVOs = BeanCopyUtil.simpleCopyList(Arrays.asList(columns), ColumnDTO.class);
+		List<ColumnDTO> columnVOs = beanCopyList(Arrays.asList(columns), ColumnDTO.class);
 
 		return CommonResponse.getSuccessResponse(columnVOs);
 	}
@@ -174,7 +173,7 @@ public class DBConnectionController extends ControllerSupport {
 		
 		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
 		
-		BeanCopyUtil.simpleCopy(option, tableOption);
+		beanCompleteCopy(option, tableOption);
 		
 		HashMap<String,String> contentMap = new HashMap<>();
 		contentMap.put("model", generateService.buildFileContent(tableOption, GenerateType.MODEL));
@@ -211,7 +210,7 @@ public class DBConnectionController extends ControllerSupport {
 		
 		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
 		
-		BeanCopyUtil.simpleCopy(option, tableOption);
+		beanCompleteCopy(option, tableOption);
 		
 		String projectPath = option.getProjectPath();
 		
