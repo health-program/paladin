@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.query.QueryInputMethod;
@@ -51,7 +50,7 @@ public class PublicityMessageController extends ControllerSupport {
 	@ResponseBody
 	@QueryOutputMethod(queryClass = MessageQuery.class, paramIndex = 0)
 	public Object findAll(MessageQuery query) {
-		return CommonResponse.getSuccessResponse(new PageResult(publicityMessageService.findSelfMessage(query)));
+		return CommonResponse.getSuccessResponse(publicityMessageService.findSelfMessage(query));
 	}
 
 	/**
@@ -75,7 +74,7 @@ public class PublicityMessageController extends ControllerSupport {
 	@ResponseBody
 	@QueryOutputMethod(queryClass = MessageExamineQuery.class, paramIndex = 0)
 	public Object findExamineAll(MessageExamineQuery query) {
-		return CommonResponse.getSuccessResponse(new PageResult(publicityMessageService.findExamineMessage(query)));
+		return CommonResponse.getSuccessResponse(publicityMessageService.findExamineMessage(query));
 	}
 
 	/**

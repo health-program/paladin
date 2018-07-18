@@ -31,7 +31,6 @@ import com.paladin.data.model.DBConnection;
 import com.paladin.data.service.DBConnectionService;
 import com.paladin.data.service.GenerateService;
 import com.paladin.framework.common.OffsetPage;
-import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.web.response.CommonResponse;
@@ -54,7 +53,7 @@ public class DBConnectionController extends ControllerSupport {
 	@RequestMapping("/search")
 	@ResponseBody
 	public Object searchAll(OffsetPage query) {
-		return CommonResponse.getSuccessResponse(new PageResult(connectionService.searchPage(query)));
+		return CommonResponse.getSuccessResponse(connectionService.searchPage(query));
 	}
 
 	@RequestMapping("/view")

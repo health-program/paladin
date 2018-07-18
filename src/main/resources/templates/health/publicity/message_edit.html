@@ -33,6 +33,12 @@
                         <label for="type" class="col-sm-2 control-label">类型：</label>
                         <div class="col-sm-3">
                             <select name="type" class="form-control tonto-select-constant" required="required" enumcode="publicity-message-type" th:attr="selectedvalue=${object.type}"></select>
+                        </div>                     
+                    </div>
+                    <div class="form-group">                      
+                        <label for="type" class="col-sm-2 control-label">发布时间：</label>
+                        <div class="col-sm-3">
+                            <input type="text" name="publishTime" class="form-control tonto-datepicker-date" th:field="*{publishTime}"/>
                         </div>
                     </div>
                     <div class="form-group">

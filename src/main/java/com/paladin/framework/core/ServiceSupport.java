@@ -18,6 +18,7 @@ import com.paladin.framework.common.CommonConditions;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.OrderType;
+import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryOrderBy;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.common.UnDelete;
@@ -49,7 +50,7 @@ public abstract class ServiceSupport<Model> {
 
 	private final static Logger logger = LoggerFactory.getLogger(ServiceSupport.class);
 
-	private Class<Model> modelType; // 业务对应类
+	protected Class<Model> modelType; // 业务对应类
 
 	@SuppressWarnings("unchecked")
 	public ServiceSupport() {
@@ -60,29 +61,29 @@ public abstract class ServiceSupport<Model> {
 		modelType = (Class<Model>) clazz;
 	}
 
-	private static int maxPageSize = 100; // 最大分页大小，防止恶意分页
+	protected static int maxPageSize = 100; // 最大分页大小，防止恶意分页
 
 	// -------------------------- 初始化配置 --------------------------
 
-	List<Condition> commonConditions = new ArrayList<>(); // 通用查询条件
-	Example commonExample;
-	boolean hasCommonCondition = false; // 是否有通用查询条件
+	protected List<Condition> commonConditions = new ArrayList<>(); // 通用查询条件
+	protected Example commonExample;
+	protected boolean hasCommonCondition = false; // 是否有通用查询条件
 
-	boolean isUnDelete = false; // 是否不删除，进行逻辑删除
-	boolean isBaseModel = false; // 是否基于基础模型
+	protected boolean isUnDelete = false; // 是否不删除，进行逻辑删除
+	protected boolean isBaseModel = false; // 是否基于基础模型
 
 	/*
 	 * 动态Example
 	 */
-	boolean hasDynamicCondition = false;
+	protected boolean hasDynamicCondition = false;
 
 	/*
 	 * 排序
 	 */
-	String[] orderByProperties;
-	OrderType[] orderByTypes;
-	boolean hasOrderBy = false;
-	boolean isAllwaysOrderFirst = false;
+	protected String[] orderByProperties;
+	protected OrderType[] orderByTypes;
+	protected boolean hasOrderBy = false;
+	protected boolean isAllwaysOrderFirst = false;
 
 	/**
 	 * 初始化
@@ -273,7 +274,7 @@ public abstract class ServiceSupport<Model> {
 	 * 
 	 * @return
 	 */
-	private Example getClearCurrentExample() {
+	protected Example getClearCurrentExample() {
 		return GeneralCriteriaBuilder.getClearCurrentExample(modelType);
 	}
 
@@ -282,7 +283,7 @@ public abstract class ServiceSupport<Model> {
 	 * 
 	 * @param example
 	 */
-	private Example buildOrderBy(Example example) {
+	protected Example buildOrderBy(Example example) {
 
 		if (hasOrderBy) {
 
@@ -324,7 +325,7 @@ public abstract class ServiceSupport<Model> {
 	 * @param example
 	 * @return
 	 */
-	private Example buildDynamicCondition(Example example) {
+	protected Example buildDynamicCondition(Example example) {
 		return example;
 	}
 
@@ -380,7 +381,7 @@ public abstract class ServiceSupport<Model> {
 	 * @param limit
 	 * @return
 	 */
-	public Page<Model> findPage(int offset, int limit) {
+	public PageResult<Model> findPage(int offset, int limit) {
 		return findPage(offset, limit, false);
 	}
 
@@ -393,8 +394,7 @@ public abstract class ServiceSupport<Model> {
 	 *            是否简单模式
 	 * @return
 	 */
-	public Page<Model> findPage(int offset, int limit, boolean simple) {
-
+	public PageResult<Model> findPage(int offset, int limit, boolean simple) {
 		if (limit > maxPageSize) {
 			limit = maxPageSize;
 		}
@@ -405,7 +405,7 @@ public abstract class ServiceSupport<Model> {
 			if (result == null || result.size() == 0) {
 				page.setTotal(0L);
 			}
-			return page;
+			return new PageResult<Model>(page);
 		} finally {
 			PageHelper.clearPage();
 		}
@@ -501,7 +501,7 @@ public abstract class ServiceSupport<Model> {
 	 * @param searchParam
 	 * @return
 	 */
-	public Page<Model> searchPage(Object searchParam) {
+	public PageResult<Model> searchPage(Object searchParam) {
 		return searchPage(searchParam, false);
 	}
 
@@ -513,7 +513,7 @@ public abstract class ServiceSupport<Model> {
 	 *            是否简单模式
 	 * @return
 	 */
-	public Page<Model> searchPage(Object searchParam, boolean simple) {
+	public PageResult<Model> searchPage(Object searchParam, boolean simple) {
 		if (searchParam == null)
 			return searchPage(searchParam, 0, OffsetPage.DEFAULT_LIMIT, simple);
 
@@ -533,17 +533,18 @@ public abstract class ServiceSupport<Model> {
 	 * @param limit
 	 * @return
 	 */
-	public Page<Model> searchPage(Object searchParam, int offset, int limit) {
+	public PageResult<Model> searchPage(Object searchParam, int offset, int limit) {
 		return searchPage(searchParam, offset, limit, false);
 	}
 
 	/**
 	 * 条件过滤分页查询（非简单模式）
+	 * 
 	 * @param searchParam
 	 * @param page
 	 * @return
 	 */
-	public Page<Model> searchPage(Object searchParam, OffsetPage page) {
+	public PageResult<Model> searchPage(Object searchParam, OffsetPage page) {
 		return searchPage(searchParam, page.getOffset(), page.getLimit(), false);
 	}
 
@@ -557,8 +558,7 @@ public abstract class ServiceSupport<Model> {
 	 *            是否简单模式
 	 * @return
 	 */
-	public Page<Model> searchPage(Object searchParam, int offset, int limit, boolean simple) {
-
+	public PageResult<Model> searchPage(Object searchParam, int offset, int limit, boolean simple) {
 		if (limit > maxPageSize) {
 			limit = maxPageSize;
 		}
@@ -569,7 +569,7 @@ public abstract class ServiceSupport<Model> {
 			if (result == null || result.size() == 0) {
 				page.setTotal(0L);
 			}
-			return page;
+			return new PageResult<Model>(page);
 		} finally {
 			PageHelper.clearPage();
 		}
@@ -577,19 +577,20 @@ public abstract class ServiceSupport<Model> {
 
 	/**
 	 * 获取一个分页
+	 * 
 	 * @param query
 	 * @return
 	 */
-	public <E> Page<E> getPage(OffsetPage query){	
+	public <E> Page<E> getPage(OffsetPage query) {
 		int limit = query.getLimit();
-		int offset  =query.getOffset();
-		
+		int offset = query.getOffset();
+
 		if (limit > maxPageSize) {
 			limit = maxPageSize;
 		}
-		return PageHelper.offsetPage(offset, limit);	
+		return PageHelper.offsetPage(offset, limit);
 	}
-	
+
 	// -----------------------------------------------------
 	// 修改保存删除
 	// -----------------------------------------------------
@@ -611,7 +612,7 @@ public abstract class ServiceSupport<Model> {
 		updateModelWrap(model);
 		return getSqlMapper().updateByPrimaryKeySelective(model);
 	}
-	
+
 	public int update(Model model) {
 		updateModelWrap(model);
 		return getSqlMapper().updateByPrimaryKey(model);
@@ -669,11 +670,11 @@ public abstract class ServiceSupport<Model> {
 	//
 	// -----------------------------------------------------
 
-	@SuppressWarnings("rawtypes")
-	public Page getEmptyPage(OffsetPage offsetPage) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public PageResult getEmptyPageResult(OffsetPage offsetPage) {
 		Page page = new Page(offsetPage.getOffset(), offsetPage.getLimit());
 		page.setTotal(0L);
-		return page;
+		return new PageResult(page);
 	}
 
 }

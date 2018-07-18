@@ -56,7 +56,7 @@
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                        <a onclick="view()" class="btn btn-default"><i class="glyphicon glyphicon-search"></i>查看</a>
+                        <a onclick="view()" class="btn btn-default"><i class="glyphicon glyphicon-search"></i>审核</a>
                     </div>
                 </div>
             </div>
@@ -83,8 +83,10 @@
                     { title: "标题", field: "title" },
                     { title: "类型", field: "type", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-type") },
                     { title: "副标题", field: "subtitle" },
+                    { title: "发布时间", field: "publishTime", formatter:"date" },
                     { title: "状态", field: "status", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-status") },
-                    { title: "创建人", field: "createUserName"}
+                    { title: "创建人", field: "createUserName"},
+                    { title: "审核人", field: "examineUserName"}
                 ]
             ],
             url: '/health/publicity/examine/find',

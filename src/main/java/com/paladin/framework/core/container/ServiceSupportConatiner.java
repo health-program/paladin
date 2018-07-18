@@ -9,11 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.paladin.framework.core.ServiceSupport;
+import com.paladin.framework.core.ServiceSupportComplex;
 import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.mybatis.JoinMapper;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.reflect.ReflectUtil;
-
 
 /**
  * 
@@ -31,7 +32,12 @@ public class ServiceSupportConatiner implements SpringContainer {
 	@Override
 	public boolean initialize() {
 
+		/**
+		 * 根据泛型类型为service support注入相应的sqlMapper
+		 */
+
 		Map<String, CustomMapper> cusomerMappers = SpringBeanHelper.getBeansByType(CustomMapper.class);
+		Map<String, JoinMapper> joinMappers = SpringBeanHelper.getBeansByType(JoinMapper.class);
 		Map<String, ServiceSupport> serviceSupports = SpringBeanHelper.getBeansByType(ServiceSupport.class);
 
 		Map<Class<?>, CustomMapper> mapperMap = new HashMap<>();
@@ -50,7 +56,24 @@ public class ServiceSupportConatiner implements SpringContainer {
 				logger.warn("实体类[" + genericType.getName() + "]存在多个CustomMapper实现类，[" + oldMapper.getClass().getName() + "]将被覆盖");
 
 			mapperMap.put(genericType, mapper);
+		}
 
+		Map<Class<?>, JoinMapper> joinMapperMap = new HashMap<>();
+
+		for (Entry<String, JoinMapper> entry : joinMappers.entrySet()) {
+			JoinMapper mapper = entry.getValue();
+			Class<?> genericType = ReflectUtil.getSuperClassArgument(mapper.getClass(), JoinMapper.class, 0);
+
+			if (genericType == null || genericType == Object.class) {
+				logger.warn("[" + mapper.getClass().getName() + "]的实现类没有明确定义[" + JoinMapper.class.getName() + "]的泛型");
+				continue;
+			}
+
+			JoinMapper oldMapper = joinMapperMap.get(genericType);
+			if (oldMapper != null)
+				logger.warn("实体类[" + genericType.getName() + "]存在多个JoinMapper实现类，[" + oldMapper.getClass().getName() + "]将被覆盖");
+
+			joinMapperMap.put(genericType, mapper);
 		}
 
 		for (Entry<String, ServiceSupport> entry : serviceSupports.entrySet()) {
@@ -58,24 +81,40 @@ public class ServiceSupportConatiner implements SpringContainer {
 			Class<?> genericType = ReflectUtil.getSuperClassArgument(support.getClass(), ServiceSupport.class, 0);
 
 			if (genericType == null || genericType == Object.class) {
-				logger.warn("[" + support.getClass().getName() + "]的实现类没有明确定义[" + ServiceSupport.class.getName() + "]的泛型，无法为其注册SqlMapper");
+				logger.warn("[" + support.getClass().getName() + "]的实现类没有明确定义[" + ServiceSupport.class.getName() + "]的泛型，无法为其注册CustomMapper");
 				continue;
 			}
 
 			CustomMapper mapper = mapperMap.get(genericType);
 			if (mapper == null) {
 				logger.warn("实体类[" + genericType.getName() + "]没有对应的[" + CustomMapper.class.getName() + "]的实现类");
-			}
-			else
-			{				
+				continue;
+			} else {
 				support.setSqlMapper(mapper);
-				logger.info("===>为["+support.getClass().getName() +"]注入SqlMapper<===");
-				
-				support.init();
-				logger.info("===>["+support.getClass().getName() +"]初始化成功<===");
+				logger.info("===>为[" + support.getClass().getName() + "]注入CustomMapper<===");
 			}
-			
-			
+
+			if (support instanceof ServiceSupportComplex) {
+				ServiceSupportComplex complexSupport = (ServiceSupportComplex) support;
+				Class<?> joinGenericType = ReflectUtil.getSuperClassArgument(complexSupport.getClass(), ServiceSupportComplex.class, 1);
+
+				if (genericType == null || genericType == Object.class) {
+					logger.warn("[" + complexSupport.getClass().getName() + "]的实现类没有明确定义[" + ServiceSupportComplex.class.getName() + "]的泛型，无法为其注册JoinMapper");
+					continue;
+				}
+
+				JoinMapper joinMapper = joinMapperMap.get(joinGenericType);
+
+				if (joinMapper == null) {
+					logger.warn("实体类[" + joinGenericType.getName() + "]没有对应的[" + JoinMapper.class.getName() + "]的实现类");
+				} else {
+					complexSupport.setJoinMapper(joinMapper);
+					logger.info("===>为[" + complexSupport.getClass().getName() + "]注入JoinMapper<===");
+				}
+			}
+
+			support.init();
+			logger.info("===>[" + support.getClass().getName() + "]初始化成功<===");
 		}
 
 		return true;

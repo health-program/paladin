@@ -190,7 +190,6 @@ public class GeneralCriteriaBuilder {
 		if (builder == null) {
 			// 同步创建Builder
 			synchronized (buildCache) {
-
 				builder = buildCache.get(clazz);
 				if (builder == null) {
 
@@ -206,12 +205,15 @@ public class GeneralCriteriaBuilder {
 							// 默认使用方法对应的field名作为column
 							if ("".equals(name))
 								name = NameUtil.removeGetOrSet(method.getName());
-
-							BuildUnit unit = new BuildUnit(name, condition.type(), method, condition.nullable());
+							
+							Class<?> entityClass = condition.entityClass();	
+							if(entityClass == Object.class) {
+								entityClass = entityType;
+							}
+							BuildUnit unit = new BuildUnit(name, entityClass, condition.type(), method, condition.nullable());
 							builder.buildUnits.add(unit);
 						}
 					}
-
 				}
 			}
 		}
@@ -235,15 +237,15 @@ public class GeneralCriteriaBuilder {
 	 */
 	private static class Builder {
 
-		Class<?> entityClass;
+		private Class<?> entityClass;
 
-		Builder(Class<?> entityClass) {
+		private Builder(Class<?> entityClass) {
 			this.entityClass = entityClass;
 		}
 
-		ArrayList<BuildUnit> buildUnits = new ArrayList<BuildUnit>();
+		private ArrayList<BuildUnit> buildUnits = new ArrayList<BuildUnit>();
 
-		Example build(Object queryParam) {
+		private Example build(Object queryParam) {
 
 			Example example = getClearCurrentExample(entityClass);
 
@@ -365,19 +367,20 @@ public class GeneralCriteriaBuilder {
 	 */
 	private static class BuildUnit {
 
-		QueryType type;
+		private QueryType type;
+		private String name;
+		private Method getMethod;
+		private boolean nullable;
+		// 用于连接查询，暂时搁置
+		@SuppressWarnings("unused")
+		private Class<?> entityClass;
 
-		String name;
-
-		Method getMethod;
-
-		boolean nullable;
-
-		BuildUnit(String name, QueryType type, Method getMethod, boolean nullable) {
+		private BuildUnit(String name, Class<?> entityClass, QueryType type, Method getMethod, boolean nullable) {
 			this.nullable = nullable;
 			this.name = name;
 			this.type = type;
 			this.getMethod = getMethod;
+			this.entityClass = entityClass;
 		}
 
 	}
@@ -392,7 +395,6 @@ public class GeneralCriteriaBuilder {
 
 		String name;
 		Object value;
-		Object value2;
 		QueryType type;
 
 		public Condition(String name, QueryType type, Object value) {

@@ -1,5 +1,7 @@
 package com.paladin.health.controller.publicity.pojo;
 
+import java.util.Date;
+
 import javax.validation.constraints.NotEmpty;
 
 public class PublicityMessageDTO {
@@ -16,6 +18,8 @@ public class PublicityMessageDTO {
 	private String summary;
 
 	private String content;
+	
+	private Date publishTime;
 
 	public String getId() {
 		return id;
@@ -63,6 +67,14 @@ public class PublicityMessageDTO {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public Date getPublishTime() {
+		return publishTime;
+	}
+
+	public void setPublishTime(Date publishTime) {
+		this.publishTime = publishTime;
 	}
 	
 }

@@ -404,19 +404,6 @@
 
     // ------------------------------------------
     //
-    // 常用业务控件和方法
-    //
-    // -----------------------------------------
-
-
-    _initValidator();
-    _initTable();
-    _initEnumConstant();
-    _initForm();
-    _initCommon();
-
-    // ------------------------------------------
-    //
     // 页面处理
     //
     // -----------------------------------------
@@ -441,13 +428,50 @@
         getCache: function(key) {
             return window.mycache[key];
         }
-    })
+    });
 
+
+    // -----------------------------------------
+    //
+    // 其他
+    //
+    // -----------------------------------------
+
+
+    $.extend({
+        beautifyInput: function(input, icon, isBefore) {
+            var a = $(input);
+            a.wrap('<div class="input-group"></div>');
+            var b = '<span class="input-group-addon"><i class="'+ icon +'"></i></span>';
+            if(isBefore) {
+                a.before(b);
+            } else {
+                a.after(b);
+            }
+            return a;
+        }
+    });
+
+    // ------------------------------------------
+    //
+    // 常用业务控件和方法
+    //
+    // -----------------------------------------
+
+    /*
+    * 以下方法最后执行
+    */
+    _initValidator();
+    _initTable();
+    _initEnumConstant();
+    _initForm();
+    _initCommon();
 
 })(jQuery);
 
 
 function _initCommon() {
+
     // 关键词搜索框添加绑定回车函数
     $('.tonto-btn-search').each(function() {
         var btn = $(this);
@@ -457,15 +481,51 @@ function _initCommon() {
             }
         });
     });
-    
+
     $('.tonto-select').each(function() {
         var that = $(this);
         var selected = that.attr("selectedvalue");
-        if(selected) {
-        	that.val(selected);
+        if (selected) {
+            that.val(selected);
         }
     });
-    
+
+    $('.tonto-datepicker-date').each(function() {
+        $.beautifyInput(this, "fa fa-calendar", false);
+        laydate.render({
+            elem: this,
+            type: "date",
+            calendar: true, //开启公历节日
+            theme: 'molv', //墨绿主题
+            showBottom: true, //是否出现底部栏
+            trigger: 'click' //绑定多个
+        });
+    });
+
+    $('.tonto-datepicker-datetime').each(function() {
+        $.beautifyInput(this, "fa fa-calendar", false);
+        laydate.render({
+            elem: this,
+            type: "datetime",
+            calendar: true, //开启公历节日
+            theme: 'molv', //墨绿主题
+            showBottom: true, //是否出现底部栏
+            trigger: 'click' //绑定多个
+        });
+    });
+
+    $('.tonto-datepicker-time').each(function() {
+        $.beautifyInput(this, "fa fa-clock-o", false);
+        laydate.render({
+            elem: this,
+            type: "time",
+            calendar: true, //开启公历节日
+            theme: 'molv', //墨绿主题
+            showBottom: true, //是否出现底部栏
+            trigger: 'click' //绑定多个
+        });
+    });
+
 }
 
 

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.paladin.health.model.origin.OriginDiseaseName;
-import com.github.pagehelper.Page;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.OffsetPage;
+import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 
@@ -66,11 +66,11 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE));
 	}
 
-	public Page<OriginDiseaseName> findPageDiseaseName(OffsetPage page) {
+	public PageResult<OriginDiseaseName> findPageDiseaseName(OffsetPage page) {
 		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE), page);
 	}
 
-	public Page<OriginDiseaseName> findPageSymptomName(OffsetPage page) {
+	public PageResult<OriginDiseaseName> findPageSymptomName(OffsetPage page) {
 		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM), page);
 	}
 

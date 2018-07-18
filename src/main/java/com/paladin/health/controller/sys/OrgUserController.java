@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.query.QueryInputMethod;
@@ -55,7 +54,7 @@ public class OrgUserController extends ControllerSupport{
 	@ResponseBody
 	@QueryOutputMethod(queryClass = OrgUserQuery.class, paramIndex = 0)
 	public Object findAll(OrgUserQuery query) {
-		return CommonResponse.getSuccessResponse(new PageResult(userService.searchPage(query)));
+		return CommonResponse.getSuccessResponse(userService.searchPage(query));
 	}
 
 	/**

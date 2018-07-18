@@ -1,27 +1,18 @@
 package com.paladin.health.service.publicity;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.paladin.health.controller.publicity.pojo.MessageExamineQuery;
 import com.paladin.health.controller.publicity.pojo.MessageQuery;
 import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.mapper.publicity.PublicityMessageMoreMapper;
 import com.paladin.health.model.publicity.PublicityMessage;
 import com.paladin.health.model.publicity.PublicityMessageMore;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import com.paladin.framework.common.GeneralCriteriaBuilder;
-import com.paladin.framework.core.ServiceSupport;
+import com.paladin.framework.common.PageResult;
+import com.paladin.framework.core.ServiceSupportComplex;
 import com.paladin.framework.core.exception.BusinessException;
 
 @Service
-public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
-
-	@Autowired
-	private PublicityMessageMoreMapper publicityMessageMoreMapper;
+public class PublicityMessageService extends ServiceSupportComplex<PublicityMessage, PublicityMessageMore> {
 
 	/**
 	 * 审核
@@ -44,11 +35,16 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 		PublicityMessage updateModel = new PublicityMessage();
 		updateModel.setStatus(success ? PublicityMessage.STATUS_EXAMINE_SUCCESS : PublicityMessage.STATUS_EXAMINE_FAIL);
+		updateModel.setExamineUserId(HealthUserSession.getCurrentUserSession().getUserId());
 		return updateSelective(updateModel) > 0;
 	}
 
+	/**
+	 * 删除公告信息
+	 * @param id
+	 * @return
+	 */
 	public int removeMessage(String id) {
-
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
 		if (session.isSystemAdmin()) {
 			return removeByPrimaryKey(id);
@@ -63,7 +59,6 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		if (status == PublicityMessage.STATUS_EXAMINE_FAIL || status == PublicityMessage.STATUS_TEMP) {
 			if (session.getUserId().equals(message.getCreateUserId())) {
 				return removeByPrimaryKey(id);
-
 			} else {
 				throw new BusinessException("您不能删除别人的公告信息");
 			}
@@ -78,31 +73,26 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 * @param query
 	 * @return
 	 */
-	public Page<PublicityMessage> findSelfMessage(MessageQuery query) {
+	public PageResult<PublicityMessage> findSelfMessage(MessageQuery query) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
 		if (!session.isSystemAdmin()) {
 			if (query != null) {
 				query = new MessageQuery();
 			}
-
 			query.setCreateUserId(session.getUserId());
 		}
 		return searchPage(query);
 	}
 
-	
-	public Page<PublicityMessageMore> findExamineMessage(MessageExamineQuery query) {
-		Page<PublicityMessageMore> pager = getPage(query);
-		
-		try {
-			List<PublicityMessageMore> result = publicityMessageMoreMapper.selectJoinByExample(GeneralCriteriaBuilder.buildQuery(PublicityMessage.class, query));
-			if (result == null || result.size() == 0) {
-				pager.setTotal(0L);
-			}
-			return pager;
-		} finally {
-			PageHelper.clearPage();
-		}
+	/**
+	 * 
+	 * 分页查询
+	 * 
+	 * @param query
+	 * @return
+	 */
+	public PageResult<PublicityMessageMore> findExamineMessage(MessageExamineQuery query) {
+		return searchJoinPage(query);
 	}
 
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
-public  class PageResult {
+public  class PageResult<T> {
 	
 	private int page;
 	
@@ -13,13 +13,13 @@ public  class PageResult {
 	
 	private long total;
 	
-	private List<?> data;
+	private List<T> data;
 	
 	public PageResult() {
 		
 	}
 	
-	public PageResult(Page<?> page)
+	public PageResult(Page<T> page)
 	{
 		this.page = page.getPageNum();
 		this.limit = page.getPageSize();
@@ -33,7 +33,7 @@ public  class PageResult {
 		return data;
 	}
 
-	public void setData(List<?> data) {
+	public void setData(List<T> data) {
 		this.data = data;
 	}
 

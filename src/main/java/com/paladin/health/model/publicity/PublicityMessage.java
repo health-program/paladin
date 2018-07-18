@@ -6,6 +6,8 @@ import com.paladin.health.model.sys.OrgUser;
 import tk.mybatis.mapper.annotation.ColumnType;
 import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 
+import java.util.Date;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
@@ -35,7 +37,9 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	private String examineUserId;
 
 	private Integer status;
-
+	
+	private Date publishTime;
+	
 	public String getId() {
 		return id;
 	}
@@ -98,6 +102,14 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setExamineUserId(String examineUserId) {
 		this.examineUserId = examineUserId;
+	}
+
+	public Date getPublishTime() {
+		return publishTime;
+	}
+
+	public void setPublishTime(Date publishTime) {
+		this.publishTime = publishTime;
 	}
 
 }
