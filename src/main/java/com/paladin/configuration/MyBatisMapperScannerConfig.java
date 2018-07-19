@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.paladin.framework.mybatis.CustomMapper;
-import com.paladin.framework.mybatis.JoinMapper;
+import com.paladin.framework.mybatis.CustomJoinMapper;
 
 import tk.mybatis.spring.mapper.MapperScannerConfigurer;
 
@@ -27,7 +27,7 @@ public class MyBatisMapperScannerConfig {
 		mapperScannerConfigurer.setBasePackage("com.paladin.health.mapper,com.paladin.common.mapper,com.paladin.data.mapper");
 
 		Properties mapperProperties = new Properties();
-		mapperProperties.setProperty("mappers", CustomMapper.class.getName() + "," + JoinMapper.class.getName());
+		mapperProperties.setProperty("mappers", CustomMapper.class.getName() + "," + CustomJoinMapper.class.getName());
 		mapperProperties.setProperty("notEmpty", "false");
 		mapperProperties.setProperty("IDENTITY", "MYSQL");
 		mapperScannerConfigurer.setProperties(mapperProperties);

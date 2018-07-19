@@ -13,13 +13,13 @@
                 <form id="searchbar" class="form-horizontal">
                     <div class="form-group">
                         <div class="col-md-4">
-                            <label for="title" style="width:130px" class="col-md-4 control-label">标题</label>
+                            <label for="title" style="width:130px" class="col-md-4 control-label">标题：</label>
                             <div class="col-md-6">
                                 <input name="title" class="form-control" th:value="${query?.title}" />
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label for="type" style="width:130px" class="col-md-4 control-label">类型</label>
+                            <label for="type" style="width:130px" class="col-md-4 control-label">类型：</label>
                             <div class="col-md-6">
                                 <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
                                     <option value="">请选择</option>
@@ -27,7 +27,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label for="status" style="width:130px" class="col-md-4 control-label">状态</label>
+                            <label for="status" style="width:130px" class="col-md-4 control-label">状态：</label>
                             <div class="col-md-6">
                                 <select name="status" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.status}" enumcode="publicity-message-status">
                                     <option value="">请选择</option>

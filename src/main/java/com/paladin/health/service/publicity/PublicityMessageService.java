@@ -34,6 +34,7 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 		}
 
 		PublicityMessage updateModel = new PublicityMessage();
+		updateModel.setId(id);
 		updateModel.setStatus(success ? PublicityMessage.STATUS_EXAMINE_SUCCESS : PublicityMessage.STATUS_EXAMINE_FAIL);
 		updateModel.setExamineUserId(HealthUserSession.getCurrentUserSession().getUserId());
 		return updateSelective(updateModel) > 0;

@@ -24,7 +24,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeException;
 import org.apache.ibatis.type.TypeHandler;
 
-import com.paladin.framework.mybatis.JoinMapper;
+import com.paladin.framework.mybatis.CustomJoinMapper;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 import tk.mybatis.mapper.MapperException;
@@ -60,11 +60,24 @@ public class JoinSelectProvider extends MapperTemplate {
 	 * @param ms
 	 * @return
 	 */
+	public String getJoin(MappedStatement ms) {
+		final Class<?> entityClass = getEntityClass(ms);
+		// 修改返回值类型为实体类型
+		setResultType(ms, entityClass);
+		return getBaseSql(entityClass, 1);
+	}
+
+	/**
+	 * 查询全部结果
+	 *
+	 * @param ms
+	 * @return
+	 */
 	public String selectJoinAll(MappedStatement ms) {
 		final Class<?> entityClass = getEntityClass(ms);
 		// 修改返回值类型为实体类型
 		setResultType(ms, entityClass);
-		return getBaseSql(entityClass, false);
+		return getBaseSql(entityClass, 2);
 	}
 
 	/**
@@ -77,7 +90,7 @@ public class JoinSelectProvider extends MapperTemplate {
 		Class<?> entityClass = getEntityClass(ms);
 		// 将返回值修改为实体类型
 		setResultType(ms, entityClass);
-		return getBaseSql(entityClass, true);
+		return getBaseSql(entityClass, 3);
 	}
 
 	/**
@@ -86,7 +99,7 @@ public class JoinSelectProvider extends MapperTemplate {
 	 * @param entityClass
 	 * @return
 	 */
-	private String getBaseSql(Class<?> entityClass, boolean isExample) {
+	private String getBaseSql(Class<?> entityClass, int type) {
 
 		JoinEntityTable entityTable = entityTableMap.get(entityClass);
 		StringBuilder sql = new StringBuilder("SELECT ");
@@ -95,13 +108,13 @@ public class JoinSelectProvider extends MapperTemplate {
 		EntityTable baseEntityTable = entityTable.baseEntityTable;
 		String baseTableAlias = entityTable.baseTableAlias;
 		for (EntityColumn entityColumn : columnList) {
-			if (!entityColumn.isIgnoreInMultipleResult()) {
+			if (type == 1 || !entityColumn.isIgnoreInMultipleResult()) {
 				sql.append(baseTableAlias).append(".").append(entityColumn.getColumn()).append(",");
 			}
 		}
 
 		for (JoinEntityColumn joinEntityColumn : entityTable.joinEntityColumns) {
-			if (!joinEntityColumn.ignoreInMultipleResult) {
+			if (type == 1 || !joinEntityColumn.ignoreInMultipleResult) {
 				sql.append(joinEntityColumn.joinCondition.alias).append(".").append(joinEntityColumn.entityColumn.getColumn()).append(",");
 			}
 		}
@@ -172,7 +185,24 @@ public class JoinSelectProvider extends MapperTemplate {
 			sql.delete(sql.length() - 4, sql.length());
 		}
 
-		if (isExample) {
+		if (type == 1) {
+			sql.append("<where>");
+			// 当某个列有主键策略时，不需要考虑他的属性是否为空，因为如果为空，一定会根据主键策略给他生成一个值
+			for (EntityColumn column : baseEntityTable.getEntityClassPKColumns()) {
+				sql.append(" AND ").append(baseTableAlias).append(".").append(column.getColumnEqualsHolder());
+			}
+			sql.append("</where>");
+		}
+
+		if (type == 2) {
+			String orderByClause = EntityHelper.getOrderByClause(baseEntityTable.getEntityClass());
+			if (orderByClause.length() > 0) {
+				sql.append(" ORDER BY ");
+				sql.append(orderByClause);
+			}
+		}
+
+		if (type == 3) {
 
 			// 只支持基础表字段查询（example必须与entity相对应，而连接表的entity不符合设定，可后续修改）
 
@@ -207,13 +237,6 @@ public class JoinSelectProvider extends MapperTemplate {
 			sql.append("<if test=\"@tk.mybatis.mapper.util.OGNL@hasForUpdate(_parameter)\">");
 			sql.append("FOR UPDATE");
 			sql.append("</if>");
-
-		} else {
-			String orderByClause = EntityHelper.getOrderByClause(baseEntityTable.getEntityClass());
-			if (orderByClause.length() > 0) {
-				sql.append(" ORDER BY ");
-				sql.append(orderByClause);
-			}
 		}
 
 		return sql.toString();
@@ -246,8 +269,8 @@ public class JoinSelectProvider extends MapperTemplate {
 		} else {
 			Class<?> mapperClass = MsUtil.getMapperClass(msId);
 
-			Class<?> joinEntityType = ReflectUtil.getSuperClassArgument(mapperClass, JoinMapper.class, 0);
-			Class<?> baseEntityType = ReflectUtil.getSuperClassArgument(mapperClass, JoinMapper.class, 1);
+			Class<?> joinEntityType = ReflectUtil.getSuperClassArgument(mapperClass, CustomJoinMapper.class, 0);
+			Class<?> baseEntityType = ReflectUtil.getSuperClassArgument(mapperClass, CustomJoinMapper.class, 1);
 
 			entityClassMap.put(msId, joinEntityType);
 			joinBaseClassMap.put(joinEntityType, baseEntityType);

@@ -78,7 +78,6 @@
                     }
                 }
             });
-
         });
 
         return obj;
@@ -791,20 +790,14 @@ function _initTable() {
                                 }
                                 return "";
                             }
-                        } else if (col.formatter == 'time') {
+                        } else if (col.formatter == 'datetime') {
                             col.formatter = function(value, row, index) {
                                 if (value) {
-                                    var time;
-                                    if (isNaN(value)) {
-                                        time = new Date(value);
-                                    } else {
-                                        time = new Date();
-                                        time.setTime(value);
+                                    if (!isNaN(value)) {
+                                        return $.formatDate(new Date(value), "yyyy-MM-dd hh:mm:ss");
                                     }
-
-                                    return $.formatDate(time, "yyyy-MM-dd hh:mm:ss");
+                                    return value;
                                 }
-
                                 return "";
                             }
                         } else if (col.formatter == 'boolean') {

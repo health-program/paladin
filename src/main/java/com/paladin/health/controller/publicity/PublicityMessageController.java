@@ -20,6 +20,7 @@ import com.paladin.health.controller.publicity.pojo.MessageExamineQuery;
 import com.paladin.health.controller.publicity.pojo.MessageQuery;
 import com.paladin.health.controller.publicity.pojo.PublicityMessageDTO;
 import com.paladin.health.model.publicity.PublicityMessage;
+import com.paladin.health.model.publicity.PublicityMessageMore;
 import com.paladin.health.service.publicity.PublicityMessageService;
 
 @Controller
@@ -186,6 +187,24 @@ public class PublicityMessageController extends ControllerSupport {
 	public Object remove(@RequestParam String id) {
 		return CommonResponse.getResponse(publicityMessageService.removeMessage(id));
 	}
+	
+	/**
+	 * 审核
+	 * 
+	 * @param id
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/examine")
+	public String examine(@RequestParam String id, Model model) {
+		PublicityMessageMore message = publicityMessageService.getJoin(id);
+		if (message == null) {
+			message = new PublicityMessageMore();
+		}
+		model.addAttribute("object", message);
+		return "/health/publicity/message_examine";
+	}
+	
 
 	/**
 	 * 审核成功
@@ -200,7 +219,7 @@ public class PublicityMessageController extends ControllerSupport {
 	}
 
 	/**
-	 * 审核成功
+	 * 审核驳回
 	 * 
 	 * @param id
 	 * @return

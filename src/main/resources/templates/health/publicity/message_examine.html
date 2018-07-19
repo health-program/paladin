@@ -7,15 +7,16 @@
         <div class="box box-solid">
             <div class="box-header with-border">
                 <i class="fa fa-list-alt"></i>
-                <h3 class="box-title">详情</h3>
+                <h3 class="box-title">审核</h3>
                 <div class="pull-right box-tools">
-                    <a class="btn btn-default btn-sm" href="/health/publicity/index">
+                    <a class="btn btn-default btn-sm" href="/health/publicity/examine/index">
                         <i class="fa fa-times"></i>
                     </a>
                 </div>
             </div>
             <div class="box-body">
                 <form class="form-horizontal" th:object="${object}">
+                    <input type="hidden" name="id" id="id" th:field="*{id}" />
                     <div class="form-group">
                         <label class="col-sm-2 control-label">标题：</label>
                         <div class="col-sm-5">
@@ -41,9 +42,23 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label class="col-sm-2 control-label">创建人：</label>
+                        <div class="col-sm-3">
+                            <p class="form-control-static" th:text="*{createUserName}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label class="col-sm-2 control-label">内容：</label>
                         <div class="col-sm-8">
                             <p class="form-control-static" th:text="*{content}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-1">
+                            <button type="button" onclick="examineSuccess()" class="btn btn-success btn-block">审核通过</button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" onclick="examineFail()" class="btn btn-danger btn-block">驳回</button>
                         </div>
                     </div>
                 </form>
@@ -52,11 +67,33 @@
     </section>
     <div th:include="health/footer" />
     <script type="text/javascript">
+    /*<![CDATA[*/
     $(function() {
         $.getConstantEnum([
             { code: "publicity-message-type", type: 'p', target: '#type' },
         ]);
     });
+
+    function examineSuccess() {
+        layer.confirm('确定审核通过吗?', function() {
+            $.getAjax("/health/publicity/examine/success?id=" + $("#id").val(), function() {
+                $.successAlert("审核通过成功", function() {
+                    window.location = "/health/publicity/examine/index";
+                });
+            });
+        });
+    }
+
+    function examineFail() {
+        layer.confirm('确定驳回吗?', function() {
+            $.getAjax("/health/publicity/examine/fail?id=" + $("#id").val(), function() {
+                $.successAlert("驳回成功", function() {
+                    window.location = "/health/publicity/examine/index";
+                });
+            });
+        });
+    }
+    /*]]>*/
     </script>
 </body>
 

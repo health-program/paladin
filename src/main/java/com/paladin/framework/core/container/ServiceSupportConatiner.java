@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.ServiceSupportComplex;
 import com.paladin.framework.mybatis.CustomMapper;
-import com.paladin.framework.mybatis.JoinMapper;
+import com.paladin.framework.mybatis.CustomJoinMapper;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.reflect.ReflectUtil;
@@ -37,7 +37,7 @@ public class ServiceSupportConatiner implements SpringContainer {
 		 */
 
 		Map<String, CustomMapper> cusomerMappers = SpringBeanHelper.getBeansByType(CustomMapper.class);
-		Map<String, JoinMapper> joinMappers = SpringBeanHelper.getBeansByType(JoinMapper.class);
+		Map<String, CustomJoinMapper> joinMappers = SpringBeanHelper.getBeansByType(CustomJoinMapper.class);
 		Map<String, ServiceSupport> serviceSupports = SpringBeanHelper.getBeansByType(ServiceSupport.class);
 
 		Map<Class<?>, CustomMapper> mapperMap = new HashMap<>();
@@ -58,18 +58,18 @@ public class ServiceSupportConatiner implements SpringContainer {
 			mapperMap.put(genericType, mapper);
 		}
 
-		Map<Class<?>, JoinMapper> joinMapperMap = new HashMap<>();
+		Map<Class<?>, CustomJoinMapper> joinMapperMap = new HashMap<>();
 
-		for (Entry<String, JoinMapper> entry : joinMappers.entrySet()) {
-			JoinMapper mapper = entry.getValue();
-			Class<?> genericType = ReflectUtil.getSuperClassArgument(mapper.getClass(), JoinMapper.class, 0);
+		for (Entry<String, CustomJoinMapper> entry : joinMappers.entrySet()) {
+			CustomJoinMapper mapper = entry.getValue();
+			Class<?> genericType = ReflectUtil.getSuperClassArgument(mapper.getClass(), CustomJoinMapper.class, 0);
 
 			if (genericType == null || genericType == Object.class) {
-				logger.warn("[" + mapper.getClass().getName() + "]的实现类没有明确定义[" + JoinMapper.class.getName() + "]的泛型");
+				logger.warn("[" + mapper.getClass().getName() + "]的实现类没有明确定义[" + CustomJoinMapper.class.getName() + "]的泛型");
 				continue;
 			}
 
-			JoinMapper oldMapper = joinMapperMap.get(genericType);
+			CustomJoinMapper oldMapper = joinMapperMap.get(genericType);
 			if (oldMapper != null)
 				logger.warn("实体类[" + genericType.getName() + "]存在多个JoinMapper实现类，[" + oldMapper.getClass().getName() + "]将被覆盖");
 
@@ -103,10 +103,10 @@ public class ServiceSupportConatiner implements SpringContainer {
 					continue;
 				}
 
-				JoinMapper joinMapper = joinMapperMap.get(joinGenericType);
+				CustomJoinMapper joinMapper = joinMapperMap.get(joinGenericType);
 
 				if (joinMapper == null) {
-					logger.warn("实体类[" + joinGenericType.getName() + "]没有对应的[" + JoinMapper.class.getName() + "]的实现类");
+					logger.warn("实体类[" + joinGenericType.getName() + "]没有对应的[" + CustomJoinMapper.class.getName() + "]的实现类");
 				} else {
 					complexSupport.setJoinMapper(joinMapper);
 					logger.info("===>为[" + complexSupport.getClass().getName() + "]注入JoinMapper<===");

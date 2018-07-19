@@ -12,7 +12,7 @@ import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
-import com.paladin.framework.mybatis.JoinMapper;
+import com.paladin.framework.mybatis.CustomJoinMapper;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 import tk.mybatis.mapper.entity.Example;
@@ -22,7 +22,7 @@ public class ServiceSupportComplex<Model, JoinModel extends Model> extends Servi
 	private final static Logger logger = LoggerFactory.getLogger(ServiceSupportComplex.class);
 
 	protected Class<JoinModel> joinModelType; // 业务对应类
-	private JoinMapper<JoinModel, Model> joinMapper;
+	private CustomJoinMapper<JoinModel, Model> joinMapper;
 
 	@SuppressWarnings("unchecked")
 	public ServiceSupportComplex() {
@@ -35,14 +35,23 @@ public class ServiceSupportComplex<Model, JoinModel extends Model> extends Servi
 		joinModelType = (Class<JoinModel>) clazz;
 	}
 
-	public JoinMapper<JoinModel, Model> getJoinMapper() {
+	public CustomJoinMapper<JoinModel, Model> getJoinMapper() {
 		return joinMapper;
 	}
 
-	public void setJoinMapper(JoinMapper<JoinModel, Model> joinMapper) {
+	public void setJoinMapper(CustomJoinMapper<JoinModel, Model> joinMapper) {
 		this.joinMapper = joinMapper;
 	}
 
+	/**
+	 * 根据主键获取
+	 * @param pk
+	 * @return
+	 */
+	public JoinModel getJoin(Object pk) {
+		return getJoinMapper().getJoin(pk);
+	}
+	
 	/**
 	 * 查找所有结果
 	 * 
