@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.utils.WebUtil;
 import com.paladin.framework.web.response.CommonResponse;
 
@@ -28,8 +28,6 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 		this.defaultErrorView = defaultErrorView;
 	}
 
-	private final static ObjectMapper objectMapper = new ObjectMapper();
-
 	private void sendJson(HttpServletResponse response, Object obj) {
 
 		response.setContentType("application/json");
@@ -37,7 +35,7 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 		response.setHeader("Cache-Control", "no-cache");
 
 		try {
-			objectMapper.writeValue(response.getOutputStream(), obj);
+			JsonUtil.writeJson(response.getOutputStream(), obj);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

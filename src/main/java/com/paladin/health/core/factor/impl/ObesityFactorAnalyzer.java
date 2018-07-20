@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 import com.paladin.health.core.factor.FactorAnalyzer;
 import com.paladin.health.core.factor.PeopleCondition;
 
+/**
+ *  肥胖因素分析器
+ * <p>该类包含部分硬编码，请参考数据库表index_item</p>
+ * @author TontoZhou
+ * @since 2018年7月20日
+ */
 @Component
 public class ObesityFactorAnalyzer implements FactorAnalyzer {
 

@@ -1,7 +1,7 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.BaseModel;
-import java.sql.Date;
+import java.util.Date;
 import javax.persistence.Id;
 
 public class PublicityRecordPaper extends BaseModel {

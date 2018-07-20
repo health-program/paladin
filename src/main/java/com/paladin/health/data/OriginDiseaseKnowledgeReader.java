@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.QueryType;
 import com.paladin.health.data.parser.knowledge.ArticleElement;
@@ -793,13 +792,5 @@ public class OriginDiseaseKnowledgeReader {
 
 	}
 
-	public static void main(String[] args) throws IOException {
-		OriginDiseaseKnowledgeReader r = new OriginDiseaseKnowledgeReader();
-		Knowledge k = knowledgePageParser.parse("http://localhost:8080/error/gxb-jb.html", "gxb", "jb");
-		//Knowledge k = knowledgePageParser.parse("yfxqgtzdz", "yfhl");
-		//System.out.println(new ObjectMapper().writeValueAsString(k));
-		ArticleItem a = r.doCategory("gxb", "jb", k == null ? new ArrayList<>() : k.getArticles(), true);
-		System.out.println(new ObjectMapper().writeValueAsString(a));
-	}
 
 }

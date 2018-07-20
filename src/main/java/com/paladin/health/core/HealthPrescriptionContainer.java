@@ -244,14 +244,18 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		public String getDetail() {
 			return detail;
 		}
+
+		public int getId() {
+			return id;
+		}
 	}
 
 	public static class PrescriptionResult {
+				
+		private List<PrescriptionFactor> factors;
+		private List<Prescription> prescriptions;
 
-		List<PrescriptionFactor> factors;
-		List<Prescription> prescriptions;
-
-		PrescriptionResult(List<Prescription> prescriptions, List<PrescriptionFactor> factors) {
+		public PrescriptionResult(List<Prescription> prescriptions, List<PrescriptionFactor> factors) {
 			this.factors = factors;
 			this.prescriptions = prescriptions;
 		}

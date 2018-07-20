@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.QueryType;
 import com.paladin.health.data.parser.knowledge.ArticleElement;
@@ -602,10 +601,5 @@ public class OriginSymptomKnowledgeReader {
 
 	}
 
-	public static void main(String[] args) throws IOException {
-		OriginSymptomKnowledgeReader r = new OriginSymptomKnowledgeReader();
-		ArticleItem obj = r.doCategory("zs", knowledgePageParser.parseArticle("fffzyyz", "zs"));
-		System.out.println(new ObjectMapper().writeValueAsString(obj));
-	}
 
 }

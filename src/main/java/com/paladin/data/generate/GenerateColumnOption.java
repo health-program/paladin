@@ -97,7 +97,7 @@ public class GenerateColumnOption {
 		this.fieldType = DataTypeUtil.getJavaType(column, dataBaseType);
 		this.fieldName = NameUtil.underline2hump(column.getName());
 		
-		this.regularType = GenerateEnvironment.getRegularType(fieldType);
+		//this.regularType = GenerateEnvironment.getRegularType(fieldType);
 		
 		if(fieldType == String.class) {
 			Integer length = column.getDataLength(); 

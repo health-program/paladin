@@ -5,16 +5,22 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.time.DateTimeUtil;
 import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
+import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 
 /**
  * 线程非安全
+ * 
+ * <p>该类包含部分硬编码，请参考数据库表index_item</p>
  * 
  * @author TontoZhou
  * @since 2018年6月21日
@@ -22,9 +28,7 @@ import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 public class PeopleCondition extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = 1829527723448405253L;
-
-	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
-
+		
 	/**
 	 * 初始化计算一些指标数值，并且分析得到有用的危险因素
 	 */
@@ -38,7 +42,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 					Integer age = DateTimeUtil.getAge(formatter.parse(csrq));
 					put("dqnl", age);
 				} catch (ParseException e) {
-					throw new RuntimeException("出生日期格式不正确，格式应如1988.06.11");
+					throw new BusinessException("出生日期格式不正确，格式应如1988.06.11");
 				}
 			}
 		}
@@ -104,11 +108,26 @@ public class PeopleCondition extends HashMap<String, Object> {
 		speculate_factors = new ArrayList<>();
 
 	}
+	
+	
+	@JsonIgnore
+	public DiagnoseTarget getDiagnoseTarget() {
+		DiagnoseTarget target = new DiagnoseTarget();
+	
+		target.setId(getString("sfzhm"));
+		target.setName(getString("xm"));
+		target.setSex(getInteger("xb"));
+		target.setCellphone(getString("sjhm"));		
+		target.setName(getString("csrq"));
+		target.setCreateTime(new Date());	
+		
+		return target;
+	}
 
 	private Collection<String> factors;
-
 	private List<FactorResult> speculate_factors;
 
+	@JsonIgnore
 	public Collection<String> getFactors() {
 		return factors;
 	}
@@ -118,6 +137,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * 
 	 * @return
 	 */
+	@JsonIgnore
 	public List<FactorResult> getSpeculateFactors() {
 		if (speculate_factors.size() == 0) {
 			return null;
@@ -183,10 +203,11 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
+	@JsonIgnore
 	public String getString(String key) {
 		Object value = get(key);
-		if (value != null && value instanceof String) {
-			return (String) value;
+		if (value != null ) {
+			return value.toString();
 		}
 		return null;
 	}
@@ -196,6 +217,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
+	@JsonIgnore
 	public Double getDouble(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -216,6 +238,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
+	@JsonIgnore
 	public Integer getInteger(String key) {
 		Object value = get(key);
 		if (value != null) {
@@ -236,6 +259,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
+	@JsonIgnore
 	public String[] getStringArray(String key) {
 		Object value = this.get(key);
 
@@ -304,6 +328,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 	 * @param key
 	 * @return
 	 */
+	@JsonIgnore
 	public Double[] getDoubleArray(String key) {
 		Object value = this.get(key);
 
@@ -388,5 +413,9 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 		return values;
 	}
+
+	
+	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
+
 
 }
