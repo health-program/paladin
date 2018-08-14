@@ -3,6 +3,8 @@ package com.paladin.health.core.factor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +15,16 @@ import org.springframework.stereotype.Component;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.EnumUtil;
+import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.core.IndexContainer;
+import com.paladin.health.core.factor.FactorAnalyzer.Basis;
 import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
 import com.paladin.health.library.Relation;
 import com.paladin.health.library.index.item.ItemValueDefinition;
 import com.paladin.health.library.index.item.ItemValueDefinition.InputType;
 import com.paladin.health.library.index.item.ItemValueDefinition.ValueType;
 import com.paladin.health.library.index.item.StandardItem;
+import com.paladin.health.model.prescription.PrescriptionFactor;
 import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 import com.paladin.health.service.prescription.PrescriptionFactorConditionService;
 
@@ -32,7 +37,11 @@ public class HealthFactorAnalyzer implements SpringContainer {
 	@Autowired
 	private IndexContainer indexContainer;
 
+	@Autowired
+	private HealthPrescriptionContainer healthPrescriptionContainer;
+
 	private List<FactorAnalyzer> factorAnalyzers;
+	private List<Basis> analyzeBasises;
 
 	@Override
 	public boolean initialize() {
@@ -82,19 +91,51 @@ public class HealthFactorAnalyzer implements SpringContainer {
 
 		analyzers1.addAll(analyzers2);
 		this.factorAnalyzers = analyzers1;
+
+		// 对分析器排序
+		Collections.sort(this.factorAnalyzers, new Comparator<FactorAnalyzer>() {
+			@Override
+			public int compare(FactorAnalyzer o1, FactorAnalyzer o2) {
+				int i1 = o1.order();
+				int i2 = o2.order();
+				return i1 == i2 ? 0 : (i1 > i2 ? 1 : -1);
+			}
+		});
+
+		// 初始化分析器判断标准的文字说明
+		analyzeBasises = new ArrayList<>();
+		for (FactorAnalyzer analyzer : this.factorAnalyzers) {
+			List<Basis> basises = analyzer.getBasis();
+			if (basises == null) {
+				continue;
+			}
+			analyzeBasises.addAll(basises);
+		}
+
 		return true;
 	}
 
+	/**
+	 * 分析因素
+	 * 
+	 * @param peopleCondition
+	 */
 	public void analyzeFactor(PeopleCondition peopleCondition) {
 		for (FactorAnalyzer analyzer : factorAnalyzers) {
-			String target = analyzer.getFactor();
-			if (!peopleCondition.hasFactor(target)) {
-				FactorResult factor = analyzer.analyseFactor(peopleCondition);
-				if (factor != null) {
-					peopleCondition.addFactor(factor);
-				}
+			FactorResult factor = analyzer.analyseFactor(peopleCondition);
+			if (factor != null) {
+				peopleCondition.addFactor(factor);
 			}
 		}
+	}
+
+	/**
+	 * 获取分析准则
+	 * 
+	 * @return
+	 */
+	public List<Basis> getAnalyzeBasises() {
+		return analyzeBasises;
 	}
 
 	private class ConditionFactorAnalyzer implements FactorAnalyzer {
@@ -142,8 +183,23 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		}
 
 		@Override
-		public String getFactor() {
-			return factorCode;
+		public List<Basis> getBasis() {
+			PrescriptionFactor factor = healthPrescriptionContainer.getFactorByCode(factorCode);
+			if (factor != null) {
+				List<String> basises = new ArrayList<>(judgers.size());
+				for (ConditionJudger judger : judgers) {
+					basises.add(judger.toString());
+				}
+				Basis basis = new Basis(factor.getName(), basises);
+				return Arrays.asList(basis);
+			}
+
+			return null;
+		}
+
+		@Override
+		public int order() {
+			return 0;
 		}
 	}
 
@@ -159,6 +215,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 		private boolean nullable;
 
 		private String[] diseases;
+		private StandardItem standardItem;
 
 		private ConditionJudger(PrescriptionFactorCondition condition) {
 			key = condition.getItemKey();
@@ -166,7 +223,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			stringValues = condition.getValue().split(",");
 			nullable = condition.getNullable() == 1;
 
-			StandardItem standardItem = indexContainer.getStandardItem(key);
+			standardItem = indexContainer.getStandardItem(key);
 			ItemValueDefinition valueDefinition = standardItem.getItemValueDefinition();
 			InputType inputType = valueDefinition.getInputType();
 
@@ -365,6 +422,10 @@ public class HealthFactorAnalyzer implements SpringContainer {
 			Arrays.sort(array1);
 			Arrays.sort(array2);
 			return Arrays.equals(array1, array2);
+		}
+
+		public String toString() {
+			return standardItem.toContent(relation, stringValues);
 		}
 	}
 

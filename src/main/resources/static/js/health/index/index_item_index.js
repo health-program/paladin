@@ -132,7 +132,7 @@ function showItemDetail(item) {
 
             if (item.standard) {
                 item.standard.forEach(function(s) {
-                    content += '<span class="label label-success" style="margin-right:10px">' + s.name + '</span>';
+                    content += '<span class="label label-success" style="margin-right:10px">' + s.name + '(' + s.standardKey + ')</span>';
                 });
             }
 

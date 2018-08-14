@@ -22,25 +22,19 @@
                     <div class="nav-tabs-custom">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="#type1" data-toggle="tab" aria-expanded="true">日常生活</a></li>
-                            <li class=""><a href="#type3" data-toggle="tab" aria-expanded="false">饮食适宜</a></li>
-                            <li class=""><a href="#type4" data-toggle="tab" aria-expanded="false">饮食禁忌</a></li>
-                            <li class=""><a href="#type5" data-toggle="tab" aria-expanded="false">饮食原则</a></li>
+                            <li class=""><a href="#type3" data-toggle="tab" aria-expanded="false">新运动锻炼</a></li>
+                            <li class=""><a href="#type4" data-toggle="tab" aria-expanded="false">新饮食原则</a></li>
                             <li class=""><a href="#type6" data-toggle="tab" aria-expanded="false">心理健康</a></li>
-                            <li class=""><a href="#type7" data-toggle="tab" aria-expanded="false">运动锻炼</a></li>
                             <li class=""><a href="#type8" data-toggle="tab" aria-expanded="false">应急就医</a></li>                           
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane active" id="type1" >
                             </div>
-                            <div class="tab-pane" id="type3">
+                            <div class="tab-pane" id="type3" >
                             </div>
                             <div class="tab-pane" id="type4" >
                             </div>
-                            <div class="tab-pane" id="type5" >
-                            </div>
                             <div class="tab-pane" id="type6" >
-                            </div>
-                            <div class="tab-pane" id="type7" >
                             </div>
                             <div class="tab-pane" id="type8" >
                             </div>
@@ -95,7 +89,11 @@
                         text = "（";
 
                         fs.forEach(function(i) {
-                            text += map[i].name + "，";
+                        	try{
+                                text += map[i].name + "，";
+                        	} catch(e){
+                        		console.log(e);
+                        	}
                         });
                         text = text.substring(0, text.length - 1);
                         text += "）";
@@ -151,9 +149,7 @@
         initItemByType(1);
         initItemByType(3);
         initItemByType(4);
-        initItemByType(5);
         initItemByType(6);
-        initItemByType(7);
         initItemByType(8);
     }
 

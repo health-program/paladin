@@ -39,8 +39,8 @@ public class IndexItemController {
 	private IndexItemStandardService itemStandardService;
 
 	@Autowired
-	private IndexItemDependenceService itemDependenceService;
-
+	private IndexItemDependenceService itemDependenceService;	
+	
 	@RequestMapping("/index")
 	public String index() {
 		return "/health/index/index_item_index";

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+
+<body>
+    <div class="container">
+        <section class="content">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <i class="fa fa-list-alt"></i>
+                    <h3 class="box-title">接口信息</h3>
+                </div>
+                <div id="" class="box-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">接口名称：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static">健康处方获取接口</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">请求地址：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static"><span th:text="${baseUrl}"/>/open/diagnose</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">请求方式：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static">POST</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">请求数据类型：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static">application/json</p>
+                            </div>
+                        </div>                        
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">返回值类型：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static">JSON</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">功能描述：</label>
+                            <div class="col-sm-5">
+                                <p class="form-control-static">获取健康处方</p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <i class="fa fa-list-alt"></i>
+                    <h3 class="box-title">请求参数</h3>
+                </div>
+                <div id="" class="box-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th width="20%">参数说明</th>
+                                <th>值内容</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestTable">
+                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <i class="fa fa-list-alt"></i>
+                    <h3 class="box-title">返回参数</h3>
+                </div>
+                <div id="" class="box-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th>参数说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>status</td>
+                                <td>int</td>
+                                <td>返回状态（1成功、0系统异常、2调用失败）</td>
+                            </tr>
+                            <tr>
+                                <td>message</td>
+                                <td>string</td>
+                                <td>返回结果的说明，返回状态异常时可查看该参数</td>
+                            </tr>
+                            <tr>
+                                <td>result</td>
+                                <td><a href="#DiagnosePrescription">DiagnosePrescription</a></td>
+                                <td>返回结果，健康处方</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3 id="DiagnosePrescription" class='text-muted'>DiagnosePrescription</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th>参数说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>diagnoseId</td>
+                                <td>string</td>
+                                <td>该次健康诊断ID</td>
+                            </tr>
+                            <tr>
+                                <td>factors</td>
+                                <td>List&lt;<a href="#PrescriptionFactor">PrescriptionFactor</a>&gt;</td>
+                                <td>危险因素</td>
+                            </tr>
+                            <tr>
+                                <td>prescriptions</td>
+                                <td>List&lt;<a href="#Prescription">Prescription</a>&gt;</td>
+                                <td>健康处方</td>
+                            </tr>
+                            <tr>
+                                <td>terminologies</td>
+                                <td>List&lt;<a href="#PrescriptionTerminology">PrescriptionTerminology</a>&gt;</td>
+                                <td>说明、注释、附录</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3 id="PrescriptionFactor" class='text-muted'>PrescriptionFactor</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th>参数说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>code</td>
+                                <td>string</td>
+                                <td>危险因素代码</td>
+                            </tr>
+                            <tr>
+                                <td>name</td>
+                                <td>string</td>
+                                <td>危险因素名称</td>
+                            </tr>
+                            <tr>
+                                <td>type</td>
+                                <td>string</td>
+                                <td>危险因素类型（1：疾病2：危险因素3：非直接危险因素）</td>
+                            </tr>
+                            <tr>
+                                <td>parentFactor</td>
+                                <td>string</td>
+                                <td>父危险因素（如果多个用逗号[,]分隔）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3 id="Prescription" class='text-muted'>Prescription</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th>参数说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>id</td>
+                                <td>string</td>
+                                <td>健康处方ID</td>
+                            </tr>
+                            <tr>
+                                <td>type</td>
+                                <td>int</td>
+                                <td>健康处方类型（1：日常生活3：运动锻炼4：饮食习惯6：心理8：其他）</td>
+                            </tr>
+                            <tr>
+                                <td>content</td>
+                                <td>string</td>
+                                <td>健康处方内容</td>
+                            </tr>
+                            <tr>
+                                <td>terminology</td>
+                                <td>string</td>
+                                <td>健康处方内容中的术语（多个用逗号[,]分隔）</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3 id="PrescriptionTerminology" class='text-muted'>PrescriptionTerminology</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="20%">参数名</th>
+                                <th width="20%">参数类型</th>
+                                <th>参数说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>name</td>
+                                <td>string</td>
+                                <td>术语名称</td>
+                            </tr>
+                            <tr>
+                                <td>nickName</td>
+                                <td>string</td>
+                                <td>别名（多个用逗号[,]分隔）</td>
+                            </tr>
+                            <tr>
+                                <td>type</td>
+                                <td>int</td>
+                                <td>类型（1：文字2：页面3：文字+页面）</td>
+                            </tr>
+                            <tr>
+                                <td>content</td>
+                                <td>string</td>
+                                <td>文字内容</td>
+                            </tr>
+                            <tr>
+                                <td>pageName</td>
+                                <td>string</td>
+                                <td>页面名称</td>
+                            </tr>
+                            <tr>
+                                <td>pageUrl</td>
+                                <td>string</td>
+                                <td>页面URL,<span th:text="${baseUrl}"/>/static/html/appendix/{pageUrl}.html</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <section class="content">
+            <div class="box box-solid">
+                <div class="box-header with-border">
+                    <i class="fa fa-list-alt"></i>
+                    <h3 class="box-title">样例</h3>
+                </div>
+                <div id="" class="box-body">
+                </div>
+            </div>
+        </section>
+    </div>
+    <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/js/health/open/open_interface.js"></script>
+</body>
+
+</html>

@@ -18,6 +18,10 @@ public class PrescriptionItem {
 	private String mutex;
 
 	private Integer mutexPriority;
+	
+	private String demand;
+	
+	private String terminology;
 
 	public Integer getId() {
 		return id;
@@ -65,6 +69,22 @@ public class PrescriptionItem {
 
 	public void setDetail(String detail) {
 		this.detail = detail;
+	}
+
+	public String getDemand() {
+		return demand;
+	}
+
+	public void setDemand(String demand) {
+		this.demand = demand;
+	}
+
+	public String getTerminology() {
+		return terminology;
+	}
+
+	public void setTerminology(String terminology) {
+		this.terminology = terminology;
 	}
 
 }

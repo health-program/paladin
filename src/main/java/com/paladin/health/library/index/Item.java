@@ -3,6 +3,8 @@ package com.paladin.health.library.index;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * 项目
  * @author TontoZhou
@@ -19,7 +21,8 @@ public abstract class Item {
 	protected List<Item> children = new ArrayList<>();
 	 
 	public abstract ItemType getItemType() ;
-		
+	
+	@JsonIgnore
 	public List<Item> getChildren() {
 		return new ArrayList<>(children);
 	}
@@ -48,6 +51,7 @@ public abstract class Item {
 		this.name = name;
 	}
 
+	@JsonIgnore
 	public Item getParent() {
 		return parent;
 	}

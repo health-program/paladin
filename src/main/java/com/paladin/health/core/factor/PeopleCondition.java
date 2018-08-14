@@ -35,15 +35,13 @@ public class PeopleCondition extends HashMap<String, Object> {
 	public void initialize() {
 
 		// 年龄
-		if (!has("dqnl")) {
-			String csrq = getString("csrq");
-			if (csrq != null && csrq.length() > 0) {
-				try {
-					Integer age = DateTimeUtil.getAge(formatter.parse(csrq));
-					put("dqnl", age);
-				} catch (ParseException e) {
-					throw new BusinessException("出生日期格式不正确，格式应如1988.06.11");
-				}
+		String csrq = getString("csrq");
+		if (csrq != null && csrq.length() > 0) {
+			try {
+				Integer age = DateTimeUtil.getAge(formatter.parse(csrq));
+				put("dqnl", age);
+			} catch (ParseException e) {
+				throw new BusinessException("出生日期格式不正确，格式应如1988.06.11");
 			}
 		}
 
@@ -109,18 +107,20 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	}
 	
+	private DiagnoseTarget target;
 	
 	@JsonIgnore
 	public DiagnoseTarget getDiagnoseTarget() {
-		DiagnoseTarget target = new DiagnoseTarget();
-	
-		target.setId(getString("sfzhm"));
-		target.setName(getString("xm"));
-		target.setSex(getInteger("xb"));
-		target.setCellphone(getString("sjhm"));		
-		target.setName(getString("csrq"));
-		target.setCreateTime(new Date());	
-		
+		if(target == null) {
+			target = new DiagnoseTarget();
+			
+			target.setId(getString("sfzhm"));
+			target.setName(getString("xm"));
+			target.setSex(getInteger("xb"));
+			target.setCellphone(getString("sjhm"));		
+			target.setName(getString("csrq"));
+			target.setCreateTime(new Date());	
+		}
 		return target;
 	}
 

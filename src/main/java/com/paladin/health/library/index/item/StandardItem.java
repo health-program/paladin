@@ -1,6 +1,5 @@
 package com.paladin.health.library.index.item;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.paladin.health.library.Relation;
@@ -19,8 +18,6 @@ public class StandardItem extends Item {
 	protected String key;
 
 	protected ItemValueDefinition itemValueDefinition;
-
-	protected List<ItemDependence> itemDependence = new ArrayList<>();
 
 	public StandardItem(String key) {
 		this.key = key;
@@ -43,37 +40,34 @@ public class StandardItem extends Item {
 		this.itemValueDefinition = itemValueDefinition;
 	}
 
-	public List<ItemDependence> getItemDependence() {
-		return new ArrayList<>(itemDependence);
-	}
-
-	public void addItemDependence(ItemDependence itemDependence) {
-		this.itemDependence.add(itemDependence);
-	}
-
-	public void addItemDependences(List<ItemDependence> itemDependences) {
-		this.itemDependence.addAll(itemDependences);
-	}
-
-	public String toContent(String... values) {
-
-		StringBuilder sb = new StringBuilder(getName());
-
-		sb.append(":");
-
+	public String toContent(Relation relation, String... values) {
+		StringBuilder sb = new StringBuilder();
 		if (itemValueDefinition.inputType == InputType.INPUT) {
 
 			if (itemValueDefinition.template != null) {
+				if (values != null && values.length > 0) {
+					String temp = itemValueDefinition.template;
+					for (int i = 0; i < values.length; i++) {
+						temp = temp.replaceAll("\\{" + i + "\\}", values[0]);
+					}
+					sb.append(temp);
+				} else {
+					sb.append(itemValueDefinition.template.replaceAll("\\{\\d{1}\\}", "______"));
+				}
+			} else {
+				String unit = itemValueDefinition.unit;
+				if (unit == null) {
+					unit = "";
+				}
 
 				if (values != null && values.length > 0) {
-					sb.append(itemValueDefinition.template.replace("{?}", values[0]));
+					for (int i = 0; i < values.length; i++) {
+						sb.append(values[i]).append(unit).append(",");
+					}
+					sb.deleteCharAt(sb.length() - 1);
 				} else {
-					sb.append(itemValueDefinition.template.replace("{?}", "______"));
+					sb.append("______").append(unit);
 				}
-			}
-
-			if (itemValueDefinition.unit != null) {
-				sb.append(itemValueDefinition.unit);
 			}
 
 		} else if (itemValueDefinition.inputType == InputType.SELECT) {
@@ -88,7 +82,6 @@ public class StandardItem extends Item {
 
 					sb.deleteCharAt(sb.length() - 1);
 				} else {
-
 					int c = 0;
 					for (ItemStandard standard : standards) {
 						String skey = standard.key;
@@ -108,10 +101,37 @@ public class StandardItem extends Item {
 			}
 		}
 
-		return sb.toString();
+		String vs = sb.toString();
+
+		if (relation == null) {
+			return getName() + ":" + vs;
+		} else {
+			if (relation == Relation.EQUAL) {
+				return getName() + "=" + vs;
+			} else if (relation == Relation.NOT_EQUAL) {
+				return getName() + "!=" + vs;
+			} else if (relation == Relation.IN) {
+				return getName() + "在[" + vs + "]之中";
+			} else if (relation == Relation.HAVE) {
+				return getName() + "包含[" + vs + "]";
+			} else if (relation == Relation.BETWEEN) {
+				return getName() + "在[" + vs + "]之中（不包含边界）";
+			} else if (relation == Relation.BETWEEN_EQUAL) {
+				return getName() + "在[" + vs + "]之中（包含边界）";
+			} else if (relation == Relation.GREAT) {
+				return getName() + ">" + vs;
+			} else if (relation == Relation.GREAT_EQUAL) {
+				return getName() + ">=" + vs;
+			} else if (relation == Relation.LESS) {
+				return getName() + "<" + vs;
+			} else if (relation == Relation.LESS_EQUAL) {
+				return getName() + "<=" + vs;
+			}
+		}
+
+		return null;
 	}
-	
-	
+
 	public String toRelationContent(Relation relation, String... values) {
 
 		StringBuilder sb = new StringBuilder(getName());
@@ -120,16 +140,15 @@ public class StandardItem extends Item {
 
 		if (itemValueDefinition.inputType == InputType.INPUT) {
 
-			
-			for(int i = 0;i<values.length;i++) {
-				
-				if(relation == Relation.EQUAL) {
-					//TODO
-				}				
+			for (int i = 0; i < values.length; i++) {
+
+				if (relation == Relation.EQUAL) {
+					// TODO
+				}
 			}
-							
+
 			if (itemValueDefinition.template != null) {
-				
+
 				if (values != null && values.length > 0) {
 					sb.append(itemValueDefinition.template.replace("{?}", values[0]));
 				} else {

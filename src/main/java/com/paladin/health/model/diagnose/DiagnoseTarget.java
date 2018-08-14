@@ -3,8 +3,14 @@ package com.paladin.health.model.diagnose;
 import java.util.Date;
 import javax.persistence.Id;
 
-public class DiagnoseTarget {
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+public class DiagnoseTarget {
+	
+	public static final int SEX_MAN = 1;
+	public static final int SEX_WOMAN = 2;
+	
+	
 	@Id
 	private String id;
 
@@ -65,5 +71,10 @@ public class DiagnoseTarget {
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
-
+	
+	@JsonIgnore
+	public boolean isGirl() {
+		return sex != null && sex == DiagnoseTarget.SEX_WOMAN;
+	}
+	
 }

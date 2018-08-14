@@ -11,7 +11,11 @@ public class WebUtil {
 		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
 	}
 
-
+	public static String getServletPath(HttpServletRequest request) {
+		return request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()	;
+	}
+	
+	
 	public static void sendJson(HttpServletResponse response, Object obj) {
 
 		response.setContentType("application/json");
@@ -25,4 +29,8 @@ public class WebUtil {
 		}
 		
 	}
+	
+	
+	
+	
 }

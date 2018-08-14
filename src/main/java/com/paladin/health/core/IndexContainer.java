@@ -37,6 +37,7 @@ public class IndexContainer implements SpringContainer {
 
 	private List<Item> roots;
 	private Map<String, StandardItem> standardItemMap;
+	private List<StandardItem> standardItemList;
 
 	@Override
 	public boolean initialize() {
@@ -97,11 +98,22 @@ public class IndexContainer implements SpringContainer {
 			Item item = null;
 			if (EnumUtil.equals(type, ItemType.CATEGORY)) {
 				item = new WrapCategoryItem(indexItem);
-			} else if (EnumUtil.equals(type, ItemType.STANDARD)) {
-				item = new WrapStandardItem(indexItem);
-				WrapStandardItem standardItem = (WrapStandardItem) item;
-				standardItem.setItemValueDefinition(itemValueDefinitionMap.get(standardItem.getId()));
-				standardItemMap.put(standardItem.getKey(), standardItem);
+			} else if (EnumUtil.equals(type, ItemType.STANDARD)) {				
+				String key = indexItem.getItemKey();
+				ItemValueDefinition itemValueDefinition = itemValueDefinitionMap.get(indexItem.getId());				
+				StandardItem standardItem = standardItemMap.get(key);
+				if(standardItem == null) {
+					standardItem = new WrapStandardItem(indexItem);
+					standardItem.setItemValueDefinition(itemValueDefinition);
+					standardItemMap.put(standardItem.getKey(), standardItem);
+					
+					item = standardItem;
+				} else {				
+					// 相同key的选择标准项可以合并，但是输入标准项不能合并，也不覆盖，默认第一个
+					if(itemValueDefinition.getInputType() == InputType.SELECT) {						
+						standardItem.getItemValueDefinition().addStandards(itemValueDefinition.getStandards());				
+					}
+				}			
 			}
 			
 			if (item != null) {
@@ -128,6 +140,14 @@ public class IndexContainer implements SpringContainer {
 				roots.add(item);
 			}
 		}
+		
+		standardItemList = new ArrayList<>();
+		for (IndexItem indexItem : indexItems) {
+			StandardItem item = standardItemMap.get(indexItem.getItemKey());
+			if(item != null && !standardItemList.contains(item)) {
+				standardItemList.add(item);
+			}	
+		}
 
 		return true;
 	}
@@ -140,6 +160,15 @@ public class IndexContainer implements SpringContainer {
 	 */
 	public StandardItem getStandardItem(String key) {
 		return standardItemMap.get(key);
+	}
+	
+	/**
+	 * 获取指标标准项
+	 * 
+	 * @return
+	 */
+	public List<StandardItem> getStandardItems() {
+		return new ArrayList<StandardItem>(standardItemList);
 	}
 
 	private static class WrapCategoryItem extends CategoryItem {

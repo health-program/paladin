@@ -13,11 +13,13 @@ import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.core.HealthPrescriptionContainer.Prescription;
 import com.paladin.health.core.HealthPrescriptionContainer.PrescriptionResult;
+import com.paladin.health.core.factor.FactorAnalyzer.Basis;
 import com.paladin.health.core.factor.HealthFactorAnalyzer;
 import com.paladin.health.core.factor.PeopleCondition;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.prescription.PrescriptionFactor;
+import com.paladin.health.model.prescription.PrescriptionTerminology;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 import com.paladin.health.service.diagnose.DiagnoseTargetService;
 
@@ -45,6 +47,10 @@ public class HealthPrescriptionService {
 		healthFactorAnalyzer.analyzeFactor(peopleCondition);
 		PrescriptionResult result = healthPrescriptionContainer.search(peopleCondition);
 		return result;
+	}
+	
+	public List<Basis> getAnalyzeBasises() {
+		return healthFactorAnalyzer.getAnalyzeBasises();
 	}
 
 	/**
@@ -92,12 +98,14 @@ public class HealthPrescriptionService {
 		private String diagnoseId;
 		private List<PrescriptionFactor> factors;
 		private List<Prescription> prescriptions;
+		private List<PrescriptionTerminology> terminologies;
 
 		public DiagnosePrescription(String diagnoseId, PrescriptionResult result) {
 			this.diagnoseId = diagnoseId;
 			if (result != null) {
 				this.factors = result.getFactors();
 				this.prescriptions = result.getPrescriptions();
+				this.terminologies = result.getTerminologies();
 			}
 		}
 
@@ -111,6 +119,10 @@ public class HealthPrescriptionService {
 
 		public String getDiagnoseId() {
 			return diagnoseId;
+		}
+
+		public List<PrescriptionTerminology> getTerminologies() {
+			return terminologies;
 		}
 	}
 

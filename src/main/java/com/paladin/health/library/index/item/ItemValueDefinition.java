@@ -36,7 +36,7 @@ public class ItemValueDefinition {
 	}
 	
 	public void addStandards(List<ItemStandard> standards) {
-		standards.addAll(standards);
+		this.standards.addAll(standards);
 	}
 
 	public boolean isSingle() {

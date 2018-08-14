@@ -1,75 +1,15 @@
 $(function() {
-    $.getAjax("/health/prescription/factor/list", initFactor);
     $.getAjax("/health/index/item/detail/list", initReport);
 });
 
-//---------------- 危险因素部分 -----------------
-var factors;
-
-function initFactor(data) {
-    factors = data;
-    $("#factorInput").bsSuggest({
-        idField: "code",
-        keyField: "name",
-        effectiveFields: ["name"],
-        effectiveFieldsAlias: { name: "危险因素" },
-        searchFields: ["name", "code"],
-        data: {
-            value: data
-        },
-        clearable: false,
-        autoSelect: false,
-        autoDropup: true,
-        ignorecase: true,
-        //showBtn: false,        
-        showHeader: true
-    }).on('onSetSelectValue', function(e, keyword, data) {
-        $("#factor").tagsinput('add', data.name);
-    });
-
-    $('#factor').on('beforeItemAdd', function(event) {
-        var val = event.item;
-        for (var i = 0; i < factors.length; i++) {
-            var obj = factors[i];
-            if (obj.name == val) {
-                return;
-            }
-        }
-        $.errorMessage("不存在危险因素：" + val);
-        event.cancel = true;
-    });
-}
 
 function findPrescription() {
-    var args = $("#factor").tagsinput("items");
-
-    if (args && args.length == 0) {
-        $.errorMessage("请选择查询条件");
-        return;
-    }
-
-    var url = "/health/prescription/find/factor?";
-    args.forEach(function(i) {
-        url += "args=" + i + "&";
-    });
-
-    $.getAjax(url, showPrescription);
-}
-
-
-function clearInput() {
-    $("#factor").tagsinput('removeAll');
-    $("#factorInput").val("");
-}
-
-
-function findPrescription2() {
     var data = $("#tableForm").serializeObject();
     $.postJsonAjax("/health/prescription/find/condition", data, showPrescription);
 }
 
 
-function clearInput2() {
+function clearInput() {
     $("#tableForm")[0].reset();
 }
 
@@ -114,6 +54,92 @@ function buildTerminology(terminologies) {
     return html;
 }
 
+function buildImage(factors) {
+
+    var data = [{
+            style: "bg-red",
+            icon: "iconfont icon-xiangcujiangyou",
+            data: [
+                { name: "盐", value: "<6克" },
+                { name: "油", value: "25~30克" }
+            ]
+        },
+        {
+            style: "bg-gray-light",
+            icon: "iconfont icon-jinkouniunai",
+            data: [
+                { name: "奶及奶制品", value: "300克" },
+                { name: "大豆及坚果类", value: "25~35克" }
+            ]
+        },
+        {
+            style: "bg-blue",
+            icon: "iconfont icon--yu",
+            data: [
+                { name: "畜禽肉", value: "40~75克" },
+                { name: "水产品", value: "40~75克" },
+                { name: "蛋类", value: "40~50克" }
+            ]
+        },
+        {
+            style: "bg-green",
+            icon: "iconfont icon-shucai",
+            data: [{
+                    name: "蔬菜类",
+                    value: "300~500克",
+                    children: [
+                        { name: "深色蔬菜", value: ">1/2" }
+                    ]
+                },
+                { name: "水果类", value: "200~350克" }
+            ]
+        },
+        {
+            style: "bg-orange",
+            icon: "iconfont icon-wugu",
+            data: [{
+                name: "谷薯类",
+                value: "250~400克",
+                children: [
+                    { name: "全谷类及杂豆类", value: "50~150克" }, { name: "薯类", value: "50~100克" }
+                ]
+            }]
+        },
+        {
+            style: "bg-aqua",
+            icon: "iconfont icon-water_icon",
+            data: [
+                { name: "水", value: "1500~1700毫升" },
+            ]
+        }
+
+    ];
+
+    var html = "<div style='text-align:left'>";
+    data.forEach(function(a) {
+
+        html += '<div class="info-box"><span class="info-box-icon ' + a.style + '"><i class="' + a.icon + '" style="font-size: inherit"></i></span>';
+        html += '<div class="info-box-content"><ul class="list-unstyled">';
+
+        a.data.forEach(function(b) {
+            html += '<li><b>' + b.name + ' </b><span class="pull-right badge bg-blue">' + b.value + '</span></li>';
+            if (b.children) {
+                html += '<ul>';
+                b.children.forEach(function(c) {
+                    html += '<li><span style="color:#999">' + c.name + '</span><span class="pull-right badge bg-blue">' + c.value + '</span></li>';
+                });
+                html += "</ul>";
+            }
+        });
+
+        html += '</ul></div></div>';
+    });
+
+    html += "</div>";
+    html += "<p class='text-muted text-center' style='width:230px'>正常居民膳食推荐，可结合健康处方推算适合自己的膳食成分</p>";
+    return html;
+}
+
 function showPrescription(result) {
     if (!result) {
         $.infoMessage("没有有用的健康处方");
@@ -126,11 +152,11 @@ function showPrescription(result) {
 
     var html = '<table class="table table-bordered">';
     if (fs && fs.length > 0) {
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>危险因素</td><td colspan='2'>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>危险因素</td><td colspan='3'>";
         fs.forEach(function(y) {
             if (y.type == 2) {
                 html += '<span class="label label-warning" style="margin-right:10px">' + y.name + '</span>';
-            } else  if (y.type == 1) {
+            } else if (y.type == 1) {
                 html += '<span class="label label-danger" style="margin-right:10px">' + y.name + '</span>';
             }
         });
@@ -141,19 +167,56 @@ function showPrescription(result) {
     }
 
     if (ps && ps.length > 0) {
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle' rowspan='5'>健康处方</td><td valign='middle' align='center' style='width:140px;vertical-align:middle'>日常生活</td><td>" + buildPrescriptionContent(ps, 1, 8) + "</td></tr>";
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>饮食习惯</td><td>" + buildPrescriptionContent(ps, 4) + "</td></tr>";
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>运动锻炼</td><td>" + buildPrescriptionContent(ps, 3) + "</td></tr>";
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>心理活动</td><td>" + buildPrescriptionContent(ps, 6) + "</td></tr>";
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>其他</td><td>" + buildPrescriptionContent(ps, 10) + "</td></tr>";        
-        html += "<tr><td valign='middle' align='center' style='width:140px;vertical-align:middle'>注解</td><td valign='middle' style='vertical-align:middle' colspan='2'>" + buildTerminology(ts) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle' rowspan='5'>健康处方</td>";
+        html += "<td valign='middle' align='center' style='width:120px;vertical-align:middle'>日常生活</td><td>" + buildPrescriptionContent(ps, 1, 8) + "</td>";
+        html += "<td valign='middle' align='center' style='width:380px;' rowspan='5'>" + buildImage(fs) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>饮食习惯</td><td>" + buildPrescriptionContent(ps, 4) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>运动锻炼</td><td>" + buildPrescriptionContent(ps, 3) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>心理活动</td><td>" + buildPrescriptionContent(ps, 6) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>其他</td><td>" + buildPrescriptionContent(ps, 10) + "</td></tr>";
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>注解</td><td valign='middle' style='vertical-align:middle' colspan='3'>" + buildTerminology(ts) + "</td></tr>";
     } else {
         $.infoMessage("没有有用的健康处方");
         return;
     }
     html += "</table>";
-    $.openPageLayer(html);
+
+    $("#prescriptionDiv").html(html);
+
+    showAppendix(result);
 }
+
+function showAppendix(result) {
+    if (!result.terminologies || result.terminologies.length == 0) {
+        return;
+    }
+
+    var html1 = "";
+    var html2 = "";
+
+    var i = 1;
+    var load = [];
+    result.terminologies.forEach(function(t) {
+        if (t.type == 2 || t.type == 3) {
+            var id = "tab_" + i;
+            html1 += '<li class="' + (i == 1 ? 'active' : '') + '"><a href="#' + id + '" data-toggle="tab" aria-expanded="false">' + t.pageName + '</a></li>';
+            html2 += '<div class="tab-pane ' + (i == 1 ? 'active' : '') + '" id="' + id + '"></div>';
+            i++;
+            load.push({
+                target: id,
+                url: "/static/html/appendix/" + t.pageUrl + ".html"
+                //url: "/static/html/appendix/yycf.html"
+            });
+        }
+    });
+    var html = '<div class="nav-tabs-custom"><ul class="nav nav-tabs">' + html1 + '</ul><div class="tab-content">' + html2 + '</div></div>';
+    $("#appendixDiv").html(html);
+
+    load.forEach(function(d) {
+        $("#" + d.target).load(d.url);
+    });
+}
+
 
 //---------------- 健康报告部分 -----------------
 

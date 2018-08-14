@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +43,11 @@ import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
 import com.paladin.health.model.prescription.PrescriptionFactor;
 import com.paladin.health.model.prescription.PrescriptionFactorItem;
 import com.paladin.health.model.prescription.PrescriptionItem;
+import com.paladin.health.model.prescription.PrescriptionTerminology;
 import com.paladin.health.service.prescription.PrescriptionFactorItemService;
 import com.paladin.health.service.prescription.PrescriptionFactorService;
 import com.paladin.health.service.prescription.PrescriptionItemService;
+import com.paladin.health.service.prescription.PrescriptionTerminologyService;
 
 /**
  * 健康处方搜索容器
@@ -62,6 +63,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	private PrescriptionFactorService prescriptionFactorService;
 	@Autowired
 	private PrescriptionItemService prescriptionItemService;
+	@Autowired
+	private PrescriptionTerminologyService prescriptionTerminologyService;
 
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_CONTENT = "content";
@@ -70,6 +73,8 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	private static final String FIELD_TYPE = "type";
 	private static final String FIELD_MUTEX = "mutex";
 	private static final String FIELD_MUTEX_PRIORITY = "mutex_priority";
+	private static final String FIELD_DEMAND = "demand";
+	private static final String FIELD_TERMINOLOGY = "terminology";
 
 	private static final int MAX_SEARCH_RESULT_COUNT = 1000;
 
@@ -82,9 +87,21 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	private Set<Factor> hasParentFactorList;
 
+	private Map<String, PrescriptionTerminology> terminologyMap;
+
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化健康处方搜索服务功能-------------");
+
+		// 初始化处方专业术语map
+		List<PrescriptionTerminology> prescriptionTerminologies = prescriptionTerminologyService.findAll();
+
+		Map<String, PrescriptionTerminology> terminologyMap = new HashMap<>();
+		for (PrescriptionTerminology terminology : prescriptionTerminologies) {
+			terminologyMap.put(terminology.getName(), terminology);
+		}
+
+		this.terminologyMap = terminologyMap;
 
 		prescriptionFactor = prescriptionFactorService.findAll();
 		prescriptionFactor = Collections.unmodifiableList(prescriptionFactor);
@@ -116,7 +133,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		for (Factor factor : hasParentFactorList) {
 			factor.initChildParam();
 		}
-		
+
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/prescription").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));
@@ -212,12 +229,16 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		String[] mutexIds;
 		int mutexPriority;
 		int id;
+		String demand;
+		String terminology;
 
 		Prescription(Document doc) {
 			id = Integer.valueOf(doc.get(FIELD_ID));
 			content = doc.get(FIELD_CONTENT);
 			detail = doc.get(FIELD_DETAIL);
 			type = Integer.valueOf(doc.get(FIELD_TYPE));
+			demand = doc.get(FIELD_DEMAND);
+			terminology = doc.get(FIELD_TERMINOLOGY);
 			String mutex = doc.get(FIELD_MUTEX);
 			if (mutex != null && mutex.length() > 0) {
 				mutexIds = mutex.split(",");
@@ -248,16 +269,22 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		public int getId() {
 			return id;
 		}
+
+		public String getTerminology() {
+			return terminology;
+		}
 	}
 
 	public static class PrescriptionResult {
-				
+
 		private List<PrescriptionFactor> factors;
 		private List<Prescription> prescriptions;
+		private List<PrescriptionTerminology> terminologies;
 
-		public PrescriptionResult(List<Prescription> prescriptions, List<PrescriptionFactor> factors) {
+		public PrescriptionResult(List<Prescription> prescriptions, List<PrescriptionFactor> factors, List<PrescriptionTerminology> terminologies) {
 			this.factors = factors;
 			this.prescriptions = prescriptions;
+			this.terminologies = terminologies;
 		}
 
 		public List<PrescriptionFactor> getFactors() {
@@ -266,6 +293,10 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 		public List<Prescription> getPrescriptions() {
 			return prescriptions;
+		}
+
+		public List<PrescriptionTerminology> getTerminologies() {
+			return terminologies;
 		}
 
 	}
@@ -355,7 +386,28 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					result[i] = new Prescription(doc);
 				}
 
-				return new PrescriptionResult(filterPrescription(result), factors);
+				// 提取处方术语说明
+				List<Prescription> prescriptions = filterPrescription(result, codes);
+				HashSet<String> terminologySet = new HashSet<>();
+
+				for (Prescription p : prescriptions) {
+					if (p.terminology.length() > 0) {
+						String[] ts = p.terminology.split(",");
+						for (String t : ts) {
+							terminologySet.add(t);
+						}
+					}
+				}
+
+				List<PrescriptionTerminology> terminologies = new ArrayList<>(terminologySet.size());
+				for (String terminologyName : terminologySet) {
+					PrescriptionTerminology pt = terminologyMap.get(terminologyName);
+					if (pt != null) {
+						terminologies.add(pt);
+					}
+				}
+
+				return new PrescriptionResult(prescriptions, factors, terminologies);
 			} catch (IOException e1) {
 				logger.error("搜索健康处方异常:" + StringParser.toString(args), e1);
 			}
@@ -379,33 +431,38 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	 * @param prescriptions
 	 * @return
 	 */
-	private List<Prescription> filterPrescription(Prescription[] prescriptions) {
+	private List<Prescription> filterPrescription(Prescription[] prescriptions, HashSet<String> factorCodes) {
 
+		// 排序，更友好的用户体验
 		Arrays.sort(prescriptions, prescriptionComparator);
 
 		HashMap<String, Prescription> mutexPriorityMap = new HashMap<>();
 		List<Prescription> result = new ArrayList<>(prescriptions.length);
 
-		LinkedHashSet<String> shouldEat = new LinkedHashSet<>();
-		LinkedHashSet<String> notShouldEat = new LinkedHashSet<>();
+		// LinkedHashSet<String> shouldEat = new LinkedHashSet<>();
+		// LinkedHashSet<String> notShouldEat = new LinkedHashSet<>();
 
 		for (Prescription p : prescriptions) {
 			if (p.mutexIds != null) {
-				for (String id : p.mutexIds) {
-					Prescription pp = mutexPriorityMap.get(id);
-					if (pp == null || p.mutexPriority > pp.mutexPriority) {
-						mutexPriorityMap.put(id, p);
+				if (isSuitable(p, factorCodes)) {
+					for (String id : p.mutexIds) {
+						Prescription pp = mutexPriorityMap.get(id);
+						if (pp == null || p.mutexPriority > pp.mutexPriority) {
+							mutexPriorityMap.put(id, p);
+						}
 					}
 				}
 			} else {
 
-				if (p.type == 3) {
-					shouldEat.add(p.content);
-				} else if (p.type == 4) {
-					notShouldEat.add(p.content);
-				} else {
-					result.add(p);
-				}
+				// if (p.type == 3) {
+				// shouldEat.add(p.content);
+				// } else if (p.type == 4) {
+				// notShouldEat.add(p.content);
+				// } else {
+				// result.add(p);
+				// }
+
+				result.add(p);
 			}
 		}
 
@@ -413,31 +470,54 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			result.add(p);
 		}
 
-		if (notShouldEat.size() > 0) {
-			StringBuilder notEatContent = new StringBuilder("忌吃");
-			for (String notEat : notShouldEat) {
-				notEatContent.append(notEat).append("、");
-			}
-			notEatContent.deleteCharAt(notEatContent.length() - 1);
-			result.add(new Prescription(notEatContent.toString(), 4));
-		}
-
-		if (shouldEat.size() > 0) {
-			StringBuilder eatContent = new StringBuilder("宜吃");
-			for (String eat : shouldEat) {
-				if (!notShouldEat.contains(eat)) {
-					eatContent.append(eat).append("、");
-				}
-			}
-
-			if (eatContent.length() > 2) {
-				eatContent.deleteCharAt(eatContent.length() - 1);
-				result.add(new Prescription(eatContent.toString(), 3));
-			}
-		}
+		// 不在做适宜与忌吃的处理
+		// if (notShouldEat.size() > 0) {
+		// StringBuilder notEatContent = new StringBuilder("忌吃");
+		// for (String notEat : notShouldEat) {
+		// notEatContent.append(notEat).append("、");
+		// }
+		// notEatContent.deleteCharAt(notEatContent.length() - 1);
+		// result.add(new Prescription(notEatContent.toString(), 4));
+		// }
+		//
+		// if (shouldEat.size() > 0) {
+		// StringBuilder eatContent = new StringBuilder("宜吃");
+		// for (String eat : shouldEat) {
+		// if (!notShouldEat.contains(eat)) {
+		// eatContent.append(eat).append("、");
+		// }
+		// }
+		//
+		// if (eatContent.length() > 2) {
+		// eatContent.deleteCharAt(eatContent.length() - 1);
+		// result.add(new Prescription(eatContent.toString(), 3));
+		// }
+		// }
 
 		Collections.sort(result, prescriptionComparator);
 		return result;
+	}
+
+	/**
+	 * 是否是合适的处方
+	 * <p>
+	 * 如果健康处方需要满足某些因素，则判断这些因素是否已经存在
+	 * </p>
+	 * 
+	 * @param p
+	 * @param factorCodes
+	 * @return
+	 */
+	private boolean isSuitable(Prescription p, HashSet<String> factorCodes) {
+		if (p.demand.length() > 0) {
+			String[] demands = p.demand.split(",");
+			for (String d : demands) {
+				if (!factorCodes.contains(d)) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	public List<PrescriptionFactor> getPrescriptionFactor() {
@@ -481,14 +561,18 @@ public class HealthPrescriptionContainer implements SpringContainer {
 					String detail = item.getDetail();
 					String mutex = item.getMutex();
 					Integer mutexPriority = item.getMutexPriority();
+					String demand = item.getDemand();
+					String terminology = item.getTerminology();
 
 					Document doc = new Document();
 					doc.add(new StringField(FIELD_ID, item.getId().toString(), Store.YES));
+					doc.add(new StringField(FIELD_DEMAND, demand == null ? "" : demand, Store.YES));
 					doc.add(new StringField(FIELD_CONTENT, content, Store.YES));
 					doc.add(new StringField(FIELD_DETAIL, detail == null ? "" : detail, Store.YES));
 					doc.add(new StringField(FIELD_TYPE, item.getType().toString(), Store.YES));
 					doc.add(new StringField(FIELD_MUTEX, mutex == null ? "" : mutex, Store.YES));
 					doc.add(new StringField(FIELD_MUTEX_PRIORITY, mutexPriority == null ? "" : mutexPriority.toString(), Store.YES));
+					doc.add(new StringField(FIELD_TERMINOLOGY, terminology == null ? "" : terminology, Store.YES));
 
 					for (PrescriptionFactorItem factorItem : factorItems) {
 						doc.add(new StringField(FIELD_FACTOR, factorItem.getFactorCode(), Store.NO));

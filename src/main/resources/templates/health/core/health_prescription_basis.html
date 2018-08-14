@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="health/header" />
+
+<body>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">分析准则</h3>
+            </div>
+            <div class="box-body">
+                <table id="dataGrid"></table>
+            </div>
+        </div>
+    </section>
+    <div th:include="health/footer" />
+    <script type="text/javascript">
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        table = $.createTable("#dataGrid", {
+            columns: [
+                [
+                    { title: "危险因素", width:"200px",field: "factorName", valign:"middle", halign:"center"},
+                    {
+                        title: "准则",
+                        halign:"center",
+                        field: "basises",
+                        formatter: function(value) {
+                            var html = "<ul>";
+                            if (value) {
+                                for(var i = 0; i <value.length;i++) {
+                                    html+="<li>" + value[i] + "</li>";
+                                }
+                            }
+                            return html;
+                        }
+                    }
+                ]
+            ],
+            responseHandler: function(result){    
+                 result.sort(function(a,b){
+                    return a.factorName > b.factorName ? 1: -1;
+                 });
+
+                 return result;
+            },
+            url: '/health/prescription/basis/data',
+            pagination: false,
+        });
+    }
+    </script>
+</body>
+
+</html>

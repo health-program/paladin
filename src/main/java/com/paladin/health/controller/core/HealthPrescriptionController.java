@@ -28,12 +28,12 @@ public class HealthPrescriptionController {
 	PrescriptionFactorService prescriptionFactorService;
 	@Autowired
 	HealthPrescriptionService healthPrescriptionService;
-	
+
 	@RequestMapping("/index")
 	public String index() {
 		return "/health/core/health_prescription_index";
 	}
-
+	
 	@RequestMapping("/index/data")
 	@ResponseBody
 	public Object indexData() {
@@ -73,21 +73,32 @@ public class HealthPrescriptionController {
 	public Object findItemOfFactor(@RequestParam String code) {
 		return CommonResponse.getSuccessResponse(prescriptionItemService.findItemOfFactor(code));
 	}
-	
-	//----------------------------------------
+
+	@RequestMapping("/basis")
+	public Object basis() {
+		return "/health/core/health_prescription_basis";
+	}
+
+	@RequestMapping("/basis/data")
+	@ResponseBody
+	public Object basisList() {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getAnalyzeBasises());
+	}
+
+	// ----------------------------------------
 	// 对外健康处方接口
-	//----------------------------------------
-	
+	// ----------------------------------------
+
 	@RequestMapping("/find/factor")
 	@ResponseBody
 	public Object findByFactor(@RequestParam String[] args) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(args));
 	}
-	
+
 	@RequestMapping("/find/condition")
 	@ResponseBody
 	public Object findByCondition(@RequestBody PeopleCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(condition));
 	}
-	
+
 }

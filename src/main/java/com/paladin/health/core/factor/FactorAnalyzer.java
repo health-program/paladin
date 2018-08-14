@@ -1,13 +1,22 @@
 package com.paladin.health.core.factor;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 
 public interface FactorAnalyzer {
 
 	public FactorResult analyseFactor(PeopleCondition peopleCondition);
 
-	public String getFactor();
-
+	public List<Basis> getBasis();
+	
+	/**
+	 * 顺序
+	 * @return
+	 */
+	public int order();
+	
 	public static class FactorResult {
 
 		private String factor;
@@ -56,4 +65,39 @@ public interface FactorAnalyzer {
 		}
 
 	}
+
+	public static class Basis{
+		
+		private String factorName;
+		
+		private List<String> basises;
+		
+		public Basis(String factorName, List<String> basises) {
+			this.factorName = factorName;
+			this.basises = basises;
+		}
+		
+		public Basis(String factorName, String... basises) {
+			this.factorName = factorName;
+			this.basises = Arrays.asList(basises);
+		}
+
+		public String getFactorName() {
+			return factorName;
+		}
+
+		public void setFactorName(String factorName) {
+			this.factorName = factorName;
+		}
+
+		public List<String> getBasises() {
+			return basises;
+		}
+
+		public void setBasises(List<String> basises) {
+			this.basises = basises;
+		}
+		
+	}
+
 }
