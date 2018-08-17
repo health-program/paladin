@@ -20,6 +20,12 @@ public class PublicityMessageDTO {
 	private String content;
 	
 	private Date publishTime;
+	
+	private Integer toApp;
+	
+	private Integer toWeixin;
+	
+	private Integer toCellphone;
 
 	public String getId() {
 		return id;
@@ -75,6 +81,30 @@ public class PublicityMessageDTO {
 
 	public void setPublishTime(Date publishTime) {
 		this.publishTime = publishTime;
+	}
+
+	public Integer getToApp() {
+		return toApp;
+	}
+
+	public void setToApp(Integer toApp) {
+		this.toApp = toApp;
+	}
+
+	public Integer getToWeixin() {
+		return toWeixin;
+	}
+
+	public void setToWeixin(Integer toWeixin) {
+		this.toWeixin = toWeixin;
+	}
+
+	public Integer getToCellphone() {
+		return toCellphone;
+	}
+
+	public void setToCellphone(Integer toCellphone) {
+		this.toCellphone = toCellphone;
 	}
 	
 }

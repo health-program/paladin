@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.publicity.PublicityMessagePushMapper">
+	<select id="findSendMessage" resultType="com.paladin.health.model.publicity.PublicityMessagePush">
+	SELECT message_id AS messageId,channel,status,try_times AS tryTimes FROM publicity_message_push WHERE status = 1 OR (status = 9 AND try_times &lt; 10) ORDER BY message_id	
+	</select>
+</mapper>

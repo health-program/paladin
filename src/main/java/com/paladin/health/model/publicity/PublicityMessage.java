@@ -17,7 +17,10 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	public final static int STATUS_SUBMIT_EXAMINE =1;
 	public final static int STATUS_EXAMINE_FAIL =2;
 	public final static int STATUS_EXAMINE_SUCCESS =9;
-
+	public final static int STATUS_TO_SEND =10;
+	
+	public final static String COLUMN_FIELD_STATUS = "status";
+	
 	@Id
 	@GeneratedValue(generator = "UUID")
 	private String id;
@@ -39,6 +42,12 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	private Integer status;
 	
 	private Date publishTime;
+	
+	private Integer toApp;
+	
+	private Integer toWeixin;
+	
+	private Integer toCellphone;
 	
 	public String getId() {
 		return id;
@@ -110,6 +119,30 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setPublishTime(Date publishTime) {
 		this.publishTime = publishTime;
+	}
+
+	public Integer getToApp() {
+		return toApp;
+	}
+
+	public void setToApp(Integer toApp) {
+		this.toApp = toApp;
+	}
+
+	public Integer getToWeixin() {
+		return toWeixin;
+	}
+
+	public void setToWeixin(Integer toWeixin) {
+		this.toWeixin = toWeixin;
+	}
+
+	public Integer getToCellphone() {
+		return toCellphone;
+	}
+
+	public void setToCellphone(Integer toCellphone) {
+		this.toCellphone = toCellphone;
 	}
 
 }

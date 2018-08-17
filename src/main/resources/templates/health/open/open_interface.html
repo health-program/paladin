@@ -1,14 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="health/header" />
+
+<head>
+    <head th:replace="health/header" />
+    <link rel="stylesheet" href="/static/assets/highlight/styles/github.css">
+</head>
 
 <body>
+    <section class="content">
     <div class="container">
-        <section class="content">
-            <div class="box box-solid">
+        <div class="box box-solid">
                 <div class="box-header with-border">
                     <i class="fa fa-list-alt"></i>
                     <h3 class="box-title">接口信息</h3>
+                    <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    </div>
                 </div>
                 <div id="" class="box-body">
                     <form class="form-horizontal">
@@ -21,7 +28,7 @@
                         <div class="form-group">
                             <label class="col-sm-2 control-label">请求地址：</label>
                             <div class="col-sm-5">
-                                <p class="form-control-static"><span th:text="${baseUrl}"/>/open/diagnose</p>
+                                <p class="form-control-static"><span th:text="${baseUrl}" />/open/diagnose</p>
                             </div>
                         </div>
                         <div class="form-group">
@@ -35,7 +42,7 @@
                             <div class="col-sm-5">
                                 <p class="form-control-static">application/json</p>
                             </div>
-                        </div>                        
+                        </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">返回值类型：</label>
                             <div class="col-sm-5">
@@ -50,217 +57,542 @@
                         </div>
                     </form>
                 </div>
-            </div>
-        </section>
-        <section class="content">
-            <div class="box box-solid">
-                <div class="box-header with-border">
-                    <i class="fa fa-list-alt"></i>
-                    <h3 class="box-title">请求参数</h3>
-                </div>
-                <div id="" class="box-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th width="20%">参数说明</th>
-                                <th>值内容</th>
-                            </tr>
-                        </thead>
-                        <tbody id="requestTable">
-                           
-                        </tbody>
-                    </table>
+        </div>
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">请求参数</h3>
+                <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                 </div>
             </div>
-        </section>
-        <section class="content">
-            <div class="box box-solid">
-                <div class="box-header with-border">
-                    <i class="fa fa-list-alt"></i>
-                    <h3 class="box-title">返回参数</h3>
-                </div>
-                <div id="" class="box-body">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th>参数说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>status</td>
-                                <td>int</td>
-                                <td>返回状态（1成功、0系统异常、2调用失败）</td>
-                            </tr>
-                            <tr>
-                                <td>message</td>
-                                <td>string</td>
-                                <td>返回结果的说明，返回状态异常时可查看该参数</td>
-                            </tr>
-                            <tr>
-                                <td>result</td>
-                                <td><a href="#DiagnosePrescription">DiagnosePrescription</a></td>
-                                <td>返回结果，健康处方</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 id="DiagnosePrescription" class='text-muted'>DiagnosePrescription</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th>参数说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>diagnoseId</td>
-                                <td>string</td>
-                                <td>该次健康诊断ID</td>
-                            </tr>
-                            <tr>
-                                <td>factors</td>
-                                <td>List&lt;<a href="#PrescriptionFactor">PrescriptionFactor</a>&gt;</td>
-                                <td>危险因素</td>
-                            </tr>
-                            <tr>
-                                <td>prescriptions</td>
-                                <td>List&lt;<a href="#Prescription">Prescription</a>&gt;</td>
-                                <td>健康处方</td>
-                            </tr>
-                            <tr>
-                                <td>terminologies</td>
-                                <td>List&lt;<a href="#PrescriptionTerminology">PrescriptionTerminology</a>&gt;</td>
-                                <td>说明、注释、附录</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 id="PrescriptionFactor" class='text-muted'>PrescriptionFactor</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th>参数说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>code</td>
-                                <td>string</td>
-                                <td>危险因素代码</td>
-                            </tr>
-                            <tr>
-                                <td>name</td>
-                                <td>string</td>
-                                <td>危险因素名称</td>
-                            </tr>
-                            <tr>
-                                <td>type</td>
-                                <td>string</td>
-                                <td>危险因素类型（1：疾病2：危险因素3：非直接危险因素）</td>
-                            </tr>
-                            <tr>
-                                <td>parentFactor</td>
-                                <td>string</td>
-                                <td>父危险因素（如果多个用逗号[,]分隔）</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 id="Prescription" class='text-muted'>Prescription</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th>参数说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>id</td>
-                                <td>string</td>
-                                <td>健康处方ID</td>
-                            </tr>
-                            <tr>
-                                <td>type</td>
-                                <td>int</td>
-                                <td>健康处方类型（1：日常生活3：运动锻炼4：饮食习惯6：心理8：其他）</td>
-                            </tr>
-                            <tr>
-                                <td>content</td>
-                                <td>string</td>
-                                <td>健康处方内容</td>
-                            </tr>
-                            <tr>
-                                <td>terminology</td>
-                                <td>string</td>
-                                <td>健康处方内容中的术语（多个用逗号[,]分隔）</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3 id="PrescriptionTerminology" class='text-muted'>PrescriptionTerminology</h3>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="20%">参数名</th>
-                                <th width="20%">参数类型</th>
-                                <th>参数说明</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>name</td>
-                                <td>string</td>
-                                <td>术语名称</td>
-                            </tr>
-                            <tr>
-                                <td>nickName</td>
-                                <td>string</td>
-                                <td>别名（多个用逗号[,]分隔）</td>
-                            </tr>
-                            <tr>
-                                <td>type</td>
-                                <td>int</td>
-                                <td>类型（1：文字2：页面3：文字+页面）</td>
-                            </tr>
-                            <tr>
-                                <td>content</td>
-                                <td>string</td>
-                                <td>文字内容</td>
-                            </tr>
-                            <tr>
-                                <td>pageName</td>
-                                <td>string</td>
-                                <td>页面名称</td>
-                            </tr>
-                            <tr>
-                                <td>pageUrl</td>
-                                <td>string</td>
-                                <td>页面URL,<span th:text="${baseUrl}"/>/static/html/appendix/{pageUrl}.html</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div id="" class="box-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th width="20%">参数说明</th>
+                            <th>值内容</th>
+                        </tr>
+                    </thead>
+                    <tbody id="requestTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">返回参数</h3>
+                <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                 </div>
             </div>
-        </section>
-        <section class="content">
-            <div class="box box-solid">
-                <div class="box-header with-border">
-                    <i class="fa fa-list-alt"></i>
-                    <h3 class="box-title">样例</h3>
-                </div>
-                <div id="" class="box-body">
+            <div id="" class="box-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th>参数说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>status</td>
+                            <td>int</td>
+                            <td>返回状态（1成功、0系统异常、2调用失败）</td>
+                        </tr>
+                        <tr>
+                            <td>message</td>
+                            <td>string</td>
+                            <td>返回结果的说明，返回状态异常时可查看该参数</td>
+                        </tr>
+                        <tr>
+                            <td>result</td>
+                            <td><a href="#DiagnosePrescription">DiagnosePrescription</a></td>
+                            <td>返回结果，健康处方</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="DiagnosePrescription" class='text-muted'>DiagnosePrescription</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th>参数说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>diagnoseId</td>
+                            <td>string</td>
+                            <td>该次健康诊断ID</td>
+                        </tr>
+                        <tr>
+                            <td>factors</td>
+                            <td>List&lt;<a href="#PrescriptionFactor">PrescriptionFactor</a>&gt;</td>
+                            <td>危险因素</td>
+                        </tr>
+                        <tr>
+                            <td>prescriptions</td>
+                            <td>List&lt;<a href="#Prescription">Prescription</a>&gt;</td>
+                            <td>健康处方</td>
+                        </tr>
+                        <tr>
+                            <td>terminologies</td>
+                            <td>List&lt;<a href="#PrescriptionTerminology">PrescriptionTerminology</a>&gt;</td>
+                            <td>说明、注释、附录</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="PrescriptionFactor" class='text-muted'>PrescriptionFactor</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th>参数说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>code</td>
+                            <td>string</td>
+                            <td>危险因素代码</td>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>string</td>
+                            <td>危险因素名称</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>string</td>
+                            <td>危险因素类型（1：疾病2：危险因素3：非直接危险因素）</td>
+                        </tr>
+                        <tr>
+                            <td>parentFactor</td>
+                            <td>string</td>
+                            <td>父危险因素（如果多个用逗号[,]分隔）</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="Prescription" class='text-muted'>Prescription</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th>参数说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>id</td>
+                            <td>string</td>
+                            <td>健康处方ID</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>int</td>
+                            <td>健康处方类型（1：日常生活3：运动锻炼4：饮食习惯6：心理8：其他）</td>
+                        </tr>
+                        <tr>
+                            <td>content</td>
+                            <td>string</td>
+                            <td>健康处方内容</td>
+                        </tr>
+                        <tr>
+                            <td>terminology</td>
+                            <td>string</td>
+                            <td>健康处方内容中的术语（多个用逗号[,]分隔）</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 id="PrescriptionTerminology" class='text-muted'>PrescriptionTerminology</h3>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th width="20%">参数名</th>
+                            <th width="20%">参数类型</th>
+                            <th>参数说明</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>name</td>
+                            <td>string</td>
+                            <td>术语名称</td>
+                        </tr>
+                        <tr>
+                            <td>nickName</td>
+                            <td>string</td>
+                            <td>别名（多个用逗号[,]分隔）</td>
+                        </tr>
+                        <tr>
+                            <td>type</td>
+                            <td>int</td>
+                            <td>类型（1：文字2：页面3：文字+页面）</td>
+                        </tr>
+                        <tr>
+                            <td>content</td>
+                            <td>string</td>
+                            <td>文字内容</td>
+                        </tr>
+                        <tr>
+                            <td>pageName</td>
+                            <td>string</td>
+                            <td>页面名称</td>
+                        </tr>
+                        <tr>
+                            <td>pageUrl</td>
+                            <td>string</td>
+                            <td>页面URL,<span th:text="${baseUrl}" />/static/html/appendix/{pageUrl}.html</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">样例</h3>
+                <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
                 </div>
             </div>
-        </section>
+            <div id="" class="box-body">
+                <h4 class='text-muted'>Request</h4>
+                <pre><code class="hljs json">{
+    "sfzhm": "320583198806119617",
+    "sjhm": "13584950680",
+    "disease": "tnb",
+    "xb": "1",
+    "csrq": "1988.6.11",
+    "ssy": "160",
+    "szy": "100",
+    "sg": "175",
+    "tz": "90",
+    "zdgc": "7",
+    "gysz": "2.3"
+}</code></pre>
+                    <h4 class='text-muted'>Response</h4>
+                    <pre><code class="hljs json">{
+    "status": 1,
+    "message": null,
+    "result":
+    {
+        "factors": [
+        {
+            "code": "gyszpg",
+            "name": "甘油三酯偏高",
+            "type": "2",
+            "parentFactor": null
+        },
+        {
+            "code": "xyg",
+            "name": "血压高",
+            "type": "2",
+            "parentFactor": null
+        },
+        {
+            "code": "tnb",
+            "name": "糖尿病",
+            "type": "1",
+            "parentFactor": null
+        },
+        {
+            "code": "fp",
+            "name": "肥胖",
+            "type": "2",
+            "parentFactor": null
+        },
+        {
+            "code": "man",
+            "name": "男",
+            "type": "3",
+            "parentFactor": null
+        },
+        {
+            "code": "zdgcpg",
+            "name": "总胆固醇偏高",
+            "type": "2",
+            "parentFactor": null
+        }],
+        "prescriptions": [
+        {
+            "content": "戒烟，避免被动吸烟",
+            "detail": "",
+            "type": 1,
+            "id": 1,
+            "terminology": ""
+        },
+        {
+            "content": "限制饮酒，一天饮酒的酒精量不超过25g（约相当于580ml啤酒，250ml葡萄酒或70ml蒸馏酒/白酒），每周不超过2次",
+            "detail": "",
+            "type": 1,
+            "id": 5,
+            "terminology": ""
+        },
+        {
+            "content": "超重或肥胖者应逐渐减轻体重，达到并维持理想体重",
+            "detail": "",
+            "type": 1,
+            "id": 9,
+            "terminology": "理想体重"
+        },
+        {
+            "content": "保证充足睡眠，最佳入睡时间应该是23点-7点",
+            "detail": "",
+            "type": 1,
+            "id": 10,
+            "terminology": ""
+        },
+        {
+            "content": "咀嚼无糖口香糖能控制对零食的摄取欲望，但数量不宜过多",
+            "detail": "",
+            "type": 1,
+            "id": 70,
+            "terminology": ""
+        },
+        {
+            "content": "控制盐摄入量（每天食盐摄入量应少于5g）",
+            "detail": "每日食盐摄入量应包括从酱油中获得的，并且可随季节活动量适当增减。例如：夏季出汗较多，户外活动多，可适当增加盐的摄入量。冬季时，出汗少，活动量相应减少，则应适当减少盐的摄入",
+            "type": 5,
+            "id": 120010,
+            "terminology": ""
+        },
+        {
+            "content": "培养清淡饮食习惯，少吃高盐和油炸食品",
+            "detail": "",
+            "type": 5,
+            "id": 120020,
+            "terminology": ""
+        },
+        {
+            "content": "戒烟，避免被动吸烟",
+            "detail": "",
+            "type": 5,
+            "id": 120030,
+            "terminology": ""
+        },
+        {
+            "content": "限制饮酒",
+            "detail": "每天白酒不能超过1两，葡萄酒不能超过2两，啤酒不能超过5两（1两约50ml）",
+            "type": 5,
+            "id": 120041,
+            "terminology": ""
+        },
+        {
+            "content": "平衡饮食，保证各种营养素的平衡和代谢的需要，合理搭配饮食结构",
+            "detail": "每天的膳食应包括谷薯类、蔬菜水果类、畜禽鱼蛋奶类、大豆坚果类等食物。平均每天摄入12种以上食物，每周25种以上。多吃蔬果、奶类、大豆，适量吃鱼、禽、蛋、瘦肉，少盐少油，控糖限酒",
+            "type": 5,
+            "id": 120050,
+            "terminology": ""
+        },
+        {
+            "content": "控制饮食总热量",
+            "detail": "低热量饮食(1000～1400kCal/d，合4182～5854kJ/d)为宜，并主张总热量的限制要逐渐进行",
+            "type": 5,
+            "id": 120051,
+            "terminology": ""
+        },
+        {
+            "content": "晚饭不宜过多，睡前2-3小时不再进食",
+            "detail": "",
+            "type": 5,
+            "id": 120060,
+            "terminology": ""
+        },
+        {
+            "content": "少食多餐，每吨饭菜吃到7分饱即可",
+            "detail": "",
+            "type": 5,
+            "id": 120070,
+            "terminology": ""
+        },
+        {
+            "content": "按时进食，忌暴饮暴食",
+            "detail": "",
+            "type": 5,
+            "id": 120071,
+            "terminology": ""
+        },
+        {
+            "content": "烹调油宜用植物油，如山茶油、菜籽油、大豆油等",
+            "detail": "",
+            "type": 5,
+            "id": 120090,
+            "terminology": ""
+        },
+        {
+            "content": "要避免产生自卑、自信心降低、恐惧、焦虑和抑郁等负面情绪，积极和朋友来往，参加文体活动",
+            "detail": "",
+            "type": 6,
+            "id": 200010,
+            "terminology": ""
+        },
+        {
+            "content": "根据自身情况每日坚持适量的运动",
+            "detail": "年龄大、体质较差者可选择如快步行走、太极拳、体操、爬楼梯、平道自行车以及轻微的家务劳动等低强度的运动。年龄较轻、体质较好者可选择如慢跑、擦地板、登山、各种球类及较重的体力劳动等中度强度的运动。运动量应遵循由轻到重循序渐进的原则。",
+            "type": 7,
+            "id": 300010,
+            "terminology": ""
+        },
+        {
+            "content": "运动要循序渐进，持之以恒，平时不运动者，不要突然从事剧烈的运动",
+            "detail": "",
+            "type": 7,
+            "id": 300030,
+            "terminology": ""
+        },
+        {
+            "content": "运动时应避免穿得太厚，影响散热，增加心率，运动后避免马上洗热水澡",
+            "detail": "",
+            "type": 7,
+            "id": 300040,
+            "terminology": ""
+        },
+        {
+            "content": "经常检查双脚的温度和感觉，检查足背动脉搏动，以便及时发现问题和就医",
+            "detail": "",
+            "type": 8,
+            "id": 400000,
+            "terminology": ""
+        },
+        {
+            "content": "每天的膳食应包括谷薯类、蔬菜水果类、畜禽肉蛋奶类、大豆坚果类等食物，每天摄取12种以上食物，每周25种以上。以谷薯类为主，多吃蔬菜（深色蔬菜为主），适当摄入鱼、禽、蛋和瘦肉（优先选择鱼和禽），保证每日一定量的奶制品和新鲜水果，经常吃豆制品，适量吃坚果",
+            "detail": "",
+            "type": 4,
+            "id": 1000100,
+            "terminology": "谷类食物,薯类食物"
+        },
+        {
+            "content": "培养清淡饮食习惯，少吃高盐和油炸食品，每天烹调油（宜用植物油）25～30g，每天食盐不超过6g（同时应限制摄入含钠高的调味品或食物，如味精、酱油、调味酱、腌制品、盐浸等加工食品等）",
+            "detail": "",
+            "type": 4,
+            "id": 1000160,
+            "terminology": ""
+        },
+        {
+            "content": "保证每天一定量的膳食纤维摄入，推荐至少每天20-25g",
+            "detail": "",
+            "type": 4,
+            "id": 1000170,
+            "terminology": ""
+        },
+        {
+            "content": "控制添加糖的摄入量，每天摄入不超过50g，最好控制在25g以下",
+            "detail": "",
+            "type": 4,
+            "id": 1000180,
+            "terminology": ""
+        },
+        {
+            "content": "足量饮水，成年人每天7～8杯（1500～1700ml），提倡饮用白开水和茶水",
+            "detail": "",
+            "type": 4,
+            "id": 1000190,
+            "terminology": ""
+        },
+        {
+            "content": "肾功能正常者推荐蛋白质摄入量至少 0.8g/（kg·d），保证优质蛋白质比例超过三分之一",
+            "detail": "",
+            "type": 4,
+            "id": 1000200,
+            "terminology": "优质蛋白质"
+        },
+        {
+            "content": "限制胆固醇摄入，每天不超过300 mg，血脂异常者不超过200 mg",
+            "detail": "",
+            "type": 4,
+            "id": 1000210,
+            "terminology": ""
+        },
+        {
+            "content": "定时定量进餐，提倡个人标准化的分餐制，进食不宜过饱，减少高能量食品的摄入，减少在外就餐",
+            "detail": "",
+            "type": 4,
+            "id": 1000300,
+            "terminology": ""
+        },
+        {
+            "content": "适量补充B组族维生素、维生素C、维生素D以及铬、锌、硒、镁、铁、锰等多种微量营养素",
+            "detail": "",
+            "type": 4,
+            "id": 1009001,
+            "terminology": ""
+        },
+        {
+            "content": "每周至少150min（如每周运动5天，每次30min）中等强度（50%-70%最大心率，运动时有点用力，心跳和呼吸加快但不急促）的有氧运动，推荐运动：快走、慢跑（6~8km/h）、打太极拳、骑自行车、乒乓球、羽毛球和高尔夫球",
+            "detail": "",
+            "type": 3,
+            "id": 1100100,
+            "terminology": ""
+        },
+        {
+            "content": "如无禁忌症，每周最好进行2-3次抗阻运动（两次锻炼间隔大于48小时），锻炼肌肉力量和耐力。锻炼部位应包括上肢、下肢、躯干等主要肌肉群，训练强度为中等",
+            "detail": "",
+            "type": 3,
+            "id": 1100200,
+            "terminology": ""
+        },
+        {
+            "content": "运动项目要根据年龄、病情及身体承受能力相适应，并定期评估，适时调整运动计划。记录运动日记，有助于提升运动依从性",
+            "detail": "",
+            "type": 3,
+            "id": 1100300,
+            "terminology": ""
+        },
+        {
+            "content": "运动前后要加强血糖监测，运动量大、激烈运动或夜间运动时应进行相应的饮食和用药调整，避免发生低血糖",
+            "detail": "",
+            "type": 3,
+            "id": 1100301,
+            "terminology": ""
+        },
+        {
+            "content": "空腹血糖>16.7 mmol/L、反复低血糖或血糖波动较大等情况下禁忌运动，病情控制稳定后方可逐步恢复运动",
+            "detail": "",
+            "type": 3,
+            "id": 1100302,
+            "terminology": ""
+        },
+        {
+            "content": "养成健康的生活习惯。培养活跃的生活方式，如增加日常身体活动，减少减少静坐时间，将有益的体育运动融入到日常生活",
+            "detail": "",
+            "type": 3,
+            "id": 1100400,
+            "terminology": ""
+        }],
+        "terminologies": [
+        {
+            "name": "优质蛋白质",
+            "nickName": null,
+            "type": 1,
+            "content": "食物蛋白质的氨基酸模式越接近人体蛋白质的氨基酸模式，则这种蛋白质越容易被人体吸收利用，称为优质蛋白质。例如动物蛋白质中的蛋、奶、肉、鱼等以及大豆蛋白质",
+            "pageName": null,
+            "pageUrl": null
+        },
+        {
+            "name": "理想体重",
+            "nickName": null,
+            "type": 1,
+            "content": "推荐理想体重计算方法：（男性）标准体重＝（身高cm－100）×0.9（kg）；（女性）标准体重＝（身高cm－100）×0.9（kg）－2.5（kg）",
+            "pageName": "",
+            "pageUrl": ""
+        }]
+    }
+}</code></pre>
+            </div>
+        </div>
     </div>
+    </section>
     <div th:include="health/footer" />
+    <script type="text/javascript" src="/static/assets/highlight/highlight.pack.js"></script>
     <script type="text/javascript" src="/static/js/health/open/open_interface.js"></script>
 </body>
 

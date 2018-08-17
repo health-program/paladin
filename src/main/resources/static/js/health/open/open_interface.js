@@ -1,5 +1,6 @@
 $(function() {
     $.getAjax("/open/interface/data", init);
+    hljs.initHighlighting();
 });
 
 function init(data) {
@@ -11,7 +12,7 @@ function init(data) {
         var content = "";
         if (valueDefinition.inputType == 'INPUT') {
             content = valueDefinition.valueType == "NUMBER" ? "输入数字" : "输入文本";
-            content += "_______";
+            content += "__________";
             if (valueDefinition.unit) {
                 content += valueDefinition.unit;
             }
