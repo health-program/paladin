@@ -44,16 +44,6 @@ public class ControllerSupport {
 		return copier.simpleCopyList(sourceList, targetType);
 	}
 
-	private static SimpleBeanCopier copier = new SimpleBeanCopier() {
-		protected void setValue(CopyUnit copyUnit, Object target, Object source, boolean ignore) throws Exception {
-			if (!ignore || !copyUnit.ignoredIfNeed) {
-				Object value = copyUnit.getMethod.invoke(source);
-				if (value != null && value instanceof String && ((String) value).length() == 0) {
-					value = null;
-				}
-				copyUnit.setMethod.invoke(target, value);
-			}
-		}
-	};
+	private static SimpleBeanCopier copier = new SimpleBeanCopier();
 
 }

@@ -92,7 +92,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化健康处方搜索服务功能-------------");
-
+		
 		// 初始化处方专业术语map
 		List<PrescriptionTerminology> prescriptionTerminologies = prescriptionTerminologyService.findAll();
 
@@ -351,7 +351,9 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				code = arg;
 			}
 			Factor factor = factorCodeMap.get(code);
-			factor.getFactorAndParent(codes);
+			if(factor != null) {
+				factor.getFactorAndParent(codes);
+			}
 		}
 
 		for (Factor factor : hasParentFactorList) {

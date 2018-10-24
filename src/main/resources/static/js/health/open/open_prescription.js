@@ -156,11 +156,18 @@ function showPrescription(result) {
         fs.forEach(function(y) {
             if (y.type == 2) {
                 html += '<span class="label label-warning" style="margin-right:10px">' + y.name + '</span>';
-            } else if (y.type == 1) {
+            } 
+        });
+        html += "</td>";
+        
+        html += "<tr><td valign='middle' align='center' style='width:120px;vertical-align:middle'>疾病</td><td colspan='3'>";
+        fs.forEach(function(y) {
+        	if(y.type == 1) {
                 html += '<span class="label label-danger" style="margin-right:10px">' + y.name + '</span>';
             }
         });
         html += "</td>";
+        
     } else {
         $.infoMessage("没有有用的健康处方");
         return;
@@ -184,6 +191,8 @@ function showPrescription(result) {
     $("#prescriptionDiv").html(html);
 
     showAppendix(result);
+    
+    document.body.scrollTop = document.documentElement.scrollTop = 0;
 }
 
 function showAppendix(result) {
@@ -424,3 +433,4 @@ function buildContent(item, value) {
 
     return html;
 }
+

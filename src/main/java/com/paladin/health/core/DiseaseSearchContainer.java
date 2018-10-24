@@ -59,6 +59,7 @@ public class DiseaseSearchContainer implements SpringContainer {
 	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化疾病搜索服务功能-------------");
+				
 		try {
 			String path = ResourceUtils.getFile("classpath:lucene/disease").getPath();
 			Directory dir = FSDirectory.open(Paths.get(path));

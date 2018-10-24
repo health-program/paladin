@@ -1,16 +1,9 @@
 package com.paladin.framework.core;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import com.paladin.framework.utils.reflect.NameUtil;
-import com.paladin.framework.utils.reflect.ReflectUtil;
+import org.springframework.cglib.beans.BeanCopier;
 import com.paladin.framework.utils.structure.SecMap;
 
 /**
@@ -21,7 +14,28 @@ import com.paladin.framework.utils.structure.SecMap;
  */
 public class SimpleBeanCopier {
 
-	private static SecMap<Class<?>, Class<?>, List<CopyUnit>> convertMap = new SecMap<>();
+	private static SecMap<Class<?>, Class<?>, BeanCopier> copierMap = new SecMap<>();
+
+	/**
+	 * 获取copier，如果没有则创建
+	 * 
+	 * @param source
+	 * @param target
+	 * @return
+	 */
+	private BeanCopier getCopier(Class<?> source, Class<?> target) {
+		BeanCopier copier = copierMap.get(source, target);
+		if (copier == null) {
+			synchronized (copierMap) {
+				copier = copierMap.get(source, target);
+				if (copier == null) {
+					copier = BeanCopier.create(source, target, false);
+					copierMap.put(source, target, copier);
+				}
+			}
+		}
+		return copier;
+	}
 
 	/**
 	 * 简单拷贝多个对象
@@ -47,18 +61,15 @@ public class SimpleBeanCopier {
 		if (sourceList.size() > 0) {
 
 			Class<?> sourceType = sourceList.get(0).getClass();
-			List<CopyUnit> copyUnits = getCopyUnit(sourceType, targetType);
+			BeanCopier copier = getCopier(sourceType, targetType);
+
+			// 这里为了效率，暂时视为所有集合对象都是一个类
 
 			List<T> targetList = new ArrayList<>(sourceList.size());
-
 			for (Object source : sourceList) {
 				try {
 					T target = targetType.newInstance();
-
-					for (CopyUnit copyUnit : copyUnits) {
-						setValue(copyUnit, target, source, ignore);
-					}
-
+					copier.copy(source, target, null);
 					targetList.add(target);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -128,104 +139,7 @@ public class SimpleBeanCopier {
 			return;
 		}
 
-		Class<?> sourceType = source.getClass();
-		Class<?> targetType = target.getClass();
-
-		List<CopyUnit> copyUnits = getCopyUnit(sourceType, targetType);
-		for (CopyUnit copyUnit : copyUnits) {
-			try {
-				setValue(copyUnit, target, source, ignore);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	protected void setValue(CopyUnit copyUnit, Object target, Object source, boolean ignore) throws Exception {
-		if (!ignore || !copyUnit.ignoredIfNeed) {
-			Object value = copyUnit.getMethod.invoke(source);
-			copyUnit.setMethod.invoke(target, value);
-		}
-	}
-
-	private List<CopyUnit> getCopyUnit(Class<?> sourceType, Class<?> targetType) {
-
-		List<CopyUnit> copyUnits = convertMap.get(sourceType, targetType);
-
-		if (copyUnits == null) {
-			synchronized (convertMap) {
-				copyUnits = convertMap.get(sourceType, targetType);
-				if (copyUnits == null) {
-					Method[] sourceMethods = sourceType.getMethods();
-					Method[] targetMethods = targetType.getMethods();
-
-					HashMap<String, Method> sourceGetMethodMap = new HashMap<>();
-
-					for (Method method : sourceMethods) {
-						if (ReflectUtil.isGetMethod(method)) {
-							String methodName = method.getName();
-							String name = NameUtil.removeGetOrSet(methodName);
-							sourceGetMethodMap.put(name, method);
-
-							if (methodName.startsWith("i")) {
-								sourceGetMethodMap.put(methodName, method);
-							}
-						}
-					}
-
-					copyUnits = new ArrayList<>(sourceGetMethodMap.size());
-
-					for (Method method : targetMethods) {
-						if (ReflectUtil.isSetMethod(method)) {
-							String name = NameUtil.removeGetOrSet(method.getName());
-
-							Method getMethod = sourceGetMethodMap.get(name);
-							if (getMethod != null) {
-								Class<?> returnType = getMethod.getReturnType();
-								if (returnType.isPrimitive()) {
-									returnType = ReflectUtil.getPackagePrimitive(returnType);
-								}
-
-								Class<?> setType = method.getParameterTypes()[0];
-								if (setType.isPrimitive()) {
-									setType = ReflectUtil.getPackagePrimitive(setType);
-								}
-
-								if (returnType == setType || setType.isAssignableFrom(returnType)) {
-									CopyUnit copyUnit = new CopyUnit();
-									copyUnit.getMethod = getMethod;
-									copyUnit.setMethod = method;
-									copyUnit.name = name;
-									copyUnit.ignoredIfNeed = getMethod.getAnnotation(IgnoredIfNeed.class) != null;
-									copyUnits.add(copyUnit);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		return copyUnits;
-	}
-
-	public static class CopyUnit {
-		Method getMethod;
-		Method setMethod;
-		String name;
-		boolean ignoredIfNeed;
-	}
-
-	/**
-	 * 注释在拷贝源对象的GET方法上
-	 * 
-	 * @author TontoZhou
-	 * @since 2018年7月5日
-	 */
-	@Target({ ElementType.METHOD })
-	@Retention(RetentionPolicy.RUNTIME)
-	public @interface IgnoredIfNeed {
-
+		getCopier(source.getClass(), target.getClass()).copy(source, target, null);
 	}
 
 	public static class SimpleBeanCopyUtil {

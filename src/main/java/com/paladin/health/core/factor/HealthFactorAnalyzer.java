@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
-import com.paladin.framework.utils.EnumUtil;
 import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.core.IndexContainer;
 import com.paladin.health.core.factor.FactorAnalyzer.Basis;
@@ -219,7 +218,7 @@ public class HealthFactorAnalyzer implements SpringContainer {
 
 		private ConditionJudger(PrescriptionFactorCondition condition) {
 			key = condition.getItemKey();
-			relation = EnumUtil.getEnum(condition.getRelation(), Relation.class);
+			relation = Enum.valueOf(Relation.class, condition.getRelation());
 			stringValues = condition.getValue().split(",");
 			nullable = condition.getNullable() == 1;
 

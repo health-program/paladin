@@ -75,7 +75,7 @@ public class IndexContainer implements SpringContainer {
 				itemValueDefinition = new ItemValueDefinition(InputType.INPUT);
 				itemValueDefinition.setUnit(indexItemValueDefinition.getUnit());
 				itemValueDefinition.setTemplate(indexItemValueDefinition.getTemplate());
-				itemValueDefinition.setValueType((ValueType) EnumUtil.getEnum(indexItemValueDefinition.getValueType(), ValueType.class));
+				itemValueDefinition.setValueType(Enum.valueOf(ValueType.class, indexItemValueDefinition.getValueType()));
 
 			} else if (EnumUtil.equals(type, InputType.SELECT)) {
 				itemValueDefinition = new ItemValueDefinition(InputType.SELECT);
@@ -98,24 +98,24 @@ public class IndexContainer implements SpringContainer {
 			Item item = null;
 			if (EnumUtil.equals(type, ItemType.CATEGORY)) {
 				item = new WrapCategoryItem(indexItem);
-			} else if (EnumUtil.equals(type, ItemType.STANDARD)) {				
+			} else if (EnumUtil.equals(type, ItemType.STANDARD)) {
 				String key = indexItem.getItemKey();
-				ItemValueDefinition itemValueDefinition = itemValueDefinitionMap.get(indexItem.getId());				
+				ItemValueDefinition itemValueDefinition = itemValueDefinitionMap.get(indexItem.getId());
 				StandardItem standardItem = standardItemMap.get(key);
-				if(standardItem == null) {
+				if (standardItem == null) {
 					standardItem = new WrapStandardItem(indexItem);
 					standardItem.setItemValueDefinition(itemValueDefinition);
 					standardItemMap.put(standardItem.getKey(), standardItem);
-					
+
 					item = standardItem;
-				} else {				
+				} else {
 					// 相同key的选择标准项可以合并，但是输入标准项不能合并，也不覆盖，默认第一个
-					if(itemValueDefinition.getInputType() == InputType.SELECT) {						
-						standardItem.getItemValueDefinition().addStandards(itemValueDefinition.getStandards());				
+					if (itemValueDefinition.getInputType() == InputType.SELECT) {
+						standardItem.getItemValueDefinition().addStandards(itemValueDefinition.getStandards());
 					}
-				}			
+				}
 			}
-			
+
 			if (item != null) {
 				itemMap.put(indexItem.getId(), item);
 				itemList.add(item);
@@ -140,13 +140,13 @@ public class IndexContainer implements SpringContainer {
 				roots.add(item);
 			}
 		}
-		
+
 		standardItemList = new ArrayList<>();
 		for (IndexItem indexItem : indexItems) {
 			StandardItem item = standardItemMap.get(indexItem.getItemKey());
-			if(item != null && !standardItemList.contains(item)) {
+			if (item != null && !standardItemList.contains(item)) {
 				standardItemList.add(item);
-			}	
+			}
 		}
 
 		return true;
@@ -161,7 +161,7 @@ public class IndexContainer implements SpringContainer {
 	public StandardItem getStandardItem(String key) {
 		return standardItemMap.get(key);
 	}
-	
+
 	/**
 	 * 获取指标标准项
 	 * 

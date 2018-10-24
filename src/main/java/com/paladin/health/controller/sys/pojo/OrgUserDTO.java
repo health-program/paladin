@@ -2,8 +2,6 @@ package com.paladin.health.controller.sys.pojo;
 
 import javax.validation.constraints.NotEmpty;
 
-import com.paladin.framework.core.SimpleBeanCopier.IgnoredIfNeed;
-
 public class OrgUserDTO {
 	
 	private String id;
@@ -33,7 +31,6 @@ public class OrgUserDTO {
 		this.name = name;
 	}
 
-	@IgnoredIfNeed
 	public String getAccount() {
 		return account;
 	}

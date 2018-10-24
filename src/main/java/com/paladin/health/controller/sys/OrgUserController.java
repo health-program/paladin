@@ -102,6 +102,7 @@ public class OrgUserController extends ControllerSupport{
 			throw new BusinessException("编辑的用户不存在");
 		}
 		model.addAttribute("isSystemAdmin", HealthUserSession.getCurrentUserSession().isSystemAdmin());
+		model.addAttribute("isEdit", true);
 		model.addAttribute("object", user);
 		return "/health/sys/user_edit";
 	}

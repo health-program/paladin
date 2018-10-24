@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="health/header" />
-
-<body>
+<body id="mainBody">
+	<a  id="goTopBtn" class="btn btn-app" href="#mainBody" style="position:fixed;bottom:170px;right:50px;z-index:999999"><i class="glyphicon glyphicon-arrow-up"></i></a>
+	<a  id="goBottomBtn" class="btn btn-app" href="#bottomDiv" style="position:fixed;bottom:100px;right:50px;z-index:999999"><i class="glyphicon glyphicon-arrow-down"></i></a>
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -39,6 +40,7 @@
             </div>
         </div>
     </section>
+    <div id="bottomDiv"></div>
     <div th:include="health/footer" />
     <script type="text/javascript" src="/static/js/health/open/open_prescription.js"></script>
 </body>
