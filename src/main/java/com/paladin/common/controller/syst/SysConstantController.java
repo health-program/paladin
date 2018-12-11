@@ -1,8 +1,8 @@
-package com.paladin.common.controller.sys;
+package com.paladin.common.controller.syst;
 
-import com.paladin.common.controller.sys.pojo.SysConstantQuery;
-import com.paladin.common.model.sys.SysConstant;
-import com.paladin.common.service.sys.SysConstantService;
+import com.paladin.common.controller.syst.pojo.SysConstantQuery;
+import com.paladin.common.model.syst.SysConstant;
+import com.paladin.common.service.syst.SysConstantService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;

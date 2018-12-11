@@ -1,4 +1,4 @@
-package com.paladin.common.controller.sys.pojo;
+package com.paladin.common.controller.syst.pojo;
 
 import com.paladin.framework.common.OffsetPage;
 

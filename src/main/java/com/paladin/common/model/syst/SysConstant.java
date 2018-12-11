@@ -1,4 +1,4 @@
-package com.paladin.common.model.sys;
+package com.paladin.common.model.syst;
 
 import javax.persistence.Id;
 
@@ -8,22 +8,15 @@ public class SysConstant {
 	public final static String  COLUMN_FIELD_TYPE = "type";
 
 	@Id
-	private String code;
+	private String type;
+	
+	@Id
+	private Integer code;
 
 	private String name;
 
-	@Id
-	private String type;
-
 	private Integer orderNo;
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
+	
 
 	public String getName() {
 		return name;
@@ -49,6 +42,13 @@ public class SysConstant {
 		this.orderNo = orderNo;
 	}
 
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
 
 
 }

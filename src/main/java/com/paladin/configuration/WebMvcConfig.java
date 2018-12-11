@@ -28,13 +28,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
 															
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Value("${web.upload.path.file}")
-	private String webUploadPathFile;
+	@Value("${attachment.path}")
+	private String attachmentPath;
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-		String fielPath = "file:" + webUploadPathFile;
+		String fielPath = "file:" + attachmentPath;
 		String staticPath = "classpath:/static/";
 
 		registry.addResourceHandler("/static/**").addResourceLocations(staticPath);
@@ -48,7 +48,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	@Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("redirect:/health/main");
+        registry.addViewController("/").setViewName("redirect:/hrms/main");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);       
     } 
     

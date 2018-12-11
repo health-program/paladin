@@ -38,7 +38,7 @@ public class MyBatisConfiguration implements TransactionManagementConfigurer {
 
 		SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
-		bean.setTypeAliasesPackage("com.paladin.common.model,com.paladin.data.model,com.paladin.health.model");
+		bean.setTypeAliasesPackage("com.paladin.common.model,com.paladin.data.model,com.paladin.hrms.model");
 
 		// 分页插件
 		PageInterceptor pageHelper = new PageInterceptor();

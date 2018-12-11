@@ -6,10 +6,8 @@ import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.SessionContext;
 import org.apache.shiro.session.mgt.SessionFactory;
-import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -20,7 +18,6 @@ import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.AbstractShiroFilter;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -31,10 +28,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
 import com.paladin.framework.shiro.AjaxFormAuthenticationFilter;
-import com.paladin.health.core.SysUserRealm;
+import com.paladin.hrms.core.SysUserRealm;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -103,56 +99,7 @@ public class ShiroConfiguration {
 
 		if (shiroConfigProperties.isClusterShare()) {
 
-			sessionManager = new DefaultWebSessionManager() {
-
-				/**
-				 * 重写检索session方法，在request上缓存session对象，从而减少session的读取
-				 */
-				protected Session retrieveSession(SessionKey sessionKey) throws UnknownSessionException {
-
-					Serializable sessionId = getSessionId(sessionKey);
-					if (sessionId == null) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("Unable to resolve session ID from SessionKey [{}].  Returning null to indicate a session could not be found.",
-									sessionKey);
-						}
-
-						return null;
-					}
-
-					/*
-					 * 首先从request中获取session，否则从数据库中检索
-					 */
-
-					ServletRequest request = null;
-					if (sessionKey instanceof WebSessionKey) {
-						request = ((WebSessionKey) sessionKey).getServletRequest();
-					}
-
-					if (request != null) {
-						Object s = request.getAttribute(sessionId.toString());
-						if (s != null) {
-							return (Session) s;
-						}
-					}
-
-					Session s = retrieveSessionFromDataSource(sessionId);
-					if (s == null) {
-						// session ID was provided, meaning one is expected to be found, but
-						// we couldn't find one:
-						String msg = "Could not find session with ID [" + sessionId + "]";
-						throw new UnknownSessionException(msg);
-					}
-
-					// 保存session到request
-					if (request != null) {
-						request.setAttribute(sessionId.toString(), s);
-					}
-
-					return s;
-				}
-
-			};
+			sessionManager = new MyWebSessionManager(true);
 
 			/**
 			 * 如果设置集群共享session，需要redis来存放session
@@ -187,7 +134,7 @@ public class ShiroConfiguration {
 
 			});
 		} else {
-			sessionManager = new DefaultWebSessionManager();
+			sessionManager = new MyWebSessionManager(false);
 		}
 
 		// session 监听
@@ -205,7 +152,7 @@ public class ShiroConfiguration {
 		sessionManager.setSessionValidationSchedulerEnabled(true);
 
 		// 是否在url上显示检索得到的sessionid
-		sessionManager.setSessionIdUrlRewritingEnabled(true);
+		sessionManager.setSessionIdUrlRewritingEnabled(false);
 
 		return sessionManager;
 	}
@@ -286,7 +233,7 @@ public class ShiroConfiguration {
 						String requestUrl = httpRequest.getRequestURI();
 
 						// 过滤静态资源，防止静态资源读取session等操作
-						if (!requestUrl.startsWith("/health/")) {
+						if (!requestUrl.startsWith("/hrms/")) {
 							chain.doFilter(servletRequest, servletResponse);
 							return;
 						}
@@ -302,9 +249,9 @@ public class ShiroConfiguration {
 		// 必须设置 SecurityManager
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
 		// 如果不设置默认会自动寻找Web工程根目录下的"/login.jsp"页面
-		shiroFilterFactoryBean.setLoginUrl("/health/login");
+		shiroFilterFactoryBean.setLoginUrl("/hrms/login");
 		// 登录成功后要跳转的链接
-		shiroFilterFactoryBean.setSuccessUrl("/health/index");
+		shiroFilterFactoryBean.setSuccessUrl("/hrms/index");
 		// 未授权界面;
 		shiroFilterFactoryBean.setUnauthorizedUrl("/static/html/error_401.html");
 
@@ -339,7 +286,7 @@ public class ShiroConfiguration {
 		// filterChainDefinitionMap.put("/file/**", "anon");
 		// filterChainDefinitionMap.put("/favicon.ico", "anon");
 
-		filterChainDefinitionMap.put("/health/logout", "logout");
+		filterChainDefinitionMap.put("/hrms/logout", "logout");
 		// 配置记住我或认证通过可以访问的地址
 		filterChainDefinitionMap.put("/**", "authc");
 
@@ -347,19 +294,20 @@ public class ShiroConfiguration {
 
 		return shiroFilterFactoryBean;
 	}
-	
-//  该方法可以手动设置filter，从而修改shiro的urlpatterns，但是并没实现，还需要研究
-//	@SuppressWarnings({ "unchecked", "rawtypes" })
-//	@Bean
-//	public FilterRegistrationBean filterRegistrationBean() {
-//		FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-//		filterRegistration.setFilter(new DelegatingFilterProxy("shiroFilter"));
-//		// 该值缺省为false,表示生命周期由SpringApplicationContext管理,设置为true则表示由ServletContainer管理
-//		// filterRegistration.addInitParameter("targetFilterLifecycle", "true");
-//		filterRegistration.setEnabled(true);
-//		filterRegistration.addUrlPatterns("/manage/*");// 可以自己灵活的定义很多，避免一些根本不需要被Shiro处理的请求被包含进来
-//		return filterRegistration;
-//	}
+
+	// 该方法可以手动设置filter，从而修改shiro的urlpatterns，但是并没实现，还需要研究
+	// @SuppressWarnings({ "unchecked", "rawtypes" })
+	// @Bean
+	// public FilterRegistrationBean filterRegistrationBean() {
+	// FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
+	// filterRegistration.setFilter(new DelegatingFilterProxy("shiroFilter"));
+	// // 该值缺省为false,表示生命周期由SpringApplicationContext管理,设置为true则表示由ServletContainer管理
+	// // filterRegistration.addInitParameter("targetFilterLifecycle", "true");
+	// filterRegistration.setEnabled(true);
+	// filterRegistration.addUrlPatterns("/manage/*");//
+	// 可以自己灵活的定义很多，避免一些根本不需要被Shiro处理的请求被包含进来
+	// return filterRegistration;
+	// }
 
 	/**
 	 * Shiro默认提供了三种 AuthenticationStrategy 实现： AtLeastOneSuccessfulStrategy
