@@ -1,11 +1,11 @@
 $(function() {
-    $.getAjax("/health/index/item/detail/list", initReport);
+    $.getAjax("/open/item/data", initReport);
 });
 
 
 function findPrescription() {
     var data = $("#tableForm").serializeObject();
-    $.postJsonAjax("/health/prescription/find/condition", data, showPrescription);
+    $.postJsonAjax("/open/diagnose", data, showPrescription);
 }
 
 

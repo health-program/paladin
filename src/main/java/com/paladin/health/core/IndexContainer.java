@@ -1,14 +1,17 @@
 package com.paladin.health.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.spring.SpringContainer;
+import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.utils.EnumUtil;
 import com.paladin.health.library.index.Item;
 import com.paladin.health.library.index.ItemType;
@@ -26,8 +29,10 @@ import com.paladin.health.service.index.IndexItemStandardService;
 import com.paladin.health.service.index.IndexItemValueDefinitionService;
 
 @Component
-public class IndexContainer implements SpringContainer {
+public class IndexContainer implements VersionContainer {
 
+	private static Logger logger = LoggerFactory.getLogger(IndexContainer.class);
+	
 	@Autowired
 	private IndexItemService itemService;
 	@Autowired
@@ -39,9 +44,13 @@ public class IndexContainer implements SpringContainer {
 	private Map<String, StandardItem> standardItemMap;
 	private List<StandardItem> standardItemList;
 
-	@Override
-	public boolean initialize() {
+	private List<IndexItemValueDefinition> indexItemValueDefinitions;
+	private List<IndexItemStandard> indexItemStandards;
+	private List<IndexItem> indexItems;
 
+	public boolean initialize() {		
+		logger.info("-------------开始初始化标准项数据-------------");
+		
 		List<IndexItemValueDefinition> indexItemValueDefinitions = itemValueDefinitionService.findAll();
 		List<IndexItemStandard> indexItemStandards = itemStandardService.findAll();
 		List<IndexItem> indexItems = itemService.findAll();
@@ -149,6 +158,11 @@ public class IndexContainer implements SpringContainer {
 			}
 		}
 
+		this.indexItemValueDefinitions = Collections.unmodifiableList(indexItemValueDefinitions);
+		this.indexItemStandards = Collections.unmodifiableList(indexItemStandards);
+		this.indexItems = Collections.unmodifiableList(indexItems);
+
+		logger.info("-------------结束初始化标准项数据-------------");		
 		return true;
 	}
 
@@ -170,6 +184,31 @@ public class IndexContainer implements SpringContainer {
 	public List<StandardItem> getStandardItems() {
 		return new ArrayList<StandardItem>(standardItemList);
 	}
+	
+	/**
+	 * 获取指标值定义数据
+	 * @return
+	 */
+	public List<IndexItemValueDefinition> getIndexItemValueDefinitions() {
+		return indexItemValueDefinitions;
+	}
+
+	/**
+	 * 获取指标标准值数据
+	 * @return
+	 */
+	public List<IndexItemStandard> getIndexItemStandards() {
+		return indexItemStandards;
+	}
+
+	/**
+	 * 获取标准项
+	 * @return
+	 */
+	public List<IndexItem> getIndexItems() {
+		return indexItems;
+	}
+	
 
 	private static class WrapCategoryItem extends CategoryItem {
 		private String parentId;
@@ -192,8 +231,15 @@ public class IndexContainer implements SpringContainer {
 		}
 	}
 
-	public int order() {
-		return 0;
+
+	@Override
+	public String getId() {
+		return "index_container";
+	}
+
+	@Override
+	public boolean versionChangedHandle(long version) {
+		return initialize();
 	}
 
 }

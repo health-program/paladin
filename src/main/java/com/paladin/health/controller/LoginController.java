@@ -19,7 +19,7 @@ import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.WebUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.service.sys.SysUserService;
+import com.paladin.health.service.syst.SysUserService;
 
 @Controller
 @RequestMapping("/health/")

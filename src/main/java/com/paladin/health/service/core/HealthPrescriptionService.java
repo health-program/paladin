@@ -42,13 +42,19 @@ public class HealthPrescriptionService {
 		return healthPrescriptionContainer.search(args);
 	}
 
+	/**
+	 * 简单获取健康处方
+	 * 
+	 * @param peopleCondition
+	 * @return
+	 */
 	public PrescriptionResult findPrescription(PeopleCondition peopleCondition) {
 		peopleCondition.initialize();
 		healthFactorAnalyzer.analyzeFactor(peopleCondition);
 		PrescriptionResult result = healthPrescriptionContainer.search(peopleCondition);
 		return result;
 	}
-	
+
 	public List<Basis> getAnalyzeBasises() {
 		return healthFactorAnalyzer.getAnalyzeBasises();
 	}
@@ -71,12 +77,18 @@ public class HealthPrescriptionService {
 		}
 
 		String targetId = target.getId();
-		
-		if(targetId == null || targetId.length() == 0) {
+
+		if (targetId == null || targetId.length() == 0) {
 			throw new BusinessException("没有诊断目标人的身份证号码");
 		}
 
-		if (diagnoseTargetService.get(targetId) == null) {
+		Date now = new Date();
+		target.setUpdateTime(now);
+		target.setFactors(splitFactor(result.getFactors()));
+
+		// 诊断目标档案维护，有则更新（只更新有的数据），无则新增
+		if (diagnoseTargetService.updateSelective(target) <= 0) {
+			target.setCreateTime(now);
 			diagnoseTargetService.save(target);
 		}
 
@@ -84,13 +96,31 @@ public class HealthPrescriptionService {
 		String diagnoseId = UUIDUtil.createUUID();
 		record.setId(diagnoseId);
 		record.setTargetId(targetId);
-		record.setCondition(JsonUtil.getJson(peopleCondition));
+		record.setTargetCondition(JsonUtil.getJson(peopleCondition));
 		record.setPrescription(JsonUtil.getJson(result));
-		record.setCreateTime(new Date());
+		record.setCreateTime(now);
 
 		diagnoseRecordService.save(record);
 
 		return new DiagnosePrescription(diagnoseId, result);
+	}
+
+	/**
+	 * 拼接危险因素
+	 * 
+	 * @param factors
+	 * @return
+	 */
+	private String splitFactor(List<PrescriptionFactor> factors) {
+		// 如果无，则需要空字符串进行填充
+		if (factors == null || factors.size() == 0) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		for (PrescriptionFactor factor : factors) {
+			sb.append(factor.getCode()).append(",");
+		}
+		return sb.toString();
 	}
 
 	public static class DiagnosePrescription {

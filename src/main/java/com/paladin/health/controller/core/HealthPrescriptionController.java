@@ -4,16 +4,14 @@ import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.core.factor.PeopleCondition;
+import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.service.core.HealthPrescriptionService;
 import com.paladin.health.service.prescription.PrescriptionFactorItemService;
-import com.paladin.health.service.prescription.PrescriptionFactorService;
 import com.paladin.health.service.prescription.PrescriptionItemService;
 
 @Controller
@@ -21,24 +19,24 @@ import com.paladin.health.service.prescription.PrescriptionItemService;
 public class HealthPrescriptionController {
 
 	@Autowired
-	PrescriptionFactorItemService prescriptionFactorItemService;
+	private PrescriptionFactorItemService prescriptionFactorItemService;
 	@Autowired
-	PrescriptionItemService prescriptionItemService;
+	private PrescriptionItemService prescriptionItemService;
 	@Autowired
-	PrescriptionFactorService prescriptionFactorService;
+	private HealthPrescriptionService healthPrescriptionService;
 	@Autowired
-	HealthPrescriptionService healthPrescriptionService;
+	private HealthPrescriptionContainer healthPrescriptionContainer;
 
 	@RequestMapping("/index")
 	public String index() {
 		return "/health/core/health_prescription_index";
 	}
-	
+
 	@RequestMapping("/index/data")
 	@ResponseBody
 	public Object indexData() {
 		HashMap<String, Object> result = new HashMap<>();
-		result.put("factors", prescriptionFactorService.findAll());
+		result.put("factors", healthPrescriptionContainer.getPrescriptionFactor());
 		result.put("items", prescriptionItemService.findAll());
 		return CommonResponse.getSuccessResponse(result);
 	}
@@ -57,15 +55,10 @@ public class HealthPrescriptionController {
 		return CommonResponse.getResponse(prescriptionFactorItemService.saveFactorItemRelation(factorCode, ids));
 	}
 
-	@RequestMapping("/analyze")
-	public String analyze() {
-		return "/health/core/health_prescription_analyze";
-	}
-
 	@RequestMapping("/factor/list")
 	@ResponseBody
 	public Object factorList() {
-		return CommonResponse.getSuccessResponse(prescriptionFactorService.findAll());
+		return CommonResponse.getSuccessResponse(healthPrescriptionContainer.getPrescriptionFactor());
 	}
 
 	@RequestMapping("/factor/item")
@@ -73,7 +66,12 @@ public class HealthPrescriptionController {
 	public Object findItemOfFactor(@RequestParam String code) {
 		return CommonResponse.getSuccessResponse(prescriptionItemService.findItemOfFactor(code));
 	}
-
+	
+	@RequestMapping("/analyze/trial/index")
+	public Object analyzeTrialIndex() {
+		return "/health/open/open_prescription_analyze_trial";
+	}
+	
 	@RequestMapping("/basis")
 	public Object basis() {
 		return "/health/core/health_prescription_basis";
@@ -84,21 +82,4 @@ public class HealthPrescriptionController {
 	public Object basisList() {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getAnalyzeBasises());
 	}
-
-	// ----------------------------------------
-	// 对外健康处方接口
-	// ----------------------------------------
-
-	@RequestMapping("/find/factor")
-	@ResponseBody
-	public Object findByFactor(@RequestParam String[] args) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(args));
-	}
-
-	@RequestMapping("/find/condition")
-	@ResponseBody
-	public Object findByCondition(@RequestBody PeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.findPrescription(condition));
-	}
-
 }

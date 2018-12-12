@@ -1,5 +1,8 @@
 package com.paladin.framework.shiro;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +15,7 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.paladin.framework.core.UserSession;
 import com.paladin.framework.utils.WebUtil;
 import com.paladin.framework.web.response.CommonResponse;
 
@@ -50,6 +54,14 @@ public class AjaxFormAuthenticationFilter extends FormAuthenticationFilter {
 	}
 
 	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject, ServletRequest request, ServletResponse response) throws Exception {
+		if (WebUtil.isApp((HttpServletRequest) request)) {
+			UserSession userSession = (UserSession) subject.getPrincipal();
+			Map<String, Object> map = new HashMap<>();
+			map.put("userSession", userSession);
+			map.put("token", subject.getSession().getId());
+			WebUtil.sendJson((HttpServletResponse) response, CommonResponse.getSuccessResponse("登录成功", map));
+			return false;
+		}
 
 		if (WebUtil.isAjaxRequest((HttpServletRequest) request)) {
 			WebUtil.sendJson((HttpServletResponse) response, CommonResponse.getSuccessResponse("成功登录"));
@@ -61,16 +73,18 @@ public class AjaxFormAuthenticationFilter extends FormAuthenticationFilter {
 	}
 
 	protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e, ServletRequest request, ServletResponse response) {
-
+		if (WebUtil.isApp((HttpServletRequest) request)) {
+			WebUtil.sendJson((HttpServletResponse) response, CommonResponse.getUnLoginResponse("登录失败,用户名或密码错误！"));
+			return false;
+		}
 		if (WebUtil.isAjaxRequest((HttpServletRequest) request)) {
 			WebUtil.sendJson((HttpServletResponse) response, CommonResponse.getUnLoginResponse("登录失败,用户名或密码错误！"));
 			return false;
 		} else {
-			//setFailureAttribute(request, e);
-			//request.setAttribute("error", e.getMessage());
+			// setFailureAttribute(request, e);
+			// request.setAttribute("error", e.getMessage());
 			return true;
 		}
 
-		
 	}
 }

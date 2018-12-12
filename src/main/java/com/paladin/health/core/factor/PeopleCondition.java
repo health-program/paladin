@@ -20,7 +20,9 @@ import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 /**
  * 线程非安全
  * 
- * <p>该类包含部分硬编码，请参考数据库表index_item</p>
+ * <p>
+ * 该类包含部分硬编码，请参考数据库表index_item
+ * </p>
  * 
  * @author TontoZhou
  * @since 2018年6月21日
@@ -28,7 +30,9 @@ import com.paladin.health.model.prescription.PrescriptionFactorCondition;
 public class PeopleCondition extends HashMap<String, Object> {
 
 	private static final long serialVersionUID = 1829527723448405253L;
-		
+
+	private SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
+
 	/**
 	 * 初始化计算一些指标数值，并且分析得到有用的危险因素
 	 */
@@ -38,7 +42,9 @@ public class PeopleCondition extends HashMap<String, Object> {
 		String csrq = getString("csrq");
 		if (csrq != null && csrq.length() > 0) {
 			try {
-				Integer age = DateTimeUtil.getAge(formatter.parse(csrq));
+				Date birthday = formatter.parse(csrq);
+				put("csrq", birthday);
+				Integer age = DateTimeUtil.getAge(birthday);
 				put("dqnl", age);
 			} catch (ParseException e) {
 				throw new BusinessException("出生日期格式不正确，格式应如1988.06.11");
@@ -106,20 +112,19 @@ public class PeopleCondition extends HashMap<String, Object> {
 		speculate_factors = new ArrayList<>();
 
 	}
-	
+
 	private DiagnoseTarget target;
-	
+
 	@JsonIgnore
 	public DiagnoseTarget getDiagnoseTarget() {
-		if(target == null) {
+		if (target == null) {
 			target = new DiagnoseTarget();
-			
+
 			target.setId(getString("sfzhm"));
 			target.setName(getString("xm"));
 			target.setSex(getInteger("xb"));
-			target.setCellphone(getString("sjhm"));		
-			target.setName(getString("csrq"));
-			target.setCreateTime(new Date());	
+			target.setCellphone(getString("sjhm"));
+			target.setBirthday(getDate("csrq"));
 		}
 		return target;
 	}
@@ -154,6 +159,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 添加一个因素
+	 * 
 	 * @param factor
 	 */
 	public void addFactor(String factor) {
@@ -162,6 +168,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 添加一个分析因素结果
+	 * 
 	 * @param result
 	 */
 	public void addFactor(FactorResult result) {
@@ -175,6 +182,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 是否存在因素
+	 * 
 	 * @param factor
 	 * @return
 	 */
@@ -184,7 +192,9 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 是否存在属性
-	 * @param key	属性关键字
+	 * 
+	 * @param key
+	 *            属性关键字
 	 * @return
 	 */
 	public boolean has(String key) {
@@ -200,13 +210,14 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 获取属性值（字符串形式）
+	 * 
 	 * @param key
 	 * @return
 	 */
 	@JsonIgnore
 	public String getString(String key) {
 		Object value = get(key);
-		if (value != null ) {
+		if (value != null) {
 			return value.toString();
 		}
 		return null;
@@ -214,6 +225,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 获取属性值（含小数形式）
+	 * 
 	 * @param key
 	 * @return
 	 */
@@ -235,6 +247,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 获取属性值（整数形式）
+	 * 
 	 * @param key
 	 * @return
 	 */
@@ -256,6 +269,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 获取属性值（字符串数组形式）
+	 * 
 	 * @param key
 	 * @return
 	 */
@@ -325,6 +339,7 @@ public class PeopleCondition extends HashMap<String, Object> {
 
 	/**
 	 * 获取属性值（小数数组形式）
+	 * 
 	 * @param key
 	 * @return
 	 */
@@ -414,8 +429,20 @@ public class PeopleCondition extends HashMap<String, Object> {
 		return values;
 	}
 
-	
-	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
-
+	private Date getDate(String key) {
+		Object value = get(key);
+		if (value != null) {
+			if (value instanceof Date) {
+				return (Date) value;
+			}
+			if (value instanceof String) {
+				try {
+					return formatter.parse((String) value);
+				} catch (ParseException e) {
+				}
+			}
+		}
+		return null;
+	}
 
 }

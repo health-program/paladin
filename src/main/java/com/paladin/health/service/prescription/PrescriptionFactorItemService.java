@@ -33,6 +33,8 @@ public class PrescriptionFactorItemService extends ServiceSupport<PrescriptionFa
 			}
 		}
 		
+		//TODO 重新生成搜索文件
+		
 		return 1;
 	}
 	

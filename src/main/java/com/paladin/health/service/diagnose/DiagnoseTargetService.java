@@ -6,6 +6,7 @@ import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.framework.core.ServiceSupport;
 
 @Service
-public class DiagnoseTargetService extends ServiceSupport<DiagnoseTarget>{
+public class DiagnoseTargetService extends ServiceSupport<DiagnoseTarget> {
+
 
 }

@@ -166,14 +166,25 @@
 		<dependency>
 		    <groupId>wsdl4j</groupId>
 		    <artifactId>wsdl4j</artifactId>
-		    <version>1.6.3</version>
-		</dependency>
+		    </dependency>
 		
 		<dependency>
 		    <groupId>axis</groupId>
 		    <artifactId>axis</artifactId>
 		    <version>1.4</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.11</version>
+		</dependency>
+		
 		
 	</dependencies>
 

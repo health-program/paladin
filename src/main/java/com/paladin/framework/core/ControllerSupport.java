@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
+import com.paladin.framework.core.copy.SimpleBeanCopier.SimpleBeanCopyUtil;
 import com.paladin.framework.web.response.CommonResponse;
 
 public class ControllerSupport {
@@ -31,19 +32,25 @@ public class ControllerSupport {
 	}
 
 	protected <T> T beanCompleteCopy(Object source, T target) {
-		copier.simpleCopy(source, target);
+		SimpleBeanCopyUtil.simpleCopy(source, target);
 		return target;
 	}
 
 	protected <T> T beanIncompleteCopy(Object source, T target) {
-		copier.simpleCopy(source, target, true);
+		SimpleBeanCopyUtil.simpleCopy(source, target, true);
 		return target;
 	}
-
+	
+	protected <T> T beanCopy(Object source, T target) {
+		SimpleBeanCopyUtil.simpleCopy(source, target, true);
+		return target;
+	}
+	
 	public <T> List<T> beanCopyList(List<?> sourceList, Class<T> targetType) {
-		return copier.simpleCopyList(sourceList, targetType);
+		return SimpleBeanCopyUtil.simpleCopyList(sourceList, targetType);
 	}
 
-	private static SimpleBeanCopier copier = new SimpleBeanCopier();
+
+	
 
 }

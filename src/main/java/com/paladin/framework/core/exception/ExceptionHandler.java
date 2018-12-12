@@ -59,6 +59,7 @@ public class ExceptionHandler implements HandlerExceptionResolver {
 		} else if (ex instanceof SystemException) {
 			responseObject = CommonResponse.getErrorResponse(message == null ? "系统异常" : message);
 			page = "/error_system";
+			logger.error("系统异常", ex);
 		} else {
 			responseObject = CommonResponse.getErrorResponse("系统未知异常");
 			page = "/error";

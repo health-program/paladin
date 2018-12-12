@@ -162,6 +162,27 @@ public abstract class ServiceSupport<Model> {
 			buildOrderBy(commonExample);
 		}
 
+		if (pkGetMethods == null) {
+			synchronized (lock) {
+				if (pkGetMethods == null) {
+					// 判断是否存在主键
+					Set<EntityColumn> pkColumns = EntityHelper.getEntityTable(modelType).getEntityClassPKColumns();
+					if (pkColumns == null || pkColumns.size() == 0) {
+						pkGetMethods = new Method[0];
+					} else {
+						pkGetMethods = new Method[pkColumns.size()];
+						pkSetMethods = new Method[pkColumns.size()];
+						int i = 0;
+						for (EntityColumn column : pkColumns) {
+							String property = column.getProperty();
+							pkGetMethods[i] = ReflectUtil.getGetMethod(property, modelType);
+							pkSetMethods[i++] = ReflectUtil.getSetMethod(property, modelType, String.class);
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	/**
@@ -197,7 +218,41 @@ public abstract class ServiceSupport<Model> {
 	}
 
 	private Method[] pkGetMethods; // 主键对应get方法
+	private Method[] pkSetMethods; // 主键对应set方法, 只保存String类型的主键
 	private Object lock = new Object();
+
+	/**
+	 * 获取主键
+	 * @param model
+	 * @return
+	 */
+	protected Object getPKValue(Model model) {
+		if (model == null)
+			return null;
+
+		if (pkGetMethods.length == 0)
+			return null;
+
+		if (pkGetMethods.length == 1) {
+			try {
+				return pkGetMethods[0].invoke(model);
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+
+			}
+		} else {
+			Object[] pkObjects = new Object[pkGetMethods.length];
+			for (int i = 0; i < pkGetMethods.length; i++) {
+				Method method = pkGetMethods[i];
+				try {
+					pkObjects[i] = method.invoke(model);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				}
+			}
+			return pkObjects;
+		}
+
+		return null;
+	}
 
 	/**
 	 * 判断是否存在主键
@@ -205,31 +260,9 @@ public abstract class ServiceSupport<Model> {
 	 * @param model
 	 * @return
 	 */
-	private boolean judgeHasPKValue(Model model) {
-
+	protected boolean judgeHasPKValue(Model model) {
 		if (model == null)
 			return false;
-
-		Class<?> type = model.getClass();
-
-		if (pkGetMethods == null) {
-			synchronized (lock) {
-				if (pkGetMethods == null) {
-					// 判断是否存在主键
-					Set<EntityColumn> pkColumns = EntityHelper.getEntityTable(modelType).getEntityClassPKColumns();
-					if (pkColumns == null || pkColumns.size() == 0) {
-						pkGetMethods = new Method[0];
-					} else {
-						pkGetMethods = new Method[pkColumns.size()];
-						int i = 0;
-						for (EntityColumn column : pkColumns) {
-							String property = column.getProperty();
-							pkGetMethods[i++] = ReflectUtil.getGetMethod(property, type);
-						}
-					}
-				}
-			}
-		}
 
 		if (pkGetMethods.length == 0)
 			return false;
@@ -237,14 +270,38 @@ public abstract class ServiceSupport<Model> {
 		for (Method method : pkGetMethods) {
 			try {
 				Object value = method.invoke(model);
-				if (value == null)
+				if (value == null || "".equals(value))
 					return false;
 			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 
 			}
 		}
-
 		return true;
+	}
+
+	/**
+	 * 检查是否是空字符串ID
+	 * 
+	 * @param model
+	 */
+	protected void checkEmptyId(Model model) {
+		if (model == null)
+			return;
+
+		if (pkGetMethods.length == 0)
+			return;
+
+		for (int i = 0; i < pkGetMethods.length; i++) {
+			Method getMethod = pkGetMethods[i];
+			try {
+				Object value = getMethod.invoke(model);
+				if ("".equals(value)) {
+					value = null;
+					pkSetMethods[i].invoke(model, value);
+				}
+			} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			}
+		}
 	}
 
 	// -----------------------------------------------------
@@ -596,6 +653,7 @@ public abstract class ServiceSupport<Model> {
 	// -----------------------------------------------------
 
 	public int save(Model model) {
+		checkEmptyId(model);
 		saveModelWrap(model);
 		return getSqlMapper().insert(model);
 	}

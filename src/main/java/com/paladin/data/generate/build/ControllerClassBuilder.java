@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ControllerClassBuilder extends SpringBootClassBuilder {
 
-	private static final Template template;
+	private static Template template;
 
 	static {
 		Configuration templateConfig = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);

@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.paladin.framework.core.UserSession;
-import com.paladin.health.model.sys.OrgUser;
-import com.paladin.health.model.sys.SysUser;
-import com.paladin.health.service.sys.OrgUserService;
-import com.paladin.health.service.sys.SysUserService;
+import com.paladin.health.model.syst.OrgUser;
+import com.paladin.health.model.syst.SysUser;
+import com.paladin.health.service.syst.OrgUserService;
+import com.paladin.health.service.syst.SysUserService;
 
 public class SysUserRealm extends AuthorizingRealm {
 

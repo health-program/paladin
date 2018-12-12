@@ -1,5 +1,7 @@
 package com.paladin.framework.utils;
 
+import java.util.Collection;
+
 public class StringUtil {
 
 	/**
@@ -24,14 +26,15 @@ public class StringUtil {
 
 	/**
 	 * 强力trim，可去除全角下的空格
+	 * 
 	 * @param str
 	 * @return
 	 */
 	public static String strongTrim(String str) {
-		if(str == null) {
+		if (str == null) {
 			return null;
 		}
-		
+
 		char[] val = str.toCharArray();
 
 		int len = val.length;
@@ -46,4 +49,15 @@ public class StringUtil {
 		return ((st > 0) || (len < val.length)) ? str.substring(st, len) : str;
 	}
 
+	public static String splitString(Collection<?> coll) {
+		return splitString(coll, ",");
+	}
+
+	public static String splitString(Collection<?> coll, String separator) {
+		StringBuilder sb = new StringBuilder();
+		for (Object obj : coll) {
+			sb.append(obj.toString()).append(separator);
+		}
+		return sb.toString();
+	}
 }

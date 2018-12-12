@@ -29,7 +29,7 @@ public  class PageResult<T> {
 		PageHelper.clearPage();
 	}
 
-	public List<?> getData() {
+	public List<T> getData() {
 		return data;
 	}
 

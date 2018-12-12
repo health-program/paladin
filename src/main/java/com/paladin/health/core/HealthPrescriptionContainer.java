@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import com.paladin.framework.spring.SpringContainer;
+import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.utils.StringParser;
 import com.paladin.health.core.factor.PeopleCondition;
 import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
@@ -53,7 +53,7 @@ import com.paladin.health.service.prescription.PrescriptionTerminologyService;
  * 健康处方搜索容器
  */
 @Component
-public class HealthPrescriptionContainer implements SpringContainer {
+public class HealthPrescriptionContainer implements VersionContainer {
 
 	private static Logger logger = LoggerFactory.getLogger(HealthPrescriptionContainer.class);
 
@@ -89,10 +89,9 @@ public class HealthPrescriptionContainer implements SpringContainer {
 
 	private Map<String, PrescriptionTerminology> terminologyMap;
 
-	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化健康处方搜索服务功能-------------");
-		
+
 		// 初始化处方专业术语map
 		List<PrescriptionTerminology> prescriptionTerminologies = prescriptionTerminologyService.findAll();
 
@@ -101,20 +100,18 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			terminologyMap.put(terminology.getName(), terminology);
 		}
 
-		this.terminologyMap = terminologyMap;
-
-		prescriptionFactor = prescriptionFactorService.findAll();
+		List<PrescriptionFactor> prescriptionFactor = prescriptionFactorService.findAll();
 		prescriptionFactor = Collections.unmodifiableList(prescriptionFactor);
 
-		factorNameMap = new HashMap<>();
-		factorCodeMap = new HashMap<>();
+		Map<String, String> factorNameMap = new HashMap<>();
+		Map<String, Factor> factorCodeMap = new HashMap<>();
 
 		for (PrescriptionFactor factor : prescriptionFactor) {
 			factorNameMap.put(factor.getName(), factor.getCode());
 			factorCodeMap.put(factor.getCode(), new Factor(factor));
 		}
 
-		hasParentFactorList = new HashSet<>();
+		Set<Factor> hasParentFactorList = new HashSet<>();
 
 		for (Factor factor : factorCodeMap.values()) {
 			String parentFactor = factor.source.getParentFactor();
@@ -142,6 +139,12 @@ public class HealthPrescriptionContainer implements SpringContainer {
 		} catch (IOException e) {
 			logger.error("初始化失败", e);
 		}
+
+		this.terminologyMap = terminologyMap;
+		this.prescriptionFactor = prescriptionFactor;
+		this.factorNameMap = factorNameMap;
+		this.factorCodeMap = factorCodeMap;
+		this.hasParentFactorList = hasParentFactorList;
 
 		logger.info("-------------结束初始化健康处方搜索服务功能-------------");
 		return true;
@@ -351,7 +354,7 @@ public class HealthPrescriptionContainer implements SpringContainer {
 				code = arg;
 			}
 			Factor factor = factorCodeMap.get(code);
-			if(factor != null) {
+			if (factor != null) {
 				factor.getFactorAndParent(codes);
 			}
 		}
@@ -606,6 +609,16 @@ public class HealthPrescriptionContainer implements SpringContainer {
 			}
 		}
 		return dir;
+	}
+
+	@Override
+	public String getId() {
+		return "health_prescription_container";
+	}
+
+	@Override
+	public boolean versionChangedHandle(long version) {
+		return initialize();
 	}
 
 }

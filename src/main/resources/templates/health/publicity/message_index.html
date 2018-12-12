@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="health/header" />
+<head th:include="/health/header" />
 
 <body>
+	<tt:constant enumcode="publicity-message-type,publicity-message-status"/>
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -64,15 +65,15 @@
             </div>
         </div>
     </section>
-    <div th:include="health/footer" />
+    <div th:include="/health/footer" />
     <script type="text/javascript">
     /*<![CDATA[*/
     var table;
     $(function() {
-        $.getConstantEnum(["publicity-message-type", "publicity-message-status"], initDataGrid);
+    	initDataGrid();
     });
 
-    function initDataGrid(enumMap) {
+    function initDataGrid() {
         var limit = $("#pageLimit").val();
         var offset = $("#pageOffset").val();
         var page = (limit && offset) ? offset / limit + 1 : 1;
@@ -83,10 +84,10 @@
                 [
                     { radio: true },
                     { title: "标题", field: "title" },
-                    { title: "类型", field: "type", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-type") },
+                    { title: "类型", field: "type", sortable: true, enumcode:"publicity-message-type"},
                     { title: "副标题", field: "subtitle" },
                     { title: "发布时间", field: "publishTime", formatter:"date" },
-                    { title: "状态", field: "status", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-status") },
+                    { title: "状态", field: "status", sortable: true, enumcode:"publicity-message-status"},
                 ]
             ],
             url: '/health/publicity/find',

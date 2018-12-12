@@ -3,17 +3,20 @@ package com.paladin.health.model.diagnose;
 import java.util.Date;
 import javax.persistence.Id;
 
+import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
+
 public class DiagnoseRecord {
 
 	@Id
 	private String id;
 
 	private String targetId;
-	
-	private String condition;
 
+	@IgnoreInMultipleResult
+	private String targetCondition;
+	@IgnoreInMultipleResult
 	private String prescription;
-
+	@IgnoreInMultipleResult
 	private String correctPrescription;
 
 	private Date createTime;
@@ -24,14 +27,6 @@ public class DiagnoseRecord {
 
 	public void setId(String id) {
 		this.id = id;
-	}
-
-	public String getCondition() {
-		return condition;
-	}
-
-	public void setCondition(String condition) {
-		this.condition = condition;
 	}
 
 	public String getPrescription() {
@@ -64,6 +59,14 @@ public class DiagnoseRecord {
 
 	public void setTargetId(String targetId) {
 		this.targetId = targetId;
+	}
+
+	public String getTargetCondition() {
+		return targetCondition;
+	}
+
+	public void setTargetCondition(String targetCondition) {
+		this.targetCondition = targetCondition;
 	}
 
 }

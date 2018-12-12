@@ -21,8 +21,12 @@ public class DiagnoseTarget {
 	private Date birthday;
 
 	private String cellphone;
+		
+	private String factors;
 
 	private Date createTime;
+	
+	private Date updateTime;
 
 	public String getId() {
 		return id;
@@ -76,5 +80,22 @@ public class DiagnoseTarget {
 	public boolean isGirl() {
 		return sex != null && sex == DiagnoseTarget.SEX_WOMAN;
 	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public String getFactors() {
+		return factors;
+	}
+
+	public void setFactors(String factors) {
+		this.factors = factors;
+	}
+
 	
 }

@@ -19,8 +19,8 @@ public class StringParser {
 		}
 
 		return obj.toString();
-
 	}
-	
+
+
 
 }

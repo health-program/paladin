@@ -1,6 +1,10 @@
 package com.paladin.framework.core;
 
-
+/**
+ * 版本控制容器接口
+ * @author TontoZhou
+ * @since 2018年12月12日
+ */
 public interface VersionContainer {
 
 	/**

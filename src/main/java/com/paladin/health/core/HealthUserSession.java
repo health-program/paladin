@@ -3,7 +3,7 @@ package com.paladin.health.core;
 import org.apache.shiro.SecurityUtils;
 
 import com.paladin.framework.core.UserSession;
-import com.paladin.health.model.sys.OrgUser;
+import com.paladin.health.model.syst.OrgUser;
 
 public class HealthUserSession extends UserSession{
 

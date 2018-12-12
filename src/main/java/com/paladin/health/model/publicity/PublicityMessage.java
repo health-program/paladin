@@ -1,7 +1,7 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.UnDeleteBaseModel;
-import com.paladin.health.model.sys.OrgUser;
+import com.paladin.health.model.syst.OrgUser;
 
 import tk.mybatis.mapper.annotation.ColumnType;
 import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;

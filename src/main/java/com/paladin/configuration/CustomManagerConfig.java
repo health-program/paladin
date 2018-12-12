@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainerManager;
-import com.paladin.hrms.thymeleaf.HrmsTontoDialect;
+import com.paladin.framework.thymeleaf.TontoDialect;
 
 
 @Configuration
@@ -24,8 +24,8 @@ public class CustomManagerConfig {
 	}
 	
 	@Bean
-	public HrmsTontoDialect tontoDialect() {
-		return new HrmsTontoDialect();
+	public TontoDialect tontoDialect() {
+		return new TontoDialect();
 	}
 	
 }

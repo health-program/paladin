@@ -114,7 +114,7 @@ public class DBConnectionController extends ControllerSupport {
 	@RequestMapping("/db/index")
 	public String dbIndex(@RequestParam String dbName, Model model) {
 		model.addAttribute("dbName", dbName);
-		return "data/connection/db_index";
+		return "/data/connection/db_index";
 	}
 
 	@RequestMapping("/db/table")

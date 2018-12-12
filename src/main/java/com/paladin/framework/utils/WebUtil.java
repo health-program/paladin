@@ -6,16 +6,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class WebUtil {
-	
+
 	public static boolean isAjaxRequest(HttpServletRequest request) {
-		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+		// 判断是不是APP,是的话返回状态码，不返回登录页
+		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || request.getHeader("isApp") != null;
+	}
+
+	public static boolean isApp(HttpServletRequest request) {
+		// 判断是不是APP
+		return request.getHeader("isApp") != null;
 	}
 
 	public static String getServletPath(HttpServletRequest request) {
-		return request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()	;
+		return request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 	}
-	
-	
+
 	public static void sendJson(HttpServletResponse response, Object obj) {
 
 		response.setContentType("application/json");
@@ -27,10 +32,7 @@ public class WebUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	
-	
+
 }

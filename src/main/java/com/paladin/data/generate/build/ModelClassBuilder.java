@@ -155,7 +155,9 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 		sb.append(" {\n\n");
 
 		for (GenerateColumnOption columnOption : columnOptions) {
-
+			
+			sb.append(tab).append("// ").append(columnOption.getColumn().getComment()).append("\n");
+			
 			if (columnOption.isPrimary()) {
 				sb.append(tab).append("@Id").append("\n");
 			}

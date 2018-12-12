@@ -83,8 +83,6 @@
         return obj;
     };
 
-
-
     // --------------------------------------
     // constant
     // --------------------------------------
@@ -110,29 +108,38 @@
      */
 
     $.extend({
-        infoMessage: function(message) {
-            layer.msg(message, { icon: 6 });
+        infoMessage: function(message, top) {
+            layer.msg(message, { icon: 6, offset: top ? top : undefined });
         },
-        failMessage: function(message) {
-            layer.msg(message, { icon: 2 });
+        failMessage: function(message, top) {
+            layer.msg(message, { icon: 2, offset: top ? top : undefined });
         },
-        errorMessage: function(message) {
-            layer.msg(message, { icon: 5 });
+        errorMessage: function(message, top) {
+            layer.msg(message, { icon: 5, offset: top ? top : undefined });
         },
-        successMessage: function(message) {
-            layer.msg(message, { icon: 1 });
+        successMessage: function(message, top) {
+            layer.msg(message, { icon: 1, offset: top ? top : undefined });
         },
-        successAlert: function(msg, fun) {
-            layer.alert(msg, { icon: 1 }, fun);
+        doAlert: function(msg, icon, fun, top) {
+            if (typeof fun === 'number' || typeof fun === 'string') {
+                top = fun;
+            }
+            layer.alert(msg, { icon: icon, offset: top ? top : undefined }, function(index) {
+                layer.close(index);
+                if (typeof fun === 'function') fun();
+            });
         },
-        failAlert: function(msg, fun) {
-            layer.alert(msg, { icon: 2 }, fun);
+        successAlert: function(msg, fun, top) {
+            $.doAlert(msg, 1, fun, top);
         },
-        errorAlert: function(msg, fun) {
-            layer.alert(msg, { icon: 5 }, fun);
+        failAlert: function(msg, fun, top) {
+            $.doAlert(msg, 2, fun, top);
         },
-        infoAlert: function(msg, fun) {
-            layer.alert(msg, { icon: 6 }, fun);
+        errorAlert: function(msg, fun, top) {
+            $.doAlert(msg, 5, fun, top);
+        },
+        infoAlert: function(msg, fun, top) {
+            $.doAlert(msg, 6, fun, top);
         },
         isLayer: function() {
             if (parent && parent.layer && parent.layer.getFrameIndex(window.name)) {
@@ -142,41 +149,30 @@
             }
         },
         openPageLayer: function(content, options) {
-            var default_options = {
-                widthPercent: 0.8,
-                heightPercent: 0.9,
-                title: " "
-            };
+            options = options || {};
 
             if (typeof options == "string") {
-                default_options.title = options;
-                options = default_options;
+                options = {
+                    title: options
+                }
             } else if (typeof options == "function") {
-                default_options.success = options;
-                options = default_options;
-            } else {
-                options = $.extend(default_options, options);
+                options = {
+                    success: options
+                };
             }
 
-            var w = options.widthPercent > 1 ? options.widthPercent : $(window).width() * options.widthPercent;
-            var h = options.heightPercent > 1 ? options.heightPercent : $(window).height() * options.heightPercent;
-
-            w += "px";
-            h += "px";
-
-            content = '<div style="padding:15px">' + content + '</div>';
-
-            layer.open({
+            options = $.extend(options, {
                 type: 1,
-                title: options.title,
+                title: options.title || '',
                 maxmin: true, //开启最大化最小化按钮
-                area: [w, h],
+                area: $.getOpenLayerSize(options.width, options.height),
                 content: content,
                 success: options.success
             });
+
+            layer.open(options);
         },
         openUrlLayerOrLocate: function(url, options) {
-
             if (options && options.data) {
                 url = $.wrapGetUrl(url, options.data);
             }
@@ -185,36 +181,28 @@
                 window.location = url;
             }
 
-            var default_options = {
-                widthPercent: 0.8,
-                heightPercent: 0.9,
-                title: " "
-            };
+            options = options || {};
 
             if (typeof options == "string") {
-                default_options.title = options;
-                options = default_options;
+                options = {
+                    title: options
+                }
             } else if (typeof options == "function") {
-                default_options.success = options;
-                options = default_options;
-            } else {
-                options = $.extend(default_options, options);
+                options = {
+                    success: options
+                };
             }
 
-            var w = options.widthPercent > 1 ? options.widthPercent : $(window).width() * options.widthPercent;
-            var h = options.heightPercent > 1 ? options.heightPercent : $(window).height() * options.heightPercent;
-
-            w += "px";
-            h += "px";
-
-            layer.open({
+            options = $.extend(options, {
                 type: 2,
-                title: options.title,
+                title: options.title || '',
                 maxmin: true, //开启最大化最小化按钮
-                area: [w, h],
+                area: $.getOpenLayerSize(options.width, options.height),
                 content: url,
                 success: options.success
-            });
+            })
+
+            layer.open(options);
         },
         getOpenLayerSize: function(w, h) {
             w = w || 0.8;
@@ -253,6 +241,28 @@
                 top.location.href = "/health/login";
             })
 
+        },
+        ajaxResponseCheck: function(response) {
+            if (typeof response === 'string') {
+                response = JSON.parse(response)
+            }
+            var resStatus = response.status,
+                status = _RESPONSE_STATUS;
+
+            if (status.NO_LOGIN === resStatus) {
+                $.ajaxUnLoginHandler(callback);
+            } else if (status.NO_PERMISSION === resStatus) {
+                $.errorMessage(response.message || "您没有权限访问该页面或执行该操作");
+            } else if (status.ERROR === resStatus) {
+                $.errorMessage(response.message || "访问页面或执行操作错误");
+            } else if (status.FAIL === resStatus) {
+                $.errorMessage(response.message || "操作失败");
+            } else if (status.FAIL_VALID === resStatus) {
+                $.errorMessage(response.message || "验证不成功，操作失败");
+            } else {
+                return true;
+            }
+            return false;
         },
         wrapAjaxSuccessCallback: function(callback, submitBtn) {
 
@@ -345,10 +355,16 @@
             // 提交表单形式ajax
             var form = $("<form method='post' action='" + url + "'></form>");
             $.each(args, function(key, value) {
-                var input = $("<input type='hidden'>");
-                input.attr({ "name": key });
-                input.val(value);
-                form.append(input);
+                if (!$.isArray(value)) {
+                    value = [value];
+                }
+
+                value.forEach(function(v) {
+                    var input = $("<input type='hidden'>");
+                    input.attr({ "name": key });
+                    input.val(v);
+                    form.append(input);
+                });
             });
             form.appendTo(document.body);
             form.submit();
@@ -366,7 +382,15 @@
                 }
 
                 for (var o in data) {
-                    url += o + "=" + data[o] + "&";
+                    var d = data[o];
+                    if (d) {
+                        if (!$.isArray(d)) {
+                            d = [d];
+                        }
+                        d.forEach(function(x) {
+                            url += o + "=" + x + "&";
+                        });
+                    }
                 }
             }
             return url;
@@ -441,13 +465,26 @@
         beautifyInput: function(input, icon, isBefore) {
             var a = $(input);
             a.wrap('<div class="input-group"></div>');
-            var b = '<span class="input-group-addon"><i class="'+ icon +'"></i></span>';
-            if(isBefore) {
+            var b = '<span class="input-group-addon"><i class="' + icon + '"></i></span>';
+            if (isBefore) {
                 a.before(b);
             } else {
                 a.after(b);
             }
             return a;
+        },
+        formatSensitive: function(str, a, b, c) {
+            if (typeof str !== 'string') {
+                return "";
+            }
+            var l = str.length;
+            if (a === undefined || typeof a !== 'number') {
+                a = Math.floor(l / 3.5);
+            }
+            if (b === undefined || typeof b !== 'number') {
+                b = Math.floor(l / 3.5);
+            }
+            return str.substring(0, a) + (c ? c : "*****") + str.substring(l - b);
         }
     });
 
@@ -457,22 +494,20 @@
     //
     // -----------------------------------------
 
-    /*
-    * 以下方法最后执行
-    */
+    _initEnumConstant();
     _initValidator();
     _initTable();
-    _initEnumConstant();
     _initForm();
+    _initAttachment();
     _initCommon();
 
-})(jQuery);
 
+})(jQuery);
 
 function _initCommon() {
 
     // 关键词搜索框添加绑定回车函数
-    $('.tonto-btn-search').each(function() {
+    $('.tonto - btn - search').each(function() {
         var btn = $(this);
         $("body").bind('keypress', function(event) {
             if (event.keyCode == "13") {
@@ -494,6 +529,18 @@ function _initCommon() {
         laydate.render({
             elem: this,
             type: "date",
+            calendar: true, //开启公历节日
+            theme: 'molv', //墨绿主题
+            showBottom: true, //是否出现底部栏
+            trigger: 'click' //绑定多个
+        });
+    });
+
+    $('.tonto-datepicker-year').each(function() {
+        $.beautifyInput(this, "fa fa-calendar", false);
+        laydate.render({
+            elem: this,
+            type: "year",
             calendar: true, //开启公历节日
             theme: 'molv', //墨绿主题
             showBottom: true, //是否出现底部栏
@@ -525,8 +572,175 @@ function _initCommon() {
         });
     });
 
-}
+    $('input').iCheck({
+        checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
+        radioClass: 'iradio_square-blue'
+        //increaseArea: '10%' // optional
+    });
 
+    // 必须在icheck后面，否则需要更改源代码适用icheck
+    $('.tonto-multiple-select').each(function() {
+        $(this).multiselect({
+            nonSelectedText: $(this).attr("placeholder") || "请选择", //未选择时显示文本
+            allSelectedText: "全部", //全部选择时显示文本
+            nSelectedText: "个选项", //超过显示数目时显示文本
+            numberDisplayed: $(this).attr("number-displayed") || 2, //显示最大选项数目
+            includeSelectAllOption: true, //是否有全选按钮
+            selectAllText: "全选", //全选时显示文本
+            selectAllNumber: false //全选时，不显示全选个数
+            //enableFiltering: true,      // 查询过滤
+            //filterPlaceholder: '输入查询内容', // 没有查询条件时显示文本
+        });
+    });
+
+    $.extend({
+        createTreeSelectComponment: function(input, type) {
+            var $input = $(input);
+            var $wrap = $('<div class="input-group"/>');
+            var name = $input.attr("name") || $input.attr("id");
+            $input.attr("name", "_" + name);
+            var $hideinput = $('<input type="text" style="display:none" name="' + name + '" id="' + name + '"  />');
+            var $removeBtn = $('<span class="input-group-addon" style="cursor:pointer"><i class="glyphicon glyphicon-remove"> </i></span>');
+            var initValue = $input.attr("selectedvalue") || $input.val();
+
+            $input.attr("readonly", true);
+            $input.css("background", "#fff");
+
+            $input.wrap($wrap);
+            $input.after($removeBtn);
+            $input.after($hideinput);
+
+            var com = {
+                input: $input,
+                removeBtn: $removeBtn,
+                name: name,
+                valueInput: $hideinput,
+                current: null,
+                initValue: initValue,
+                type: type,
+                treedata: null,
+                changedCallback: null,
+                setCurrent: function(val) {
+                    var that = this;
+
+                    if (!that.current && !val) {
+                        return;
+                    }
+                    if (that.current && val && that.current.value == val.value) {
+                        return;
+                    }
+
+                    that.current = val;
+                    that.input.val(val ? val.name : "");
+                    that.valueInput.val(val ? val.value : "");
+
+                    if (that.changedCallback) {
+                        that.changedCallback(val);
+                    }
+                },
+                getCurrent: function() {
+                    var that = this;
+                    if (!that.valueInput.val()) {
+                        that.current = null;
+                        return null;
+                    }
+                    return that.current;
+                },
+                setEnabled: function(enabled) {
+                    if (enabled) {
+                        this.input.attr('disabled', false);
+                        this.valueInput.attr('disabled', false);
+                        this.input.css("background", "#fff");
+                    } else {
+                        this.input.attr('disabled', true);
+                        this.valueInput.attr('disabled', true);
+                        this.input.css("background", "#eee");
+                    }
+                },
+                setData: function(datalist) {
+                    var that = this;
+                    that.datalist = datalist;
+                    var initValue = that.initValue;
+                    var current;
+
+                    var g = function(ns, all) {
+                        if (!all) {
+                            all = ns;
+                            ns = $.grep(all, function(a, b) {
+                                return a.parentValue === "-";
+                            });
+                        }
+                        var nodes = [];
+                        ns.forEach(function(n) {
+                            var node = {
+                                text: n.name,
+                                data: n
+                            };
+
+                            if (n.value === initValue) {
+                                current = n;
+                            }
+
+                            var parentValue = n.value;
+                            var children = $.grep(all, function(a, b) {
+                                return a.parentValue == parentValue;
+                            });
+
+                            if (children && children.length > 0) {
+                                node.nodes = g(children, all);
+                            }
+
+                            nodes.push(node);
+                        });
+                        return nodes;
+                    }
+
+                    that.treedata = g(datalist);
+                    that.setCurrent(current);
+
+                    that.removeBtn.on("click", function() {
+                        that.setCurrent(null);
+                    });
+
+                    that.input.click(function() {
+                        layer.open({
+                            type: 1,
+                            title: "",
+                            content: "<div class='tonto-tree-div'></div>",
+                            area: ['350px', '460px'],
+                            success: function(layero, index) {
+                                $tree = $(layero).find('.tonto-tree-div');
+
+                                $tree.treeview({
+                                    data: that.treedata,
+                                    levels: 1
+                                });
+
+                                $tree.on('nodeSelected', function(event, node) {
+                                    var data = node.data;
+
+                                    if (data.description === '不可选') {
+                                        $.infoMessage("您不能选择该选项");
+                                        return;
+                                    }
+
+                                    that.setCurrent(data);
+                                    layer.close(index);
+                                });
+                            }
+                        });
+                    });
+                }
+            }
+
+            $input.data("Tree_Select", com);
+            $hideinput.data("Tree_Select", com);
+
+            return com;
+        }
+    });
+
+}
 
 function _initValidator() {
     // --------------------------------------
@@ -557,9 +771,9 @@ function _initValidator() {
     // 账号
     $.validator.addMethod("account", function(value, element) { return this.optional(element) || (/^\w{5,30}$/.test(value)); }, "账号格式错误");
     // 手机
-    $.validator.addMethod("cellphone", function(value, element) { return this.optional(element) || (/^1[3|5|7|8|]\d{9}$/.test(value)); }, "手机号码格式错误");
+    $.validator.addMethod("cellphone", function(value, element) { return this.optional(element) || (/^[1][3,4,5,7,8][0-9]{9}$/.test(value)); }, "手机号码格式错误");
     // 电话（包括手机和座机）
-    $.validator.addMethod("phone", function(value, element) { return this.optional(element) || (/((^\d{3,4}-?)?\d{7,8}$)|(^1[3|5|7|8|]\d{9}$)/.test(value)); }, "电话号码格式错误");
+    $.validator.addMethod("phone", function(value, element) { return this.optional(element) || (/((^\d{3,4}-?)?\d{7,8}(-(\d{3,}))?$)|(^[1][3,4,5,7,8][0-9]{9}$)/.test(value)); }, "电话号码格式错误");
 
     // 日期
     $.validator.addMethod("date", function(value, element) {
@@ -742,7 +956,6 @@ function _initValidator() {
     });
 }
 
-
 function _initTable() {
     /*
      * options 参数配置基于bootstrp table，参考
@@ -762,9 +975,27 @@ function _initTable() {
 
         if (!options.ajax) {
             options.ajax = function(request) {
-                if (typeof url === 'function')
+                if (typeof url === 'function') {
                     request.url = request.url();
+                }
+                if (options.joinArrayValue) {
+                    var d = request.data;
+                    if (d) {
+                        for (var o in d) {
+                            var v = d[o];
+                            if (v instanceof Array) {
+                                d[o] = v.join(",");
+                            }
+                        }
+                    }
+                }
                 $.sendAjax(request);
+            }
+        }
+
+        if (!options.classes) {
+            if (window.screen.height <= 900 || window.screen.width <= 1600) {
+                options.classes = "table table-hover table-condensed";
             }
         }
 
@@ -805,6 +1036,11 @@ function _initTable() {
                                 return (value === true || value === "true") ? "是" : "否";
                             }
                         }
+                    }
+
+                    // 枚举情况
+                    if (col.enumcode && !col.formatter) {
+                        col.formatter = $.getEnumColumnFormatter(window._constant_cache, col.enumcode);
                     }
                 });
             });
@@ -956,10 +1192,13 @@ function _initTable() {
             return function() { return '<a class="edit" href="javascript:void(0);" ><i class="glyphicon glyphicon-edit"></i>' + (text ? text : '修改') + '</a>' };
         },
         viewColumnFormatter: function(text) {
-            return function() { return '<a class="view" href="javascript:void(0);" ><i class="glyphicon glyphicon-search"></i>' + (text ? text : '查看') + '</a>' };
+            return function() { return '<a class="view" href="javascript:void(0);" ><i class="glyphicon glyphicon-eye-open"></i>' + (text ? text : '查看') + '</a>' };
         },
         confirmColumnFormatter: function(text) {
             return function() { return '<a class="confirm" href="javascript:void(0);" ><i class="glyphicon glyphicon-edit"></i>' + (text ? text : '确认') + '</a>' };
+        },
+        checkColumnFormatter: function(text) {
+            return function() { return '<a class="check" href="javascript:void(0);" ><i class="glyphicon glyphicon-eye-open"></i>' + (text ? text : '确认') + '</a>' };
         }
     });
 
@@ -1055,188 +1294,139 @@ function _initTable() {
 }
 
 
-var _constant_cache = {
-    boolean: [{
-        key: "1",
-        value: "是"
-    }, {
-        key: "0",
-        value: "否"
-    }]
-};
 /**
  * 自动加载常量下拉框 <class = tonto-select-constant>
  */
-function _initEnumConstant(container) {
+function _initEnumConstant(container, enumcodes, callback) {
+    var tc = $("#tonto_constant_value");
+    if (tc.length > 0) {
+        window._constant_cache = $.parseJSON(tc.text());
+    }
 
     $.extend({
         // 获取常量
-        getConstantEnum: function(enumcode, callback) {
-
-            var getTargetCallback = function(param) {
-                var that = $(param.target);
-                var codeValue = that.attr("enum-code-value");
-                var code = param.code;
-                var type = param.type || (that[0].type.startsWith("select") ? "select" : "input");
-                return function(map) {
-                    var enumvalues = map[code];
-                    if (enumvalues) {
-                        if (type == 'select') {
-                            if (enumvalues) {
-                                enumvalues.forEach(function(a) {
-                                    that.append("<option value='" + a.key + "'>" + a.value + "</option>");
-                                });
-                            }
-                            if (codeValue) {
-                                that.val(codeValue);
-                            }
-                        } else if (type == 'input') {
-                            if (codeValue) {
-                                enumvalues.forEach(function(a) {
-                                    if (a.key == codeValue) {
-                                        that.val(a.value);
-                                        return false;
-                                    }
-                                });
-                            }
-                        } else if (type == 'p') {
-                            if (codeValue) {
-                                enumvalues.forEach(function(a) {
-                                    if (a.key == codeValue) {
-                                        that.html(a.value);
-                                        return false;
-                                    }
-                                });
-                            }
-                        }
-                    }
-                }
+        getConstantEnum: function(enumcode) {
+            if (enumcode) {
+                return window._constant_cache[enumcode];
             }
-
-            // 先从缓存中获取，没有再去后台取
-            window._constant_cache = _constant_cache || {};
-
-            var targetCallbacks = [];
-
-            var url = "/common/constant";
-            if (!$.isArray(enumcode)) {
-                var code;
-                if (typeof enumcode == 'string') {
-                    code = enumcode;
-                } else {
-                    code = enumcode.code;
-                    targetCallbacks.push(getTargetCallback(enumcode));
-                }
-
-                if (_constant_cache[code]) {
-                    if (callback) {
-                        callback(_constant_cache);
-                    }
-
-                    targetCallbacks.forEach(function(f) {
-                        f(_constant_cache);
-                    });
-
-                    return;
-                }
-
-                url += "?code=" + code;
-
-            } else {
-                url += "?";
-                var i = 0;
-
-                enumcode.forEach(function(item) {
-                    var code;
-                    if (typeof item == 'string') {
-                        code = item;
-                    } else {
-                        code = item.code;
-                        targetCallbacks.push(getTargetCallback(item));
-                    }
-
-                    if (!_constant_cache[code]) {
-                        url += "code=" + code + "&";
-                        i++;
-                    }
-                });
-
-                if (i == 0) {
-                    callback(_constant_cache);
-                    targetCallbacks.forEach(function(f) {
-                        f(_constant_cache);
-                    });
-                    return;
-                }
-            }
-
-            $.getAjax(url, function(data) {
-                $.extend(_constant_cache, data);
-                targetCallbacks.forEach(function(f) {
-                    f(_constant_cache);
-                });
-
-                if (typeof callback === 'function') {
-                    callback(_constant_cache);
-                }
-            });
         },
         getConstantEnumItem: function(enumcode, key) {
-            var items = window._constant_cache[enumcode]
-            for (var i = 0; i < items.length; i++) {
-                if (items[i].key == key) {
-                    return items[i];
+            var items = window._constant_cache[enumcode];
+            if (items) {
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].key == key) {
+                        return items[i];
+                    }
                 }
             }
-
+            return null;
+        },
+        getConstantEnumValue: function(enumcode, key) {
+            var items = window._constant_cache[enumcode];
+            if (items) {
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].key == key) {
+                        return items[i] && items[i].value;
+                    }
+                }
+            }
             return null;
         }
     });
 
+    // 下拉框
     var constants = container ? container.find(".tonto-select-constant") : $(".tonto-select-constant");
-    var _enumKeys = [];
-
     constants.each(function() {
-        var a = $(this);
-        var enumcode = a.attr("enumcode");
+        var $s = $(this);
+        var enumcode = $s.attr("enumcode");
         if (enumcode) {
-            if (a.is('p')) {
-                _enumKeys.push({ code: enumcode, type: 'p', target: a });
-            } else {
-                _enumKeys.push(enumcode);
+            if ($s.is("select")) {
+                var enumvalues = window._constant_cache[enumcode];
+                if (enumvalues) {
+                    enumvalues.forEach(function(a) {
+                        $s.append("<option value='" + a.key + "'>" + a.value + "</option>");
+                    });
+                }
+                var selectedvalue = $s.attr("selectedvalue");
+                if (selectedvalue) {
+                    if ($s.attr("multiple")) {
+                        $s.val(selectedvalue.split(","));
+                    } else {
+                        $s.val(selectedvalue);
+                    }
+                }
+            } else if ($s.is("p")) {
+                var code = $s.attr("enum-code-value");
+                if (code) {
+                    $s.html($.getConstantEnumValue(enumcode, code));
+                }
             }
         }
     });
 
-    if (_enumKeys.length > 0) {
-        $.getConstantEnum(_enumKeys, function(data) {
-            constants.each(function() {
-                var $s = $(this);
-                if ($s.is("select")) {
-                    var enumcode = $s.attr("enumcode");
-                    if (enumcode) {
-                        var enumvalues = data[enumcode];
-                        if (enumvalues) {
-                            enumvalues.forEach(function(a) {
-                                $s.append("<option value='" + a.key + "'>" + a.value + "</option>");
-                            });
-                        }
-                        var selectedvalue = $s.attr("selectedvalue");
-                        if (selectedvalue) {
-                            $s.val(selectedvalue);
+    // 单选Radio
+    constants = container ? container.find(".tonto-radio-constant") : $(".tonto-radio-constant");
+    constants.each(function() {
+        var $s = $(this);
+        var enumcode = $s.attr("enumcode");
+        if (enumcode) {
+            var name = $s.attr("name") || $s.attr("id");
+            var selectedvalue = $s.attr("selectedvalue");
+            var enumvalues = window._constant_cache[enumcode];
+            if (enumvalues) {
+                var checked = false;
+                enumvalues.forEach(function(a) {
+                    if ((selectedvalue && selectedvalue == a.key) || (!selectedvalue && !checked)) {
+                        $s.append('<label><input type="radio" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                        checked = true;
+                    } else {
+                        $s.append('<label><input type="radio" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                    }
+                });
+            }
+        }
+    });
+
+    // 多选checkbox
+    constants = container ? container.find(".tonto-checkbox-constant") : $(".tonto-checkbox-constant");
+    constants.each(function() {
+        var $s = $(this);
+        var enumcode = $s.attr("enumcode");
+        if (enumcode) {
+            var name = $s.attr("name") || $s.attr("id");
+            var selectedvalue = $s.attr("selectedvalue");
+            if (selectedvalue) {
+                selectedvalue = selectedvalue.split(",");
+            }
+            var enumvalues = window._constant_cache[enumcode];
+            var isChecked = function(key) {
+                if (selectedvalue) {
+                    for (var i = 0; i < selectedvalue.length; i++) {
+                        if (key == selectedvalue[i]) {
+                            return true;
                         }
                     }
                 }
-            });
-        });
-    }
+                return false;
+            }
+            if (enumvalues) {
+                enumvalues.forEach(function(a) {
+                    if (isChecked(a.key)) {
+                        $s.append('<label><input type="checkbox" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                    } else {
+                        $s.append('<label><input type="checkbox" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                    }
+                });
+            }
+        }
+    });
 }
 
 
 /**
  * 加载form表单验证 <class = tonto-form-validate>
  */
-function _initForm(container, formOptions) {
+function _initForm(container) {
 
 
     /**
@@ -1248,7 +1438,6 @@ function _initForm(container, formOptions) {
             if (forms && forms.length > 0) {
                 forms.each(function() {
                     $(this)[0].submitSuccessHandler = function(data) {
-
                         if (typeof submitSuccess == 'string') {
                             msg = submitSuccess;
                             submitSuccess = null;
@@ -1257,6 +1446,7 @@ function _initForm(container, formOptions) {
                         if (msg) {
                             $.successMessage(msg);
                         }
+
                         if (submitSuccess) {
                             submitSuccess(data);
                         }
@@ -1284,11 +1474,8 @@ function _initForm(container, formOptions) {
         };
     };
 
-    var forms = container ? $(container).find(".tonto-form-validate") : $(".tonto-form-validate");
-
-    forms.each(function() {
+    $.fn.createForm = function(formOptions, validateOptions) {
         var submitForm = $(this);
-
         var submitBtn = submitForm.find('button[type="submit"],input[type="submit"]')
 
         submitBtn.each(function() {
@@ -1310,7 +1497,6 @@ function _initForm(container, formOptions) {
             });
         });
 
-
         var config = {
             debug: true,
             // 不要设置true，只有不想启用时候去设置false
@@ -1320,6 +1506,7 @@ function _initForm(container, formOptions) {
             onkeyup: false,
             // 当鼠标掉级时验证
             onclick: false,
+            backurl: submitForm.attr("callback-url"),
             // 给未通过验证的元素加效果,闪烁等
             // highlight : false,
             showErrors: function(errorMap, errorList) {
@@ -1328,86 +1515,171 @@ function _initForm(container, formOptions) {
                     layer.tips(v.message, v.element, { time: 2000, tips: [3, 'red'] });
                     return false;
                 });
-            },
-            submitHandler: function(a) {
-                var form = $(a);
-                form.ajaxSubmit({
-                    url: submitBtn.data('action') ? submitBtn.data('action') : form.attr('action'),
-                    dataType: 'json',
-                    beforeSubmit: function(arr, $form, options) {
-                        submitBtn.each(function() {
-                            var that = $(this);
-                            that.data("loading", true);
-                            var text = that.text();
-                            that.data("orginText", text);
-                            that.text(text + '中...').prop('disabled', true).addClass('disabled');
-                        });
-                    },
-                    success: function(data) {
-
-                        submitBtn.each(function() {
-                            var that = $(this);
-                            var text = that.text();
-                            that.removeClass('disabled').prop('disabled', false).text(that.data("orginText"));
-                        });
-
-                        var resStatus = data.status,
-                            status = _RESPONSE_STATUS;
-
-                        if (status.NO_LOGIN === resStatus) {
-                            ajaxUnLoginHandler(form.data("submitSuccessHandler"));
-                        } else if (status.NO_PERMISSION === resStatus) {
-                            $.errorMessage(data.message || "您没有权限访问该页面或执行该操作");
-                        } else if (status.ERROR === resStatus) {
-                            $.errorMessage(data.message || "访问页面或执行操作错误");
-                        } else if (status.FAIL === resStatus) {
-                            $.errorMessage(data.message || "操作失败");
-                        } else if (status.FAIL_VALID === resStatus) {
-                            error = data.result;
-                            if ($.isArray(error)) {
-                                error.forEach(function(item) {
-                                    var el = item[1];
-                                    var errorMsg = item[2];
-                                    form.find("#" + el + ",[name='" + el + "']").each(function() {
-                                        layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
-                                    });
-                                });
-                            }
-                        } else if (status.SUCCESS === resStatus) {
-                            var handler = form[0].submitSuccessHandler || form.data("submitSuccessHandler");
-                            if (handler) {
-                                handler(data.result ? data.result : data);
-                            }
-                        }
-                    },
-                    error: function(xhr, e, statusText) {
-                        $.errorMessage("系统异常");
-                    },
-                    complete: function() {
-                        submitBtn.data("loading", false);
-                    }
-                });
             }
         };
 
-        if (formOptions)
-            config = $.extend(config, formOptions);
+        if (formOptions) {
+            if (typeof formOptions === 'function') {
+                config.formOptions = {
+                    successCallback: formOptions
+                }
+            } else if (typeof formOptions === 'object') {
+                config.formOptions = formOptions;
+            }
+        }
 
-        var backurl = submitForm.attr("callback-url");
+        if (validateOptions) {
+            if (typeof validateOptions === 'object') {
+                config = $.extend(config, validateOptions);
+            }
+        }
 
-        if (backurl && !(submitForm[0].submitSuccessHandler || submitForm.data("submitSuccessHandler"))) {
-            submitForm.setFormSubmitHandler(function() {
-                layer.alert("操作成功", function(index) {
-                    layer.close(index);
-                    window.location = backurl;
-                });
-            });
+        config.submitHandler = function(a) {
+            var form = $(a);
+            var formConfig = {
+                url: submitBtn.data('action') ? submitBtn.data('action') : form.attr('action'),
+                dataType: 'json',
+                beforeSubmit: function(arr, $form, options) {
+                    submitBtn.each(function() {
+                        var that = $(this);
+                        that.data("loading", true);
+                        var text = that.text();
+                        that.data("orginText", text);
+                        that.text(text + '中...').prop('disabled', true).addClass('disabled');
+                    });
+
+                    if (typeof formConfig.beforeCallback === 'function') {
+                        return formConfig.beforeCallback(arr, $form, options);
+                    }
+                },
+                success: function(data) {
+                    submitBtn.each(function() {
+                        var that = $(this);
+                        var text = that.text();
+                        that.removeClass('disabled').prop('disabled', false).text(that.data("orginText"));
+                    });
+
+                    var resStatus = data.status,
+                        status = _RESPONSE_STATUS;
+
+                    if (status.NO_LOGIN === resStatus) {
+                        ajaxUnLoginHandler(form.data("submitSuccessHandler"));
+                    } else if (status.NO_PERMISSION === resStatus) {
+                        $.errorMessage(data.message || "您没有权限访问该页面或执行该操作");
+                    } else if (status.ERROR === resStatus) {
+                        $.errorMessage(data.message || "访问页面或执行操作错误");
+                    } else if (status.FAIL === resStatus) {
+                        $.errorMessage(data.message || "操作失败");
+                    } else if (status.FAIL_VALID === resStatus) {
+                        error = data.result;
+                        if ($.isArray(error)) {
+                            error.forEach(function(item) {
+                                var el = item[1];
+                                var errorMsg = item[2];
+                                form.find("#" + el + ",[name='" + el + "']").each(function() {
+                                    layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
+                                });
+                            });
+                        }
+                    } else if (status.SUCCESS === resStatus) {
+                        var handler = formConfig.successCallback || form[0].submitSuccessHandler || form.data("submitSuccessHandler");
+                        if (handler) {
+                            handler(data.result ? data.result : data);
+                        } else {
+                            if (config.backurl) {
+                                layer.alert("操作成功", function(index) {
+                                    layer.close(index);
+                                    window.location = config.backurl;
+                                });
+                            }
+                        }
+                    }
+                },
+                error: function(xhr, e, statusText) {
+                    $.errorMessage("系统异常");
+                },
+                complete: function() {
+                    submitBtn.data("loading", false);
+                }
+            };
+
+            if (config.formOptions) {
+                formConfig = $.extend(formConfig, config.formOptions);
+            }
+
+            form.ajaxSubmit(formConfig);
         }
 
         submitForm.createFormValidater(config);
+    }
+
+    var forms = container ? $(container).find(".tonto-form-validate") : $(".tonto-form-validate");
+
+    forms.each(function() {
+        var submitForm = $(this);
+        submitForm.createForm();
     });
 }
 
+
+// ------------------------------------------
+//
+// 附件处理
+//
+// -----------------------------------------
+
+function _initAttachment() {
+    $.extend({
+        loadAttachment: function(id, callback) {
+            $.getAjax("/common/attachment/" + id, function(data) {
+                if (typeof callback === 'function') {
+                    callback($.parseAttachmentData(data));
+                }
+            });
+        },
+        loadAttachments: function(ids, callback) {
+            $.postAjax("/common/attachment", { id: ids }, function(data) {
+                var result = {};
+                if (data && data.length > 0) {
+                    data.forEach(function(i) {
+                        result[i.id] = $.parseAttachmentData(i);
+                    });
+                }
+                if (typeof callback === 'function') {
+                    callback(result);
+                }
+            });
+        },
+        parseAttachmentData(data) {
+            if (data) {
+                if ($.isArray(data)) {
+                    var result = [];
+                    data.forEach(function(item) {
+                        result.push({
+                            id: item.id,
+                            name: item.name,
+                            filename: item.name + item.suffix,
+                            url: "/file/" + item.pelativePath,
+                            size: item.size,
+                            type: item.type
+                        });
+                    });
+                    return result;
+                } else {
+                    return {
+                        id: data.id,
+                        name: data.name,
+                        filename: data.name + data.suffix,
+                        url: "/file/" + data.pelativePath,
+                        size: data.size,
+                        type: data.type
+                    }
+                }
+            }
+            return null;
+        }
+    });
+}
 
 // ------------------------------------------
 //
@@ -1415,26 +1687,893 @@ function _initForm(container, formOptions) {
 //
 // -----------------------------------------
 
-/**
- * 信息描述通用显示
+
+// ------------------------------------------
+//
+// 常用工具方法
+//
+// -----------------------------------------
+
+/*
+ * 时间格式化工具 
+ * 把Long类型的1527672756454日期还原yyyy-MM-dd 00:00:00格式日期   
  */
-function _showInfoDescription(items, container, isHorizontal) {
+function datetimeFormat(longTypeDate) {
+    var dateTypeDate = "";
+    var date = new Date();
+    date.setTime(longTypeDate);
+    dateTypeDate += date.getFullYear(); //年    
+    dateTypeDate += "-" + getMonth(date); //月     
+    dateTypeDate += "-" + getDay(date); //日    
+    dateTypeDate += " " + getHours(date); //时    
+    dateTypeDate += ":" + getMinutes(date); //分  
+    dateTypeDate += ":" + getSeconds(date); //分  
+    return dateTypeDate;
+}
+/*  
+ * 时间格式化工具 
+ * 把Long类型的1527672756454日期还原yyyy-MM-dd格式日期   
+ */
+function dateFormat(longTypeDate) {
+    var dateTypeDate = "";
+    var date = new Date();
+    date.setTime(longTypeDate);
+    dateTypeDate += date.getFullYear(); //年    
+    dateTypeDate += "-" + getMonth(date); //月     
+    dateTypeDate += "-" + getDay(date); //日    
+    return dateTypeDate;
+}
+//返回 01-12 的月份值     
+function getMonth(date) {
+    var month = "";
+    month = date.getMonth() + 1; //getMonth()得到的月份是0-11    
+    if (month < 10) {
+        month = "0" + month;
+    }
+    return month;
+}
+//返回01-30的日期    
+function getDay(date) {
+    var day = "";
+    day = date.getDate();
+    if (day < 10) {
+        day = "0" + day;
+    }
+    return day;
+}
+//小时  
+function getHours(date) {
+    var hours = "";
+    hours = date.getHours();
+    if (hours < 10) {
+        hours = "0" + hours;
+    }
+    return hours;
+}
+//分  
+function getMinutes(date) {
+    var minute = "";
+    minute = date.getMinutes();
+    if (minute < 10) {
+        minute = "0" + minute;
+    }
+    return minute;
+}
+//秒  
+function getSeconds(date) {
+    var second = "";
+    second = date.getSeconds();
+    if (second < 10) {
+        second = "0" + second;
+    }
+    return second;
+}
 
-    var c = $(container);
-    c.empty();
-    var dl = $('<dl ' + (isHorizontal ? 'class="dl-horizontal"' : '') + '></dl>');
 
-    items.forEach(function(i) {
-        if (i.content instanceof jQuery) {
-            dl.append("<dt>" + i.title + ":</dt>");
-            var k = $("<dd></dd>");
-            k.append(i.content);
-            dl.append(k);
-        } else {
-            dl.append("<dt>" + i.title + ":</dt><dd>" + i.content + "</dd>");
+//------------------------------------------
+//
+// 自动化编辑查看代码
+//
+// -----------------------------------------
+
+function generateHtml(options) {
+    var id = options.id,
+        name = options.name,
+        columns = options.columns,
+        icon = options.icon || 'glyphicon glyphicon-user';
+
+    var html =
+        '<div class="box box-solid">\n' +
+        '<div class="box-header with-border">\n' +
+        '    <i class="' + icon + '"></i>\n' +
+        '    <h3 class="box-title">' + name + '</h3>\n' +
+        '    <div class="box-tools pull-right">\n' +
+        '        <a class="btn" id="' + id + '_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>\n' +
+        '    </div>\n' +
+        '</div>\n';
+
+    var maxColspan = 2,
+        currentColspan = 0,
+        firstLabelSize = 3,
+        inputSize = 3,
+        labelSize = 2;
+
+    html += generateViewFormHtml(options);
+
+    html +=
+        '<div id="' + id + '_edit" class="box-body" style="display: none">\n' +
+        '   <form id="' + id + '_form" action="' + column.url + '" method="post" class="form-horizontal edit-body">\n';
+
+    for (var i = 0; i < columns.length;) {
+        var column = columns[i++];
+        var name = column.name,
+            type = column.inputType,
+            title = column.title,
+            colspan = column.colspan || 1;
+
+        if (colspan > maxColspan) colspan = maxColspan;
+
+        if (type == 'ID') continue;
+
+        // 附件独占一行
+        var back = false;
+        if (type == 'ATTACHMENT' && currentColspan > 0) {
+            back = true;
         }
 
+        if (currentColspan + colspan <= maxColspan) {
+            if (currentColspan == 0) {
+                html += '<div class="form-group">\n';
+            }
+
+            html += '<label for="' + name + '" class="col-sm-' + (currentColspan == 0 ? firstLabelSize : labelSize) + ' control-label">' + title + '：</label>\n';
+            if (type == 'ATTACHMENT') {
+                html += '<div class="col-sm-' + ((maxColspan - 1) * (inputSize + labelSize) + inputSize) + '"></div>\n';
+                currentColspan = maxColspan;
+            } else {
+                html += '<div class="col-sm-' + ((colspan - 1) * (inputSize + labelSize) + inputSize) + '">\n';
+
+                if (type == 'TEXT') {
+                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control"/>\n';
+                } else if (type == 'DISTRICT') {
+                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control ' + column.districtType + '"/>\n';
+                } else if (type == 'NUMBER') {
+                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="number" class="form-control"/>\n';
+                } else if (type == 'DATE') {
+                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control tonto-datepicker-date"/>\n';
+                } else if (type == 'SELECT') {
+                    html += '<select name="' + name + '" class="form-control tonto-select-constant" enumcode="' + column.enum + '">\n';
+                    if (column.nullable !== false) {
+                        html += '<option value="">请选择</option>\n';
+                    }
+                    html += '</select>\n';
+                } else if (type == 'TREE') {
+                    html += '<input name="' + name + '" placeholder="请选择' + title + '" type="text" class="form-control tonto-select-constant-tree" enumcode="' + column.enum + '"/>\n';
+                }
+
+                html += '</div>\n';
+                currentColspan += colspan;
+            }
+        } else {
+            back = true;
+        }
+
+        if (back) {
+            i--;
+            currentColspan = maxColspan;
+        }
+
+        if (currentColspan >= maxColspan) {
+            html += '</div>\n';
+            currentColspan = 0;
+        }
+    }
+
+    html +=
+        '   <div class="form-group">\n' +
+        '       <div class="col-sm-2 col-sm-offset-3">\n' +
+        '           <button type="submit" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
+        '       </div>\n' +
+        '       <div class="col-sm-2 col-sm-offset-1">\n' +
+        '       <button type="button" id="' + id + '_form_cancel_btn" class="btn btn-default btn-block">取消</button>\n' +
+        '       </div>\n' +
+        '   </div>\n' +
+        '</form>\n' +
+        '</div>\n' +
+        '</div>\n';
+
+    return html;
+}
+
+function generateViewHtml(options) {
+    var id = options.id,
+        name = options.name,
+        columns = options.columns,
+        icon = options.icon || 'glyphicon glyphicon-user';
+
+    var html =
+        '<div class="box box-solid">\n' +
+        '<div class="box-header with-border">\n' +
+        '    <i class="' + icon + '"></i>\n' +
+        '    <h3 class="box-title">' + name + '</h3>\n' +
+        '    <div class="box-tools pull-right">\n' +
+        '    </div>\n' +
+        '</div>\n';
+
+    html += generateViewFormHtml(options);
+    html += '</div>';
+    return html;
+}
+
+function generateViewFormHtml(options) {
+    var id = options.id,
+        columns = options.columns;
+    var html =
+        '<div id="' + id + '_view" class="box-body">\n' +
+        '    <form class="form-horizontal">\n';
+
+    var maxColspan = 2,
+        currentColspan = 0,
+        firstLabelSize = 3,
+        inputSize = 3,
+        labelSize = 2;
+
+    for (var i = 0; i < columns.length;) {
+        var column = columns[i++];
+        var name = column.name,
+            type = column.inputType,
+            title = column.title,
+            colspan = column.colspan || 1;
+
+        if (colspan > maxColspan) colspan = maxColspan;
+
+        if (type == 'ID') continue;
+
+        // 附件独占一行
+        var back = false;
+        if (type == 'ATTACHMENT' && currentColspan > 0) {
+            back = true;
+        } else if (currentColspan + colspan <= maxColspan) {
+            if (currentColspan == 0) {
+                html += '<div class="form-group">\n';
+            }
+
+            html += '<label for="' + name + '" class="col-sm-' + (currentColspan == 0 ? firstLabelSize : labelSize) + ' control-label">' + title + '：</label>\n';
+            if (type == 'ATTACHMENT') {
+                html += '<div name="' + name + '" class="col-sm-' + ((maxColspan - 1) * (inputSize + labelSize) + inputSize) + '"></div>\n';
+                currentColspan = maxColspan;
+            } else {
+                html += '<div class="col-sm-' + ((colspan - 1) * (inputSize + labelSize) + inputSize) + '">\n';
+                html += '<p name="' + name + '" class="form-control-static description"></p>\n';
+                html += '</div>\n';
+                currentColspan += colspan;
+            }
+        } else {
+            back = true;
+        }
+
+        if (back) {
+            i--;
+            currentColspan = maxColspan;
+        }
+
+        if (currentColspan >= maxColspan) {
+            html += '</div>\n';
+            currentColspan = 0;
+        }
+    }
+
+    html +=
+        '   </form>\n' +
+        '</div>\n';
+    return html;
+}
+
+
+
+var _Model = function(name, column, options) {
+    var that = this;
+    that.name = name;
+    that.editBtn = $("#" + name + "_edit_btn");
+    that.addBtn = $("#" + name + "_add_btn");
+    that.status = "view";
+    that.viewBody = $("#" + name + "_view");
+    that.editBody = $("#" + name + "_edit");
+    that.formSubmitBtn = $("#" + name + "_form_submit_btn");
+    that.formCancelBtn = $("#" + name + "_form_cancel_btn");
+    that.formBody = $("#" + name + "_form");
+
+    that.editBtn.click(function() {
+        that.toEdit();
     });
 
-    c.append(dl);
+    that.addBtn.click(function() {
+        that.toAdd();
+    });
+
+    that.formCancelBtn.click(function() {
+        that.toView();
+    });
+
+    that.columns = column;
+
+    // 附件列
+    that.attachmentColumn = null;
+
+    that.dependency = {};
+    that.checkboxColumn = {};
+
+    if (that.columns) {
+        that.columns.forEach(function(column) {
+            if (column.inputType === 'ATTACHMENT') {
+                that.attachmentColumn = column;
+                that.attachmentColumn.disabled = false;
+            }
+
+            if (column.inputType === 'CHECKBOX') {
+                that.checkboxColumn[column.name] = column;
+            }
+
+            if (column.dependency) {
+                that.dependency[column.name] = [{
+                    target: column.name,
+                    dependColumn: column.dependency[0],
+                    dependValue: column.dependency.slice(1, column.dependency.length + 1)
+                }];
+            }
+        });
+
+        for (var o in that.dependency) {
+            var d = that.dependency[o];
+            var fd = d[0].dependColumn;
+
+            var p = that.dependency[fd];
+            while (p) {
+                d.push(p[0]);
+                p = that.dependency[p[0].dependColumn];
+            }
+        }
+    }
+
+    that.config = $.extend({
+        successCallback: function(data) {
+            $.successMessage("保存成功");
+            that.setData(data)
+            that.toView();
+        }
+    }, options);
+
+    // 创建表单提交
+    if (that.formBody) {
+        that.formBody.createForm({
+            beforeCallback: function(formData) {
+                var extraParam = that.config.extraParam;
+                if (extraParam) {
+                    if (typeof extraParam === 'function') {
+                        extraParam = extraParam();
+                    }
+
+                    for (var o in extraParam) {
+                        formData.push({
+                            name: o,
+                            value: extraParam[o],
+                            type: "text",
+                            required: false
+                        });
+                    }
+                }
+
+                if (that.attachmentColumn) {
+                    var fileCount = 0;
+
+                    // 原表单文件数据只有最后一个，这里需要手动从插件中获取File Object添加到表单数据中
+                    var i = 0;
+
+                    for (; i < formData.length; i++) {
+                        if (formData[i].name == that.attachmentColumn.fileName) {
+                            break;
+                        }
+                    }
+
+                    formData.splice(i, 1);
+
+                    if (that.attachmentColumn.disabled === false) {
+                        // 有附件时，需要替换某些参数
+                        var previews = that.inputAttachment.fileinput('getPreview');
+                        var attachments = "";
+                        if (previews && previews.config && previews.config.length > 0) {
+                            previews.config.forEach(function(p) {
+                                attachments += p.key + ",";
+                                fileCount++;
+                            });
+                        }
+
+                        // 动态加入已经上传的附件ID
+                        formData.push({
+                            name: that.attachmentColumn.name,
+                            value: attachments,
+                            type: "text",
+                            required: false
+                        });
+
+                        var files = that.inputAttachment.fileinput('getFileStack');
+                        if (files) {
+                            files.forEach(function(file) {
+                                formData.push({
+                                    name: that.attachmentColumn.fileName,
+                                    value: file,
+                                    type: "file",
+                                    required: false
+                                });
+                                fileCount++;
+                            });
+                        }
+
+                        if (fileCount > 4) {
+                            $.errorAlert("附件数量不能超过4个");
+                            return false;
+                        }
+                    }
+                }
+
+                var beforeSubmit = that.config.beforeSubmit;
+                if (beforeSubmit && typeof beforeSubmit === 'function') {
+                    return beforeSubmit(formData);
+                }
+            },
+            successCallback: that.config.successCallback
+        });
+    }
+
+    that.initEditDependency();
 }
+
+_Model.prototype.getColumn = function(columnName) {
+    for (var i = 0; i < this.columns.length; i++) {
+        if (this.columns[i].name == columnName) {
+            return this.columns[i];
+        }
+    }
+    return null;
+}
+
+_Model.prototype.setData = function(data) {
+    var that = this;
+    that.data = data;
+
+    if (that.data) {
+        for (var o in that.checkboxColumn) {
+            var col = that.checkboxColumn[o];
+            var x = that.data[col.name];
+            if (x) {
+                that.data[col.name] = x.split(",");
+            }
+        }
+
+        // 如果列依赖不成立时，列数据应该为空
+        for (var o in that.dependency) {
+            var depends = that.dependency[o];
+            var tar = depends[0].target;
+
+            if (!that.isDependencySatisfy(depends, that.data)) {
+                that.data[tar] = null;
+            }
+        }
+
+        if (that.attachmentColumn) {
+            // 解析的附件
+            var filename = that.attachmentColumn.fileName;
+            that.data[filename] = $.parseAttachmentData(that.data[filename]);
+        }
+    }
+
+    that.fillViewBody();
+}
+
+_Model.prototype.fillViewBody = function() {
+    var that = this;
+    var data = that.data;
+    if (that.columns) {
+        that.columns.forEach(function(column) {
+            if (column.inputType === 'RADIO') {
+                that.viewBody.find("input[name='" + column.name + "'][value='" + that.getColumnValue(column, data) + "']").iCheck('check');
+            } else if (column.inputType === 'CHECKBOX') {
+                var v = that.getColumnValue(column, data);
+                if (v) {
+                    v.forEach(function(a) {
+                        that.viewBody.find("input[name='" + column.name + "'][value='" + a + "']").iCheck('check');
+                    });
+                }
+            } else {
+                var p = that.viewBody.find("[name='" + column.name + "']");
+
+                if (!p || p.length == 0 || column.inputType === 'ATTACHMENT') return;
+
+                var v = that.getColumnValue(column, data);
+
+                if (v) {
+                    p.removeClass("text-muted");
+                    p.text(v);
+                } else {
+                    p.addClass("text-muted");
+                    p.text("无");
+                }
+            }
+        });
+
+        that.fillAttachment();
+        that.checkViewDependency(that.viewBody, data);
+    }
+}
+
+_Model.prototype.getColumnValue = function(column, data) {
+    var v = data ? data[column.name] : null;
+
+    if (column.inputType === 'SELECT') {
+        return $.getConstantEnumValue(column.enum, v);
+    } else if (column.inputType === 'TREE') {
+        return $.getTreeConstantEnumValue(column.enum, v);
+    } else if (column.inputType === 'DISTRICT') {
+        return $.getDistrictFullName(v);
+    } else if (column.inputType === 'DATE') {
+        if (typeof v === 'number') {
+            v = dateFormat(v);
+        }
+    }
+    return v;
+}
+
+_Model.prototype.fillEditBody = function() {
+    var that = this;
+    var data = that.currentData;
+    if (that.columns) {
+        that.columns.forEach(function(column) {
+            if (column.inputType === 'RADIO') {
+                that.editBody.find("input[name='" + column.name + "'][value='" + that.getColumnValue(column, data) + "']").iCheck('check');
+            } else if (column.inputType === 'CHECKBOX') {
+                var v = that.getColumnValue(column, data);
+                if (v) {
+                    v.forEach(function(a) {
+                        that.editBody.find("input[name='" + column.name + "'][value='" + a + "']").iCheck('check');
+                    });
+                }
+            } else {
+                var input = that.editBody.find("[name='" + column.name + "']");
+                var ov = data ? data[column.name] : null;
+                var v = ov,
+                    isP = input.is("p");
+
+
+                if (!input || column.inputType === 'ATTACHMENT') return;
+
+                if (column.inputType === 'TREE') {
+                    if (!isP) {
+                        input.data("Tree_Select").setCurrent($.getTreeConstantEnumValue(column.enum, v));
+                        return;
+                    }
+                }
+
+                if (column.inputType === 'DISTRICT') {
+                    if (!isP) {
+                        input.data("District_Select").setCurrent($.getDistrict(v));
+                        return;
+                    } else {
+                        input.text($.getDistrict(v).name);
+                        return;
+                    }
+                }
+
+                if (column.inputType === 'SELECT') {
+                    v = $.getConstantEnumValue(column.enum, v);
+                } else if (column.inputType === 'DATE') {
+                    if (typeof v === 'number') {
+                        v = dateFormat(v);
+                    }
+                }
+
+                if (v) {
+                    if (isP) {
+                        input.removeClass("text-muted");
+                        input.text(v);
+                    } else {
+                        if (column.inputType === 'SELECT') {
+                            input.val(ov);
+                        } else {
+                            input.val(v);
+                        }
+                    }
+                } else {
+                    if (isP) {
+                        input.addClass("text-muted");
+                        input.text("无");
+                    } else {
+                        if (input.is("SELECT")) {
+                            input[0].options[0].selected = true;
+                        } else {
+                            input.val("");
+                        }
+                    }
+                }
+            }
+        });
+
+        that.checkEditDependency();
+    }
+}
+
+_Model.prototype.toAdd = function() {
+    var that = this;
+    that.currentData = null;
+    that.addBtn.hide();
+    that.viewBody.hide();
+    that.editBody.show();
+    that.fillEditBody();
+    that.initAttachmentUploader();
+}
+
+_Model.prototype.toEdit = function(index) {
+    var that = this;
+    that.currentData = that.data;
+
+    that.editBtn.hide();
+    that.viewBody.hide();
+    that.editBody.show();
+    that.fillEditBody();
+    that.initAttachmentUploader();
+}
+
+_Model.prototype.toView = function() {
+    var that = this;
+    that.editBtn.show();
+    that.addBtn.show();
+    that.viewBody.show();
+    that.editBody.hide();
+}
+
+_Model.prototype.fillAttachment = function() {
+    var that = this;
+    if (that.attachmentColumn) {
+        var name = that.attachmentColumn.name;
+        var atts = that.data[that.attachmentColumn.fileName];
+
+        if (atts) {
+
+            // 方案1
+            // var attDiv = that.viewBody.find('[name="' + name + '"]');
+            // var html = '<label class="col-sm-3 control-label"><i class="icon fa fa-download"></i>附件下载：</label><div class="col-sm-6"><ul class="products-list product-list-in-box">';
+            // for (var i = 0; i < atts.length; i++) {
+            //     var b = atts[i];
+            //     html += '<li class="item"><a target="_blank" href="' + b.url + '" download="' + b.filename + '">' + b.filename + '</a></li>';
+            // }
+            // html += "</ul></div>";
+            // attDiv.html(html);
+
+            // 方案2
+            var attDiv = that.viewBody.find('[name="' + name + '"]');
+            var html = '<ul class="mailbox-attachments clearfix">';
+            for (var i = 0; i < atts.length; i++) {
+                var b = atts[i];
+                var k = b.filename.lastIndexOf(".");
+                var suffix = "";
+                if (k >= 0) {
+                    suffix = b.filename.substring(k + 1).toLowerCase();
+                }
+
+                var header = "";
+                if (suffix == "jpeg" || suffix == "jpg" || suffix == "png" || suffix == "gif") {
+                    header = '<span class="mailbox-attachment-icon has-img"><img src="' + b.url + '" alt="Attachment"></span>';
+                } else {
+                    var iconMap = {
+                        txt: "fa-file-text-o",
+                        xls: "fa-file-excel-o",
+                        xlsx: "fa-file-excel-o",
+                        pdf: "fa-file-pdf-o",
+                        doc: "fa-file-word-o",
+                        docx: "fa-file-word-o",
+                        rar: "fa-file-zip-o",
+                        zip: "fa-file-zip-o"
+                    }
+                    var icon = iconMap[suffix] || "fa-file-o";
+                    header = '<span class="mailbox-attachment-icon"><i class="fa ' + icon + '"></i></span>';
+                }
+
+                html +=
+                    '<li>' + header +
+                    '    <div class="mailbox-attachment-info">' +
+                    '        <a target="_blank" href="' + b.url + '" class="mailbox-attachment-name"><i class="fa fa-camera"></i>' + b.filename + '</a>' +
+                    '        <span class="mailbox-attachment-size">' + (Math.floor(b.size / 1024) + "KB") + '<a target="_blank" download="' + b.filename + '" href="' + b.url + '" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a></span>' +
+                    '    </div>' +
+                    '</li>';
+            }
+            html += "</ul>";
+            attDiv.html(html);
+        }
+    }
+}
+
+_Model.prototype.initAttachmentUploader = function(fileInput, files) {
+    var that = this;
+    if (that.attachmentColumn) {
+        var name = that.attachmentColumn.fileName;
+        var atts = that.currentData ? that.currentData[name] : null;
+        var fileInput = that.formBody.find('[name="' + name + '"]');
+
+        var initialPreview = [];
+        var initialPreviewConfig = [];
+        if (atts) {
+            atts.forEach(function(att) {
+                initialPreview.push(att.url);
+                initialPreviewConfig.push({
+                    caption: att.filename,
+                    size: att.size,
+                    //url:"/common/constant?code=sex",
+                    key: att.id
+                });
+            });
+        }
+
+        if (that.inputAttachment) {
+            that.inputAttachment.fileinput('destroy');
+        }
+
+        that.inputAttachment = $(fileInput).fileinput({
+            language: 'zh',
+            uploadUrl: '/common/upload/files',
+            showUpload: false,
+            layoutTemplates: {
+                actionUpload: '' //去除上传预览缩略图中的上传图片；
+            },
+            uploadAsync: false,
+            maxFileCount: 4,
+            allowedFileExtensions: that.attachmentColumn.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],
+            overwriteInitial: false,
+            ajaxDelete: false, // 扩展定义配置，不进行后台删除操作
+            initialPreview: initialPreview,
+            initialPreviewAsData: true, // allows you to set a raw markup
+            initialPreviewFileType: 'image', // image is the default and can be overridden in config below
+            initialPreviewConfig: initialPreviewConfig
+        });
+    }
+}
+
+_Model.prototype.isInDependencyValues = function(val, vals) {
+    if (val != null && val != undefined && val !== "") {
+        if ($.isArray(val)) {
+            for (var i = 0; i < val.length; i++) {
+                var v = val[i];
+                for (var j = 0; j < vals.length; j++) {
+                    if (v == vals[s]) {
+                        return true;
+                    }
+                }
+            }
+        } else {
+            for (var i = 0; i < vals.length; i++) {
+                if (val == vals[i]) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+_Model.prototype.isDependencySatisfy = function(dependencies, data) {
+    for (var i = 0; i < dependencies.length; i++) {
+        var dep = dependencies[i];
+        if (!this.isInDependencyValues(data[dep.dependColumn], dep.dependValue)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+_Model.prototype.checkViewDependency = function(container, data) {
+    var that = this;
+    for (var o in that.dependency) {
+        var depends = that.dependency[o];
+        var tar = depends[0].target;
+        var tc = that.getColumn(tar);
+        var div;
+
+        if (tc.inputType == 'ATTACHMENT') {
+            div = container.find("[name='" + tc.fileName + "']:eq(0)").parents(".form-group");
+        } else {
+            div = container.find("[name='" + tar + "']:eq(0)").parents(".form-group");
+        }
+
+        if (!that.isDependencySatisfy(depends, data)) {
+            if (!div.hasClass("hidden-column")) {
+                div.addClass("hidden-column");
+            }
+        } else {
+            if (div.hasClass("hidden-column")) {
+                div.removeClass("hidden-column");
+            }
+        }
+    }
+}
+
+_Model.prototype.checkEditDependency = function() {
+    var that = this;
+    for (var o in that.dependency) {
+        var dependencies = that.dependency[o];
+        var isOk = true;
+
+        for (var i = 0; i < dependencies.length; i++) {
+            var dep = dependencies[i];
+            var val;
+            var dc = that.getColumn(dep.dependColumn);
+            if (dc.inputType == 'RADIO' || dc.inputType == 'CHECKBOX') {
+                val = that.editBody.find("input[name='" + dep.dependColumn + "']:checked").val();
+            } else {
+                val = that.editBody.find("[name='" + dep.dependColumn + "']").val();
+            }
+
+            if (!that.isInDependencyValues(val, dep.dependValue)) {
+                isOk = false;
+                break;
+            }
+        }
+
+        var tc = that.getColumn(dependencies[0].target);
+        var input;
+        if (tc.inputType == 'ATTACHMENT') {
+            input = that.editBody.find("[name='" + tc.fileName + "']");
+        } else {
+            input = that.editBody.find("[name='" + tc.name + "']");
+        }
+
+        var div = input.parents(".form-group");
+        if (isOk) {
+            if (div.hasClass("hidden-column")) {
+                div.removeClass("hidden-column");
+            }
+
+            if (tc.inputType == 'ATTACHMENT') {
+                //input.fileinput('enable');
+                tc.disabled = false;
+            } else {
+                input.removeAttr("disabled");
+            }
+
+        } else {
+            if (!div.hasClass("hidden-column")) {
+                div.addClass("hidden-column");
+            }
+
+            if (tc.inputType == 'ATTACHMENT') {
+                //input.fileinput('disable');
+                tc.disabled = true;
+            } else {
+                input.attr("disabled", true);
+            }
+        }
+    }
+}
+
+_Model.prototype.initEditDependency = function() {
+    var that = this;
+    var cache = {};
+    for (var o in that.dependency) {
+        var depend = that.dependency[o][0];
+        if (cache[depend.dependColumn]) {
+            continue;
+        }
+        var dc = that.getColumn(depend.dependColumn);
+        if (dc.inputType == 'RADIO' || dc.inputType == 'CHECKBOX') {
+            // 这里使用icheck 所以调用ifChecked事件
+            that.editBody.find("input[name='" + depend.dependColumn + "']").on('ifChecked', function() {
+                that.checkEditDependency();
+            });
+        } else {
+            that.editBody.find("[name='" + depend.dependColumn + "']").change(function() {
+                that.checkEditDependency();
+            });
+        }
+        cache[depend.dependColumn] = 1;
+    }
+}
+
+if (!window.toton) window.toton = {};
+window.tonto.Model = _Model;

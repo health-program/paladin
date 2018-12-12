@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
-import com.paladin.framework.spring.SpringContainer;
+import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.utils.StringParser;
 import com.paladin.health.model.origin.OriginDiseaseName;
 import com.paladin.health.model.origin.OriginDiseaseTag;
@@ -38,25 +38,24 @@ import com.paladin.health.service.origin.OriginDiseaseTagService;
  * 疾病搜索容器
  */
 @Component
-public class DiseaseSearchContainer implements SpringContainer {
+public class DiseaseSearchContainer implements VersionContainer {
 
 	private static Logger logger = LoggerFactory.getLogger(DiseaseSearchContainer.class);
 
 	@Autowired
-	OriginDiseaseTagService diseaseTagService;
+	private OriginDiseaseTagService diseaseTagService;
 	@Autowired
-	OriginDiseaseNameService diseaseNameService;
+	private OriginDiseaseNameService diseaseNameService;
 
-	static final String FIELD_SEARCH = "attr";
-	static final String FIELD_NAME = "name";
-	static final String FIELD_KEY = "key";
+	private static final String FIELD_SEARCH = "attr";
+	private static final String FIELD_NAME = "name";
+	private static final String FIELD_KEY = "key";
 
-	static final int MAX_SEARCH_RESULT_COUNT = 1000;
+	private static final int MAX_SEARCH_RESULT_COUNT = 1000;
 
-	IndexReader reader = null;
-	IndexSearcher searcher = null;
+	private IndexReader reader = null;
+	private IndexSearcher searcher = null;
 
-	@Override
 	public boolean initialize() {
 		logger.info("-------------开始初始化疾病搜索服务功能-------------");
 				
@@ -200,5 +199,15 @@ public class DiseaseSearchContainer implements SpringContainer {
 			this.totalNum = totalNum;
 		}
 
+	}
+
+	@Override
+	public String getId() {
+		return "disease_search_container";
+	}
+
+	@Override
+	public boolean versionChangedHandle(long version) {
+		return initialize();
 	}
 }
