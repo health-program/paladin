@@ -82,6 +82,35 @@ public class SimpleBeanCopier {
 	}
 
 	/**
+	 * 简单拷贝多个对象
+	 * 
+	 * @param sourceList
+	 * @param targetList
+	 * @return
+	 */
+	public <T> List<T> simpleCopyList(List<?> sourceList, List<T> targetList) {
+		return simpleCopyList(sourceList, targetList, false);
+	}
+
+	/**
+	 * 简单拷贝多个对象
+	 * 
+	 * @param sourceList
+	 * @param targetList
+	 * @param ignore
+	 * @return
+	 */
+	public <T> List<T> simpleCopyList(List<?> sourceList, List<T> targetList, boolean ignore) {
+		int size = Math.min(sourceList.size(), targetList.size());
+		if (size > 0) {
+			for (int i = 0; i < size; i++) {
+				simpleCopy(sourceList.get(i), targetList.get(i), ignore);
+			}
+		}
+		return targetList;
+	}
+
+	/**
 	 * 简单拷贝对象
 	 * 
 	 * @param source
@@ -155,6 +184,29 @@ public class SimpleBeanCopier {
 		 */
 		public static <T> List<T> simpleCopyList(List<?> sourceList, Class<T> targetType) {
 			return copier.simpleCopyList(sourceList, targetType);
+		}
+
+		/**
+		 * 简单拷贝多个对象
+		 * 
+		 * @param sourceList
+		 * @param targetList
+		 * @return
+		 */
+		public static <T> List<T> simpleCopyList(List<?> sourceList, List<T> targetList) {
+			return copier.simpleCopyList(sourceList, targetList);
+		}
+
+		/**
+		 * 简单拷贝多个对象
+		 * 
+		 * @param sourceList
+		 * @param targetList
+		 * @param ignore
+		 * @return
+		 */
+		public static <T> List<T> simpleCopyList(List<?> sourceList, List<T> targetList, boolean ignore) {
+			return copier.simpleCopyList(sourceList, targetList, ignore);
 		}
 
 		/**

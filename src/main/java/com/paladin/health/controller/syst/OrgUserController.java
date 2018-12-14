@@ -128,10 +128,10 @@ public class OrgUserController extends ControllerSupport{
 				throw new BusinessException("编辑的用户不存在");
 			}
 			
-			beanIncompleteCopy(userDTO, user);
+			beanCopy(userDTO, user);
 			return CommonResponse.getResponse(userService.updateUser(user));
 		} else {
-			OrgUser user = beanCompleteCopy(userDTO, new OrgUser());
+			OrgUser user = beanCopy(userDTO, new OrgUser());
 			return CommonResponse.getResponse(userService.addUser(user));
 		}
 	}

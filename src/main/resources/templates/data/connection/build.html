@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="data/header"/>
+<head th:include="/data/header"/>
 
 <body class="layout-boxed sidebar-mini">
 <input type="hidden" id="dbName" th:value="${dbName}"/>
@@ -26,19 +26,7 @@
                         <table id="dataGrid"></table>
                     </li>
                     <li class="item">
-                        <form class="form-horizontal tonto-form-validate">
-                            <div class="form-group">
-                                <div class="col-md-offset-2 col-md-10">
-                                    <div class="checkbox">
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" id="inlineCheckbox1" value="option1">新增·编辑HTML
-                                        </label>
-                                        <label class="checkbox-inline">
-                                            <input type="checkbox" id="inlineCheckbox3" value="option3">查看HTML
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
+                        <form class="form-horizontal tonto-form-validate">                        
                             <div class="form-group">
                                 <label for="basePackage" class="col-md-2 control-label">基础包路径</label>
                                 <div class="col-md-5">
@@ -83,7 +71,7 @@
     </section>
 </div>
 
-<div th:include="data/footer"></div>
+<div th:include="/data/footer"></div>
 <link rel="stylesheet" href="/static/assets/highlight/styles/dark.css">
 <style>
     pre {
@@ -154,6 +142,20 @@ function initDataGrid() {
                     }
                 },
                 {
+                    title: "常量类型",
+                    field: "constantType",
+                    formatter: function(value, row, index) {
+                        return '<input class="form-control t_' + row.name + '" name="constantType" value="' + (value ? value : row.name) + '"/>';
+                    }
+                },
+                {
+                    title: "列表字段",
+                    formatter: function(value, row, index) {
+                        var checked = !(row.isPrimary || row.isForeignKey || row.isUnique || isDefaultColumn(row.name));
+                        return '<input class="t_' + row.name + '" name="tableable" type="checkbox" ' + (checked ? 'checked="true"' : '') + '>';
+                    }
+                },
+                {
                     title: "新增字段",
                     formatter: function(value, row, index) {
                         var checked = !(row.isPrimary || row.isForeignKey || row.isUnique || isDefaultColumn(row.name));
@@ -196,7 +198,7 @@ function buildParams() {
     for (var i = 0; i < rows.length; i++) {
         var column = rows[i];
         var param = {
-            name: column.name
+            columnName: column.name
         };
         $(".t_" + column.name).each(function() {
             var input = $(this);

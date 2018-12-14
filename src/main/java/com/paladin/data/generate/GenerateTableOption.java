@@ -8,10 +8,13 @@ import java.util.Map;
 import com.paladin.data.database.DataBaseType;
 import com.paladin.data.database.model.Column;
 import com.paladin.data.database.model.Table;
+import com.paladin.data.database.model.constraint.ColumnConstraint;
+import com.paladin.data.database.model.constraint.TableConstraint;
 import com.paladin.framework.utils.reflect.NameUtil;
 
 /**
  * 自动创建配置类
+ * 
  * @author TontoZhou
  * @since 2018年4月11日
  */
@@ -21,6 +24,11 @@ public class GenerateTableOption {
 	 * 具体表描述
 	 */
 	private Table table;
+
+	/**
+	 * 主标题
+	 */
+	private String title;
 
 	/**
 	 * 基础路径，配合{@code model}属性
@@ -38,7 +46,7 @@ public class GenerateTableOption {
 	 * </p>
 	 */
 	private String model;
-	
+
 	/**
 	 * 子模块
 	 * <p>
@@ -85,8 +93,24 @@ public class GenerateTableOption {
 		return new ArrayList<>(columnOptions.values());
 	}
 
-	public String getModelFullName() {
-		return GenerateUtil.getClassPackage(this, GenerateType.MODEL) + "." + modelName;
+	public String[] getPrimaryName() {
+		TableConstraint tableConstraint = table.getPrimaryConstraint();
+		if (tableConstraint != null) {
+			ColumnConstraint[] constraints = table.getPrimaryConstraint().getConstraint();
+			if (constraints != null) {
+				String[] names = new String[constraints.length];
+				for (int i = 0; i < names.length; i++) {
+					names[i] = NameUtil.underline2hump(constraints[i].getColumn());
+				}
+				return names;
+			}
+		}
+		return null;
+	}
+
+	public String getFirstPrimaryName() {
+		String[] primaries = getPrimaryName();
+		return primaries != null ? primaries[0] : null;
 	}
 
 	public String getModelName() {
@@ -127,6 +151,10 @@ public class GenerateTableOption {
 
 	public void setSubModel(String subModel) {
 		this.subModel = subModel;
+	}
+
+	public String getTitle() {
+		return title == null || title.length() == 0 ? table.getName() : title;
 	}
 
 }

@@ -1,0 +1,87 @@
+package ${package};
+
+${imports}
+import com.paladin.framework.core.ControllerSupport;
+import com.paladin.framework.web.response.CommonResponse;
+import com.paladin.framework.utils.uuid.UUIDUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
+
+@Controller
+@RequestMapping("${baseRequestMapping}")
+public class ${upperModelName}Controller extends ControllerSupport {
+
+    @Autowired
+    private ${upperModelName}Service ${lowerModelName}Service;
+
+    @RequestMapping("${indexRM}")
+    public String index() {
+        return "${indexPage}";
+    }
+
+    @RequestMapping("${findPageRM}")
+    @ResponseBody
+    public Object findPage(${upperModelName}QueryDTO query) {
+        return CommonResponse.getSuccessResponse(${lowerModelName}Service.searchPage(query));
+    }
+    
+    @RequestMapping("${getDetailRM}")
+    @ResponseBody
+    public Object getDetail(@RequestParam String id, Model model) {   	
+        return CommonResponse.getSuccessResponse(beanCopy(${lowerModelName}Service.get(id), new ${upperModelName}VO()));
+    }
+    
+    @RequestMapping("${addRM}")
+    public String addInput() {
+        return "${addPage}";
+    }
+
+    @RequestMapping("${detailRM}")
+    public String detailInput(@RequestParam String id, Model model) {
+    	model.addAttribute("id", id);
+        return "${detailPage}";
+    }
+    
+    @RequestMapping("${saveRM}")
+	@ResponseBody
+    public Object save(@Valid ${upperModelName}DTO ${lowerModelName}DTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return validErrorHandler(bindingResult);
+		}
+        ${upperModelName} model = beanCopy(${lowerModelName}DTO, new ${upperModelName}());
+		String id = UUIDUtil.createUUID();
+		model.set${primaryName}(id);
+		if (testUserService.save(model) > 0) {
+			return CommonResponse.getSuccessResponse(${lowerModelName}Service.get(id));
+		}
+		return CommonResponse.getFailResponse();
+	}
+
+    @RequestMapping("${updateRM}")
+	@ResponseBody
+    public Object update(@Valid ${upperModelName}DTO ${lowerModelName}DTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return validErrorHandler(bindingResult);
+		}
+		String id = ${lowerModelName}DTO.getId();
+		${upperModelName} model = beanCopy(${lowerModelName}DTO, ${lowerModelName}Service.get(id));
+		if (${lowerModelName}Service.update(model) > 0) {
+			return CommonResponse.getSuccessResponse(${lowerModelName}Service.get(id));
+		}
+		return CommonResponse.getFailResponse();
+	}
+
+    @RequestMapping("${deleteRM}")
+    @ResponseBody
+    public Object delete(@RequestParam String id) {
+        return CommonResponse.getResponse(${lowerModelName}Service.removeByPrimaryKey(id));
+    }
+}

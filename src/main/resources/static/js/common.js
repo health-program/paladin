@@ -494,13 +494,18 @@
     //
     // -----------------------------------------
 
-    _initEnumConstant();
-    _initValidator();
-    _initTable();
-    _initForm();
-    _initAttachment();
-    _initCommon();
+    $.extend({
+        initComponment: function(container) {
+            _initEnumConstant(container);
+            _initValidator(container);
+            _initTable(container);
+            _initForm(container);
+            _initAttachment(container);
+            _initCommon(container);
+        }
+    })
 
+    $.initComponment();
 
 })(jQuery);
 
@@ -1792,17 +1797,48 @@ function generateHtml(options) {
         '    </div>\n' +
         '</div>\n';
 
+    html += generateViewFormHtml(options);
+    html += generateEditFormHtml(options, true);
+
+    html += '</div>\n';
+
+    return html;
+}
+
+function generateEditHtml(options) {
+    var id = options.id,
+        name = options.name,
+        columns = options.columns,
+        icon = options.icon || 'glyphicon glyphicon-user';
+
+    var html =
+        '<div class="box box-solid">\n' +
+        '<div class="box-header with-border">\n' +
+        '    <i class="' + icon + '"></i>\n' +
+        '    <h3 class="box-title">' + name + '</h3>\n' +
+        '    <div class="box-tools pull-right">\n' +
+        '    </div>\n' +
+        '</div>\n';
+
+    html += generateEditFormHtml(options);
+    html += '</div>';
+    return html;
+}
+
+function generateEditFormHtml(options, hide) {
+
+    var id = options.id,
+        columns = options.columns;
+
+    var html =
+        '<div id="' + id + '_edit" class="box-body" ' + (hide == true ? 'style="display: none"' : '') + '>\n' +
+        '   <form id="' + id + '_form" action="' + options.url + '" method="post" class="form-horizontal edit-body">\n';
+
     var maxColspan = 2,
         currentColspan = 0,
         firstLabelSize = 3,
         inputSize = 3,
         labelSize = 2;
-
-    html += generateViewFormHtml(options);
-
-    html +=
-        '<div id="' + id + '_edit" class="box-body" style="display: none">\n' +
-        '   <form id="' + id + '_form" action="' + column.url + '" method="post" class="form-horizontal edit-body">\n';
 
     for (var i = 0; i < columns.length;) {
         var column = columns[i++];
@@ -1869,19 +1905,28 @@ function generateHtml(options) {
         }
     }
 
+    if (currentColspan > 0) {
+        html += '</div>\n';
+        currentColspan = 0;
+    }
+
     html +=
         '   <div class="form-group">\n' +
         '       <div class="col-sm-2 col-sm-offset-3">\n' +
         '           <button type="submit" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
-        '       </div>\n' +
-        '       <div class="col-sm-2 col-sm-offset-1">\n' +
-        '       <button type="button" id="' + id + '_form_cancel_btn" class="btn btn-default btn-block">取消</button>\n' +
-        '       </div>\n' +
+        '       </div>\n';
+
+    if (hide == true) {
+        html +=
+            '       <div class="col-sm-2 col-sm-offset-1">\n' +
+            '       <button type="button" id="' + id + '_form_cancel_btn" class="btn btn-default btn-block">取消</button>\n' +
+            '       </div>\n';
+    }
+
+    html +=
         '   </div>\n' +
         '</form>\n' +
-        '</div>\n' +
         '</div>\n';
-
     return html;
 }
 
@@ -1963,12 +2008,16 @@ function generateViewFormHtml(options) {
         }
     }
 
+    if (currentColspan > 0) {
+        html += '</div>\n';
+        currentColspan = 0;
+    }
+
     html +=
         '   </form>\n' +
         '</div>\n';
     return html;
 }
-
 
 
 var _Model = function(name, column, options) {
@@ -2036,6 +2085,7 @@ var _Model = function(name, column, options) {
     }
 
     that.config = $.extend({
+        pattern: "normal", // edit:只能编辑,view:只能查看
         successCallback: function(data) {
             $.successMessage("保存成功");
             that.setData(data)
@@ -2167,7 +2217,11 @@ _Model.prototype.setData = function(data) {
         }
     }
 
-    that.fillViewBody();
+    if (that.config.pattern == 'edit') {
+        that.toEdit();
+    } else {
+        that.fillViewBody();
+    }
 }
 
 _Model.prototype.fillViewBody = function() {

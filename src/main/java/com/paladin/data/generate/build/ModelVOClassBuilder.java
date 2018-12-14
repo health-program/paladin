@@ -1,120 +1,35 @@
 package com.paladin.data.generate.build;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.persistence.Id;
-
-import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+import org.springframework.stereotype.Component;
+
 import com.paladin.data.generate.GenerateColumnOption;
-import com.paladin.data.generate.GenerateEnvironment;
 import com.paladin.data.generate.GenerateTableOption;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 @Component
-public class ModelClassBuilder extends SpringBootClassBuilder {
-
-	private static Map<Class<?>, Set<String>> modelFieldMap = new HashMap<>();
-
-	static {
-		for (Class<?> type : GenerateEnvironment.baseModelTypeMap) {
-			Set<String> fieldNames = new HashSet<>();
-			Method[] methods = type.getMethods();
-			for (Method method : methods) {
-				if (ReflectUtil.isGetMethod(method)) {
-					String methodName = method.getName();
-					String name = NameUtil.removeGetOrSet(methodName);
-					fieldNames.add(name);
-				}
-			}
-
-			if (fieldNames.size() > 0) {
-				modelFieldMap.put(type, fieldNames);
-			}
-		}
-	}
-
-	/**
-	 * 获得基础实体类
-	 * 
-	 * @param tableOption
-	 * @return
-	 */
-	private Class<?> getBaseModelType(GenerateTableOption tableOption) {
-
-		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
-
-		Class<?> clazz = null;
-		int fieldNum = 0;
-
-		for (Entry<Class<?>, Set<String>> entry : modelFieldMap.entrySet()) {
-
-			Set<String> fields = entry.getValue();
-			int count = 0;
-			for (GenerateColumnOption columnOption : columnOptions) {
-				if (fields.contains(columnOption.getFieldName())) {
-					count++;
-				}
-			}
-
-			if (count == fields.size()) {
-				if (clazz == null || (clazz != null && fieldNum < count)) {
-					clazz = entry.getKey();
-					fieldNum = count;
-				}
-			}
-		}
-
-		return clazz;
-	}
-
-	private List<GenerateColumnOption> getNeedColumnOption(GenerateTableOption tableOption, Class<?> baseModelType) {
-		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
-		if (baseModelType != null) {
-			ArrayList<GenerateColumnOption> result = new ArrayList<>(columnOptions.size());
-			Set<String> baseModelFields = modelFieldMap.get(baseModelType);
-			for (GenerateColumnOption columnOption : columnOptions) {
-				if (!baseModelFields.contains(columnOption.getFieldName())) {
-					result.add(columnOption);
-				}
-			}
-			return result;
-		} else {
-			return columnOptions;
-		}
-	}
+public class ModelVOClassBuilder extends SpringBootClassBuilder {
 
 	public String buildContent(GenerateTableOption tableOption) {
 
 		Set<Class<?>> importClassSet = new HashSet<>();
-		Class<?> baseModelType = getBaseModelType(tableOption);
-		List<GenerateColumnOption> columnOptions = getNeedColumnOption(tableOption, baseModelType);
+
+		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
 
 		Collections.sort(columnOptions, new Comparator<GenerateColumnOption>() {
-
 			@Override
 			public int compare(GenerateColumnOption o1, GenerateColumnOption o2) {
 				return o1.getColumn().getOrderIndex() - o2.getColumn().getOrderIndex();
 			}
-
 		});
-
-		importClassSet.add(Id.class);
-		if (baseModelType != null) {
-			importClassSet.add(baseModelType);
-		}
 
 		for (GenerateColumnOption columnOption : columnOptions) {
 			Class<?> clazz = columnOption.getFieldType();
@@ -145,10 +60,7 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 				sb.append("import ").append(className).append(";\n");
 		}
 
-		sb.append("\npublic class ").append(tableOption.getModelName());
-		if (baseModelType != null) {
-			sb.append(" extends ").append(baseModelType.getSimpleName());
-		}
+		sb.append("\npublic class ").append(getClassName(tableOption));
 
 		sb.append(" {\n\n");
 
@@ -157,7 +69,6 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 			sb.append(tab).append("// ").append(columnOption.getColumn().getComment()).append("\n");
 
 			if (columnOption.isPrimary()) {
-				sb.append(tab).append("@Id").append("\n");
 			}
 
 			sb.append(tab).append("private ").append(columnOption.getFieldType().getSimpleName()).append(" ").append(columnOption.getFieldName())
@@ -185,17 +96,17 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 
 	@Override
 	public BuilderType getBuilderType() {
-		return BuilderType.MODEL;
+		return BuilderType.MODEL_VO;
 	}
 
 	@Override
 	public String getPackage(GenerateTableOption tableOption) {
-		return "model";
+		return "service.*.vo";
 	}
 
 	@Override
 	public String getClassName(GenerateTableOption tableOption) {
-		return tableOption.getModelName();
+		return tableOption.getModelName() + "VO";
 	}
 
 }

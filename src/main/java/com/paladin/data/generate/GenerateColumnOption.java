@@ -17,7 +17,7 @@ public class GenerateColumnOption {
 	 * 数据库类型
 	 */
 	private DataBaseType dataBaseType;
-	
+
 	/**
 	 * 是否主键
 	 */
@@ -27,7 +27,7 @@ public class GenerateColumnOption {
 	 * 自动生成方式，UUID等
 	 */
 	private String generatedType;
-	
+
 	/**
 	 * 属性java类型
 	 */
@@ -42,6 +42,11 @@ public class GenerateColumnOption {
 	 * 标题
 	 */
 	private String title;
+	
+	/**
+	 * 是否列表显示
+	 */
+	private boolean tableable;
 
 	/**
 	 * 必填
@@ -57,17 +62,17 @@ public class GenerateColumnOption {
 	 * 可新增
 	 */
 	private boolean addable;
-	
+
 	/**
 	 * 可查询
 	 */
 	private boolean queryable;
-	
+
 	/**
 	 * 查询类型
 	 */
-	private QueryType queryType; 
-	
+	private QueryType queryType;
+
 	/**
 	 * 常量类型
 	 */
@@ -82,7 +87,6 @@ public class GenerateColumnOption {
 	 * 正则表达式
 	 */
 	private String regularExpression;
-	
 
 	/**
 	 * 正则类型，例如日期，邮箱，电话等
@@ -96,12 +100,12 @@ public class GenerateColumnOption {
 
 		this.fieldType = DataTypeUtil.getJavaType(column, dataBaseType);
 		this.fieldName = NameUtil.underline2hump(column.getName());
-		
-		//this.regularType = GenerateEnvironment.getRegularType(fieldType);
-		
-		if(fieldType == String.class) {
-			Integer length = column.getDataLength(); 
-			if(length != null) {
+
+		// this.regularType = GenerateEnvironment.getRegularType(fieldType);
+
+		if (fieldType == String.class) {
+			Integer length = column.getDataLength();
+			if (length != null) {
 				this.maxLength = length;
 			}
 		}
@@ -215,12 +219,28 @@ public class GenerateColumnOption {
 		this.queryType = queryType;
 	}
 
+	/**
+	 * 是否常量
+	 * @return
+	 */
+	public boolean isConstant() {
+		return constantType != null && constantType.length() > 0;
+	}
+
 	public String getConstantType() {
 		return constantType;
 	}
 
 	public void setConstantType(String constantType) {
 		this.constantType = constantType;
+	}
+
+	public boolean isTableable() {
+		return tableable;
+	}
+
+	public void setTableable(boolean tableable) {
+		this.tableable = tableable;
 	}
 
 }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="data/header" />
+<head th:include="/data/header" />
 
 <body class="layout-boxed sidebar-mini">
     <input type="hidden" id="dbName" th:value="${dbName}">
@@ -31,7 +31,7 @@
             </div>
     </div>
     </section>
-    <div th:include="data/footer"></div>
+    <div th:include="/data/footer"></div>
 </body>
 <script type="text/javascript">
 var table;

@@ -165,12 +165,12 @@ public class PublicityMessageController extends ControllerSupport {
 				throw new BusinessException("已经审核成功的信息无法修改");
 			}
 
-			beanCompleteCopy(publicityMessage, model);
+			beanCopy(publicityMessage, model);
 			model.setStatus(statu);
 			return CommonResponse.getResponse(publicityMessageService.update(model));
 		} else {
 			PublicityMessage model = new PublicityMessage();
-			beanCompleteCopy(publicityMessage, model);
+			beanCopy(publicityMessage, model);
 			model.setStatus(statu);
 			return CommonResponse.getResponse(publicityMessageService.save(model));
 		}

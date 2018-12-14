@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.paladin.data.generate.GenerateBuilderContainer;
 import com.paladin.data.generate.GenerateTableOption;
-import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.build.BuilderType;
 import com.paladin.data.generate.build.FileBuilder;
 
 @Service
@@ -18,8 +18,7 @@ public class GenerateService {
 	 * @param generateType
 	 * @return 如果有文件内容构建器则调用构建，无则返回空字符串
 	 */
-	public String buildFileContent(GenerateTableOption tableOption, GenerateType generateType) {
-
+	public String buildFileContent(GenerateTableOption tableOption, BuilderType generateType) {
 		FileBuilder builder = GenerateBuilderContainer.getFileContentBuilder(generateType);
 		if(builder != null) {
 			return builder.buildContent(tableOption);
@@ -35,7 +34,7 @@ public class GenerateService {
 	 * @param generateType
 	 * @param content
 	 */
-	public void buildProjectFile(GenerateTableOption tableOption, GenerateType generateType, String projectPath) {
+	public void buildProjectFile(GenerateTableOption tableOption, BuilderType generateType, String projectPath) {
 		FileBuilder builder = GenerateBuilderContainer.getFileContentBuilder(generateType);
 		if(builder != null) {
 			builder.buildFile(tableOption, projectPath);

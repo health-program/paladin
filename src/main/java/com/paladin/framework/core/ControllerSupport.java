@@ -31,16 +31,6 @@ public class ControllerSupport {
 		return CommonResponse.getValidFailResponse(result);
 	}
 
-	protected <T> T beanCompleteCopy(Object source, T target) {
-		SimpleBeanCopyUtil.simpleCopy(source, target);
-		return target;
-	}
-
-	protected <T> T beanIncompleteCopy(Object source, T target) {
-		SimpleBeanCopyUtil.simpleCopy(source, target, true);
-		return target;
-	}
-	
 	protected <T> T beanCopy(Object source, T target) {
 		SimpleBeanCopyUtil.simpleCopy(source, target, true);
 		return target;
@@ -50,7 +40,9 @@ public class ControllerSupport {
 		return SimpleBeanCopyUtil.simpleCopyList(sourceList, targetType);
 	}
 
-
+	public <T> List<T> beanCopyList(List<?> sourceList, List<T> targeList) {
+		return SimpleBeanCopyUtil.simpleCopyList(sourceList, targeList);
+	}
 	
 
 }

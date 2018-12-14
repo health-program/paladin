@@ -21,12 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.common.service.cache.SysVisitCacheService;
 import com.paladin.data.controller.dto.ColumnDTO;
 import com.paladin.data.controller.dto.GenerateTableOptionDTO;
+import com.paladin.data.controller.dto.GenerateTableOptionDTO.GenerateColumnOptionDTO;
 import com.paladin.data.database.DataBaseSource;
 import com.paladin.data.database.model.Column;
 import com.paladin.data.database.model.DataBase;
 import com.paladin.data.database.model.Table;
+import com.paladin.data.generate.GenerateColumnOption;
 import com.paladin.data.generate.GenerateTableOption;
-import com.paladin.data.generate.GenerateType;
+import com.paladin.data.generate.build.BuilderType;
 import com.paladin.data.model.DBConnection;
 import com.paladin.data.service.DBConnectionService;
 import com.paladin.data.service.GenerateService;
@@ -41,7 +43,7 @@ public class DBConnectionController extends ControllerSupport {
 
 	@Autowired
 	private DBConnectionService connectionService;
-	
+
 	@Autowired
 	private GenerateService generateService;
 
@@ -147,7 +149,7 @@ public class DBConnectionController extends ControllerSupport {
 		model.addAttribute("tableName", tableName);
 		model.addAttribute("projectPath", visitCacheService.getCache(request, CACHE_PROJECT_PATH));
 
-		return "data/connection/build";
+		return "/data/connection/build";
 	}
 
 	@RequestMapping("/db/build")
@@ -156,81 +158,90 @@ public class DBConnectionController extends ControllerSupport {
 
 		String dbName = option.getDbName();
 		String tableName = option.getTableName();
-		
+
 		DataBaseSource dataBaseSource = connectionService.getDataBaseSource(dbName);
-		
-		if(dataBaseSource == null) {
+
+		if (dataBaseSource == null) {
 			throw new BusinessException("不存在数据库：" + dbName);
 		}
-		
+
 		DataBase dataBase = dataBaseSource.getDataBase(false);
 		Table table = dataBase.getChild(tableName);
-		
-		if(table == null) {
+
+		if (table == null) {
 			throw new BusinessException("不存在表：" + tableName);
 		}
-		
+
 		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
-		
-		beanCompleteCopy(option, tableOption);
-		
-		HashMap<String,String> contentMap = new HashMap<>();
-		contentMap.put("model", generateService.buildFileContent(tableOption, GenerateType.MODEL));
-		contentMap.put("mapper", generateService.buildFileContent(tableOption, GenerateType.MAPPER));
-		contentMap.put("service", generateService.buildFileContent(tableOption, GenerateType.SERVICE));
-		
+
+		beanCopy(option, tableOption);
+
+		HashMap<String, String> contentMap = new HashMap<>();
+		contentMap.put("model", generateService.buildFileContent(tableOption, BuilderType.MODEL));
+		contentMap.put("mapper", generateService.buildFileContent(tableOption, BuilderType.MAPPER));
+		contentMap.put("service", generateService.buildFileContent(tableOption, BuilderType.SERVICE));
+
 		return CommonResponse.getSuccessResponse(null, contentMap);
 	}
-	
+
 	@Autowired
 	SysVisitCacheService visitCacheService;
-	
+
 	private final static String CACHE_PROJECT_PATH = "data_project_path";
-	
+
 	@RequestMapping("/db/build/boot")
 	@ResponseBody
 	public Object buildBoot(HttpServletRequest request, @RequestBody GenerateTableOptionDTO option) {
 
 		String dbName = option.getDbName();
 		String tableName = option.getTableName();
-		
+
 		DataBaseSource dataBaseSource = connectionService.getDataBaseSource(dbName);
-		
-		if(dataBaseSource == null) {
+
+		if (dataBaseSource == null) {
 			throw new BusinessException("不存在数据库：" + dbName);
 		}
-		
+
 		DataBase dataBase = dataBaseSource.getDataBase(false);
 		Table table = dataBase.getChild(tableName);
-		
-		if(table == null) {
+
+		if (table == null) {
 			throw new BusinessException("不存在表：" + tableName);
 		}
-		
+
 		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
+
+		beanCopy(option, tableOption);
 		
-		beanCompleteCopy(option, tableOption);
-		
-		String projectPath = option.getProjectPath();
-		
-		if(projectPath == null || projectPath.length() == 0) {
-			throw new BusinessException("项目路径不能为空" );
+		List<GenerateColumnOptionDTO>  columnOptionDTOs = option.getColumnOptions();
+		for(GenerateColumnOptionDTO columnOptionDTO : columnOptionDTOs) {
+			GenerateColumnOption columnOption = tableOption.getColumnOption(columnOptionDTO.getColumnName());
+			beanCopy(columnOptionDTO, columnOption);
 		}
-		
-		generateService.buildProjectFile(tableOption, GenerateType.MODEL, projectPath);
-		generateService.buildProjectFile(tableOption, GenerateType.MAPPER, projectPath);
-		generateService.buildProjectFile(tableOption, GenerateType.SERVICE, projectPath);
-//		generateService.buildProjectFile(tableOption, GenerateType.CONTROLLER, projectPath);
-	
-		generateService.buildProjectFile(tableOption, GenerateType.SQLMAPPER, projectPath);
-//		generateService.buildProjectFile(tableOption, GenerateType.JAVASCRIPT, projectPath);
-//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_INDEX, projectPath);
-//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_VIEW, projectPath);
-//		generateService.buildProjectFile(tableOption, GenerateType.PAGE_EDIT, projectPath);
-	
+
+		String projectPath = option.getProjectPath();
+
+		if (projectPath == null || projectPath.length() == 0) {
+			throw new BusinessException("项目路径不能为空");
+		}
+
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL_VO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.QUERY_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.SERVICE, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.CONTROLLER, projectPath);
+
+		generateService.buildProjectFile(tableOption, BuilderType.SQLMAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.JAVASCRIPT, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_INDEX, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_ADD, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_DETAIL, projectPath);
+
 		visitCacheService.putCache(request, CACHE_PROJECT_PATH, projectPath);
-		
+
 		return CommonResponse.getSuccessResponse();
 	}
-	
+
 }

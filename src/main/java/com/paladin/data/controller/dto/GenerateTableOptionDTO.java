@@ -8,23 +8,23 @@ import java.util.List;
  * @since 2018年4月11日
  */
 public class GenerateTableOptionDTO {
-	
+
 	private String dbName;
-	
+
 	private String tableName;
-	
+
+	private String title;
+
 	private String basePackage;
-	
+
 	private String model;
-	
+
 	private String subModel;
-	
+
 	private String projectPath;
-	
+
 	private List<GenerateColumnOptionDTO> columnOptions;
-	
-	
-	
+
 	public String getDbName() {
 		return dbName;
 	}
@@ -79,18 +79,8 @@ public class GenerateTableOptionDTO {
 	 * @since 2018年4月11日
 	 */
 	public static class GenerateColumnOptionDTO {
-		
-		private String columnName;
-		
-		/**
-		 * 自动生成方式，UUID等
-		 */
-		private String generatedType;
 
-		/**
-		 * 属性名称
-		 */
-		private String fieldName;
+		private String columnName;
 
 		/**
 		 * 标题
@@ -98,9 +88,19 @@ public class GenerateTableOptionDTO {
 		private String title;
 
 		/**
+		 * 常量类型
+		 */
+		private String constantType;
+
+		/**
 		 * 必填
 		 */
 		private boolean required;
+		
+		/**
+		 * 是否列表显示
+		 */
+		private boolean tableable;
 
 		/**
 		 * 可编辑
@@ -121,112 +121,92 @@ public class GenerateTableOptionDTO {
 		 * 正则表达式
 		 */
 		private String regularExpression;
-		
 
 		/**
 		 * 正则类型，例如日期，邮箱，电话等
 		 */
 		private String regularType;
 
-
-		public String getGeneratedType() {
-			return generatedType;
-		}
-
-
-		public void setGeneratedType(String generatedType) {
-			this.generatedType = generatedType;
-		}
-
-
-		public String getFieldName() {
-			return fieldName;
-		}
-
-
-		public void setFieldName(String fieldName) {
-			this.fieldName = fieldName;
-		}
-
-
 		public String getTitle() {
 			return title;
 		}
-
 
 		public void setTitle(String title) {
 			this.title = title;
 		}
 
-
 		public boolean isRequired() {
 			return required;
 		}
-
 
 		public void setRequired(boolean required) {
 			this.required = required;
 		}
 
-
 		public boolean isEditable() {
 			return editable;
 		}
-
 
 		public void setEditable(boolean editable) {
 			this.editable = editable;
 		}
 
-
 		public boolean isAddable() {
 			return addable;
 		}
-
 
 		public void setAddable(boolean addable) {
 			this.addable = addable;
 		}
 
-
 		public int getMaxLength() {
 			return maxLength;
 		}
-
 
 		public void setMaxLength(int maxLength) {
 			this.maxLength = maxLength;
 		}
 
-
 		public String getRegularExpression() {
 			return regularExpression;
 		}
-
 
 		public void setRegularExpression(String regularExpression) {
 			this.regularExpression = regularExpression;
 		}
 
-
 		public String getRegularType() {
 			return regularType;
 		}
-
 
 		public void setRegularType(String regularType) {
 			this.regularType = regularType;
 		}
 
-
 		public String getColumnName() {
 			return columnName;
 		}
 
-
 		public void setColumnName(String columnName) {
 			this.columnName = columnName;
 		}
+
+		public String getConstantType() {
+			return constantType;
+		}
+
+		public void setConstantType(String constantType) {
+			this.constantType = constantType;
+		}
+
+		public boolean isTableable() {
+			return tableable;
+		}
+
+		public void setTableable(boolean tableable) {
+			this.tableable = tableable;
+		}
+
 	}
 
 	public String getProjectPath() {
@@ -236,5 +216,13 @@ public class GenerateTableOptionDTO {
 	public void setProjectPath(String projectPath) {
 		this.projectPath = projectPath;
 	}
-	
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 }
