@@ -151,23 +151,6 @@
 			<version>2.3.28</version><!--$NO-MVN-MAN-VER$ -->
 		</dependency>
 
-
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-frontend-jaxws</artifactId>
-			<version>3.2.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-rt-transports-http</artifactId>
-			<version>3.2.6</version>
-		</dependency>
-
-		<dependency>
-		    <groupId>wsdl4j</groupId>
-		    <artifactId>wsdl4j</artifactId>
-		    </dependency>
-		
 		<dependency>
 		    <groupId>axis</groupId>
 		    <artifactId>axis</artifactId>
