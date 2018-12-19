@@ -3,7 +3,6 @@ package com.paladin.health.core;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UnknownAccountException;
@@ -16,9 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.paladin.framework.core.UserSession;
-import com.paladin.health.model.syst.OrgUser;
 import com.paladin.health.model.syst.SysUser;
-import com.paladin.health.service.syst.OrgUserService;
 import com.paladin.health.service.syst.SysUserService;
 
 public class SysUserRealm extends AuthorizingRealm {
@@ -27,9 +24,9 @@ public class SysUserRealm extends AuthorizingRealm {
 
 	@Autowired
 	private SysUserService sysUserService;
-
+	
 	@Autowired
-	private OrgUserService orgUserService;
+	private HealthUserSessionFactory userSessionFactory;
 
 	/**
 	 * 认证信息.(身份验证) : Authentication 是用来验证用户身份
@@ -57,22 +54,11 @@ public class SysUserRealm extends AuthorizingRealm {
 			throw new LockedAccountException(); // 帐号锁定
 		}
 
-		UserSession userSession = null;
-
-		int type = sysUser.getType();
-
-		if (type == SysUser.TYPE_ADMIN) {
-			userSession = new HealthUserSession("admin", "系统管理员", username);
-		} else if (type == SysUser.TYPE_ORG_USER) {			
-			OrgUser orgUser = orgUserService.get(sysUser.getUserId());
-			if(orgUser == null) {
-				throw new DisabledAccountException();
-			}
-			userSession = new HealthUserSession(orgUser, username);
-		} else {
-			throw new DisabledAccountException();
+		UserSession userSession = userSessionFactory.createSession(sysUser);
+		if(userSession == null) {
+			throw new AuthenticationException("账号不可用");
 		}
-
+		
 		/*
 		 * 获取权限信息:这里没有进行实现， 请自行根据UserInfo,Role,Permission进行实现； 获取之后可以在前端for循环显示所有链接;
 		 */

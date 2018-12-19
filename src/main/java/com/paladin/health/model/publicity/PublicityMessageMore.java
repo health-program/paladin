@@ -1,6 +1,7 @@
 package com.paladin.health.model.publicity;
 
-import com.paladin.health.model.syst.OrgUser;
+
+import com.paladin.health.model.org.OrgUser;
 
 import tk.mybatis.mapper.annotation.JoinColumn;
 

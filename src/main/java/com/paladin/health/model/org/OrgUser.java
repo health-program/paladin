@@ -1,19 +1,28 @@
-package com.paladin.health.controller.syst.pojo;
+package com.paladin.health.model.org;
 
-import javax.validation.constraints.NotEmpty;
+import com.paladin.framework.common.UnDeleteBaseModel;
+import javax.persistence.Id;
 
-public class OrgUserDTO {
-	
+public class OrgUser extends UnDeleteBaseModel {
+
+	// id
+	@Id
 	private String id;
 
-	@NotEmpty(message = "名称不能为空")
+	// 姓名
 	private String name;
 
+	// 角色id
+	private String roleId;
+
+	// 机构ID
+	private String agencyId;
+
+	// 账号
 	private String account;
 
+	// 描述
 	private String description;
-	
-	private Integer isAdmin;
 
 	public String getId() {
 		return id;
@@ -29,6 +38,22 @@ public class OrgUserDTO {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(String roleId) {
+		this.roleId = roleId;
+	}
+
+	public String getAgencyId() {
+		return agencyId;
+	}
+
+	public void setAgencyId(String agencyId) {
+		this.agencyId = agencyId;
 	}
 
 	public String getAccount() {
@@ -47,12 +72,4 @@ public class OrgUserDTO {
 		this.description = description;
 	}
 
-	public Integer getIsAdmin() {
-		return isAdmin;
-	}
-
-	public void setIsAdmin(Integer isAdmin) {
-		this.isAdmin = isAdmin;
-	}
-	
 }

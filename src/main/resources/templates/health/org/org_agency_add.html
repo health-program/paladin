@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>org_agency</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/org/agency/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url:"/health/org/agency/save",
+        columns: [
+				{ title: "机构名称", name: "name", inputType: "TEXT" },
+				{ title: "备注", name: "remarks", inputType: "TEXT" }
+				]
+    }
+
+    $(function() {       
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/org/agency/index";
+                });
+            }
+        });
+        model.setData(null);
+        $.initComponment();
+    });
+    </script>
+</body>
+
+</html>

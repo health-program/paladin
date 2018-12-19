@@ -59,7 +59,7 @@ public class ${upperModelName}Controller extends ControllerSupport {
         ${upperModelName} model = beanCopy(${lowerModelName}DTO, new ${upperModelName}());
 		String id = UUIDUtil.createUUID();
 		model.set${primaryName}(id);
-		if (testUserService.save(model) > 0) {
+		if (${lowerModelName}Service.save(model) > 0) {
 			return CommonResponse.getSuccessResponse(${lowerModelName}Service.get(id));
 		}
 		return CommonResponse.getFailResponse();

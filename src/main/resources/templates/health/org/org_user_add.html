@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>org_user</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/org/user/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url:"/health/org/user/save",
+        columns: [
+				{ title: "角色id", name: "roleId", inputType: "TEXT" },
+				{ title: "姓名", name: "name", inputType: "TEXT" },
+				{ title: "机构ID", name: "agencyId", inputType: "TEXT" },
+				{ title: "描述", name: "description", inputType: "TEXT" },
+				{ title: "账号", name: "account", inputType: "TEXT" }
+				]
+    }
+
+    $(function() {       
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/org/user/index";
+                });
+            }
+        });
+        model.setData(null);
+        $.initComponment();
+    });
+    </script>
+</body>
+
+</html>

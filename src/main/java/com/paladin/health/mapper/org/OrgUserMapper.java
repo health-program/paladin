@@ -1,7 +1,7 @@
-package com.paladin.health.mapper.syst;
+package com.paladin.health.mapper.org;
 
+import com.paladin.health.model.org.OrgUser;
 import com.paladin.framework.mybatis.CustomMapper;
-import com.paladin.health.model.syst.OrgUser;
 
 public interface OrgUserMapper extends CustomMapper<OrgUser>{
 

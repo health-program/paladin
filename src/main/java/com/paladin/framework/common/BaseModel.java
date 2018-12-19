@@ -4,7 +4,7 @@ import java.util.Date;
 
 import javax.persistence.OrderBy;
 
-import com.paladin.health.model.syst.OrgUser;
+import com.paladin.health.model.org.OrgUser;
 
 import tk.mybatis.mapper.annotation.ColumnType;
 

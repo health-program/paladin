@@ -1,7 +1,7 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.UnDeleteBaseModel;
-import com.paladin.health.model.syst.OrgUser;
+import com.paladin.health.model.org.OrgUser;
 
 import tk.mybatis.mapper.annotation.ColumnType;
 import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
@@ -13,14 +13,14 @@ import javax.persistence.Id;
 
 public class PublicityMessage extends UnDeleteBaseModel {
 
-	public final static int STATUS_TEMP =0;
-	public final static int STATUS_SUBMIT_EXAMINE =1;
-	public final static int STATUS_EXAMINE_FAIL =2;
-	public final static int STATUS_EXAMINE_SUCCESS =9;
-	public final static int STATUS_TO_SEND =10;
-	
+	public final static int STATUS_TEMP = 0;
+	public final static int STATUS_SUBMIT_EXAMINE = 1;
+	public final static int STATUS_EXAMINE_FAIL = 2;
+	public final static int STATUS_EXAMINE_SUCCESS = 9;
+	public final static int STATUS_TO_SEND = 10;
+
 	public final static String COLUMN_FIELD_STATUS = "status";
-	
+
 	@Id
 	@GeneratedValue(generator = "UUID")
 	private String id;
@@ -35,20 +35,20 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	@IgnoreInMultipleResult
 	private String content;
-	
+
 	@ColumnType(foreignClass = OrgUser.class)
 	private String examineUserId;
 
 	private Integer status;
-	
+
 	private Date publishTime;
-	
+
 	private Integer toApp;
-	
+
 	private Integer toWeixin;
-	
+
 	private Integer toCellphone;
-	
+
 	public String getId() {
 		return id;
 	}

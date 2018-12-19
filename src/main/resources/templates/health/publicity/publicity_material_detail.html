@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="publicity-material-type,"/>
+    <section class="content-header">
+        <h1>publicity_material</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/publicity/material/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <input type="hidden" id="id" th:value="${id}"/>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+
+    $(function() {
+    	var options = {
+	        id: "model",
+	        name: "详情",
+	        url:"/health/publicity/material/update?id="+$("#id").val(),
+	        columns: [
+				{ title: "工作周期", name: "workCycle", inputType: "TEXT" },
+				{ title: "日期", name: "date", inputType: "DATE" },
+				{ title: "所属机构", name: "agencyId", inputType: "TEXT" },
+				{ title: "数量", name: "count", inputType: "TEXT" },
+				{ title: "健康教育宣传资料类型", name: "type", enum: "publicity-material-type", inputType: "SELECT" },
+				{ title: "编发单位", name: "compileIssueUnit", inputType: "TEXT" },
+				{ title: "健康教育宣传资料名称", name: "name", inputType: "TEXT" },
+				{ title: "备注", name: "remarks", inputType: "TEXT" }
+				]
+	    }
+    
+        $.getAjax("/health/publicity/material/get?id="+$("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
+            $.initComponment();
+        });
+    });
+    </script>
+</body>
+
+</html>

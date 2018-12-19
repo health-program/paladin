@@ -4,22 +4,35 @@ import com.paladin.framework.common.BaseModel;
 import java.util.Date;
 import javax.persistence.Id;
 
-public class PublicityRecordPaper extends BaseModel {
+public class PublicityMaterial extends BaseModel {
 
+	// 
 	@Id
 	private String id;
 
+	// 工作周期
+	private String workCycle;
+
+	// 所属机构
+	private String agencyId;
+
+	// 健康教育宣传资料名称
 	private String name;
 
+	// 健康教育宣传资料类型
 	private String type;
 
+	// 编发单位
 	private String compileIssueUnit;
 
-	private String remarks;
-
+	// 数量
 	private Integer count;
 
+	// 日期
 	private Date date;
+
+	// 备注
+	private String remarks;
 
 	public String getId() {
 		return id;
@@ -27,6 +40,22 @@ public class PublicityRecordPaper extends BaseModel {
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public String getWorkCycle() {
+		return workCycle;
+	}
+
+	public void setWorkCycle(String workCycle) {
+		this.workCycle = workCycle;
+	}
+
+	public String getAgencyId() {
+		return agencyId;
+	}
+
+	public void setAgencyId(String agencyId) {
+		this.agencyId = agencyId;
 	}
 
 	public String getName() {
@@ -53,14 +82,6 @@ public class PublicityRecordPaper extends BaseModel {
 		this.compileIssueUnit = compileIssueUnit;
 	}
 
-	public String getRemarks() {
-		return remarks;
-	}
-
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
-	}
-
 	public Integer getCount() {
 		return count;
 	}
@@ -75,6 +96,14 @@ public class PublicityRecordPaper extends BaseModel {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public String getRemarks() {
+		return remarks;
+	}
+
+	public void setRemarks(String remarks) {
+		this.remarks = remarks;
 	}
 
 }
