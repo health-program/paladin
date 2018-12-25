@@ -1,5 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.publicity.PublicityMaterialMapper">
-
+<!-- 关联查询材料列表 -->
+	<select id="selectByQuery" parameterType="com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO" 
+	resultType="com.paladin.health.service.publicity.vo.PublicityMaterialVO">
+		SELECT 
+		pm.id,
+		pm.work_cycle as workCycle,
+		pm.agency_id as agencyId,
+		oa.name as agencyName,
+		pm.name,
+		pm.type,
+		pm.compile_issue_unit as compileIssueUnit,
+		pm.count,
+		pm.date,
+		pm.remarks
+		FROM publicity_material pm
+		LEFT JOIN org_agency oa ON pm.agency_id = oa.id
+		WHERE oa.is_delete = 0
+		<if test="workCycle!=null and workCycle!=''">
+			AND pm.work_cycle = #{workCycle}
+		</if>
+		<if test="name!=null and name!=''">
+			AND pm.name LIKE CONCAT('%',#{name},'%')
+		</if>
+		<if test="type!=null and type!=''">
+			AND pm.type = #{type}
+		</if>
+		<if test="agencyId!=null and agencyId!=''">
+			AND pm.agency_id = #{agencyId}
+		</if>
+		<if test="startTime!=null">
+			AND pm.date &gt;= #{startTime}
+		</if>
+		<if test="endTime!=null">
+			AND pm.date &lt;= #{endTime}
+		</if>
+		ORDER BY  pm.create_time DESC
+	</select>
+	<!-- 关联查询材料记录 -->
+	<select id="getOne" parameterType="string" resultType="com.paladin.health.service.publicity.vo.PublicityMaterialVO">
+		SELECT 
+		pm.id,
+		pm.work_cycle as workCycle,
+		pm.agency_id as agencyId,
+		oa.name as agencyName,
+		pm.name,
+		pm.type,
+		pm.compile_issue_unit as compileIssueUnit,
+		pm.count,
+		pm.date,
+		pm.remarks
+		FROM publicity_material pm
+		LEFT JOIN org_agency oa ON pm.agency_id = oa.id
+		WHERE oa.is_delete = 0 AND pm.id = #{id}
+	</select>
 </mapper>

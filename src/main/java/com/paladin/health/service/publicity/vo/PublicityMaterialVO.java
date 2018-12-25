@@ -4,14 +4,16 @@ import java.util.Date;
 
 public class PublicityMaterialVO {
 
-	// 
 	private String id;
 
 	// 工作周期
 	private String workCycle;
-
+	
 	// 所属机构
 	private String agencyId;
+	
+	// 所属机构
+	private String agencyName;
 
 	// 健康教育宣传资料名称
 	private String name;
@@ -145,6 +147,14 @@ public class PublicityMaterialVO {
 
 	public void setUpdateUserId(String updateUserId) {
 		this.updateUserId = updateUserId;
+	}
+
+	public String getAgencyName() {
+		return agencyName;
+	}
+
+	public void setAgencyName(String agencyName) {
+		this.agencyName = agencyName;
 	}
 
 }

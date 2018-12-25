@@ -52,7 +52,7 @@
                                 <li class="user-header">
                                     <img src="/static/image/user.png" class="img-circle" alt="User Image" />
                                     <p th:text="${user.userName}"></p>
-                                    <p><small th:text="${user.systemAdmin}? '系统管理员' : (${user.userAdmin}? '管理用户' : '普通用户')"></small></p>
+                                    <p><small th:text="${user.isSystemAdmin}? '系统管理员' : '普通用户'"></small></p>
                                 </li>
                                 <li class="user-footer">
                                     <div class="pull-left">
@@ -325,8 +325,34 @@
                         targetType: "iframe-tab"
                     }
                 ]
+            },
+            {
+                id: "9004",
+                text: "宣传资料管理",
+                icon: "fa fa-laptop",
+                children: [{
+                        id: "90041",
+                        text: "健康教育宣传资料登记表",
+                        icon: "fa fa-circle-o",
+                        url: "/publicity/material/index",
+                        targetType: "iframe-tab"
+                    },
+                    {
+                        id: "90043",
+                        text: "健康教育宣传资料发放表",
+                        icon: "fa fa-circle-o",
+                        url: "/publicity/material/grant/index",
+                        targetType: "iframe-tab"
+                    },
+                    {
+                        id: "90042",
+                        text: "健康教育音像资料播放表",
+                        icon: "fa fa-circle-o",
+                        url: "publicity/video/grant/index",
+                        targetType: "iframe-tab"
+                    }
+                ]
             }
-
         ];
 
         $('.sidebar-menu').sidebarMenu({ data: menus });

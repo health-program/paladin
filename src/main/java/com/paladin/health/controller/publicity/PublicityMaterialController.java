@@ -1,15 +1,18 @@
 package com.paladin.health.controller.publicity;
 
+import java.util.Calendar;
+import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.publicity.PublicityMaterial;
+import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.publicity.PublicityMaterialService;
 import com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO;
 import com.paladin.health.service.publicity.dto.PublicityMaterialDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialVO;
-
 import com.paladin.framework.core.ControllerSupport;
+import com.paladin.framework.core.query.QueryInputMethod;
+import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.framework.utils.uuid.UUIDUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +20,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import javax.validation.Valid;
 
 @Controller
@@ -27,31 +29,44 @@ public class PublicityMaterialController extends ControllerSupport {
     @Autowired
     private PublicityMaterialService publicityMaterialService;
 
+    @Autowired
+    private OrgAgencyService orgAgencyService;
+    
     @RequestMapping("/index")
-    public String index() {
+    @QueryInputMethod(queryClass = PublicityMaterialQueryDTO.class)
+    public String index(Model model) {
+    	 Calendar calendar = Calendar.getInstance();//日历对象
+    	 model.addAttribute("year", calendar.get(Calendar.YEAR));
+    	 model.addAttribute("agencyList", orgAgencyService.findAll());
         return "/health/publicity/publicity_material_index";
     }
 
     @RequestMapping("/find/page")
     @ResponseBody
+    @QueryOutputMethod(queryClass = PublicityMaterialQueryDTO.class, paramIndex = 0)
     public Object findPage(PublicityMaterialQueryDTO query) {
-        return CommonResponse.getSuccessResponse(publicityMaterialService.searchPage(query));
+        return CommonResponse.getSuccessResponse(publicityMaterialService.selectByQuery(query));
     }
     
     @RequestMapping("/get")
     @ResponseBody
-    public Object getDetail(@RequestParam String id, Model model) {   	
-        return CommonResponse.getSuccessResponse(beanCopy(publicityMaterialService.get(id), new PublicityMaterialVO()));
+    public Object getDetail(@RequestParam String id, Model model) {
+        return CommonResponse.getSuccessResponse(beanCopy(publicityMaterialService.getOne(id), new PublicityMaterialVO()));
     }
     
     @RequestMapping("/add")
-    public String addInput() {
+    public String addInput(Model model) {
+    	model.addAttribute("workCycle",Calendar.getInstance().get(Calendar.YEAR));
+    	HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
+		model.addAttribute("agencyId", userSession.getAgencyId());
+		model.addAttribute("agencyList", orgAgencyService.findAll());
         return "/health/publicity/publicity_material_add";
     }
 
     @RequestMapping("/detail")
     public String detailInput(@RequestParam String id, Model model) {
     	model.addAttribute("id", id);
+    	model.addAttribute("agencyList", orgAgencyService.findAll());
         return "/health/publicity/publicity_material_detail";
     }
     

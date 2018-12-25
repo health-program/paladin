@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head th:include="/health/header" />
 
 <body>
-    <tt:constant enumcode="publicity-material-type"/>
+    <tt:constant enumcode="publicity-material-type,grant-target-type"/>
     <input type="hidden" name="year"/>
     <section class="content-header">
-        <h1>健康教育宣传资料登记表</h1>
+        <h1>健康教育资料发放记录</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
@@ -18,9 +17,9 @@
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
                 <div class="input-group" style="width:100%">
-                    <label for="agencyId"  class="col-md-1 control-label">机构名称</label>
+                    <label for="grantorAgency"  class="col-md-1 control-label">发放机构</label>
 		                    <div class="col-md-2">
-		                       <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
+		                       <select name="grantorAgency" class="form-control" th:value="${query?.grantorAgency}">
                                     <option value="">请选择</option>
                                     <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
                                 </select>
@@ -29,17 +28,15 @@
 		                    <div class="col-md-2">
 		                          <input type="text" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请输入工作周期" th:value="${query}? ${query.workCycle} : ${year}">
 		                    </div>
-                            <label for="type"  class="col-md-1 control-label">宣传资料类型</label>
+                           <label for="grantor" class="col-md-1 control-label">发放人</label>
                             <div class="col-md-2">
-                                <select name="type" class="form-control tonto-select-constant" enumcode="publicity-material-type">
-                                    <option value="">请选择</option>
-                                </select>
+                                <input type="text" name="grantor" placeholder="请输入发放人" class="form-control" th:value="${query?.grantor}" />
                             </div>
                             </div>
                             <div class="input-group" style="width:100%;margin-top:20px">
-                             <label for="name" class="col-md-1 control-label">宣传资料名称</label>
+                            <label for="receiver" class="col-md-1 control-label">接收人</label>
                             <div class="col-md-2">
-                                <input type="text" name="name" placeholder="请输入宣传资料名称" class="form-control" th:value="${query?.name}" />
+                                <input type="text" name="receiver" placeholder="请输入接收人" class="form-control" th:value="${query?.receiver}" />
                             </div>
                             <label for="startTime" class="col-md-1 control-label">开始时间</label>
                             <div class="col-md-2">
@@ -72,7 +69,6 @@
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                        <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
                     </div>
                 </div>
             </div>
@@ -96,13 +92,14 @@
                 [
                     { title: "序号", align: "center",formatter: function (value, row, index) {return index+1;}},
                     { title: "工作周期", align: "center", field: "workCycle" },
-					{ title: "日期", align: "center", field: "date" ,formatter: "date" },
-					{ title: "所属机构", align: "center", field: "agencyName" },
-					{ title: "宣传资料名称", align: "center", field: "name" },
-					{ title: "宣传资料类型", align: "center", field: "type" ,enumcode: "publicity-material-type" },
-					{ title: "编发单位", align: "center", field: "compileIssueUnit" },
+					{ title: "资料名称", align: "center", field: "materialName" },
+					{ title: "资料类型", align: "center", field: "materialType" ,enumcode: "publicity-material-type"},
 					{ title: "数量", align: "center", field: "count" },
-					{ title: "备注", align: "center", field: "remarks" ,visible: false},
+					{ title: "发放对象类型", align: "center", field: "grantTargetType",enumcode: "grant-target-type"},
+					{ title: "发放机构", align: "center", field: "grantorAgency" ,visible: false },
+					{ title: "发放人", align: "center", field: "grantor" },
+					{ title: "接收人", align: "center", field: "receiver" },
+					{ title: "发放日期", align: "center", field: "grantDate",formatter: "date" },
                     {
                         title: "操作",
                         align: "center",
@@ -111,22 +108,19 @@
                             'click .detail': function(e, value, row, index) {
                                 detail(row);
                             },
-                            'click .share': function(e, value, row, index) {
-                            	distribute(row);
-                            },
                             'click .remove': function(e, value, row, index) {
                                 remove(row);
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
                             return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
-                                   '<button class="share btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-share"></i>发放</button>' +
-                                   '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+                                '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+
                         }
                     }
                 ]
             ],
-            url: '/health/publicity/material/find/page',
+            url: '/health/publicity/material/grant/find/page',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,
@@ -139,21 +133,17 @@
     }
 
     function add() {
-        window.location = '/health/publicity/material/add';
+        window.location = '/health/publicity/material/grant/add';
     }
 
     function detail(row) {
-        window.location = '/health/publicity/material/detail' + (row ? ('?id=' + row.id) : '');
+        window.location = '/health/publicity/material/grant/detail' + (row ? ('?id=' + row.id) : '');
     }
 
-    function distribute(row) {
-        window.location = '/health/publicity/material/grant/add' + (row ? ('?name=' + row.name +'&type=' + row.type +'&id=' + row.id) : '');
-    }
-    
     function remove(row) {
         if (row) {
             layer.confirm('确定删除吗?', function() {
-                $.getAjax('/health/publicity/material/delete?id=' + row.id, function() {
+                $.getAjax('/health/publicity/material/grant/delete?id=' + row.id, function() {
                     $.successMessage("删除成功");
                     table.refresh();
                 });
