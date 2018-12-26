@@ -6,29 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.controller.publicity.pojo.MessageExamineQuery;
-import com.paladin.health.controller.publicity.pojo.MessageQuery;
-import com.paladin.health.controller.publicity.pojo.PublicityMessageDTO;
 import com.paladin.health.model.publicity.PublicityMessage;
-import com.paladin.health.model.publicity.PublicityMessageMore;
 import com.paladin.health.service.publicity.PublicityMessageService;
+import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
+import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
 
 @Controller
-@RequestMapping("/health/publicity")
+@RequestMapping("/health/publicity/message")
 public class PublicityMessageController extends ControllerSupport {
 
 	@Autowired
-	PublicityMessageService publicityMessageService;
+	private PublicityMessageService publicityMessageService;
 
 	/**
 	 * 发布信息页面
@@ -36,7 +32,6 @@ public class PublicityMessageController extends ControllerSupport {
 	 * @return
 	 */
 	@RequestMapping("/index")
-	@QueryInputMethod(queryClass = MessageQuery.class)
 	public String index() {
 		return "/health/publicity/message_index";
 	}
@@ -49,8 +44,7 @@ public class PublicityMessageController extends ControllerSupport {
 	 */
 	@RequestMapping("/find")
 	@ResponseBody
-	@QueryOutputMethod(queryClass = MessageQuery.class, paramIndex = 0)
-	public Object findAll(MessageQuery query) {
+	public Object findAll(PublicityMessageQueryDTO query) {
 		return CommonResponse.getSuccessResponse(publicityMessageService.findSelfMessage(query));
 	}
 
@@ -60,7 +54,7 @@ public class PublicityMessageController extends ControllerSupport {
 	 * @return
 	 */
 	@RequestMapping("/examine/index")
-	@QueryInputMethod(queryClass = MessageExamineQuery.class)
+	@QueryInputMethod(queryClass = PublicityMessageQueryDTO.class)
 	public String examineIndex() {
 		return "/health/publicity/message_examine_index";
 	}
@@ -73,8 +67,8 @@ public class PublicityMessageController extends ControllerSupport {
 	 */
 	@RequestMapping("/examine/find")
 	@ResponseBody
-	@QueryOutputMethod(queryClass = MessageExamineQuery.class, paramIndex = 0)
-	public Object findExamineAll(MessageExamineQuery query) {
+	@QueryOutputMethod(queryClass = PublicityMessageQueryDTO.class, paramIndex = 0)
+	public Object findExamineAll(PublicityMessageQueryDTO query) {
 		return CommonResponse.getSuccessResponse(publicityMessageService.findExamineMessage(query));
 	}
 
@@ -85,14 +79,10 @@ public class PublicityMessageController extends ControllerSupport {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping("/view")
-	public String view(@RequestParam String id, Model model) {
-		PublicityMessage message = publicityMessageService.get(id);
-		if (message == null) {
-			message = new PublicityMessage();
-		}
-		model.addAttribute("object", message);
-		return "/health/publicity/message_view";
+	@RequestMapping("/get")
+	@ResponseBody
+	public Object view(@RequestParam String id) {
+		return CommonResponse.getSuccessResponse(publicityMessageService.get(id));
 	}
 
 	/**
@@ -104,7 +94,7 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/add")
 	public String add(Model model) {
 		model.addAttribute("object", new PublicityMessage());
-		return "/health/publicity/message_edit";
+		return "/health/publicity/message_add";
 	}
 
 	/**
@@ -114,66 +104,48 @@ public class PublicityMessageController extends ControllerSupport {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping("/edit")
-	public String edit(@RequestParam String id, Model model) {
-		PublicityMessage message = publicityMessageService.get(id);
-		if (message == null) {
-			throw new BusinessException("找不到需要编辑的公告消息");
-		}
-		model.addAttribute("object", message);
-		return "/health/publicity/message_edit";
+	@RequestMapping("/detail")
+	public String detail(@RequestParam String id, Model model) {
+		model.addAttribute("id", id);
+		return "/health/publicity/message_detail";
 	}
 
 	/**
-	 * 保存，status：temp -> 暂存; submit -> 提交;
+	 * 保存
 	 * 
 	 * @param publicityMessage
 	 * @param bindingResult
 	 * @return
 	 */
-	@RequestMapping("/save/{status}")
+	@RequestMapping("/save")
 	@ResponseBody
-	public Object save(@Valid PublicityMessageDTO publicityMessage, @PathVariable("status") String status, BindingResult bindingResult) {
+	public Object save(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
 
-		int statu = PublicityMessage.STATUS_TEMP;
-		if (status != null && status.length() > 0) {
-			if ("temp".equals(status)) {
-				statu = PublicityMessage.STATUS_TEMP;
-			} else if ("submit".equals(status)) {
-				statu = PublicityMessage.STATUS_SUBMIT_EXAMINE;
-			} else {
-				throw new BusinessException("错误的请求");
-			}
+		return CommonResponse.getResponse(publicityMessageService.saveMessage(publicityMessage));
+	}
+
+	/**
+	 * 保存
+	 * 
+	 * @param publicityMessage
+	 * @param bindingResult
+	 * @return
+	 */
+	@RequestMapping("/update")
+	@ResponseBody
+	public Object update(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return validErrorHandler(bindingResult);
 		}
-
-		String id = publicityMessage.getId();
-		if (id != null && id.length() != 0) {
-			PublicityMessage model = publicityMessageService.get(id);
-			if (model == null) {
-				throw new BusinessException("找不到需要编辑的公告消息");
-			}
-
-			Integer currentStatus = model.getStatus();
-			if (currentStatus == PublicityMessage.STATUS_SUBMIT_EXAMINE) {
-				throw new BusinessException("已经提交待审核的信息无法修改");
-			}
-
-			if (currentStatus == PublicityMessage.STATUS_EXAMINE_SUCCESS) {
-				throw new BusinessException("已经审核成功的信息无法修改");
-			}
-
-			beanCopy(publicityMessage, model);
-			model.setStatus(statu);
-			return CommonResponse.getResponse(publicityMessageService.update(model));
+		
+		if(publicityMessageService.updateMessage(publicityMessage)) {
+			return CommonResponse.getSuccessResponse(publicityMessageService.get(publicityMessage.getId()));
 		} else {
-			PublicityMessage model = new PublicityMessage();
-			beanCopy(publicityMessage, model);
-			model.setStatus(statu);
-			return CommonResponse.getResponse(publicityMessageService.save(model));
-		}
+			return CommonResponse.getFailResponse();
+		}	
 	}
 
 	/**
@@ -187,7 +159,7 @@ public class PublicityMessageController extends ControllerSupport {
 	public Object remove(@RequestParam String id) {
 		return CommonResponse.getResponse(publicityMessageService.removeMessage(id));
 	}
-	
+
 	/**
 	 * 审核
 	 * 
@@ -197,14 +169,9 @@ public class PublicityMessageController extends ControllerSupport {
 	 */
 	@RequestMapping("/examine")
 	public String examine(@RequestParam String id, Model model) {
-		PublicityMessageMore message = publicityMessageService.getJoin(id);
-		if (message == null) {
-			message = new PublicityMessageMore();
-		}
-		model.addAttribute("object", message);
+		model.addAttribute("id", id);
 		return "/health/publicity/message_examine";
 	}
-	
 
 	/**
 	 * 审核成功

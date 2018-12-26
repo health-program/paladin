@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
-	<tt:constant enumcode="publicity-message-type,publicity-message-status"/>
+    <tt:constant enumcode="publicity-message-type,publicity-message-status" />
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -13,34 +14,28 @@
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-md-4">
-                            <label for="title" style="width:130px" class="col-md-4 control-label">标题：</label>
-                            <div class="col-md-6">
-                                <input name="title" class="form-control" th:value="${query?.title}" />
-                            </div>
+                        <label for="title" class="col-md-1 control-label">标题：</label>
+                        <div class="col-md-2">
+                            <input name="title" class="form-control" th:value="${query?.title}" />
                         </div>
-                        <div class="col-md-4">
-                            <label for="type" style="width:130px" class="col-md-4 control-label">类型：</label>
-                            <div class="col-md-6">
-                                <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
-                                    <option value="">请选择</option>
-                                </select>
-                            </div>
+                        <label for="type" class="col-md-1 control-label">类型：</label>
+                        <div class="col-md-2">
+                            <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
+                                <option value="">请选择</option>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <label for="status" style="width:130px" class="col-md-4 control-label">状态：</label>
-                            <div class="col-md-6">
-                                <select name="status" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.status}" enumcode="publicity-message-status">
-                                    <option value="">请选择</option>
-                                </select>
-                            </div>
+                        <label for="status" class="col-md-1 control-label">状态：</label>
+                        <div class="col-md-2">
+                            <select name="status" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.status}" enumcode="publicity-message-status">
+                                <option value="">请选择</option>
+                            </select>
                         </div>
                     </div>
                 </form>
                 <div class="col-md-12">
                     <div class="pull-right">
-                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()">查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')">重置</button>
+                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')"><i class="fa fa-repeat"></i>重置</button>
                     </div>
                 </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
@@ -56,10 +51,7 @@
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                        <a onclick="view()" class="btn btn-default"><i class="glyphicon glyphicon-search"></i>查看</a>
-                        <a onclick="add()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>新增</a>
-                        <a onclick="edit()" class="btn btn-default"><i class="glyphicon glyphicon-edit"></i>修改</a>
-                        <a onclick="remove()" class="btn btn-default"><i class="glyphicon glyphicon-remove"></i>删除</a>
+                        <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
                     </div>
                 </div>
             </div>
@@ -70,7 +62,7 @@
     /*<![CDATA[*/
     var table;
     $(function() {
-    	initDataGrid();
+        initDataGrid();
     });
 
     function initDataGrid() {
@@ -82,49 +74,56 @@
             idField: "id",
             columns: [
                 [
-                    { radio: true },
                     { title: "标题", field: "title" },
-                    { title: "类型", field: "type", sortable: true, enumcode:"publicity-message-type"},
+                    { title: "类型", field: "type", sortable: true, enumcode: "publicity-message-type" },
                     { title: "副标题", field: "subtitle" },
-                    { title: "发布时间", field: "publishTime", formatter:"date" },
-                    { title: "状态", field: "status", sortable: true, enumcode:"publicity-message-status"},
+                    { title: "发布时间", field: "publishTime", formatter: "date" },
+                    { title: "状态", field: "status", sortable: true, enumcode: "publicity-message-status" },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            },
+                            'click .remove': function(e, value, row, index) {
+                                remove(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
+                                '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+
+                        }
+                    }
                 ]
             ],
-            url: '/health/publicity/find',
+            url: '/health/publicity/message/find',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,
             pageNumber: page || 1,
             pagination: true,
-            clickToSelect: true,
             toolbar: "#toolbar",
             showRefresh: true
         });
     }
 
-    function view() {
-        var row = getSelectRow();
-        if (row) {
-            window.location = '/health/publicity/view?id=' + row.id;
-        }
-    }
-
     function add() {
-        window.location = '/health/publicity/add';
+        window.location = '/health/publicity/message/add';
     }
 
-    function edit() {
-        var row = getSelectRow();
+    function detail(row) {
         if (row) {
-            window.location = '/health/publicity/edit?id=' + row.id;
+            window.location = '/health/publicity/message/detail?id=' + row.id;
         }
     }
 
-    function remove() {
-        var row = getSelectRow();
+    function remove(row) {
         if (row) {
             layer.confirm('确定删除吗?', function() {
-                $.getAjax('/health/publicity/remove?id=' + row.id, function() {
+                $.getAjax('/health/publicity/message/remove?id=' + row.id, function() {
                     $.successMessage("删除成功");
                     table.refresh();
                 });

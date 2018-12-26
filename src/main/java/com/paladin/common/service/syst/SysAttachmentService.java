@@ -11,12 +11,20 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.paladin.common.mapper.syst.SysAttachmentMapper;
 import com.paladin.common.model.syst.SysAttachment;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
+import com.paladin.framework.common.OffsetPage;
+import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.exception.SystemException;
@@ -26,6 +34,9 @@ import com.paladin.framework.utils.uuid.UUIDUtil;
 @Service
 public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 
+	@Autowired
+	private SysAttachmentMapper sysAttachmentMapper;
+	
 	@Value("${attachment.path}")
 	private String attachmentPath;
 
@@ -33,6 +44,8 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	private int maxFileSize;
 
 	private long maxFileByteSize;
+
+	private int maxFileNameSize = 50;
 
 	@PostConstruct
 	protected void initialize() {
@@ -65,6 +78,18 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 * @return
 	 */
 	public SysAttachment createAttachment(MultipartFile file, String attachmentName) {
+		return createAttachment(file, attachmentName, null);
+	}
+
+	/**
+	 * 创建附件（MultipartFile格式）
+	 * 
+	 * @param file
+	 * @param attachmentName
+	 * @param userType
+	 * @return
+	 */
+	public SysAttachment createAttachment(MultipartFile file, String attachmentName, Integer userType) {
 		String id = UUIDUtil.createUUID();
 		String name = file.getOriginalFilename();
 		long size = file.getSize();
@@ -91,6 +116,12 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 
 		attachment.setName(attachmentName);
 
+		if (userType == null || (userType != SysAttachment.USE_TYPE_COLUMN_RELATION && userType != SysAttachment.USE_TYPE_RESOURCE)) {
+			userType = SysAttachment.USE_TYPE_COLUMN_RELATION;
+		}
+		
+		attachment.setUseType(userType);
+
 		try {
 			saveFile(file.getBytes(), attachment);
 		} catch (IOException e) {
@@ -109,6 +140,18 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 * @return
 	 */
 	public SysAttachment createAttachment(String base64String, String filename, String type) {
+		return createAttachment(base64String, filename, null);
+	}
+
+	/**
+	 * 创建附件（base64格式）
+	 * 
+	 * @param base64String
+	 * @param filename
+	 * @param userType
+	 * @return
+	 */
+	public SysAttachment createAttachment(String base64String, String filename, String type, Integer userType) {
 		String id = UUIDUtil.createUUID();
 		long size = Base64Util.getFileSize(base64String);
 		if (size > maxFileByteSize) {
@@ -133,6 +176,12 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 			throw new BusinessException("文件名不能为空");
 		}
 
+		if (userType == null || (userType != SysAttachment.USE_TYPE_COLUMN_RELATION && userType != SysAttachment.USE_TYPE_RESOURCE)) {
+			userType = SysAttachment.USE_TYPE_COLUMN_RELATION;
+		}
+		
+		attachment.setUseType(userType);
+		
 		try {
 			saveFile(Base64Util.decode(base64String), attachment);
 		} catch (IOException e) {
@@ -142,15 +191,97 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 		return attachment;
 	}
 
+	/**
+	 * 创建附件（字节格式）
+	 * 
+	 * @param data
+	 * @param filename
+	 * @param type
+	 * @return
+	 */
+	public SysAttachment createAttachment(byte[] data, String filename, String type) {
+		return createAttachment(data, filename, type, null, null);
+	}
+
+	/**
+	 * 创建附件（字节格式）
+	 * 
+	 * @param base64String
+	 * @param filename
+	 * @param subFilePath
+	 *            子路径
+	 * @return
+	 */
+	public SysAttachment createAttachment(byte[] data, String filename, String type, String subFilePath, Integer userType) {
+		String id = UUIDUtil.createUUID();
+		long size = data.length;
+		if (size > maxFileByteSize) {
+			throw new BusinessException("上传附件不能大于" + maxFileSize + "MB");
+		}
+
+		SysAttachment attachment = new SysAttachment();
+		attachment.setId(id);
+		attachment.setSize(size);
+		attachment.setType(type);
+
+		if (filename != null && filename.length() > 0) {
+			int i = filename.lastIndexOf(".");
+			if (i >= 0) {
+				String suffix = filename.substring(i);
+				attachment.setSuffix(suffix);
+				attachment.setName(filename.substring(0, i));
+			} else {
+				attachment.setName(filename);
+			}
+		} else {
+			throw new BusinessException("文件名不能为空");
+		}
+		
+		if (userType == null || (userType != SysAttachment.USE_TYPE_COLUMN_RELATION && userType != SysAttachment.USE_TYPE_RESOURCE)) {
+			userType = SysAttachment.USE_TYPE_COLUMN_RELATION;
+		}
+		attachment.setUseType(userType);
+		
+		try {
+			saveFile(data, attachment, subFilePath);
+		} catch (IOException e) {
+			throw new SystemException("保存附件文件失败", e);
+		}
+		save(attachment);
+		return attachment;
+	}
+
 	private SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 
+	/**
+	 * 保存文件，并生成相对路径到附件数据中，子路径为当前日期
+	 * 
+	 * @param data
+	 * @param attachment
+	 * @throws IOException
+	 */
 	private void saveFile(byte[] data, SysAttachment attachment) throws IOException {
+		saveFile(data, attachment, null);
+	}
+
+	/**
+	 * 保存文件，并生成相对路径到附件数据中
+	 * 
+	 * @param data
+	 * @param attachment
+	 * @param subPath
+	 * @throws IOException
+	 */
+	private void saveFile(byte[] data, SysAttachment attachment, String subPath) throws IOException {
 		if (data == null || data.length == 0) {
 			throw new SystemException("文件为空");
 		}
 
-		String date = format.format(new Date());
-		Path path = Paths.get(attachmentPath, date);
+		if (subPath == null || subPath.length() == 0) {
+			subPath = format.format(new Date());
+		}
+
+		Path path = Paths.get(attachmentPath, subPath);
 		if (!Files.exists(path)) {
 			try {
 				Files.createDirectory(path);
@@ -165,10 +296,17 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 			filename += suffix;
 		}
 
-		String pelativePath = date + "/" + filename;
+		String pelativePath = subPath + "/" + filename;
 		Files.write(Paths.get(attachmentPath + pelativePath), data);
 
 		attachment.setPelativePath(pelativePath);
+		attachment.setCreateTime(new Date());
+
+		// 附件名称太长则截取
+		String attachmentName = attachment.getName();
+		if (attachmentName != null && attachmentName.length() > maxFileNameSize) {
+			attachmentName = attachmentName.substring(0, maxFileNameSize);
+		}
 	}
 
 	/**
@@ -179,6 +317,18 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 */
 	public List<SysAttachment> getAttachment(String... ids) {
 		return searchAll(new Condition(SysAttachment.COLUMN_FIELD_ID, QueryType.IN, Arrays.asList(ids)));
+	}
+	
+	/**
+	 * 获取文件附件记录
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	public PageResult<SysAttachment> getResourceImagePage(OffsetPage query) {
+		Page<SysAttachment> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		sysAttachmentMapper.findImageResource();
+		return new PageResult<>(page);
 	}
 
 	/**

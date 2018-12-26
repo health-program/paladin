@@ -38,18 +38,7 @@ public class MessageScheduleService {
 
 		for (PublicityMessage message : messages) {
 			String id = message.getId();
-
-			if (message.getToApp() != null && message.getToApp() == 1) {
-				publicityMessageService.pushMessage(id, PublicityMessagePush.CHANNEL_APP, message.getPublishTime());
-			}
-
-			if (message.getToApp() != null && message.getToCellphone() == 1) {
-				publicityMessageService.pushMessage(id, PublicityMessagePush.CHANNEL_CELLPHONE, message.getPublishTime());
-			}
-
-			if (message.getToApp() != null && message.getToWeixin() == 1) {
-				publicityMessageService.pushMessage(id, PublicityMessagePush.CHANNEL_WEIXIN, message.getPublishTime());
-			}
+			publicityMessagePushService.pushMessage(id, message.getType(), message.getPublishTime());
 		}
 	}
 
@@ -75,18 +64,20 @@ public class MessageScheduleService {
 			int result = 0;
 
 			int channel = messagePush.getChannel();
-			if (channel == PublicityMessagePush.CHANNEL_APP) {
-				logger.info("发送消息给APP[" + id + "]");
-				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-			} else if (channel == PublicityMessagePush.CHANNEL_CELLPHONE) {
-				logger.info("发送消息给短信[" + id + "]");
-				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-			} else if (channel == PublicityMessagePush.CHANNEL_WEIXIN) {
-				logger.info("发送消息给微信[" + id + "]");
-				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-			} else {
-				result = 99;
-			}
+//			if (channel == PublicityMessagePush.CHANNEL_APP) {
+//				logger.info("发送消息给APP[" + id + "]");
+//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
+//			} else if (channel == PublicityMessagePush.CHANNEL_CELLPHONE) {
+//				logger.info("发送消息给短信[" + id + "]");
+//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
+//			} else if (channel == PublicityMessagePush.CHANNEL_WEIXIN) {
+//				logger.info("发送消息给微信[" + id + "]");
+//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
+//			} else {
+//				result = 99;
+//			}
+			
+			//TODO 发送信息
 
 			Integer times = messagePush.getTryTimes();
 			if (times == null)

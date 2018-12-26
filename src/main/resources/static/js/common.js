@@ -505,7 +505,9 @@
         }
     })
 
-    $.initComponment();
+    if (window.needInitComponet !== false) {
+        $.initComponment();
+    }
 
 })(jQuery);
 
@@ -810,6 +812,10 @@ function _initValidator() {
             // 创建元素验证器
             for (var i = 0; this.length > i; i++) {
                 var target = $(this[i]);
+
+                if (target.hasClass("no-validate")) {
+                    continue;
+                }
 
                 var name = target.attr("name");
                 var rules = config && config.rules && config.rules[name] || {};
@@ -1382,10 +1388,10 @@ function _initEnumConstant(container, enumcodes, callback) {
                 var checked = false;
                 enumvalues.forEach(function(a) {
                     if ((selectedvalue && selectedvalue == a.key) || (!selectedvalue && !checked)) {
-                        $s.append('<label><input type="radio" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                        $s.append('<label class="control-label radio-label"><input type="radio" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
                         checked = true;
                     } else {
-                        $s.append('<label><input type="radio" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                        $s.append('<label class="control-label radio-label"><input type="radio" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
                     }
                 });
             }
@@ -1417,9 +1423,9 @@ function _initEnumConstant(container, enumcodes, callback) {
             if (enumvalues) {
                 enumvalues.forEach(function(a) {
                     if (isChecked(a.key)) {
-                        $s.append('<label><input type="checkbox" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                        $s.append('<label class="control-label radio-label"><input type="checkbox" checked="checked" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
                     } else {
-                        $s.append('<label><input type="checkbox" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
+                        $s.append('<label class="control-label radio-label"><input type="checkbox" name="' + name + '" value="' + a.key + '">&nbsp;&nbsp;' + a.value + '&nbsp;&nbsp;</label>');
                     }
                 });
             }
@@ -1506,7 +1512,7 @@ function _initForm(container) {
             debug: true,
             // 不要设置true，只有不想启用时候去设置false
             // 是否在获取焦点时验证
-            // onfocusout: false,
+            onfocusout: false,
             // 在keyup时验证.
             onkeyup: false,
             // 当鼠标掉级时验证
@@ -2176,6 +2182,10 @@ var _Model = function(name, column, options) {
     }
 
     that.initEditDependency();
+
+    if(that.config.pattern == 'view') {
+        that.editBtn.hide();
+    }
 }
 
 _Model.prototype.getColumn = function(columnName) {
@@ -2229,41 +2239,32 @@ _Model.prototype.fillViewBody = function() {
     var data = that.data;
     if (that.columns) {
         that.columns.forEach(function(column) {
-            if (column.inputType === 'RADIO') {
-                that.viewBody.find("input[name='" + column.name + "'][value='" + that.getColumnValue(column, data) + "']").iCheck('check');
-            } else if (column.inputType === 'CHECKBOX') {
-                var v = that.getColumnValue(column, data);
-                if (v) {
-                    v.forEach(function(a) {
-                        that.viewBody.find("input[name='" + column.name + "'][value='" + a + "']").iCheck('check');
-                    });
-                }
+            var p = that.viewBody.find("[name='" + column.name + "']");
+
+            if (!p || p.length == 0 || column.inputType === 'ATTACHMENT') return;
+
+            var v = that.getColumnValue(column, data);
+
+            if (v) {
+                p.removeClass("text-muted");
+                p.text(v);
             } else {
-                var p = that.viewBody.find("[name='" + column.name + "']");
-
-                if (!p || p.length == 0 || column.inputType === 'ATTACHMENT') return;
-
-                var v = that.getColumnValue(column, data);
-
-                if (v) {
-                    p.removeClass("text-muted");
-                    p.text(v);
-                } else {
-                    p.addClass("text-muted");
-                    p.text("无");
-                }
+                p.addClass("text-muted");
+                p.text("无");
             }
         });
 
         that.fillAttachment();
         that.checkViewDependency(that.viewBody, data);
     }
+
+    typeof that.config.fillViewHandler === "function" && that.config.fillViewHandler(data, that);
 }
 
 _Model.prototype.getColumnValue = function(column, data) {
     var v = data ? data[column.name] : null;
 
-    if (column.inputType === 'SELECT') {
+    if (column.inputType === 'SELECT' || column.inputType === 'RADIO' || column.inputType === 'CHECKBOX') {
         return $.getConstantEnumValue(column.enum, v);
     } else if (column.inputType === 'TREE') {
         return $.getTreeConstantEnumValue(column.enum, v);
@@ -2281,12 +2282,17 @@ _Model.prototype.fillEditBody = function() {
     var that = this;
     var data = that.currentData;
     if (that.columns) {
+        // TODO 重构成注册形式，基于inputType建立数据模型
         that.columns.forEach(function(column) {
             if (column.inputType === 'RADIO') {
-                that.editBody.find("input[name='" + column.name + "'][value='" + that.getColumnValue(column, data) + "']").iCheck('check');
-            } else if (column.inputType === 'CHECKBOX') {
-                var v = that.getColumnValue(column, data);
+                var v = data ? data[column.name] : null;
                 if (v) {
+                    that.editBody.find("input[name='" + column.name + "'][value='" + v + "']").iCheck('check');
+                }
+            } else if (column.inputType === 'CHECKBOX') {
+                var v = data ? data[column.name] : null;
+                if (v) {
+                    v = v.split(",");
                     v.forEach(function(a) {
                         that.editBody.find("input[name='" + column.name + "'][value='" + a + "']").iCheck('check');
                     });
@@ -2353,6 +2359,8 @@ _Model.prototype.fillEditBody = function() {
 
         that.checkEditDependency();
     }
+
+    typeof that.config.fillEditHandler === "function" && that.config.fillEditHandler(data, that);
 }
 
 _Model.prototype.toAdd = function() {
@@ -2365,7 +2373,7 @@ _Model.prototype.toAdd = function() {
     that.initAttachmentUploader();
 }
 
-_Model.prototype.toEdit = function(index) {
+_Model.prototype.toEdit = function() {
     var that = this;
     that.currentData = that.data;
 

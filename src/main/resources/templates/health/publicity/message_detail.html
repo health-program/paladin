@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<link rel="stylesheet" href="/static/assets/ueditor/themes/default/css/ueditor.min.css" />
+
+<body>
+    <tt:constant enumcode="publicity-message-type" />
+    <section class="content-header">
+        <h1>信息详情</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/publicity/message/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">详情</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-edit"></i>
+                <h3 class="box-title">详情</h3>
+                <div class="box-tools pull-right">
+                    <a class="btn" id="model_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>
+                </div>
+            </div>
+            <div id="model_view" class="box-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-3 control-label">标题：</label>
+                        <div class="col-sm-3">
+                            <p name="title" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subtitle" class="col-sm-3 control-label">副标题：</label>
+                        <div class="col-sm-3">
+                            <p name="subtitle" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="type" class="col-sm-3 control-label">类型：</label>
+                        <div class="col-sm-3">
+                            <p name="type" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
+                        <div class="col-sm-3">
+                            <p name="publishTime" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="content" class="col-sm-3 control-label">内容：</label>
+                        <div class="col-sm-3">
+                            <p name="content" id="contentP" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="model_edit" class="box-body" style="display: none">
+                <form id="model_form" action="/health/publicity/message/update" method="post" class="form-horizontal edit-body">
+                    <div class="form-group">
+                        <label for="title" class="col-sm-3 control-label">标题：</label>
+                        <div class="col-sm-3">
+                            <input name="title" placeholder="请输入标题" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="subtitle" class="col-sm-3 control-label">副标题：</label>
+                        <div class="col-sm-3">
+                            <input name="subtitle" placeholder="请输入副标题" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
+                        <div class="col-sm-3">
+                            <input name="publishTime" placeholder="请输入发布时间" type="text" class="form-control tonto-datepicker-date" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="type" class="col-sm-3 control-label">类型：</label>
+                        <div class="col-sm-3 tonto-radio-constant" enumcode="publicity-message-type">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="content" class="col-sm-3 control-label">内容：</label>
+                        <div class="col-sm-8" id="contentDiv">
+                            <script type="text/plain" id="myEditor" style="width:100%;height:540px;"></script>
+                        </div>
+                    </div>
+                    <input type="hidden" id="statusInput" name="status" />
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-3">
+                            <button type="submit" class="btn btn-primary" onclick="setStatus(0)">暂存</button>
+                            <button type="submit" class="btn btn-success" onclick="setStatus(1)">提交</button>
+                            <button type="button" id="model_form_cancel_btn" class="btn btn-default">取消</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <input type="hidden" id="id" th:value="${id}" />
+    <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript">
+    function fillViewHandler(data, model) {
+        $("#contentP").html(data.content);
+    }
+
+    function fillEditHandler(data, model) {
+        typeCheckedHandler(data.type);
+        if (data.type == 1) {
+            editor.setContent(data.content);
+        } else if (data.type == 2) {
+            urlInput.val(data.content);
+        } else if (data.type == 3) {
+            messageInput.val(data.content);
+        }
+    }
+
+    function setStatus(stat) {
+        $("#statusInput").val(stat);
+    }
+    $(function() {
+        initEditor();
+        var options = {
+            id: "model",
+            name: "详情",
+            url: "/health/publicity/message/update?id=" + $("#id").val(),
+            columns: [
+                { title: "标题", name: "title", inputType: "TEXT" },
+                { title: "副标题", name: "subtitle", inputType: "TEXT" },
+                { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
+                { title: "发布时间", name: "publishTime", inputType: "DATE" }
+            ]
+        }
+
+        $.getAjax("/health/publicity/message/get?id=" + $("#id").val(), function(data) {
+            var model = new tonto.Model("model", options.columns, {
+                pattern: data.status == 0 ? "normal" : "view",
+                extraParam: function() {
+                    var type = $('input[name="type"]:checked').val();
+                    return type == 1 ? {
+                        id: $("#id").val(),
+                        content: editor.getContent()
+                    } : {
+                        id: $("#id").val()
+                    };
+                },
+                fillEditHandler: fillEditHandler,
+                fillViewHandler: fillViewHandler
+            });
+            model.setData(data);
+        });
+    });
+
+    var current = 1,
+        editor, urlInput, messageInput;
+
+    function initEditor() {
+        $("input:radio[name='type']").on('ifChecked', function(a, b) {
+            typeCheckedHandler(a.currentTarget.value);
+        });
+
+        editor = UE.getEditor('myEditor');
+        urlInput = $('<input name="content" placeholder="请输入视频URL" type="text" class="form-control no-validate" style="display:none"  disabled="disabled"/>');
+        messageInput = $('<textarea name="content" class="no-validate" style="width:100%;height: 300px;display:none" disabled="disabled"></textarea>');
+        $("#contentDiv").append(urlInput);
+        $("#contentDiv").append(messageInput);
+    }
+
+    function typeCheckedHandler(type) {
+        if (current == type) {
+            return;
+        }
+
+        if (type == 1) {
+            editor.setShow();
+            urlInput.hide();
+            urlInput.attr("disabled", true);
+            messageInput.hide();
+            messageInput.attr("disabled", true);
+        } else if (type == 2) {
+            editor.setHide();
+            urlInput.show();
+            urlInput.attr("disabled", false);
+            messageInput.hide();
+            messageInput.attr("disabled", true);
+        } else if (type == 3) {
+            editor.setHide();
+            urlInput.hide();
+            urlInput.attr("disabled", true);
+            messageInput.show();
+            messageInput.attr("disabled", false);
+        }
+
+        current = type;
+    }
+    </script>
+</body>
+
+</html>
