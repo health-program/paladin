@@ -8,7 +8,7 @@ public class PublicityMaterialDTO {
 	private String id;
 
 	// 工作周期
-	private String workCycle;
+	private Integer workCycle;
 
 	// 所属机构
 	private String agencyId;
@@ -17,7 +17,7 @@ public class PublicityMaterialDTO {
 	private String name;
 
 	// 健康教育宣传资料类型
-	private String type;
+	private Integer type;
 
 	// 编发单位
 	private String compileIssueUnit;
@@ -31,18 +31,6 @@ public class PublicityMaterialDTO {
 	// 备注
 	private String remarks;
 
-	// 创建时间
-	private Date createTime;
-
-	// 创建人
-	private String createUserId;
-
-	// 更新时间
-	private Date updateTime;
-
-	// 更新人
-	private String updateUserId;
-
 	public String getId() {
 		return id;
 	}
@@ -51,11 +39,11 @@ public class PublicityMaterialDTO {
 		this.id = id;
 	}
 
-	public String getWorkCycle() {
+	public Integer getWorkCycle() {
 		return workCycle;
 	}
 
-	public void setWorkCycle(String workCycle) {
+	public void setWorkCycle(Integer workCycle) {
 		this.workCycle = workCycle;
 	}
 
@@ -75,11 +63,11 @@ public class PublicityMaterialDTO {
 		this.name = name;
 	}
 
-	public String getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 
@@ -113,38 +101,6 @@ public class PublicityMaterialDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdateUserId() {
-		return updateUserId;
-	}
-
-	public void setUpdateUserId(String updateUserId) {
-		this.updateUserId = updateUserId;
 	}
 
 }

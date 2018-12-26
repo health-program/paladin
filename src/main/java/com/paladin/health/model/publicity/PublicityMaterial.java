@@ -11,7 +11,7 @@ public class PublicityMaterial extends BaseModel {
 	private String id;
 
 	// 工作周期
-	private String workCycle;
+	private Integer workCycle;
 
 	// 所属机构
 	private String agencyId;
@@ -20,7 +20,7 @@ public class PublicityMaterial extends BaseModel {
 	private String name;
 
 	// 健康教育宣传资料类型
-	private String type;
+	private Integer type;
 
 	// 编发单位
 	private String compileIssueUnit;
@@ -42,11 +42,11 @@ public class PublicityMaterial extends BaseModel {
 		this.id = id;
 	}
 
-	public String getWorkCycle() {
+	public Integer getWorkCycle() {
 		return workCycle;
 	}
 
-	public void setWorkCycle(String workCycle) {
+	public void setWorkCycle(Integer workCycle) {
 		this.workCycle = workCycle;
 	}
 
@@ -66,11 +66,11 @@ public class PublicityMaterial extends BaseModel {
 		this.name = name;
 	}
 
-	public String getType() {
+	public Integer getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Integer type) {
 		this.type = type;
 	}
 

@@ -1,14 +1,12 @@
 package com.paladin.health.core;
 
 import org.apache.shiro.SecurityUtils;
-
 import com.paladin.framework.core.UserSession;
 import com.paladin.health.model.org.OrgUser;
 
 public class HealthUserSession extends UserSession {
 
 	private static final long serialVersionUID = 4854607722824823403L;
-
 	public final static int DATA_LEVEL_ADMIN = 1;
 	public final static int DATA_LEVEL_AGENCY = 2;
 
@@ -57,6 +55,13 @@ public class HealthUserSession extends UserSession {
 	 */
 	public String getAgencyId() {
 		return agencyId;
+	}
+	/**
+	 * 获取用户类型
+	 * @return
+	 */
+	public boolean getIsSystemAdmin() {
+		return isSystemAdmin;
 	}
 
 	/**

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.publicity.PublicityMaterialGrantMapper">
+<!-- 关联查询发放表 -->
+<select id="selectByQuery" parameterType="com.paladin.health.service.publicity.dto.PublicityMaterialGrantQueryDTO" 
+resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantVO">
+	SELECT 
+	pmg.id,
+	pmg.work_cycle as workCycle,
+	pm.name materialName,
+	pmg.material_type materialType,
+	pmg.count,
+	pmg.grant_target as grantTarget,
+	pmg.grant_target_type as grantTargetType,
+	pmg.grantor,
+	oa.name grantorAgency,
+	pmg.grant_date as grantDate,
+	pmg.receiver,
+	pmg.remarks 
+	FROM publicity_material_grant pmg
+	LEFT JOIN publicity_material pm ON pmg.material_id = pm.id
+	LEFT JOIN org_agency oa ON pmg.grantor_agency = oa.id
+	WHERE oa.is_delete = 0
+	<if test="workCycle!=null">
+		AND pmg.work_cycle = #{workCycle}
+	</if>
+	<if test="materialName!=null and materialName!=''">
+		AND pm.name LIKE CONCAT('%',#{materialName},'%')
+	</if>
+	<if test="grantorAgency!=null and grantorAgency!=''">
+		AND pmg.grantor_agency = #{grantorAgency}
+	</if>
+	<if test="grantor!=null and grantor!=''">
+		AND pmg.grantor = #{grantor}
+	</if>
+	<if test="receiver!=null and receiver!=''">
+		AND pmg.receiver = #{receiver}
+	</if>
+	<if test="startTime!=null">
+		AND pmg.grant_date &gt;= #{startTime}
+	</if>
+	<if test="endTime!=null">
+		AND pmg.grant_date &lt;= #{endTime}
+	</if>
+	ORDER BY  pmg.create_time DESC
+</select>
+<!-- 关联查发放记录 -->
+<select id="getOne" parameterType="string" resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantVO">
+	SELECT 
+	pmg.id,
+	pmg.work_cycle as workCycle,
+	pmg.material_id as materialId,
+	pm.name materialName,
+	pmg.material_type materialType,
+	pmg.count,
+	pmg.grant_target as grantTarget,
+	oap.name as grantTargetName,
+	pmg.grant_target_type as grantTargetType,
+	pmg.grantor,
+	pmg.grantor_agency as grantorAgency,
+	oa.name agencyName,
+	pmg.grant_date as grantDate,
+	pmg.receiver,
+	pmg.remarks 
+	FROM publicity_material_grant pmg
+	LEFT JOIN publicity_material pm ON pmg.material_id = pm.id
+	LEFT JOIN org_agency oa ON pmg.grantor_agency = oa.id
+	LEFT JOIN org_agency oap ON pmg.grant_target = oap.id
+	WHERE oa.is_delete = 0 AND pmg.id = #{id}
+</select>
+<!-- 分发时判断材料的数量够不够 -->
+<select id="checkCount" parameterType="string" resultType="com.paladin.health.service.publicity.vo.CheckCountVO">
+	SELECT * FROM
+	(SELECT SUM(count) as reduce FROM publicity_material_grant  WHERE material_id = #{id})a,
+	(SELECT count as total FROM publicity_material WHERE id = #{id})b
+</select>
+</mapper>
