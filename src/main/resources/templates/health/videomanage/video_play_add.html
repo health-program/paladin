@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>视频播放记录</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/video/play/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+	<section class="content">
+		<div class="box box-solid">
+			<div class="box-header with-border">
+				<i class="glyphicon glyphicon-user"></i>
+				<h3 class="box-title">新增</h3>
+				<div class="box-tools pull-right"></div>
+			</div>
+			<div id="model_edit" class="box-body">
+				<form id="model_form" action="/health/video/play/save" method="post"
+					class="form-horizontal edit-body">
+					<div class="form-group">
+						<label for="videoName" class="col-sm-3 control-label">视频名称：</label>
+						<div class="col-sm-3">
+						    <input name="videoId" type="hidden" th:value="${videoId}"/>
+							<input name="videoName" placeholder="请输入视频名称" type="text"
+								class="form-control" th:value="${videoName}" readonly="readonly">
+						</div>
+						<label for="playAddress" class="col-sm-2 control-label">播放地点：</label>
+						<div class="col-sm-3">
+							<input name="playAddress" placeholder="请输入播放地点" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="principal" class="col-sm-3 control-label">负责人：</label>
+						<div class="col-sm-3">
+							<input name="principal" placeholder="请输入负责人" type="text"
+								class="form-control">
+						</div>
+						<label for="visitorCount" class="col-sm-2 control-label">观看人数：</label>
+						<div class="col-sm-3">
+							<input name="visitorCount" placeholder="请输入观看人数" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="playStartTime" class="col-sm-3 control-label">播放开始时间：</label>
+						<div class="col-sm-3">
+							<input name="playStartTime" placeholder="请输入播放开始时间" type="text"
+								class="form-control tonto-datepicker-datetime">
+						</div>
+						<label for="playEndTime" class="col-sm-2 control-label">播放结束时间：</label>
+						<div class="col-sm-3">
+							<input name="playEndTime" placeholder="请输入播放结束时间" type="text"
+								class="form-control tonto-datepicker-datetime">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="agencyId" class="col-sm-3 control-label">所属机构：</label>
+						<div class="col-sm-3">
+							<select name="agencyId" class="form-control" th:value="${agencyId}">
+								<option value="">请选择</option>
+								<option th:each="agency : ${agencyList}" th:value="${agency.Id}" 
+                                  th:selected="${agencyId == agency.Id}"
+                                  th:text="${agency.name}"></option>
+							</select>
+						</div>
+						<label for="remarks" class="col-sm-2 control-label">备注：</label>
+						<div class="col-sm-3">
+							<input name="remarks" placeholder="请输入备注" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-2 col-sm-offset-3">
+							<button type="submit" id="model_form_submit_btn"
+								class="btn btn-primary btn-block">保存</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+	<div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url:"/health/video/play/save",
+        columns: [
+				{ title: "视频Id", name: "videoId", inputType: "TEXT" },
+				{ title: "视频名称", name: "videoName", inputType: "TEXT" },
+				{ title: "播放地点", name: "playAddress", inputType: "TEXT" },
+				{ title: "负责人", name: "principal", inputType: "TEXT" },
+				{ title: "观看人数", name: "visitorCount", inputType: "TEXT" },
+				{ title: "播放开始时间", name: "playStartTime", inputType: "DATETIME" },
+				{ title: "播放结束时间", name: "playEndTime", inputType: "DATETIME" },
+				{ title: "所属机构", name: "agencyId", inputType: "SELECT" },
+				{ title: "备注", name: "remarks", inputType: "TEXT" }
+				
+				]
+    }
+
+    $(function() {       
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/video/play/index";
+                });
+            }
+        });
+    });
+    </script>
+</body>
+
+</html>

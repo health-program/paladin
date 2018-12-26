@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.videomanage.VideoPlayMapper">
+	<select id="selectByQuery" parameterType="com.paladin.health.service.videomanage.dto.VideoPlayQueryDTO" resultType="com.paladin.health.service.videomanage.vo.VideoPlayVO">
+	    SELECT 
+		vp.id,
+		vp.video_id as videoId,
+		v.name as videoName,
+		vp.agency_id as agencyId,
+		oa.name as agencyName,
+		vp.play_address as playAddress,
+		vp.play_start_time as playStartTime,
+		vp.play_end_time as playEndTime,
+		vp.visitor_count as visitorCount,
+		vp.principal
+		FROM video_play vp
+		LEFT JOIN org_agency oa ON vp.agency_id = oa.id
+		LEFT JOIN video v ON vp.video_id = v.id
+		WHERE oa.is_delete = 0
+		<if test="videoName!=null and videoName!=''">
+			AND v.name LIKE CONCAT('%',#{videoName},'%')
+		</if>
+		<if test="agencyId!=null and agencyId!=''">
+			AND vp.agency_id = #{agencyId}
+		</if>
+		<if test="startTime!=null">
+			AND vp.play_start_time &gt;= #{startTime}
+		</if>
+		<if test="endTime!=null">
+			AND vp.play_start_time &lt;= #{endTime}
+		</if>
+		ORDER BY  vp.create_time DESC
+	</select>
+<!-- 关联查询材料记录 -->
+	<select id="getOne" parameterType="string" resultType="com.paladin.health.service.videomanage.vo.VideoPlayVO">
+		SELECT 
+		vp.id,
+		vp.video_id as videoId,
+		v.name as videoName,
+		vp.agency_id as agencyId,
+		oa.name as agencyName,
+		vp.play_address as playAddress,
+		vp.play_start_time as playStartTime,
+		vp.play_end_time as playEndTime,
+		vp.visitor_count as visitorCount,
+		vp.principal,
+		vp.remarks
+		FROM video_play vp
+		LEFT JOIN org_agency oa ON vp.agency_id = oa.id
+		LEFT JOIN video v ON vp.video_id = v.id
+		WHERE oa.is_delete = 0 AND vp.id = #{id}
+	</select>
+</mapper>
