@@ -77,6 +77,7 @@ public class HealthPrescriptionContainer implements VersionContainer {
 	private static final String FIELD_TERMINOLOGY = "terminology";
 
 	private static final int MAX_SEARCH_RESULT_COUNT = 1000;
+	private static HealthPrescriptionContainer container;
 
 	private IndexReader reader = null;
 	private IndexSearcher searcher = null;
@@ -146,6 +147,7 @@ public class HealthPrescriptionContainer implements VersionContainer {
 		this.factorCodeMap = factorCodeMap;
 		this.hasParentFactorList = hasParentFactorList;
 
+		container = this;
 		logger.info("-------------结束初始化健康处方搜索服务功能-------------");
 		return true;
 	}
@@ -619,6 +621,10 @@ public class HealthPrescriptionContainer implements VersionContainer {
 	@Override
 	public boolean versionChangedHandle(long version) {
 		return initialize();
+	}
+
+	public static HealthPrescriptionContainer getInstance() {
+		return container;
 	}
 
 }

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="boolean,role-level,boolean,"/>
+    <section class="content-header">
+        <h1>org_role</h1>
+        <ol class="breadcrumb">
+            <li><a href="/common/org/role/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url:"/common/org/role/save",
+        columns: [
+				{ title: "角色名称", name: "roleName", inputType: "TEXT" },
+				{ title: "是否启用", name: "enable", enum: "boolean", inputType: "SELECT" },
+				{ title: "角色等级", name: "roleLevel", enum: "role-level", inputType: "SELECT" },
+				{ title: "角色说明", name: "roleDesc", inputType: "TEXT" },
+				{ title: "是否默认角色", name: "isDefault", enum: "boolean", inputType: "SELECT" }
+				]
+    }
+
+    $(function() {       
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/common/org/role/index";
+                });
+            }
+        });
+        model.setData(null);
+        $.initComponment();
+    });
+    </script>
+</body>
+
+</html>

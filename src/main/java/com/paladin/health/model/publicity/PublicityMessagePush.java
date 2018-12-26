@@ -9,10 +9,9 @@ public class PublicityMessagePush {
 	public final static int STATUS_SEND_SUCCESS = 2;
 	public final static int STATUS_SEND_FAIL = 9;
 
-	public final static int CHANNEL_WEIXIN = 1;
+	public final static int CHANNEL_WEB = 1;
 	public final static int CHANNEL_CELLPHONE = 2;
-	public final static int CHANNEL_APP = 3;
-	
+
 	@Id
 	private String messageId;
 
@@ -20,7 +19,7 @@ public class PublicityMessagePush {
 	private Integer channel;
 
 	private Integer status;
-	
+
 	private Integer tryTimes;
 
 	public String getMessageId() {

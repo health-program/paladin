@@ -1,26 +1,79 @@
 package com.paladin.health.service.publicity;
 
-import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.paladin.health.controller.publicity.pojo.MessageExamineQuery;
-import com.paladin.health.controller.publicity.pojo.MessageQuery;
 import com.paladin.health.core.HealthUserSession;
+import com.paladin.health.mapper.publicity.PublicityMessageMapper;
 import com.paladin.health.model.publicity.PublicityMessage;
-import com.paladin.health.model.publicity.PublicityMessageMore;
-import com.paladin.health.model.publicity.PublicityMessagePush;
+import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
+import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.PageResult;
-import com.paladin.framework.core.ServiceSupportComplex;
+import com.paladin.framework.core.ServiceSupport;
+import com.paladin.framework.core.copy.SimpleBeanCopier.SimpleBeanCopyUtil;
 import com.paladin.framework.core.exception.BusinessException;
 
 @Service
-public class PublicityMessageService extends ServiceSupportComplex<PublicityMessage, PublicityMessageMore> {
+public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 	@Autowired
-	private PublicityMessagePushService publicityMessagePushService;
+	private PublicityMessageMapper publicityMessageMapper;
+
+	/**
+	 * 保存信息
+	 * 
+	 * @param publicityMessage
+	 * @return
+	 */
+	public boolean saveMessage(PublicityMessageDTO publicityMessage) {
+		Integer statu = publicityMessage.getStatus();
+		if (statu != null && (statu == PublicityMessage.STATUS_TEMP || statu == PublicityMessage.STATUS_SUBMIT_EXAMINE)) {
+			PublicityMessage model = new PublicityMessage();
+			SimpleBeanCopyUtil.simpleCopy(publicityMessage, model);
+			return save(model) > 0;
+		} else {
+			throw new BusinessException("信息状态不正确");
+		}
+	}
+
+	/**
+	 * 更新信息
+	 * 
+	 * @param publicityMessage
+	 * @return
+	 */
+	public boolean updateMessage(PublicityMessageDTO publicityMessage) {
+		String id = publicityMessage.getId();
+		if (id != null && id.length() != 0) {
+			PublicityMessage model = get(id);
+			if (model == null) {
+				throw new BusinessException("找不到需要编辑的信息");
+			}
+
+			Integer currentStatus = model.getStatus();
+			if (currentStatus == PublicityMessage.STATUS_SUBMIT_EXAMINE) {
+				throw new BusinessException("已经提交待审核的信息无法修改");
+			}
+
+			if (currentStatus == PublicityMessage.STATUS_EXAMINE_SUCCESS) {
+				throw new BusinessException("已经审核成功的信息无法修改");
+			}
+
+			Integer statu = publicityMessage.getStatus();
+			if (statu != null && (statu == PublicityMessage.STATUS_TEMP || statu == PublicityMessage.STATUS_SUBMIT_EXAMINE)) {
+				SimpleBeanCopyUtil.simpleCopy(publicityMessage, model);
+				return update(model) > 0;
+			} else {
+				throw new BusinessException("信息状态不正确");
+			}
+		} else {
+			throw new BusinessException("找不到需要编辑的信息");
+		}
+	}
 
 	/**
 	 * 审核
@@ -33,7 +86,7 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 	public boolean examine(String id, boolean success) {
 		PublicityMessage message = get(id);
 		if (message == null) {
-			throw new BusinessException("找不到需要审核的公告消息");
+			throw new BusinessException("找不到需要审核的信息数据");
 		}
 
 		Integer status = message.getStatus();
@@ -43,60 +96,17 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 		}
 
 		status = success ? PublicityMessage.STATUS_EXAMINE_SUCCESS : PublicityMessage.STATUS_EXAMINE_FAIL;
-		
+
 		if (success) {
-			if (message.getToApp() != null && message.getToApp() == 1) {
-				pushMessage(id, PublicityMessagePush.CHANNEL_APP, message.getPublishTime());
-			}
-
-			if (message.getToApp() != null && message.getToCellphone() == 1) {
-				pushMessage(id, PublicityMessagePush.CHANNEL_CELLPHONE, message.getPublishTime());
-			}
-
-			if (message.getToApp() != null && message.getToWeixin() == 1) {
-				pushMessage(id, PublicityMessagePush.CHANNEL_WEIXIN, message.getPublishTime());
-			}
-			
-			status = PublicityMessage.STATUS_TO_SEND;
+			// TODO 成功推送
 		}
-				
-		PublicityMessage updateModel = new PublicityMessage();
-		updateModel.setId(id);
-		updateModel.setStatus(status);
-		updateModel.setExamineUserId(HealthUserSession.getCurrentUserSession().getUserId());
-		boolean result = updateSelective(updateModel) > 0;
 
-		return result;
-	}
-
-	/**
-	 * 推送消息进入发送流程
-	 * @param messageId
-	 * @param channel
-	 * @param publishTime
-	 */
-	public void pushMessage(String messageId, int channel, Date publishTime) {
-		if (publishTime == null || publishTime.getTime() < System.currentTimeMillis()) {
-			pushMessage(messageId, channel, PublicityMessagePush.STATUS_SENDING);
+		if (publicityMessageMapper.updateExamineStatus(id, status, HealthUserSession.getCurrentUserSession().getUserId()) > 0) {
+			return true;
 		} else {
-			pushMessage(messageId, channel, PublicityMessagePush.STATUS_WAITING);
+			throw new BusinessException("审核失败");
 		}
-	}
 
-	/**
-	 * 推送消息进入发送流程
-	 * @param messageId
-	 * @param channel
-	 * @param status
-	 */
-	public void pushMessage(String messageId, int channel, int status) {	
-		
-		PublicityMessagePush push = new PublicityMessagePush();
-		push.setMessageId(messageId);
-		push.setChannel(channel);
-		push.setStatus(status);
-		push.setTryTimes(0);
-		publicityMessagePushService.save(push);		
 	}
 
 	/**
@@ -105,10 +115,10 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 	 * @param id
 	 * @return
 	 */
-	public int removeMessage(String id) {
+	public boolean removeMessage(String id) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
 		if (session.isSystemAdmin()) {
-			return removeByPrimaryKey(id);
+			return removeByPrimaryKey(id) > 0;
 		}
 
 		PublicityMessage message = get(id);
@@ -118,8 +128,8 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 
 		Integer status = message.getStatus();
 		if (status == PublicityMessage.STATUS_EXAMINE_FAIL || status == PublicityMessage.STATUS_TEMP) {
-			if (session.getUserId().equals(message.getCreateUserId())) {
-				return removeByPrimaryKey(id);
+			if (session.getUserId().equals(message.getCreateUserId()) || session.isAdminDataLevel()) {
+				return removeByPrimaryKey(id) > 0;
 			} else {
 				throw new BusinessException("您不能删除别人的公告信息");
 			}
@@ -129,20 +139,31 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 	}
 
 	/**
+	 * 获取信息
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public PublicityMessageVO getMessage(String id) {
+		return publicityMessageMapper.getMessage(id);
+	}
+
+	/**
 	 * 分页查询自己发布的信息
 	 * 
 	 * @param query
 	 * @return
 	 */
-	public PageResult<PublicityMessage> findSelfMessage(MessageQuery query) {
+	public PageResult<PublicityMessageVO> findSelfMessage(PublicityMessageQueryDTO query) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
-		if (!session.isSystemAdmin()) {
+		if (!session.isAdminDataLevel()) {
 			if (query != null) {
-				query = new MessageQuery();
+				query = new PublicityMessageQueryDTO();
 			}
 			query.setCreateUserId(session.getUserId());
 		}
-		return searchPage(query);
+
+		return findMessage(query);
 	}
 
 	/**
@@ -152,8 +173,23 @@ public class PublicityMessageService extends ServiceSupportComplex<PublicityMess
 	 * @param query
 	 * @return
 	 */
-	public PageResult<PublicityMessageMore> findExamineMessage(MessageExamineQuery query) {
-		return searchJoinPage(query);
+	public PageResult<PublicityMessageVO> findExamineMessage(PublicityMessageQueryDTO query) {
+		query.setStatus(PublicityMessage.STATUS_SUBMIT_EXAMINE);
+		query.setCreateUserId(null);
+		query.setStatuses(null);
+
+		return findMessage(query);
 	}
 
+	/**
+	 * 查询信息
+	 * 
+	 * @param query
+	 * @return
+	 */
+	private PageResult<PublicityMessageVO> findMessage(PublicityMessageQueryDTO query) {
+		Page<PublicityMessageVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		publicityMessageMapper.findMessage(query);
+		return new PageResult<>(page);
+	}
 }

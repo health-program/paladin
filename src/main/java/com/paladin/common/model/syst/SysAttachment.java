@@ -1,13 +1,20 @@
 package com.paladin.common.model.syst;
 
+import java.util.Date;
+
 import javax.persistence.Id;
 
 public class SysAttachment {
 	
-	public static final String COLUMN_FIELD_ID = "id";
+	public final static int USE_TYPE_COLUMN_RELATION = 1;
+	public final static int USE_TYPE_RESOURCE = 2;
 
+	public static final String COLUMN_FIELD_ID = "id";
+	public static final String COLUMN_FIELD_USER_TYPE = "userType";
 	@Id
 	private String id;
+	
+	private Integer useType;
 
 	private String type;
 
@@ -18,6 +25,8 @@ public class SysAttachment {
 	private Long size;
 
 	private String pelativePath;
+	
+	private Date createTime;
 
 	public String getId() {
 		return id;
@@ -43,7 +52,6 @@ public class SysAttachment {
 		this.suffix = suffix;
 	}
 
-
 	public String getPelativePath() {
 		return pelativePath;
 	}
@@ -66,6 +74,24 @@ public class SysAttachment {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Integer getUseType() {
+		return useType;
+	}
+
+	public void setUseType(Integer useType) {
+		this.useType = useType;
 	}
 
 }

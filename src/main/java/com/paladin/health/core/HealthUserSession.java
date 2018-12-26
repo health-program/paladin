@@ -19,7 +19,7 @@ public class HealthUserSession extends UserSession {
 	public HealthUserSession(OrgUser orgUser) {
 		this(orgUser.getId(), orgUser.getName(), orgUser.getAccount(), 2, false);
 		this.agencyId = orgUser.getAgencyId();
-	}
+	}		
 
 	private boolean isSystemAdmin;
 	private int dataLevel;
