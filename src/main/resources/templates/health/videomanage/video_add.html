@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
+
+<body>
+    <tt:constant enumcode="boolean" />
+    <section class="content-header">
+        <h1>视频管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="box box-solid" id="videoform">
+            <div class="box-header with-border">
+                <i class="glyphicon glyphicon-user"></i>
+                <h3 class="box-title">新增</h3>
+            </div>
+            <div id="model_edit" class="box-body">
+                <form id="model_form" action="/health/video/save" method="post" class="form-horizontal edit-body">
+                    <div class="form-group">
+                        <label for="showImage" class="col-sm-3 control-label">展示图片(附件ID)：</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="showImage" placeholder="请输入展示图片(附件ID)" required="required" />
+                        </div>
+                        <label for="summary" class="col-sm-2 control-label">视频简介：</label>
+                        <div class="col-sm-3">
+                            <input name="summary" type="text" class="form-control" placeholder="请输入视频简介" required="required" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="top" class="col-sm-3 control-label">是否置顶：</label>
+                        <div class="col-sm-3">
+                            <select name="top" class="form-control tonto-select-constant" enumcode="boolean">
+                                <option value="">请选择</option>
+                            </select>
+                        </div>
+                        <label for="name" class="col-sm-2 control-label">视频名称：</label>
+                        <div class="col-sm-3">
+                            <input name="name" id="name" placeholder="请输入视频名称" type="text" class="form-control" required="required" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="tag" name="tag" placeholder="请输入标签" required="required" />
+                                <span class="input-group-btn">
+                              <button type="button" class="btn btn-flat"  id="search-btn">
+                                  <i class="fa fa-search"></i>
+                              </button>
+                              <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                              </ul>
+                          </span>
+                            </div>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" id="label" name="label" data-role="tagsinput" required="required"></input>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="topOrderNo" class="col-sm-3 control-label">置顶排序号：</label>
+                        <div class="col-sm-3">
+                            <input name="topOrderNo" placeholder="请输入置顶排序号" type="text" class="form-control" required="required" />
+                        </div>
+                        <label for="url" class="col-sm-2 control-label">视频地址：</label>
+                        <div class="col-sm-3">
+                            <input name="url" placeholder="请输入视频地址" type="text" class="form-control" required="required" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 col-sm-offset-3">
+                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!--     <section class="content-header">
+        <h1>video</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content" >
+    </section> -->
+    <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url: "/health/video/save",
+        columns: [
+            { title: "展示图片(附件ID)", name: "showImage", inputType: "TEXT" },
+            { title: "视频简介", name: "summary", inputType: "TEXT" },
+            { title: "是否置顶（boolean）", name: "top", inputType: "TEXT" },
+            { title: "视频名称", name: "name", inputType: "TEXT" },
+            { title: "标签", name: "label", inputType: "TEXT" },
+            { title: "置顶排序号", name: "topOrderNo", inputType: "TEXT" },
+            { title: "视频地址", name: "url", inputType: "TEXT" }
+        ]
+    }
+
+    $(function() {
+
+
+        //  var html = generateEditHtml(options);
+        //  $(".content").html($("#videoform").html());
+        var model = new tonto.Model("model", options.columns, {
+            pattern: "edit",
+            successCallback: function() {
+                $.successAlert("保存成功", function() {
+                    window.location = "/health/video/index";
+                });
+            }
+        });
+        model.setData(null);
+        // $.initComponment(); 
+
+        init([
+            { code: 'tnb', label: '糖尿病' },
+            { code: 'xyg', label: '血压高' },
+            { code: 'tf', label: '痛风' },
+            { code: 'ncz', label: '脑卒中' }
+        ])
+    });
+
+    function init(data) {
+        $("#tag").bsSuggest({
+            idField: "code",
+            keyField: "label",
+            effectiveFields: ["label"],
+            searchFields: ["label"],
+            data: {
+                value: data
+            },
+            clearable: false,
+            autoSelect: false,
+            autoDropup: true,
+            ignorecase: true,
+            showHeader: true
+        }).on('onSetSelectValue', function(e, keyword, data) {
+            $("#label").tagsinput('add', data.label);
+        });
+    }
+    </script>
+</body>
+
+</html>

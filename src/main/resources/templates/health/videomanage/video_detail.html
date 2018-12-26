@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>视频管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <input type="hidden" id="id" th:value="${id}"/>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+
+    $(function() {
+    	var options = {
+	        id: "model",
+	        name: "详情",
+	        url:"/health/video/update?id="+$("#id").val(),
+	        columns: [
+				{ title: "展示图片(附件ID)", name: "showImage", inputType: "TEXT" },
+				{ title: "视频简介", name: "summary", inputType: "TEXT" },
+				{ title: "是否置顶（boolean）", name: "top", inputType: "TEXT" },
+				{ title: "视频名称", name: "name", inputType: "TEXT" },
+				{ title: "标签", name: "label", inputType: "TEXT" },
+				{ title: "置顶排序号", name: "topOrderNo", inputType: "TEXT" },
+				{ title: "视频地址", name: "url", inputType: "TEXT" }
+				]
+	    }
+    
+        $.getAjax("/health/video/get?id="+$("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
+            $.initComponment();
+        });
+    });
+    </script>
+</body>
+
+</html>
