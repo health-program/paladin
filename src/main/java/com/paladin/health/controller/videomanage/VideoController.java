@@ -22,6 +22,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 
+/**
+ * 视频管理
+ * 
+ * @author  jisanjie
+ * @version  [版本号, 2018年12月26日]
+ */
+
+
 @Controller
 @RequestMapping("/health/video")
 public class VideoController extends ControllerSupport {
@@ -33,6 +41,16 @@ public class VideoController extends ControllerSupport {
     @QueryInputMethod(queryClass = VideoQueryDTO.class)
     public String index() {
         return "/health/videomanage/video_index";
+    }
+    
+    /**
+     * 视屏播放统计首页
+     * 
+     */
+    @RequestMapping("/play/index")
+    @QueryInputMethod(queryClass = VideoQueryDTO.class)
+    public String palyIndex() {
+        return "/health/videomanage/video_play_index";
     }
 
     @RequestMapping("/find/page")
