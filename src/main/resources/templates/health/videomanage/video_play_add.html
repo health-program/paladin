@@ -110,7 +110,9 @@
             pattern:"edit",
             successCallback:function(){
                 $.successAlert("保存成功",function(){
-                    window.location = "/health/video/play/index";
+                    window.location = "/health/video/play/index?id=" 
+                    	+ $("input[name='videoId']").val() 
+                    	+ "&name=" + $("input[name='videoName']").val();
                 });
             }
         });
