@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
+    <tt:constant enumcode="publicity-message-type,publicity-message-status" />
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -12,35 +14,30 @@
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-md-4">
-                            <label for="title" style="width:130px" class="col-md-4 control-label">标题：</label>
-                            <div class="col-md-6">
-                                <input name="title" class="form-control" th:value="${query?.title}" />
-                            </div>
+                        <label for="title" class="col-md-1 control-label">标题：</label>
+                        <div class="col-md-2">
+                            <input name="title" class="form-control" th:value="${query?.title}" />
                         </div>
-                        <div class="col-md-4">
-                            <label for="type" style="width:130px" class="col-md-4 control-label">类型：</label>
-                            <div class="col-md-6">
-                                <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
-                                    <option value="">请选择</option>
-                                </select>
-                            </div>
+                        <label for="type" class="col-md-1 control-label">类型：</label>
+                        <div class="col-md-2">
+                            <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
+                                <option value="">请选择</option>
+                            </select>
                         </div>
-                        <div class="col-md-4">
-                            <label for="status" style="width:130px" class="col-md-4 control-label">状态：</label>
-                            <div class="col-md-6">
-                                <select name="status" class="form-control tonto-select" th:attr="selectedvalue=${query?.status}">
-                                    <option value="1">待审核</option>
-                                    <option value="9">审核成功</option>
-                                </select>
-                            </div>
+                        <label for="status" class="col-md-1 control-label">状态：</label>
+                        <div class="col-md-2">
+                            <select name="status" class="form-control tonto-select" th:attr="selectedvalue=${query?.status}">
+                                <option value="1">待审核</option>
+                                <option value="9">审核成功</option>
+                                <option value="2">审核未通过</option>
+                            </select>
                         </div>
                     </div>
                 </form>
                 <div class="col-md-12">
                     <div class="pull-right">
-                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()">查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')">重置</button>
+                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')"><i class="fa fa-repeat"></i>重置</button>
                     </div>
                 </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
@@ -56,7 +53,6 @@
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                        <a onclick="view()" class="btn btn-default"><i class="glyphicon glyphicon-search"></i>审核</a>
                     </div>
                 </div>
             </div>
@@ -67,7 +63,7 @@
     /*<![CDATA[*/
     var table;
     $(function() {
-        $.getConstantEnum(["publicity-message-type", "publicity-message-status"], initDataGrid);
+        initDataGrid();
     });
 
     function initDataGrid(enumMap) {
@@ -79,32 +75,43 @@
             idField: "id",
             columns: [
                 [
-                    { radio: true },
                     { title: "标题", field: "title" },
-                    { title: "类型", field: "type", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-type") },
-                    { title: "副标题", field: "subtitle" },
-                    { title: "发布时间", field: "publishTime", sortable: true, formatter:"date" },
-                    { title: "状态", field: "status", sortable: true, formatter: $.getEnumColumnFormatter(enumMap, "publicity-message-status") },
-                    { title: "创建人", field: "createUserName"},
-                    { title: "审核人", field: "examineUserName"}
+                    { title: "类型", field: "type", sortable: true, enumcode: "publicity-message-type" },
+                    { title: "发布时间", field: "publishTime", sortable: true, formatter: "date" },
+                    { title: "状态", field: "status", sortable: true, enumcode: "publicity-message-status" },
+                    { title: "创建人", field: "createUserName", formatter: function(value, row, index) { return value ? value : "管理员" } },
+                    { title: "审核人", field: "examineUserName", formatter: function(value, row, index) { return value ? value : "管理员" } },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .examine': function(e, value, row, index) {
+                                examine(row);
+                            },
+
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return '<button class="examine btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
+
+                        }
+                    }
                 ]
             ],
-            url: '/health/publicity/examine/find',
+            url: '/health/publicity/message/examine/find',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,
             pageNumber: page || 1,
             pagination: true,
-            clickToSelect: true,
             toolbar: "#toolbar",
             showRefresh: true
         });
     }
 
-    function view() {
-        var row = getSelectRow();
+    function examine(row) {
         if (row) {
-            window.location = '/health/publicity/examine?id=' + row.id;
+            window.location = '/health/publicity/message/examine?id=' + row.id;
         }
     }
 

@@ -27,6 +27,8 @@ public class PublicityMessageVO {
 
 	private Integer status;
 
+	private String label;
+	
 	private Date publishTime;
 
 	private String publishTarget;
@@ -153,6 +155,14 @@ public class PublicityMessageVO {
 
 	public void setCreateUserName(String createUserName) {
 		this.createUserName = createUserName;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

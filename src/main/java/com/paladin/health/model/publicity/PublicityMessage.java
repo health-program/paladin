@@ -1,9 +1,7 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.UnDeleteBaseModel;
-import com.paladin.health.model.org.OrgUser;
 
-import tk.mybatis.mapper.annotation.ColumnType;
 import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 
 import java.util.Date;
@@ -19,8 +17,8 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	public final static int STATUS_EXAMINE_SUCCESS = 9;
 
 	
-	public final static int TYPE_ARTICLE = 1;
-	public final static int TYPE_VIDEO = 2;
+	public final static int TYPE_NOTICE = 1;
+	public final static int TYPE_ARTICLE = 2;
 	public final static int TYPE_SHORT_MESSAGE = 3;
 	
 	public final static String COLUMN_FIELD_STATUS = "status";
@@ -40,10 +38,11 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	@IgnoreInMultipleResult
 	private String content;
 
-	@ColumnType(foreignClass = OrgUser.class)
 	private String examineUserId;
 
 	private Integer status;
+	
+	private String label;
 
 	private Date publishTime;
 
@@ -127,6 +126,14 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setPublishTarget(String publishTarget) {
 		this.publishTarget = publishTarget;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

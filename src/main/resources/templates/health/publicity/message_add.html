@@ -3,10 +3,12 @@
 
 <head th:include="/health/header" />
 <link rel="stylesheet" href="/static/assets/ueditor/themes/default/css/ueditor.min.css" />
+<link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
 
 <body>
+    <tt:constant enumcode="publicity-message-type" />
     <section class="content-header">
-        <h1>新增信息</h1>
+        <h1>发布信息</h1>
         <ol class="breadcrumb">
             <li><a href="/health/publicity/message/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">新增</li>
@@ -29,12 +31,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="subtitle" class="col-sm-3 control-label">副标题：</label>
-                        <div class="col-sm-3">
-                            <input name="subtitle" placeholder="请输入副标题" type="text" class="form-control" />
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
                         <div class="col-sm-3">
                             <input name="publishTime" placeholder="请输入发布时间" type="text" class="form-control tonto-datepicker-date" />
@@ -42,16 +38,32 @@
                     </div>
                     <div class="form-group">
                         <label for="type" class="col-sm-3 control-label">类型：</label>
-                        <div class="col-sm-3">
-                            <label class="control-label radio-label"><input type="radio" name="type" value="1" checked="checked" />&nbsp;公告文章</label>
-                            <label class="control-label radio-label"><input type="radio" name="type" value="2" />&nbsp;视频</label>
-                            <label class="control-label radio-label"><input type="radio" name="type" value="3" />&nbsp;短信</label>
+                        <div class="col-sm-3 tonto-radio-constant" name="type" enumcode="publicity-message-type">
+                        </div>
+                    </div>
+                    <div class="form-group" id="publishTargetGroup" style="display: none">
+                        <label for="publishTarget" class="col-sm-3 control-label">发送对象：<br>
+                            <font style="color:red">（不选为全部）</font>
+                        </label>
+                        <div class="col-sm-8" id="publishTargetDiv">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="summary" class="col-sm-3 control-label">简介：</label>
+                        <div class="col-sm-5">
+                            <textarea name="summary" style="width:100%;height: 150px" class="form-control"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="content" class="col-sm-3 control-label">内容：</label>
                         <div class="col-sm-8" id="contentDiv">
                             <script type="text/plain" id="myEditor" style="width:100%;height:540px;"></script>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-3">
+                            <input name="label" id="label" type="text" class="form-control" />
                         </div>
                     </div>
                     <input type="hidden" id="statusInput" name="status" />
@@ -70,6 +82,7 @@
     <div th:include="/health/footer" />
     <script type="text/javascript" src="/static/assets/ueditor/ueditor.config.js"></script>
     <script type="text/javascript" src="/static/assets/ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
     <script type="text/javascript">
     var options = {
         id: "model",
@@ -77,10 +90,11 @@
         url: "/health/publicity/message/save",
         columns: [
             { title: "标题", name: "title", inputType: "TEXT" },
-            { title: "副标题", name: "subtitle", inputType: "TEXT" },
+            { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "1", "2"] },
             { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
             { title: "发布时间", name: "publishTime", inputType: "DATE" },
-            { title: "内容", name: "content", inputType: "TEXT" }
+            { title: "内容", name: "content", inputType: "TEXT" },
+            { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
         ]
     }
 
@@ -89,19 +103,33 @@
     }
 
     $(function() {
+        $("#label").tagsinput();
+
         $("input:radio[name='type']").on('ifChecked', function(a, b) {
             typeCheckedHandler(a.currentTarget.value);
         });
 
         initEditor();
+        initPublishTarget();
 
         var model = new tonto.Model("model", options.columns, {
             pattern: "edit",
             extraParam: function() {
                 var type = $('input[name="type"]:checked').val();
-                return type == 1 ? {
-                    content: editor.getContent()
-                } : {};
+                var result = {};
+                if (type == 1 || type == 2) {
+                    result.content = editor.getContent();
+                } else if (type == 3) {
+                    var pt = "";
+                    $('input[name="ptarget"]:checked').each(function(i, dom) {
+                        pt += dom.value + ",";
+                    });
+                    if (pt) {
+                        result.publishTarget = pt;
+                    }
+                }
+
+                return result;
             },
             successCallback: function() {
                 $.successAlert("保存成功", function() {
@@ -113,14 +141,12 @@
     });
 
 
-    var current = 1,
-        editor, urlInput, messageInput;
+    var current = -1,
+        editor, messageInput;
 
     function initEditor() {
         editor = UE.getEditor('myEditor');
-        urlInput = $('<input name="content" placeholder="请输入视频URL" type="text" class="form-control no-validate" style="display:none"  disabled="disabled"/>');
         messageInput = $('<textarea name="content" class="no-validate" style="width:100%;height: 300px;display:none" disabled="disabled"></textarea>');
-        $("#contentDiv").append(urlInput);
         $("#contentDiv").append(messageInput);
     }
 
@@ -129,27 +155,36 @@
             return;
         }
 
-        if (type == 1) {
+        if (type == 1 || type == 2) {
             editor.setShow();
-            urlInput.hide();
-            urlInput.attr("disabled", true);
             messageInput.hide();
             messageInput.attr("disabled", true);
-        } else if (type == 2) {
-            editor.setHide();
-            urlInput.show();
-            urlInput.attr("disabled", false);
-            messageInput.hide();
-            messageInput.attr("disabled", true);
+            $("#publishTargetGroup").hide();
         } else if (type == 3) {
             editor.setHide();
-            urlInput.hide();
-            urlInput.attr("disabled", true);
             messageInput.show();
             messageInput.attr("disabled", false);
+            $("#publishTargetGroup").show();
         }
 
         current = type;
+    }
+
+    function initPublishTarget() {
+        $.getAjax("/health/prescription/factor/list", function(data) {
+            var c = $("#publishTargetDiv");
+            for (var i = 0; i < data.length; i++) {
+                var d = data[i];
+                if (d.type == 1) {
+                    var k = $('<label class="control-label radio-label"><input type="checkbox" name="ptarget" value="' + d.code + '">&nbsp;&nbsp;' + d.name + '&nbsp;&nbsp;</label>');
+                    c.append(k);
+                    k.iCheck({
+                        checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
+                        radioClass: 'iradio_square-blue'
+                    });
+                }
+            }
+        });
     }
     </script>
 </body>

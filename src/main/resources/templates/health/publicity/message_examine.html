@@ -1,76 +1,89 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
+    <tt:constant enumcode="publicity-message-type" />
+    <input type="hidden" id="id" th:value="${id}" />
+    <section class="content-header">
+        <h1>信息审核</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/publicity/message/examine/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">审核</li>
+        </ol>
+    </section>
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
                 <i class="fa fa-list-alt"></i>
                 <h3 class="box-title">审核</h3>
                 <div class="pull-right box-tools">
-                    <a class="btn btn-default btn-sm" href="/health/publicity/examine/index">
+                    <a class="btn btn-default btn-sm" href="/health/publicity/message/examine/index">
                         <i class="fa fa-times"></i>
                     </a>
                 </div>
             </div>
-            <div class="box-body">
-                <form class="form-horizontal" th:object="${object}">
-                    <input type="hidden" name="id" id="id" th:field="*{id}" />
+            <div id="model_view" class="box-body">
+                <form class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">标题：</label>
-                        <div class="col-sm-5">
-                            <p class="form-control-static" th:text="*{title}" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">副标题：</label>
-                        <div class="col-sm-5">
-                            <p class="form-control-static" th:text="*{subtitle}" />
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">类型：</label>
+                        <label for="title" class="col-sm-3 control-label">标题：</label>
                         <div class="col-sm-3">
-                            <p class="form-control-static" id="type" th:attr="enum-code-value=${object.type}" />
+                            <p name="title" class="form-control-static description"></p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">发布时间：</label>
+                        <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
                         <div class="col-sm-3">
-                            <p class="form-control-static" th:text="${#dates.format(object.publishTime, 'yyyy-MM-dd')}" />
-                        </div>
-                    </div>
-                    <div class="form-group">                      
-                        <label class="col-sm-2 control-label">发布对象：</label>
-                        <div class="col-sm-10">
-	                        <div class="checkbox">
-	                            <label class="checkbox-inline">
-	                                <input type="checkbox" disabled="disabled" th:checked="${object.toWeixin!=null&&object.toWeixin==1}">微信
-	                            </label>
-	                            <label class="checkbox-inline">
-	                                <input type="checkbox" disabled="disabled" th:checked="${object.toCellphone!=null&&object.toCellphone==1}">短信
-	                            </label>
-	                            <label class="checkbox-inline">
-	                                <input type="checkbox" disabled="disabled" th:checked="${object.toApp!=null&&object.toApp==1}">APP
-	                            </label>
-	                        </div>
+                            <p name="publishTime" class="form-control-static description"></p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">创建人：</label>
+                        <label for="type" class="col-sm-3 control-label">类型：</label>
                         <div class="col-sm-3">
-                            <p class="form-control-static" th:text="*{createUserName}" />
+                            <p name="type" class="form-control-static description"></p>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">内容：</label>
+                    <div class="form-group" id="publishTargetViewGroup">
+                        <label for="publishTarget" class="col-sm-3 control-label">发送对象：<br>
+                        </label>
                         <div class="col-sm-8">
-                            <p class="form-control-static" th:text="*{content}" />
+                            <p id="publishTargetP" class="form-control-static description"></p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-1">
+                        <label for="summary" class="col-sm-3 control-label">简介：</label>
+                        <div class="col-sm-3">
+                            <p name="summary" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="content" class="col-sm-3 control-label">内容：</label>
+                        <div class="col-sm-3">
+                            <p id="contentP" class="form-control-static description">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-3">
+                            <p id="labelP" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="createUserName" class="col-sm-3 control-label">创建人：</label>
+                        <div class="col-sm-3">
+                            <p class="form-control-static description" name="createUserName" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="examineUserName" class="col-sm-3 control-label">审核人：</label>
+                        <div class="col-sm-3">
+                            <p class="form-control-static description" name="examineUserName" />
+                        </div>
+                    </div>
+                    <div class="form-group" id="examineGroup">
+                        <div class="col-sm-offset-3 col-sm-1">
                             <button type="button" onclick="examineSuccess()" class="btn btn-success btn-block">审核通过</button>
                         </div>
                         <div class="col-sm-1">
@@ -84,17 +97,85 @@
     <div th:include="/health/footer" />
     <script type="text/javascript">
     /*<![CDATA[*/
+    var messageData;
+
+    function fillViewHandler(data, model) {
+        $("#contentP").html(data.content);
+        if (data.type != 3) {
+            $("#publishTargetViewGroup").hide();
+            $("#contentP").html('<a href="javascript:previewContent()"><i class="glyphicon glyphicon-search"></i>查看富文本</a>');
+            var ns = data.label,
+                c = "";
+            if (ns) {
+                ns = ns.split(",");
+                ns.forEach(function(n) {
+                    c += '<span class="label label-info" style="margin-right:10px">' + n + '</span>';
+                })
+            }
+            $("#labelP").html(c);
+
+        } else {
+            $("#publishTargetViewGroup").show();
+
+            var ns = data.publishTargetName,
+                c = "";
+            if (ns) {
+                ns.forEach(function(n) {
+                    c += '<span class="label label-warning" style="margin-right:10px">' + n.name + '</span>';
+                })
+                c
+            } else {
+                c = "全部"
+            }
+
+            $("#publishTargetP").html(c);
+            $("#contentP").html(data.content);
+        }
+
+        if (data.status != 1) {
+            $("#examineGroup").hide();
+        }
+    }
+
+    function previewContent() {
+        if (messageData) {
+            $.openPageLayer(messageData.content);
+        }
+    }
+
     $(function() {
-        $.getConstantEnum([
-            { code: "publicity-message-type", type: 'p', target: '#type' },
-        ]);
+        var options = {
+            id: "model",
+            name: "详情",
+            columns: [
+                { title: "标题", name: "title", inputType: "TEXT" },
+                { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "1", "2"] },
+                { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
+                { title: "发布时间", name: "publishTime", inputType: "DATE" },
+                { title: "内容", name: "content", inputType: "TEXT" },
+                { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
+                { title: "创建人", name: "createUserName", inputType: "TEXT" },
+                { title: "审核人", name: "examineUserName", inputType: "TEXT" }
+            ]
+        }
+
+        $.getAjax("/health/publicity/message/get?id=" + $("#id").val(), function(data) {
+            var model = new tonto.Model("model", options.columns, {
+                pattern: "view",
+                fillViewHandler: fillViewHandler
+            });
+            data.createUserName = data.createUserName ? data.createUserName : "管理员";
+            data.examineUserName = data.examineUserName ? data.examineUserName : "管理员";
+            model.setData(data);
+            messageData = data;
+        });
     });
 
     function examineSuccess() {
         layer.confirm('确定审核通过吗?', function() {
-            $.getAjax("/health/publicity/examine/success?id=" + $("#id").val(), function() {
+            $.getAjax("/health/publicity/message/examine/success?id=" + $("#id").val(), function() {
                 $.successAlert("审核通过成功", function() {
-                    window.location = "/health/publicity/examine/index";
+                    window.location = "/health/publicity/message/examine/index";
                 });
             });
         });
@@ -102,9 +183,9 @@
 
     function examineFail() {
         layer.confirm('确定驳回吗?', function() {
-            $.getAjax("/health/publicity/examine/fail?id=" + $("#id").val(), function() {
+            $.getAjax("/health/publicity/message/examine/fail?id=" + $("#id").val(), function() {
                 $.successAlert("驳回成功", function() {
-                    window.location = "/health/publicity/examine/index";
+                    window.location = "/health/publicity/message/examine/index";
                 });
             });
         });

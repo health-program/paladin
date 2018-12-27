@@ -19,6 +19,8 @@ public class PublicityMessageDTO {
 
 	private String content;
 	
+	private String label;
+	
 	private Date publishTime;
 	
 	private String publishTarget;
@@ -95,6 +97,14 @@ public class PublicityMessageDTO {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	

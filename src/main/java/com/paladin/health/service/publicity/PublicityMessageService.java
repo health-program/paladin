@@ -1,5 +1,7 @@
 package com.paladin.health.service.publicity;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,9 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		if (statu != null && (statu == PublicityMessage.STATUS_TEMP || statu == PublicityMessage.STATUS_SUBMIT_EXAMINE)) {
 			PublicityMessage model = new PublicityMessage();
 			SimpleBeanCopyUtil.simpleCopy(publicityMessage, model);
+			if (model.getPublishTime() == null) {
+				model.setPublishTime(new Date());
+			}
 			return save(model) > 0;
 		} else {
 			throw new BusinessException("信息状态不正确");
@@ -66,6 +71,9 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 			Integer statu = publicityMessage.getStatus();
 			if (statu != null && (statu == PublicityMessage.STATUS_TEMP || statu == PublicityMessage.STATUS_SUBMIT_EXAMINE)) {
 				SimpleBeanCopyUtil.simpleCopy(publicityMessage, model);
+				if (model.getPublishTime() == null) {
+					model.setPublishTime(new Date());
+				}
 				return update(model) > 0;
 			} else {
 				throw new BusinessException("信息状态不正确");
@@ -174,7 +182,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 * @return
 	 */
 	public PageResult<PublicityMessageVO> findExamineMessage(PublicityMessageQueryDTO query) {
-		query.setStatus(PublicityMessage.STATUS_SUBMIT_EXAMINE);
+		// query.setStatus(PublicityMessage.STATUS_SUBMIT_EXAMINE);
 		query.setCreateUserId(null);
 		query.setStatuses(null);
 
