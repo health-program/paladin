@@ -6,7 +6,7 @@
 <body>
     <tt:constant enumcode="publicity-message-status" />
     <section class="content-header">
-        <h1>视频管理</h1>
+        <h1>视频审核</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
@@ -65,7 +65,7 @@
             idField: "id",
             columns: [
                 [
-                    { title: "展示图片(附件ID)", align: "center", field: "showImage" },
+                    { title: "展示图片", align: "center", field: "showImage" },
                     { title: "视频简介", align: "center", field: "summary" },
                     { title: "视频名称", align: "center", field: "name" },
                     { title: "标签", align: "center", field: "label" },
@@ -106,7 +106,7 @@
         });
     }
 
-    function examine(row) {
+/*     function examine(row) {
     	if(row){        
     		layer.confirm('确定审核吗?', function() {
             $.getAjax('/health/video/examine?id=' + row.id, function() {
@@ -115,6 +115,12 @@
             });
         });
       }
+    } */
+    
+    function examine(row) {
+        if (row) {
+            window.location = '/health/video/examine?id=' + row.id;
+        }
     }
 
 
