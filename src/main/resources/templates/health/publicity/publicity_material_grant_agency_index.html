@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="publicity-material-type,grant-target-type"/>
+    <input type="hidden" name="year"/>
+    <section class="content-header">
+        <h1>宣传资料发放机构历年统计</h1>
+    </section>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-search"></i>
+                <h3 class="box-title">查询</h3>
+            </div>
+            <div class="box-body">
+                <form id="searchbar" class="form-horizontal">
+                <div class="input-group" style="width:100%">
+                     <label for="grantorAgency"  class="col-md-1 control-label">机构名称</label>
+	                    <div class="col-md-2">
+	                       <input type="text" id="agencyName" name="agencyName" class="form-control" placeholder="请输入机构" >
+	                    </div>
+                   </div>
+                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                    <input type="text" style="display:none">
+                </form>
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <button type="button" style="width:100px" class="btn btn-primary " onclick="query()"><i class="fa fa-search"></i>查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                    </div>
+                </div>
+                <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+                <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+            </div>
+        </div>
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">图表</h3>
+            </div>
+            <div id="result" class="box-body">
+                <div id="toolbar">
+                    <div class="col-sm-12">
+					<div id="chart" style="height: 400px"></div>
+				</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table;
+    $(function() {
+    	 charts(chart);
+    });
+    
+    var chart = echarts.init(document.getElementById('chart'));
+    function charts(chart) {
+		 var agencyName=$("#agencyName").val();
+		$.postAjax("/health/publicity/material/grant/count/agency",{'agencyName':agencyName} ,function(result) {
+			var list = result;
+			var chartValue = [];
+			var chartName = [];
+			list.forEach(function(item) {
+				chartValue.push({
+					value : item.total
+				});
+				chartName.push({
+					value : item.workCycle+'年'
+				});
+			}) 
+			
+			option = {
+		    color: ['#3398DB'],
+		    tooltip : {
+		        trigger: 'axis',
+		        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+		            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+		        }
+		    },
+		    grid: {
+		        left: '3%',
+		        right: '4%',
+		        bottom: '3%',
+		        containLabel: true
+		    },
+		    xAxis : [
+		        {
+		            type : 'category',
+		            data : chartName,
+		            axisTick: {
+		                alignWithLabel: true
+		            }
+		        }
+		    ],
+		    yAxis : [
+		        {
+		            type : 'value'
+		        }
+		    ],
+		    series : [
+		        {
+		            name:'直接访问',
+		            type:'bar',
+		            barWidth: '60%',
+		            data:chartValue
+		        }
+		    ]
+		};
+			chart.setOption(option,true);
+		}); 
+	}
+    
+    function query(){
+    	 charts(chart);
+    }
+    
+    </script>
+</body>
+
+</html>
