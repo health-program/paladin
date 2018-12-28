@@ -10,7 +10,8 @@
 		    `name`,
 		    label,
 		    top_order_no AS topOrderNo,
-		    url
+		    url,
+            create_time AS createTime
 		FROM 
 		    video
 		WHERE 1=1
@@ -22,4 +23,16 @@
 	    </if>
 	    ORDER BY top_order_no ASC
      </select>
+    <select id="findVideos" resultType="com.paladin.health.service.videomanage.vo.VideoShowVo">
+         SELECT
+	        id,
+		    show_image AS showImage,
+		    summary,
+		    `name`,
+		    label
+		FROM
+		    video
+		WHERE  top = 1
+		 ORDER BY top_order_no ASC
+    </select>
 </mapper>

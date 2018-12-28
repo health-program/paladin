@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header"/>
+
+<body >
+<section class="content">
+    <div class="container">
+        <div class="box box-solid">
+            <div class="box-body">
+                <input type="hidden" id="url" th:value="${video.url}">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <div  id="my-video"  class="media-object">Loading the video...</div>
+                    </div>
+                    <div class="media-body">
+                        <h3 class="media-heading" style="text-align: center" th:text="${video.name}"></h3>
+                        <p th:text="|适合症状:  ${video.label}|"></p>
+                        <p th:text="|视频简介:  ${video.summary}|"></p>
+                        <p th:text="|视频发布时间:  ${#dates.format(video.createTime,'yyyy-MM-dd HH:mm:SS')}|"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:include="/health/footer"/>
+<script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $(function () {
+            var url =$("#url").val();
+        jwplayer("my-video").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 850,
+            height: 500,
+            showdigits : false,
+            bufferlength: 10
+           /* events: {
+                onReady: function() {
+                    video = $('#my-video').is('object') ? $('#my-video').parent() : $('#my-video');
+                    video.videoController();
+                },
+                onPlay: function () {
+                    $( '#example1' ).sliderPro({
+                        autoplay : false
+                    });
+                },
+                onFullscreen: function (obj) { if (obj.fullscreen) { alert("全屏"); } else { alert("非全屏"); } }
+            }*/
+        });
+    })
+    /*]]>*/
+</script>
+</body>
+</html>

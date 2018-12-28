@@ -1,11 +1,12 @@
 package com.paladin.health.model.videomanage;
 
 import com.paladin.framework.common.BaseModel;
+
 import javax.persistence.Id;
 
 public class Video extends BaseModel {
 
-	// 
+    public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
 	@Id
 	private String id;
 
@@ -25,10 +26,10 @@ public class Video extends BaseModel {
 	private String label;
 
 	// 是否置顶（boolean）
-	private Integer top;
+	private Integer top = 0;
 
 	// 置顶排序号
-	private Integer topOrderNo;
+	private Integer topOrderNo = 6;
 
 	public String getId() {
 		return id;
