@@ -21,6 +21,8 @@
 	    <if test="label != null and label != ''">
 	        AND label LIKE CONCAT ('%',#{label},'%') 
 	    </if>
+	        AND status = #{status}
+	    
 	    ORDER BY top_order_no ASC
      </select>
     <select id="findVideos" resultType="com.paladin.health.service.videomanage.vo.VideoShowVo">
@@ -36,4 +38,21 @@
 		WHERE  top = 1
 		 ORDER BY top_order_no ASC
     </select>
+    
+     <select id="findToExamine" resultType="com.paladin.health.service.videomanage.dto.VideoExamineDTO">
+	      SELECT
+	          id,
+	          show_image AS showImage,
+	          summary,
+	          status,
+	          `name`,
+	          label,
+	          url
+	      FROM
+	          video
+	      WHERE
+	          `status` = '1'
+	      ORDER BY create_time
+   </select>
+    
 </mapper>

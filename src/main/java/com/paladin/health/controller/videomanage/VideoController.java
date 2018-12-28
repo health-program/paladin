@@ -199,4 +199,34 @@ public class VideoController extends ControllerSupport {
     public Object sort(String id, Integer topOrderNo){
         return  CommonResponse.getResponse(videoService.updateByOrderNo(id,topOrderNo));
     }
+    
+    
+    /**
+     * 视频审核首页
+     * 
+     * @author jisanjie
+     */
+    @RequestMapping("/examine/index")
+    public String videoExamineIndex(){
+      return "/health/videomanage/video_examine_index";
+    }
+    
+    /**
+     * 加载首页待审核的数据
+     * 
+     */
+    @RequestMapping("/find/to/examine")
+    @ResponseBody
+    public Object findToExamine(){
+          OffsetPage page = new OffsetPage();
+          return CommonResponse.getSuccessResponse(videoService.findToExamine(page));
+          
+    }
+    
+    @RequestMapping("/examine")
+    @ResponseBody
+    public Object examineVideo(String id){
+      return CommonResponse.getSuccessResponse(videoService.updateVideoStatus(id));
+          
+    }
 }

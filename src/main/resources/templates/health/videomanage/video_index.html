@@ -105,6 +105,9 @@
                             },
                             'click .sort': function(e, value, row, index) {
                                 topvideo(row);
+                            },
+                            'click .confirm': function(e, value, row, index) {
+                                publish(row);
                             }
                         },
                         formatter: operateFormatter
@@ -132,9 +135,12 @@
                 '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-remove"></i>删除' ,
                 '</button>',
-                '<button class="top btn btn-xs btn-primary">' ,
+                '<button class="top btn btn-xs btn-primary" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-pushpin"></i>置顶' ,
                 '</button>',
+                '<button class="confirm btn btn-xs btn-info">' ,
+                '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
+                '</button>'
             ].join('');
         }else {
             return [
@@ -144,9 +150,12 @@
                 '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-remove"></i>删除' ,
                 '</button>',
-                '<button class="sort btn btn-xs btn-success" >' ,
+                '<button class="sort btn btn-xs btn-success" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-sort"></i>排序' ,
                 '</button>',
+                '<button class="confirm btn btn-xs btn-info">' ,
+                '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
+                '</button>'
             ].join('');
         }
         
@@ -239,6 +248,10 @@
             $.errorMessage("请选中一条业务数据");
         }
         return row;
+    }
+    
+    function publish(row){
+        
     }
     </script>
 </body>

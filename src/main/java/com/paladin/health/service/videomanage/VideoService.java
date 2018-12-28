@@ -12,6 +12,7 @@ import com.paladin.framework.core.copy.SimpleBeanCopier;
 import com.paladin.health.mapper.videomanage.VideoMapper;
 import com.paladin.health.model.videomanage.Video;
 import com.paladin.health.service.videomanage.dto.VideoDTO;
+import com.paladin.health.service.videomanage.dto.VideoExamineDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVo;
 import com.paladin.health.service.videomanage.vo.VideoVO;
@@ -28,6 +29,7 @@ public class VideoService extends ServiceSupport<Video> {
 
       public PageResult<VideoVO> searchPageList(VideoQueryDTO query) {
             Page<VideoVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+            query.setStatus(Video.COLUMN_FIELD_EXAMINE_SUCCESS_STATUS);
             videoMapper.searchPageList(query);
             return new PageResult<>(page);
       }
@@ -61,4 +63,17 @@ public class VideoService extends ServiceSupport<Video> {
         }
         return updateSelective(video);
     }
+    
+    public PageResult<VideoExamineDTO> findToExamine(OffsetPage pages) {
+          Page<VideoExamineDTO>  page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
+          videoMapper.findToExamine();
+          return new PageResult<>(page);
+   }
+
+   public Object updateVideoStatus(String id) {
+         Video video = new  Video();
+         video.setId(id);
+         video.setStatus(Video.COLUMN_FIELD_EXAMINE_SUCCESS_STATUS);
+         return videoMapper.updateByPrimaryKeySelective(video);
+   }
 }

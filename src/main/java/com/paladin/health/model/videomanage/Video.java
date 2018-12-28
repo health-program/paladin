@@ -9,6 +9,17 @@ public class Video extends BaseModel {
     public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
 
     public static final Integer topNumber = 6;
+    
+    /**
+     * 待审核
+     */
+    public final static int COLUMN_FIELD_TO_EXAMINE_STATUS = 1;
+    
+    /**
+     * 审核成功
+     */
+    public final static int COLUMN_FIELD_EXAMINE_SUCCESS_STATUS = 9;
+    
 	@Id
 	private String id;
 
@@ -32,6 +43,9 @@ public class Video extends BaseModel {
 
 	// 置顶排序号
 	private Integer topOrderNo;
+	
+	   //状态
+    private Integer status;
 
 	public String getId() {
 		return id;
@@ -96,5 +110,13 @@ public class Video extends BaseModel {
 	public void setTopOrderNo(Integer topOrderNo) {
 		this.topOrderNo = topOrderNo;
 	}
+
+    public Integer getStatus() {
+          return status;
+    }
+
+    public void setStatus(Integer status) {
+          this.status = status;
+    }
 
 }

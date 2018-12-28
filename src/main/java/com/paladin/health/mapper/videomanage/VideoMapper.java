@@ -2,6 +2,7 @@ package com.paladin.health.mapper.videomanage;
 
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.health.model.videomanage.Video;
+import com.paladin.health.service.videomanage.dto.VideoExamineDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVo;
 import com.paladin.health.service.videomanage.vo.VideoVO;
@@ -16,5 +17,8 @@ public interface VideoMapper extends CustomMapper<Video>{
 
       List<Video> findLabelList();
 
-    List<VideoShowVo> findVideos(OffsetPage pages);
+      List<VideoShowVo> findVideos(OffsetPage pages);
+    
+      List<VideoExamineDTO> findToExamine();
+
 }
