@@ -39,6 +39,9 @@ public class VideoPlayPublishController extends ControllerSupport {
         return CommonResponse.getSuccessResponse(videoPlayPublishService.searchPublishedVideo(query));
     }
     
+    /**
+     * 展示柱状图
+     */
     @RequestMapping("/getStatistics")
     @ResponseBody
     public Object getStatistics(VideoPlayPublishDTO videoPlayPublishDTO, Model model) {   	
@@ -69,9 +72,9 @@ public class VideoPlayPublishController extends ControllerSupport {
 
     @RequestMapping("/updateCount")
 	@ResponseBody
-    public Object update( String videoId) {
+    public Object update(@RequestParam String videoId) {
 		if (videoPlayPublishService.updateOrSave(videoId) > 0) {
-			return CommonResponse.getSuccessResponse(videoPlayPublishService.get(videoId));
+			return CommonResponse.getSuccessResponse("");
 		}
 		return CommonResponse.getFailResponse();
 	}

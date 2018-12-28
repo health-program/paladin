@@ -6,7 +6,6 @@
 <section class="content">
     <input type="hidden" id="url" th:value="${video.url}">
     <input type="hidden" id="id" th:value="${video.id}">
-    <input type="text" id="count">
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
@@ -47,9 +46,9 @@
             }*/
         });
         /* 更新播放次数 */
-        debugger
+    
         $.getAjax("/health/video/play/publish/updateCount?videoId="+$("#id").val(), function(data) {
-           $("#count").val(data.result.count);
+           
         });
     })
     /*]]>*/

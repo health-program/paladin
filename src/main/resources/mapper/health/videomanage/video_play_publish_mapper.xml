@@ -17,7 +17,7 @@
 		(select video_id , sum(count) total from video_play_publish group by video_id) vpp 
 		ON 
 		v.id = vpp.video_id
-		WHERE 1=1
+		WHERE v.status=9
 	    <if test="name != null and name != ''">
 	        AND v.name LIKE CONCAT ('%',#{name},'%') 
 	    </if>

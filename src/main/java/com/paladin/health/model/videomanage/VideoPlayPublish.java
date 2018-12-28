@@ -1,5 +1,6 @@
 package com.paladin.health.model.videomanage;
 
+import java.util.Date;
 import javax.persistence.Id;
 
 public class VideoPlayPublish {
@@ -10,7 +11,7 @@ public class VideoPlayPublish {
 
 	// 日期
 	@Id
-	private String date;
+	private Date date;
 
 	// 年
 	private Integer year;
@@ -32,11 +33,11 @@ public class VideoPlayPublish {
 		this.videoId = videoId;
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
