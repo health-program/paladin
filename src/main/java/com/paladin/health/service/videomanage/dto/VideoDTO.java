@@ -21,12 +21,6 @@ public class VideoDTO {
 	// 标签
 	private String label;
 
-	// 是否置顶（boolean）
-	private Integer top;
-
-	// 置顶排序号
-	private Integer topOrderNo;
-
 	public String getId() {
 		return id;
 	}
@@ -74,22 +68,5 @@ public class VideoDTO {
 	public void setLabel(String label) {
 		this.label = label;
 	}
-
-	public Integer getTop() {
-		return top;
-	}
-
-	public void setTop(Integer top) {
-		this.top = top;
-	}
-
-	public Integer getTopOrderNo() {
-		return topOrderNo;
-	}
-
-	public void setTopOrderNo(Integer topOrderNo) {
-		this.topOrderNo = topOrderNo;
-	}
-
 
 }

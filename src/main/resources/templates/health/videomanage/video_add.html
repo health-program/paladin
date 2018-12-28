@@ -32,13 +32,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="top" class="col-sm-3 control-label">是否置顶：</label>
-                        <div class="col-sm-3">
-                            <select name="top" class="form-control tonto-select-constant" enumcode="boolean">
-                                <option value="">请选择</option>
-                            </select>
-                        </div>
-                        <label for="name" class="col-sm-2 control-label">视频名称：</label>
+                        <label for="name" class="col-sm-3 control-label">视频名称：</label>
                         <div class="col-sm-3">
                             <input name="name" id="name" placeholder="请输入视频名称" type="text" class="form-control" required="required" />
                         </div>
@@ -62,11 +56,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="topOrderNo" class="col-sm-3 control-label">置顶排序号：</label>
-                        <div class="col-sm-3">
-                            <input name="topOrderNo" placeholder="请输入置顶排序号" type="text" class="form-control" required="required" />
-                        </div>
-                        <label for="url" class="col-sm-2 control-label">视频地址：</label>
+                        <label for="url" class="col-sm-3 control-label">视频地址：</label>
                         <div class="col-sm-3">
                             <input name="url" placeholder="请输入视频地址" type="text" class="form-control" required="required" />
                         </div>
@@ -100,10 +90,8 @@
         columns: [
             { title: "展示图片(附件ID)", name: "showImage", inputType: "TEXT" },
             { title: "视频简介", name: "summary", inputType: "TEXT" },
-            { title: "是否置顶（boolean）", name: "top", inputType: "TEXT" },
             { title: "视频名称", name: "name", inputType: "TEXT" },
             { title: "标签", name: "label", inputType: "TEXT" },
-            { title: "置顶排序号", name: "topOrderNo", inputType: "TEXT" },
             { title: "视频地址", name: "url", inputType: "TEXT" }
         ]
     }

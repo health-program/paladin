@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
+<style>
+    .notice-list {
+        list-style: none;
+    }
+
+    .right-tool {
+        float: right;
+    }
+
+    .list {
+        list-style: none;
+        float: left;
+        text-align: center;
+        width: 23%
+    }
+
+    .right-text {
+        display: inline;
+        float: right;
+    }
+
+    .name-box {
+        display: inline-block;
+        height: 54px;
+        width: 140px;
+    }
+
+    .fa-check-square-o {
+        font-size: 54px;
+    }
+
+    .p1 {
+        color: #666666;
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    .p2 {
+        color: #666666;
+        line-height: 20px;
+        font-size: 22px;
+    }
+
+    .go-todo-btn {
+        padding
+    }
+
+    .name {
+        color: #000;
+    }
+
+    .name:hover,
+    .name:active,
+    .name:focus {
+        color: #000;
+        text-decoration: underline
+    }
+
+    .btn-primary {
+        background-color: #00a65a;
+        border-color: #00a65a
+    }
+
+    .btn-primary:hover {
+        background-color: #1ddc50;
+        border-color: #1ddc50
+    }
+
+    .p-number strong {
+        font-size: 24px
+    }
+
+    .ul-dashed {
+        border-bottom: 1px dashed #dddddd;
+        padding-left: 12px;
+        line-height: 14px;
+        margin-right: 21px;
+    }
+
+    .notice-li {
+        margin-bottom: 6px;
+    }
+
+    .info-box-text {
+        font-size: 20px;
+    }
+
+    .info-box-content {
+        padding: 5px 25px;
+    }
+
+    .text-view {
+        margin-left: 90px;
+        text-align: right;
+        margin-right: 19px;
+    }
+
+    #noticeContent p {
+        margin-left: 15px;
+    }
+
+    .content {
+        min-height: 250px;
+        padding: 30px;
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+</style>
+
+<body class="container">
+<section class="content">
+    <div class="box box-solid">
+        <div class="box-body">
+            <div id="example1" class="slider-pro">
+                <div class="sp-slides" th:each="video,iter: ${videos}">
+                    <div class="sp-slide">
+                        <a th:href="${'/health/video/play?id='+ video.id}" ><img class="sp-image" data-src="/static/js/sliderPro/js/1.jpg"/></a>
+                        <p class="sp-layer sp-white sp-padding"
+                            data-vertical="5" data-horizontal="1%" data-width="98%"
+                            data-show-transition="down" data-show-delay="400" data-hide-transition="up" style="text-align: center" >
+                            <span class="hide-small-screen" th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></span>
+                    </p>
+                    </div>
+                </div>
+                <div class="sp-thumbnails">
+                    <div class="sp-thumbnail">
+                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                    </div>
+                    <div class="sp-thumbnail">
+                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                    </div>
+
+                    <div class="sp-thumbnail">
+                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                    </div>
+
+                    <div class="sp-thumbnail">
+                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                    </div>
+
+                    <div class="sp-thumbnail">
+                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <i class="fa fa-bullhorn"></i>
+            <h3 class="box-title">视频列表</h3>
+            <a style="float:right" href="/hrms/system/announcement/index">更多 </a>
+        </div>
+        <div class="box-body">
+            <ul class="notice-list ul-dashed" th:each="video,iter: ${videosAll}">
+                <li class="notice-li">
+                    <strong><a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a></strong><img th:if="${iter.index <= 2}" src="/static/image/hot.gif" style="position: absolute;z-index: 1001;margin-left: 3px;margin-top: -3px">
+                    <div class="right-tool">
+                        <span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+<div th:include="/health/footer" />
+<script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $( '#example1' ).sliderPro({
+            width: 1110,
+            height: 450,
+            arrows: true,
+            buttons: false,
+            waitForLayers: true,
+            autoplayDelay: 10000,
+            thumbnailPointer: true,
+            thumbnailWidth: 220,
+            thumbnailHeight:150,
+            breakpoints: {
+                500: {
+                    thumbnailWidth: 120,
+                    thumbnailHeight: 50
+                }
+            }
+        });
+    })
+</script>
+</body>
+
+</html>
