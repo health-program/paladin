@@ -6,9 +6,9 @@
 <body>
     
     <section class="content-header">
-        <h1>publicity_video</h1>
+        <h1>video_play_publish</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/publicity/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li><a href="/health/video/play/publish/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">新增</li>
         </ol>
     </section>
@@ -19,14 +19,12 @@
     var options = {
         id: "model",
         name: "新增",
-        url:"/health/publicity/video/save",
+        url:"/health/video/play/publish/save",
         columns: [
-				{ title: "工作周期", name: "workCycle", inputType: "TEXT" },
-				{ title: "所属机构", name: "agencyId", inputType: "TEXT" },
-				{ title: "音像名称", name: "name", inputType: "TEXT" },
-				{ title: "数量", name: "count", inputType: "TEXT" },
-				{ title: "制作单位", name: "makeUnit", inputType: "TEXT" },
-				{ title: "备注", name: "remarks", inputType: "TEXT" }
+				{ title: "月", name: "month", inputType: "TEXT" },
+				{ title: "年", name: "year", inputType: "TEXT" },
+				{ title: "播放次数", name: "count", inputType: "TEXT" },
+				{ title: "日", name: "day", inputType: "TEXT" }
 				]
     }
 
@@ -37,7 +35,7 @@
             pattern:"edit",
             successCallback:function(){
                 $.successAlert("保存成功",function(){
-                    window.location = "/health/publicity/video/index";
+                    window.location = "/health/video/play/publish/index";
                 });
             }
         });
