@@ -28,6 +28,7 @@
 	        id,
 		    show_image AS showImage,
 		    summary,
+		    url,
 		    `name`,
 		    label
 		FROM

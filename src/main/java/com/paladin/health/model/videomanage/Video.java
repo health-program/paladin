@@ -7,6 +7,8 @@ import javax.persistence.Id;
 public class Video extends BaseModel {
 
     public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
+
+    public static final Integer topNumber = 6;
 	@Id
 	private String id;
 
@@ -26,10 +28,10 @@ public class Video extends BaseModel {
 	private String label;
 
 	// 是否置顶（boolean）
-	private Integer top = 0;
+	private Integer top;
 
 	// 置顶排序号
-	private Integer topOrderNo = 6;
+	private Integer topOrderNo;
 
 	public String getId() {
 		return id;

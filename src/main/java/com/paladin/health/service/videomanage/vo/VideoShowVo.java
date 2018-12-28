@@ -12,6 +12,8 @@ public class VideoShowVo {
 
     private String id;
 
+    private  String url;
+
     // 视频名称
     private String name;
 
@@ -72,5 +74,13 @@ public class VideoShowVo {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

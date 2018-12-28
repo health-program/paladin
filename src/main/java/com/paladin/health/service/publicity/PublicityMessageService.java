@@ -1,6 +1,7 @@
 package com.paladin.health.service.publicity;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -200,4 +201,6 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		publicityMessageMapper.findMessage(query);
 		return new PageResult<>(page);
 	}
+
+    public List<PublicityMessageVO> showDisplayMessage() { return publicityMessageMapper.findDisplay(); }
 }

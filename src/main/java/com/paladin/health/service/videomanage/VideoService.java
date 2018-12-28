@@ -53,6 +53,8 @@ public class VideoService extends ServiceSupport<Video> {
             Video oldVideo = videos.get(0);
             Video model = new Video();
             model.setId(oldVideo.getId());
+            model.setTop(0);
+            model.setTopOrderNo(Video.topNumber);
             if (updateSelective(model) > 0){
                return updateSelective(video);
             }

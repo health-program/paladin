@@ -8,6 +8,8 @@ import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.model.videomanage.Video;
+import com.paladin.health.service.publicity.PublicityMessageService;
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import com.paladin.health.service.videomanage.VideoService;
 import com.paladin.health.service.videomanage.dto.VideoDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 视频管理
@@ -37,6 +40,9 @@ public class VideoController extends ControllerSupport {
 
     @Autowired
     private VideoService videoService;
+
+    @Autowired
+    private PublicityMessageService publicityMessageService;
 
     @RequestMapping("/index")
     @QueryInputMethod(queryClass = VideoQueryDTO.class)
@@ -85,6 +91,8 @@ public class VideoController extends ControllerSupport {
 			return validErrorHandler(bindingResult);
 		}
         Video model = beanCopy(videoDTO, new Video());
+		model.setTop(0);
+		model.setTopOrderNo(Video.topNumber);
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
 		if (videoService.save(model) > 0) {
@@ -137,10 +145,30 @@ public class VideoController extends ControllerSupport {
         queryDTO.setLimit(8);
         queryDTO.setOffset(0);
         PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
+       List<PublicityMessageVO> messages =  publicityMessageService.showDisplayMessage();
         model.addAttribute("videos",pages.getData());
         model.addAttribute("videosAll",videosAll.getData());
+        model.addAttribute("messages",messages);
         return "/health/videomanage/video_top_index";
     }
+    @RequestMapping("/topVideo")
+    public String topVideo(Model model) {
+        OffsetPage page = new OffsetPage();
+        page.setLimit(5);
+        page.setOffset(0);
+        PageResult<VideoShowVo> pages = videoService.findVideoPage(page);
+        VideoQueryDTO queryDTO = new VideoQueryDTO();
+        queryDTO.setLimit(8);
+        queryDTO.setOffset(0);
+        PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
+        List<PublicityMessageVO> messages =  publicityMessageService.showDisplayMessage();
+        model.addAttribute("videos",pages.getData());
+        model.addAttribute("videosAll",videosAll.getData());
+        model.addAttribute("messages",messages);
+        return "/health/videomanage/video_top_video_index";
+    }
+
+
 
     /**
      * 功能描述: <br>

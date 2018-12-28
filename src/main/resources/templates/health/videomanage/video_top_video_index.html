@@ -121,12 +121,13 @@
             <div id="example1" class="slider-pro">
                 <div class="sp-slides" th:each="video,iter: ${videos}">
                     <div class="sp-slide">
-                        <a th:href="${'/health/video/play?id='+ video.id}" ><img class="sp-image" data-src="/static/js/sliderPro/js/1.jpg"/></a>
+                        <input type="hidden" th:id="|url${iter.index+1}|" th:value="${video.url}">
+                        <div  th:id="|video${iter.index+1}|"  class="media-object">Loading the video...</div>
                         <p class="sp-layer sp-white sp-padding"
-                            data-vertical="5" data-horizontal="1%" data-width="98%"
-                            data-show-transition="down" data-show-delay="400" data-hide-transition="up" style="text-align: center" >
+                           data-vertical="5" data-horizontal="1%" data-width="98%"
+                           data-show-transition="down" data-show-delay="400" data-hide-transition="up" style="text-align: center" >
                             <span class="hide-small-screen" th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></span>
-                    </p>
+                        </p>
                     </div>
                 </div>
                 <div class="sp-thumbnails">
@@ -153,14 +154,14 @@
         </div>
     </div>
     <div class="box box-solid">
-            <ul id="myTab" class="nav nav-tabs">
-                <li class="active">
-                    <a href="#info" data-toggle="tab" ><i class="glyphicon glyphicon-list-alt"></i>&nbsp;&nbsp;信息发布</a>
-                </li>
-                <li>
-                    <a href="#video" data-toggle="tab"><i class="glyphicon glyphicon-facetime-video"></i>&nbsp;&nbsp;视频列表</a>
-                </li>
-            </ul>
+        <ul id="myTab" class="nav nav-tabs">
+            <li class="active">
+                <a href="#info" data-toggle="tab" ><i class="glyphicon glyphicon-list-alt"></i>&nbsp;&nbsp;信息发布</a>
+            </li>
+            <li>
+                <a href="#video" data-toggle="tab"><i class="glyphicon glyphicon-facetime-video"></i>&nbsp;&nbsp;视频列表</a>
+            </li>
+        </ul>
         <div class="box-body">
             <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade in active" id="info">
@@ -183,16 +184,17 @@
                         </li>
                     </ul>
                 </div>
+            </div>
         </div>
-    </div>
 </section>
 <div th:include="/health/footer" />
 <script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
+<script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
 <script type="text/javascript">
     $(function () {
         $( '#example1' ).sliderPro({
             width: 1110,
-            height: 450,
+            height: 600,
             arrows: true,
             buttons: false,
             waitForLayers: true,
@@ -207,7 +209,72 @@
                 }
             }
         });
-    })
+        _initVideo1($("#url1").val());
+        _initVideo2($("#url2").val());
+        _initVideo3($("#url3").val());
+        _initVideo4($("#url4").val());
+        _initVideo5($("#url5").val());
+    });
+    function _initVideo1(url) {
+        jwplayer("video1").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 1110,
+            height: 653,
+            showdigits : false,
+            bufferlength: 10
+        });
+    }
+    function _initVideo2(url) {
+        jwplayer("video2").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 1110,
+            height: 653,
+            showdigits : false,
+            bufferlength: 10
+        });
+    }
+    function _initVideo3(url) {
+        jwplayer("video3").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 1110,
+            height: 653,
+            showdigits : false,
+            bufferlength: 10
+        });
+    }
+    function _initVideo4(url) {
+        jwplayer("video4").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 1110,
+            height: 653,
+            showdigits : false,
+            bufferlength: 10
+        });
+    }
+    function _initVideo5(url) {
+        jwplayer("video5").setup({
+            flashplayer: '/static/js/jwplayer/player.swf',
+            file: url,
+            image: "/static/js/sliderPro/js/1.jpg",
+            overstretch: true,
+            width: 1110,
+            height: 653,
+            showdigits : false,
+            bufferlength: 10
+        });
+    }
 </script>
 </body>
 
