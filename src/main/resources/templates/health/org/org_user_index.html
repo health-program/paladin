@@ -4,9 +4,8 @@
 <head th:include="/health/header" />
 
 <body>
-     
     <section class="content-header">
-        <h1>org_user</h1>
+        <h1>用户管理</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
@@ -47,6 +46,14 @@
     <div th:include="/health/footer" />
     <script type="text/javascript">
     var table;
+    var roleMap = {
+        "1": "默认",
+        "2": "机构管理员"
+    };
+    var agencyMap = {
+        "8abdb2047b8a4ebabfbb775b6cc8e8d3": "昆山健康促进中心",
+        "1333e2a2c25f4b90bd1f97e5d84ca84e": "卫计委信息科"
+    }
     $(function() {
         initDataGrid();
     });
@@ -60,11 +67,11 @@
             idField: "id",
             columns: [
                 [
-                    					{ title: "角色id", align: "center", field: "roleId" },
-					{ title: "姓名", align: "center", field: "name" },
-					{ title: "机构ID", align: "center", field: "agencyId" },
-					{ title: "描述", align: "center", field: "description" },
-					{ title: "账号", align: "center", field: "account" },
+                    { title: "姓名", align: "center", field: "name" },
+                    { title: "账号", align: "center", field: "account" },
+                    { title: "机构", align: "center", field: "agencyId", formatter: function(value, row) { return agencyMap[value] } },
+                    { title: "角色", align: "center", field: "roleId", formatter: function(value, row) { return roleMap[value] } },
+                    { title: "描述", align: "center", field: "description" },
                     {
                         title: "操作",
                         align: "center",
