@@ -82,7 +82,7 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/get")
 	@ResponseBody
 	public Object view(@RequestParam String id) {
-		return CommonResponse.getSuccessResponse(publicityMessageService.get(id));
+		return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(id));
 	}
 
 	/**
@@ -142,7 +142,7 @@ public class PublicityMessageController extends ControllerSupport {
 		}
 		
 		if(publicityMessageService.updateMessage(publicityMessage)) {
-			return CommonResponse.getSuccessResponse(publicityMessageService.get(publicityMessage.getId()));
+			return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(publicityMessage.getId()));
 		} else {
 			return CommonResponse.getFailResponse();
 		}	
