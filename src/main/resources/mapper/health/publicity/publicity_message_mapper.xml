@@ -89,7 +89,7 @@
 		LEFT JOIN org_user b ON a.examine_user_id = b.id
 		LEFT JOIN org_user c ON a.create_user_id = c.id
 		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type IN  (1,2)
-		ORDER BY publish_time ASC
+		ORDER BY publish_time DESC
 		LIMIT 8;
     </select>
 

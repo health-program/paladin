@@ -2,6 +2,7 @@ package com.paladin.health.controller.publicity;
 
 import javax.validation.Valid;
 
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -84,6 +85,22 @@ public class PublicityMessageController extends ControllerSupport {
 	public Object view(@RequestParam String id) {
 		return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(id));
 	}
+
+    /**
+     * 功能描述: <br>
+     * 〈发布信息前台展示页面〉
+     * @param id
+     * @param model
+     * @return  java.lang.Object
+     * @author  Huangguochen
+     * @date  2018/12/28
+     */
+    @RequestMapping("/display/index")
+    public Object display(@RequestParam String id,Model model) {
+        PublicityMessageVO message = publicityMessageService.getMessage(id);
+        model.addAttribute("message",message);
+        return "/health/publicity/message_display_index";
+    }
 
 	/**
 	 * 新增
