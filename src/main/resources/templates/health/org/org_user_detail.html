@@ -4,9 +4,8 @@
 <head th:include="/health/header" />
 
 <body>
-    
     <section class="content-header">
-        <h1>org_user</h1>
+        <h1>用户管理</h1>
         <ol class="breadcrumb">
             <li><a href="/health/org/user/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">详情</li>
@@ -14,28 +13,43 @@
     </section>
     <section class="content">
     </section>
-    <input type="hidden" id="id" th:value="${id}"/>
+    <input type="hidden" id="id" th:value="${id}" />
     <div th:include="/health/footer" />
     <script type="text/javascript">
-
+    var roleMap = {
+        "1": "默认",
+        "2": "机构管理员"
+    };
+    var agencyMap = {
+        "8abdb2047b8a4ebabfbb775b6cc8e8d3": "昆山健康促进中心",
+        "1333e2a2c25f4b90bd1f97e5d84ca84e": "卫计委信息科"
+    };
     $(function() {
-    	var options = {
-	        id: "model",
-	        name: "详情",
-	        url:"/health/org/user/update?id="+$("#id").val(),
-	        columns: [
-				{ title: "角色id", name: "roleId", inputType: "TEXT" },
-				{ title: "姓名", name: "name", inputType: "TEXT" },
-				{ title: "机构ID", name: "agencyId", inputType: "TEXT" },
-				{ title: "描述", name: "description", inputType: "TEXT" },
-				{ title: "账号", name: "account", inputType: "TEXT" }
-				]
-	    }
-    
-        $.getAjax("/health/org/user/get?id="+$("#id").val(), function(data) {
+        var options = {
+            id: "model",
+            name: "详情",
+            url: "/health/org/user/update?id=" + $("#id").val(),
+            columns: [
+                { title: "姓名", name: "name", inputType: "TEXT" },
+                { title: "账号", name: "account", inputType: "TEXT" },
+                { title: "机构", name: "agencyName", inputType: "TEXT" },
+                { title: "角色", name: "roleName", inputType: "TEXT" },
+                { title: "描述", name: "description", inputType: "TEXT" }
+            ]
+        }
+
+        $.getAjax("/health/org/user/get?id=" + $("#id").val(), function(data) {
             var html = generateHtml(options);
             $(".content").html(html);
             var model = new tonto.Model("model", options.columns);
+            if (data) {
+                try {
+                    data.agencyName = agencyMap[data.agencyId];
+                    data.roleName = roleMap[data.roleId];
+                } catch (e) {
+
+                }
+            }
             model.setData(data);
             $.initComponment();
         });

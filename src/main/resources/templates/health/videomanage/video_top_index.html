@@ -117,7 +117,7 @@
 <body class="container">
 <section class="content">
     <div class="box box-solid">
-        <div class="box-body">
+
             <div id="example1" class="slider-pro">
                 <div class="sp-slides" th:each="video,iter: ${videos}">
                     <div class="sp-slide">
@@ -150,7 +150,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+
     </div>
     <div class="box box-solid">
             <ul id="myTab" class="nav nav-tabs">
@@ -166,7 +166,7 @@
                 <div class="tab-pane fade in active" id="info">
                     <ul class="notice-list ul-dashed" th:each="message,iter: ${messages}">
                         <li class="notice-li">
-                            <strong><a class="name" th:href="${'/health/video/play?id='+ message.id}" th:text="${message.title}"></a></strong><img th:if="${iter.index <= 2}" src="/static/image/hot.gif" style="position: absolute;z-index: 1001;margin-left: 3px;margin-top: -3px">
+                            <strong><a class="name" th:href="${'/health/publicity/message/display/index?id='+ message.id}" th:text="${message.title}"></a></strong><img th:if="${iter.index <= 2}" src="/static/image/hot.gif" style="position: absolute;z-index: 1001;margin-left: 3px;margin-top: -3px">
                             <div class="right-tool">
                                 <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span>
                             </div>

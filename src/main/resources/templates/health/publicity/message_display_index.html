@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header"/>
+
+<body>
+<section class="content">
+        <div class="container">
+                <div class="row">
+                    <div class="col-sm-8">
+                        <h2 th:text="${message.title}" style="text-align: center"></h2>
+                        <h5 th:text="|信息发布时间:  ${#dates.format(message.publishTime,'yyyy-MM-dd')}|"></h5>
+                        <h5>信息内容:</h5>
+                        <div style="text-align: center" class="media-object" th:utext="${message.content}"></div>
+                        <p th:text="|标签:  ${message.label != null ? message.label:'无'}|"></p>
+                        <p th:text="|信息简介:  ${message.summary != null ? message.summary:'无'}|"></p>
+                    </div>
+                </div>
+        </div>
+</section>
+<div th:include="/health/footer"/>
+<script type="text/javascript">
+    /*<![CDATA[*/
+
+    /*]]>*/
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.videomanage.VideoPlayPublishMapper">
+	 <update id="updateCount" parameterType="com.paladin.health.model.videomanage.VideoPlayPublish">
+		UPDATE video_play_publish SET count = count + 1 WHERE video_id = #{videoId} AND date = #{date}
+	 </update>
+	 <!-- 已发布的视频列表 -->
+     <select id="searchPublishedVideo" parameterType="com.paladin.health.service.videomanage.dto.VideoPlayPublishQueryDTO" resultType="com.paladin.health.service.videomanage.vo.PublishedVideoVO">
+	    SELECT
+        v.id,
+	    v.name,
+	    v.summary,
+	    v.label,
+	    vpp.total as count
+		FROM  video v
+		LEFT JOIN  
+		(select video_id , sum(count) total from video_play_publish group by video_id) vpp 
+		ON 
+		v.id = vpp.video_id
+		WHERE 1=1
+	    <if test="name != null and name != ''">
+	        AND v.name LIKE CONCAT ('%',#{name},'%') 
+	    </if>
+	    <if test="label != null and label != ''">
+	        AND v.label LIKE CONCAT ('%',#{label},'%') 
+	    </if>
+	    ORDER BY v.create_time DESC
+     </select>
+     <!-- echarts -->
+	 <select id="getStatistics" parameterType="com.paladin.health.service.videomanage.dto.VideoPlayPublishDTO"
+	 resultType="com.paladin.health.service.videomanage.vo.VideoPlayPublishVO">
+		SELECT video_id videoId,
+		YEAR(date) year,
+		<if test="year!=null">
+			MONTH(date) month,
+		</if>
+		<if test="month!=null">
+			DAY(date) day,
+		</if>
+		sum(count) count
+		FROM 
+		video_play_publish
+		WHERE 
+		video_id = #{videoId}
+		<if test="year!=null">
+		AND YEAR(date) = #{year}
+		</if>
+		<if test="month!=null">
+			AND MONTH(date) = #{month}
+		</if>
+		<if test="day!=null">
+			AND DAY(date) = #{day}
+		</if>
+		GROUP BY 
+		video_id,
+		year(date)
+		<if test="year!=null">
+			,month(date)
+		</if>
+		<if test="month!=null">
+			,day(date)
+		</if>
+		ORDER BY YEAR(date) DESC
+		<if test="year!=null">
+			,month(date) ASC
+		</if>
+		<if test="month!=null">
+			,day(date) ASC
+		</if>
+	 </select>
+</mapper>
