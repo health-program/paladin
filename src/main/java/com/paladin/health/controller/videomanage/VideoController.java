@@ -217,9 +217,8 @@ public class VideoController extends ControllerSupport {
      */
     @RequestMapping("/find/to/examine")
     @ResponseBody
-    public Object findToExamine(){
-          OffsetPage page = new OffsetPage();
-          return CommonResponse.getSuccessResponse(videoService.findToExamine(page));
+    public Object findToExamine(VideoExamineQueryVo vo){
+          return CommonResponse.getSuccessResponse(videoService.findToExamine(vo));
           
     }
     

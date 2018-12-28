@@ -19,8 +19,10 @@
                     <div class="form-group">
                         <label for="status" class="col-md-1 control-label">状态：</label>
                         <div class="col-md-2">
-                            <select name="status" class="form-control tonto-select" th:attr="selectedvalue=${query?.status}" disabled="disabled">
+                            <select name="status" class="form-control tonto-select">
                                 <option value="1">待审核</option>
+                                <option value="9">审核成功</option>
+                                <option value="2">审核未通过</option>
                             </select>
                         </div>
                     </div>
@@ -82,7 +84,7 @@
                         width: "10%",
                         events: {
                             'click .detail': function(e, value, row, index) {
-                                detail(row);
+                                examine(row);
                             }
                         },
                        formatter: function operateFormatter(value, row, index) {
@@ -104,7 +106,7 @@
         });
     }
 
-    function detail(row) {
+    function examine(row) {
     	if(row){        
     		layer.confirm('确定审核吗?', function() {
             $.getAjax('/health/video/examine?id=' + row.id, function() {
