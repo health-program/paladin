@@ -54,11 +54,11 @@ public class VideoController extends ControllerSupport {
      * 视屏播放统计首页
      * 
      */
- /*   @RequestMapping("/play/index")
+    @RequestMapping("/play/list")
     @QueryInputMethod(queryClass = VideoQueryDTO.class)
     public String palyIndex1() {
-        return "/health/videomanage/video_play_index";
-    }*/
+        return "/health/videomanage/video_play_list";
+    }
 
     @RequestMapping("/find/page")
     @ResponseBody
