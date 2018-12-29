@@ -10,6 +10,8 @@ import com.paladin.health.service.videomanage.vo.VideoVO;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.paladin.framework.mybatis.CustomMapper;
 
 public interface VideoMapper extends CustomMapper<Video>{
@@ -21,5 +23,7 @@ public interface VideoMapper extends CustomMapper<Video>{
       List<VideoShowVo> findVideos(OffsetPage pages);
     
       List<VideoExamineDTO> findToExamine(VideoExamineQueryVo vo);
+
+      int updateExamineStatus(@Param("id") String id, @Param("status") Integer status, @Param("examinerId") String examinerId);
 
 }

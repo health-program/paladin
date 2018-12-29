@@ -8,11 +8,11 @@ import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
-import com.paladin.framework.core.copy.SimpleBeanCopier;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.health.controller.videomanage.VideoExamineQueryVo;
+import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.mapper.videomanage.VideoMapper;
 import com.paladin.health.model.videomanage.Video;
-import com.paladin.health.service.videomanage.dto.VideoDTO;
 import com.paladin.health.service.videomanage.dto.VideoExamineDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVo;
@@ -70,10 +70,30 @@ public class VideoService extends ServiceSupport<Video> {
           return new PageResult<>(page);
    }
 
-   public Object updateVideoStatus(String id) {
-         Video video = new  Video();
-         video.setId(id);
-         video.setStatus(Video.COLUMN_FIELD_EXAMINE_SUCCESS_STATUS);
-         return videoMapper.updateByPrimaryKeySelective(video);
-   }
+   public boolean examine(String id, boolean success) {
+         Video video = get(id);
+         if (video == null) {
+             throw new BusinessException("找不到需要审核的信息数据");
+         }
+
+         Integer status = video.getStatus();
+
+         if (status != Video.STATUS_TO_EXAMINE) {
+             throw new BusinessException("当前视频不是待审核状态！");
+         }
+
+         status = success ? Video.STATUS_EXAMINE_SUCCESS : Video.STATUS_EXAMINE_FAIL;
+
+         if (success) {
+             // TODO 成功推送
+         }
+
+         if (videoMapper.updateExamineStatus(id, status, HealthUserSession.getCurrentUserSession().getUserId()) > 0) {
+             return true;
+         } else {
+             throw new BusinessException("审核失败");
+         }
+     }
+   
+   
 }

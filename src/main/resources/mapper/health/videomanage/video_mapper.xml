@@ -54,5 +54,10 @@
 	          `status` = #{status}
 	      ORDER BY create_time
    </select>
+   
+    <update id="updateExamineStatus">
+        UPDATE video SET status = #{status}, examine_user_id = #{examinerId} WHERE id = #{id} AND status = 1
+    </update>
+   
     
 </mapper>

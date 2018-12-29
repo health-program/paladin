@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="publicity-message-type" />
+    <input type="hidden" id="id" th:value="${id}" />
+    <section class="content-header">
+        <h1>视频审核</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/video/examine/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">审核</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">审核</h3>
+                <div class="pull-right box-tools">
+                    <a class="btn btn-default btn-sm" href="/health/video/examine/index">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div id="model_view" class="box-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="showImage" class="col-sm-3 control-label">展示图片：</label>
+                        <div class="col-sm-3">
+                            <p name="showImage" class="form-control-static description"></p>
+                        </div>
+                        <label for="summary" class="col-sm-3 control-label">视频简介：</label>
+                        <div class="col-sm-3">
+                            <p name="summary" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">视频名称：</label>
+                        <div class="col-sm-3">
+                            <p name="name" class="form-control-static description"></p>
+                        </div>
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-3">
+                            <p name="label" class="form-control-static description"></p>
+                        </div>
+                        
+                    </div>
+                    <div class="form-group">
+                        <label for="url" class="col-sm-3 control-label">视频地址：</label>
+                        <div class="col-sm-3">
+                            <p name="url" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" id="examineGroup">
+                        <div class="col-sm-offset-3 col-sm-1">
+                            <button type="button" onclick="examineSuccess()" class="btn btn-success btn-block">审核通过</button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" onclick="examineFail()" class="btn btn-danger btn-block">驳回</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    /*<![CDATA[*/
+
+    $(function() {
+        var options = {
+            id: "model",
+            name: "详情",
+            columns: [
+                      { title: "展示图片", name: "showImage", inputType: "TEXT" },
+                      { title: "视频简介", name: "summary", inputType: "TEXT" },
+                      { title: "视频名称", name: "name", inputType: "TEXT" },
+                      { title: "标签", name: "label", inputType: "TEXT" },
+                      { title: "视频地址", name: "url", inputType: "TEXT" }
+                      ]
+        }
+
+        $.getAjax("/health/video/get?id=" + $("#id").val(), function(data) {
+            var model = new tonto.Model("model", options.columns, {
+                pattern: "view"
+            });
+            data.createUserName = data.createUserName ? data.createUserName : "管理员";
+            data.examineUserName = data.examineUserName ? data.examineUserName : "管理员";
+            model.setData(data);
+        });
+    });
+
+    function examineSuccess() {
+        layer.confirm('确定审核通过吗?', function() {
+            $.getAjax("/health/video/examine/success?id=" + $("#id").val(), function() {
+                $.successAlert("审核通过成功", function() {
+                    window.location = "/health/video/examine/index";
+                });
+            });
+        });
+    }
+
+    function examineFail() {
+        layer.confirm('确定驳回吗?', function() {
+            $.getAjax("/health/video/examine/fail?id=" + $("#id").val(), function() {
+                $.successAlert("驳回成功", function() {
+                    window.location = "/health/video/examine/index";
+                });
+            });
+        });
+    }
+    /*]]>*/
+    </script>
+</body>
+
+</html>

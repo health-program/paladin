@@ -214,6 +214,7 @@ public class VideoController extends ControllerSupport {
     /**
      * 加载首页待审核的数据
      * 
+     * @author jisanjie
      */
     @RequestMapping("/find/to/examine")
     @ResponseBody
@@ -222,10 +223,38 @@ public class VideoController extends ControllerSupport {
           
     }
     
+    /**
+     * 审核
+     * 
+     * @author jisanjie
+     */
     @RequestMapping("/examine")
-    @ResponseBody
-    public Object examineVideo(String id){
-      return CommonResponse.getSuccessResponse(videoService.updateVideoStatus(id));
-          
+    public String examine(@RequestParam String id, Model model) {
+        model.addAttribute("id", id);
+        return "/health/videomanage/video_examine";
     }
+    
+    /**
+     * 审核成功
+     * 
+     * @author jisanjie
+     */
+    @RequestMapping("/examine/success")
+    @ResponseBody
+    public Object examineSuccess(@RequestParam String id) {
+        return CommonResponse.getResponse(videoService.examine(id, true));
+    }
+    
+    /**
+     * 审核失败
+     * 
+     * @author jisanjie
+     */
+    @RequestMapping("/examine/fail")
+    @ResponseBody
+    public Object examineFail(@RequestParam String id) {
+        return CommonResponse.getResponse(videoService.examine(id, false));
+    }
+    
+    
 }

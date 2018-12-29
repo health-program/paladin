@@ -13,12 +13,17 @@ public class Video extends BaseModel {
     /**
      * 待审核
      */
-    public final static int COLUMN_FIELD_TO_EXAMINE_STATUS = 1;
+    public final static int STATUS_TO_EXAMINE = 1;
+    
+    /**
+     * 驳回
+     */
+    public final static int STATUS_EXAMINE_FAIL = 2;
     
     /**
      * 审核成功
      */
-    public final static int COLUMN_FIELD_EXAMINE_SUCCESS_STATUS = 9;
+    public final static int STATUS_EXAMINE_SUCCESS = 9;
     
 	@Id
 	private String id;
@@ -46,6 +51,8 @@ public class Video extends BaseModel {
 	
 	   //状态
     private Integer status;
+    
+    private String examineUserId;
 
 	public String getId() {
 		return id;
@@ -118,5 +125,13 @@ public class Video extends BaseModel {
     public void setStatus(Integer status) {
           this.status = status;
     }
+    
+    public String getExamineUserId() {
+          return examineUserId;
+      }
+
+    public void setExamineUserId(String examineUserId) {
+          this.examineUserId = examineUserId;
+      }
 
 }
