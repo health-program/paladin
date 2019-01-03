@@ -19,6 +19,7 @@ import com.paladin.health.service.videomanage.vo.VideoShowVo;
 import com.paladin.health.service.videomanage.vo.VideoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -45,23 +46,31 @@ public class VideoService extends ServiceSupport<Video> {
         return  new PageResult<>(page);
     }
 
-    public int updateByOrderNo(String id, Integer topOrderNo) {
-        List<Video> videos = searchAll(new GeneralCriteriaBuilder.Condition(Video.COLUMN_FIELD_TOP_ORDER_NO, QueryType.EQUAL, topOrderNo));
-        Video video = new Video();
-        video.setTop(1);
-        video.setId(id);
-        video.setTopOrderNo(topOrderNo);
-        if (videos != null && videos.size()>0){
-            Video oldVideo = videos.get(0);
-            Video model = new Video();
-            model.setId(oldVideo.getId());
-            model.setTop(0);
-            model.setTopOrderNo(Video.topNumber);
-            if (updateSelective(model) > 0){
-               return updateSelective(video);
+    public int updateByOrderNo(String[] ids) {
+        int staus = 0;
+        for (int i = 0; i <ids.length; i++) {
+            String idAndNo = ids[i];
+            String[] strings = idAndNo.split(":");
+            String id = strings[0];
+            String topNo = strings[1];
+            List<Video> oldVideos = searchAll(new GeneralCriteriaBuilder.Condition(Video.COLUMN_FIELD_TOP_ORDER_NO, QueryType.EQUAL, topNo));
+            Video video = new Video();
+            video.setTop(1);
+            video.setId(id);
+            video.setTopOrderNo(Integer.valueOf(topNo));
+            if (oldVideos != null && oldVideos.size() > 0) {
+                Video oldVideo = oldVideos.get(0);
+                if (!id.equals(oldVideo.getId())) {
+                    int j = cancelTopById(oldVideo.getId());
+                    if (j > 0) {
+                        staus += updateSelective(video);
+                    }
+                }
+            } else {
+                staus += updateSelective(video);
             }
         }
-        return updateSelective(video);
+        return  staus;
     }
     
     public PageResult<VideoExamineDTO> findToExamine(VideoExamineQueryVo vo) {
@@ -94,6 +103,13 @@ public class VideoService extends ServiceSupport<Video> {
              throw new BusinessException("审核失败");
          }
      }
-   
-   
+
+
+    public int cancelTopById(String id) {
+        Video model = new Video();
+        model.setId(id);
+        model.setTop(0);
+        model.setTopOrderNo(Video.topNumber);
+        return updateSelective(model) ;
+    }
 }

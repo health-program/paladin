@@ -189,17 +189,31 @@ public class VideoController extends ControllerSupport {
     /**
      * 功能描述: <br>
      * 〈更换排序顺序〉
-     * @param videoDTO
+     * @param ids
      * @return  java.lang.Object
      * @author  Huangguochen
      * @date  2018/12/27
      */
     @RequestMapping("/sort")
     @ResponseBody
-    public Object sort(String id, Integer topOrderNo){
-        return  CommonResponse.getResponse(videoService.updateByOrderNo(id,topOrderNo));
+    public Object sort(@RequestParam("ids[]") String[] ids){
+        return  CommonResponse.getResponse(videoService.updateByOrderNo(ids));
     }
-    
+
+
+    /**
+     * 功能描述: <br>
+     * 〈取消置顶〉
+     * @param id
+     * @return  java.lang.Object
+     * @author  Huangguochen
+     * @date  2019/1/2
+     */
+    @RequestMapping("/cancel")
+    @ResponseBody
+    public Object cancel(@RequestParam String id) {
+        return CommonResponse.getResponse(videoService.cancelTopById(id));
+    }
     
     /**
      * 视频审核首页

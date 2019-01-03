@@ -50,15 +50,53 @@
                     <div class="btn-group">
                         <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
                     </div>
+                    <div class="btn-group">
+                        <a href="javascript:void(0);" onclick="initTable()" class="btn btn-primary">待排序视频&nbsp;&nbsp;<span class="badge" id="sortCount">0</span></a>
+                    </div>
                 </div>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title">置顶排序顺序</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table class="table  table-bordered"
+                                   id="field_list_table">
+                                <thead id="gridThead">
+                                <tr style="cursor: pointer;">
+                                    <td class="listHeadCell">排序顺序</td>
+                                    <td class="listHeadCell">视频名称</td>
+                                </tr>
+                                </thead>
+                                <tbody id="gridtbody">
+                                <tr>
+                                    <td>
+                                        <span class="badge" >1</span>
+                                    </td>
+                                    <td>名称1</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
+                            <button class="btn btn-primary" onclick="sort()"  type="button">提交</button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
             </div>
         </div>
     </section>
     <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/js/dragsort/jquery.dragsort-0.5.2.js"></script>
     <script type="text/javascript">
     var table;
     $(function() {
         initDataGrid();
+        initdragsort();
     });
 
     function initDataGrid() {
@@ -92,7 +130,7 @@
                     {
                         title: "操作",
                         align: "center",
-                        width: "20%",
+                        width: "27%",
                         events: {
                             'click .detail': function(e, value, row, index) {
                                 detail(row);
@@ -101,13 +139,16 @@
                                 remove(row);
                             },
                             'click .top': function(e, value, row, index) {
-                                topvideo(row);
+                                addSortNo(row);
                             },
                             'click .sort': function(e, value, row, index) {
-                                topvideo(row);
+                                addSortNo(row);
                             },
                             'click .confirm': function(e, value, row, index) {
                                 publish(row);
+                            },
+                            'click .cancel': function(e, value, row, index) {
+                                cancelTop(row);
                             }
                         },
                         formatter: operateFormatter
@@ -135,7 +176,7 @@
                 '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-remove"></i>删除' ,
                 '</button>',
-                '<button class="top btn btn-xs btn-primary" style="margin-right:10px">' ,
+                '<button class="top btn btn-xs btn-primary"  style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-pushpin"></i>置顶' ,
                 '</button>',
                 '<button class="confirm btn btn-xs btn-info">' ,
@@ -153,6 +194,9 @@
                 '<button class="sort btn btn-xs btn-success" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-sort"></i>排序' ,
                 '</button>',
+                '<button class="cancel btn btn-xs btn-warning" style="margin-right:10px">' ,
+                '<i class="glyphicon glyphicon-ban-circle"></i>取消置顶' ,
+                '</button>',
                 '<button class="confirm btn btn-xs btn-info">' ,
                 '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
                 '</button>'
@@ -160,66 +204,76 @@
         }
         
     }
+    var sortCount = [];
 
-    function topvideo(row) {
-        var html =
-            '<div class="content">' +
-            '    <div class="form-group">' +
-            '        <label for="gAgencyName" class="col-sm-3 control-label">置顶排序顺序</label>' +
-            '        <div class="col-sm-7">' +
-            '           <select id="sortNo" name="sortNo" class="form-control">'+
-            '               <option value="">请选择</option>'+
-            '               <option value="1">1</option>'+
-            '               <option value="2">2</option>'+
-            '               <option value="3">3</option>'+
-            '               <option value="4">4</option>'+
-            '               <option value="5">5</option>'+
-            '           </select>'+
-            '        </div>' +
-            '    </div>' +
-            '    <div class="form-group">' +
-            '        <div class="col-sm-3 col-sm-offset-3">' +
-            '            <button type="button" id="submitBtn" class="btn btn-primary btn-block">提交</button>' +
-            '        </div>' +
-            '        <div class="col-sm-3 col-sm-offset-1">' +
-            '            <button type="button" id="cancelBtn" class="btn btn-default btn-block">取消</button>' +
-            '        </div>' +
-            '    </div>' +
-            '</div>';
+    function addSortNo(row) {
+        var obj= {};
+        var  videoId = row.id;
+        var  videoName = row.name;
+        obj.id= videoId;
+        obj.name = videoName;
+        var i =sortCount.findIndex(function (video) {
+            return video.id === videoId;
+        });
+       if ( i >= 0){
+           $.errorMessage("已存在该视频");
+       }else{
+           sortCount.push(obj);
+       }
+       $("#sortCount").text(sortCount.length);
+    };
 
-        layer.open({
-            type: 1,
-            closeBtn: 1,
-            title: "置顶顺序",
-            shadeClose: true,
-            area: ['500px', '350px'],
-            content: html,
-            success: function(layero, index) {
-                sort(index, row);
-            }
-        })
+    function initTable() {
+        if (sortCount.length === 0) {
+            $.errorMessage("请先添加置顶视频");
+            return;
+        }
+        if (sortCount.length === 9){
+            $.errorMessage("最多添加8个置顶视频");
+            return;
+        }
+        var html = '';
+        sortCount.forEach(function (video,index) {
+            var i =index +1;
+            html += '<tr id="'+video.id+'">' +
+                '        <td><span class="badge">'+ i +
+                '       </span></td>' +
+                '        <td>' + video.name+
+                '         </td>' +
+                '    </tr>';
+        });
+        $("#myModal").modal('show');
+        $("#gridtbody").html(html);
     }
 
-    function sort(index,row) {
-        $("#cancelBtn").click(function() {
-            layer.close(index);
+    var arr = [];
+    function sort() {
+        if ($("#field_list_table tr").length > 1) {
+            $("#gridtbody tr").each(function (i,item) {
+                arr[i]= $(this).attr('id')+":"+$(this).find(".badge").text();
+            })
+        }
+        if(arr.length > 5){
+            arr  =  arr.slice(0,5);
+        }
+        $.postAjax("/health/video/sort", {
+            ids : arr
+        }, function() {
+            $.successMessage("排序设置成功!");
+            $("#myModal").modal('hide');
+            sortCount = [];
+            $("#sortCount").text(sortCount.length);
+            table.refresh();
         });
-        $("#submitBtn").click(function() {
-            var sortNo = $("#sortNo").val();
-            if (!sortNo) {
-                $.errorMessage("请选择排序顺序");
-                return;
-            }
-            $.postAjax("/health/video/sort", {
-                id: row.id,
-                topOrderNo: sortNo
-            }, function() {
-                $.successMessage("排序设置成功!");
-                layer.close(index);
-                table.refresh();
-            });
-        })
+    }
 
+    function initdragsort() {
+        $("#gridtbody").dragsort({
+            itemSelector: "tr",
+            dragSelector: "tr",
+            dragBetween: false,
+            placeHolderTemplate: "<tr><td></td></tr>"
+        });
     }
 
     function add() {
@@ -240,16 +294,16 @@
             });
         }
     }
-
-    function getSelectRow(notShowError) {
-        var rows = table.getSelections();
-        var row = rows.length > 0 ? rows[0] : null;
-        if (!notShowError && !row) {
-            $.errorMessage("请选中一条业务数据");
+    function cancelTop(row) {
+        if (row) {
+            layer.confirm('确定取消吗?', function() {
+                $.getAjax('/health/video/cancel?id=' + row.id, function() {
+                    $.successMessage("取消成功");
+                    table.refresh();
+                });
+            });
         }
-        return row;
     }
-    
     function publish(row){
         
     }
