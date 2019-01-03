@@ -4,6 +4,8 @@ import org.apache.shiro.authc.DisabledAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.paladin.common.core.permission.PermissionContainer;
+import com.paladin.common.core.permission.Role;
 import com.paladin.framework.core.UserSession;
 import com.paladin.health.model.org.OrgUser;
 import com.paladin.health.model.syst.SysUser;
@@ -14,6 +16,8 @@ public class HealthUserSessionFactory {
 
 	@Autowired
 	private OrgUserService orgUserService;
+	@Autowired
+	private PermissionContainer permissionContainer;
 
 	public UserSession createSession(SysUser sysUser) {
 		int type = sysUser.getType();
@@ -25,7 +29,8 @@ public class HealthUserSessionFactory {
 			if (orgUser == null) {
 				throw new DisabledAccountException();
 			}
-			userSession = new HealthUserSession(orgUser);
+			Role role = permissionContainer.getRole(orgUser.getRoleId());
+			userSession = new HealthUserSession(orgUser, role);
 		}
 		return userSession;
 	}

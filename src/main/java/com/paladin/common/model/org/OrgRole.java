@@ -12,7 +12,7 @@ public class OrgRole extends UnDeleteBaseModel {
 	// 角色名称
 	private String roleName;
 
-	// 角色等级（考核权限等级）
+	// 角色等级
 	private Integer roleLevel;
 
 	// 角色说明

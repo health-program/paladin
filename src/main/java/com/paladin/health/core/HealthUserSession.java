@@ -1,6 +1,8 @@
 package com.paladin.health.core;
 
 import org.apache.shiro.SecurityUtils;
+
+import com.paladin.common.core.permission.Role;
 import com.paladin.framework.core.UserSession;
 import com.paladin.health.model.org.OrgUser;
 
@@ -16,15 +18,44 @@ public class HealthUserSession extends UserSession {
 		this.isSystemAdmin = isSystemAdmin;
 	}
 
-	public HealthUserSession(OrgUser orgUser) {
+	public HealthUserSession(OrgUser orgUser, Role role) {
 		this(orgUser.getId(), orgUser.getName(), orgUser.getAccount(), 2, false);
 		this.agencyId = orgUser.getAgencyId();
+		this.role = role;
+		this.dataLevel = role.getRoleLevel();
 	}		
 
 	private boolean isSystemAdmin;
 	private int dataLevel;
+	private Role role;
 	private String agencyId;
+	
 
+	@Override
+	public boolean ownPermission(String code) {
+		if(isSystemAdmin) {
+			return true;
+		}
+		
+		if(role != null) {
+			return role.ownPermission(code);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean ownLevel(int level) {
+		if(isSystemAdmin) {
+			return true;
+		}
+		
+		if(role != null) {
+			return role.ownLevel(level);
+		}
+		return false;
+	}
+	
 	/**
 	 * 是否系统管理员
 	 * @return
@@ -56,13 +87,6 @@ public class HealthUserSession extends UserSession {
 	public String getAgencyId() {
 		return agencyId;
 	}
-	/**
-	 * 获取用户类型
-	 * @return
-	 */
-	public boolean getIsSystemAdmin() {
-		return isSystemAdmin;
-	}
 
 	/**
 	 * 获取当前用户会话
@@ -72,6 +96,7 @@ public class HealthUserSession extends UserSession {
 	public static HealthUserSession getCurrentUserSession() {
 		return (HealthUserSession) SecurityUtils.getSubject().getPrincipal();
 	}
+
 
 
 

@@ -12,15 +12,18 @@ public class OrgPermission extends UnDeleteBaseModel {
 	// 权限名称
 	private String name;
 
-	// 权限类型1：菜单2：功能3:分类
-	private Integer type;
-
 	// 表现形式1：URL2：CODE
 	private Integer expressionType;
 
 	// 表现内容
 	private String expressionContent;
 
+	// 是否菜单
+	private Integer isMenu;
+	
+	// 图标
+	private String menuIcon;
+	
 	// 权限描述
 	private String description;
 
@@ -31,7 +34,7 @@ public class OrgPermission extends UnDeleteBaseModel {
 	private Integer listOrder;
 
 	// 是否系统管理员权限
-	private Integer isAdminMenu;
+	private Integer isAdmin;
 
 	public String getId() {
 		return id;
@@ -49,14 +52,6 @@ public class OrgPermission extends UnDeleteBaseModel {
 		this.name = name;
 	}
 
-	public Integer getType() {
-		return type;
-	}
-
-	public void setType(Integer type) {
-		this.type = type;
-	}
-
 	public Integer getExpressionType() {
 		return expressionType;
 	}
@@ -71,6 +66,22 @@ public class OrgPermission extends UnDeleteBaseModel {
 
 	public void setExpressionContent(String expressionContent) {
 		this.expressionContent = expressionContent;
+	}
+
+	public Integer getIsMenu() {
+		return isMenu;
+	}
+
+	public void setIsMenu(Integer isMenu) {
+		this.isMenu = isMenu;
+	}
+
+	public String getMenuIcon() {
+		return menuIcon;
+	}
+
+	public void setMenuIcon(String menuIcon) {
+		this.menuIcon = menuIcon;
 	}
 
 	public String getDescription() {
@@ -97,12 +108,14 @@ public class OrgPermission extends UnDeleteBaseModel {
 		this.listOrder = listOrder;
 	}
 
-	public Integer getIsAdminMenu() {
-		return isAdminMenu;
+	public Integer getIsAdmin() {
+		return isAdmin;
 	}
 
-	public void setIsAdminMenu(Integer isAdminMenu) {
-		this.isAdminMenu = isAdminMenu;
+	public void setIsAdmin(Integer isAdmin) {
+		this.isAdmin = isAdmin;
 	}
+
+	
 
 }
