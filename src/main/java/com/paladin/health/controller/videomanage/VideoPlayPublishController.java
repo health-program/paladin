@@ -40,7 +40,7 @@ public class VideoPlayPublishController extends ControllerSupport {
     }
     
     /**
-     * 展示柱状图
+     * 外部统计播放量展示柱状图
      */
     @RequestMapping("/getStatistics")
     @ResponseBody

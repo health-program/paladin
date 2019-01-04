@@ -50,4 +50,34 @@
 		LEFT JOIN video v ON vp.video_id = v.id
 		WHERE oa.is_delete = 0 AND vp.id = #{id}
 	</select>
+	
+<!-- 内部按机构分组播放量统计 -->
+	<select id="getStatisticsByAgency" parameterType="string" resultType="com.paladin.health.service.videomanage.vo.VideoPlayCountVO">
+		SELECT vp.id,vp.work_cycle workCycle,SUM(vp.play_duration)duration,SUM(vp.visitor_count)visitorCount,org.name agencyName FROM video_play vp
+		LEFT JOIN org_agency  org ON vp.agency_id = org.id
+		WHERE org.is_delete = 0
+		
+		<if test="workCycle != null and workCycle!=''">
+			AND vp.work_cycle =#{workCycle}
+		</if>
+		
+		<if test="agencyName != null and agencyName !=''">
+			AND org.name LIKE CONCAT('%',#{agencyName},'%')
+		</if>
+		
+		GROUP BY vp.agency_id
+	</select>
+	
+<!-- 内部按时间分组播放量统计 -->
+	<select id="getStatisticsByYear" resultType="com.paladin.health.service.videomanage.vo.VideoPlayCountVO">
+		SELECT vp.id,vp.work_cycle workCycle,SUM(vp.play_duration)duration,SUM(vp.visitor_count)visitorCount,org.name agencyName FROM video_play vp
+		LEFT JOIN org_agency  org ON vp.agency_id = org.id
+		WHERE org.is_delete = 0
+		
+		<if test="agencyName != null and agencyName !=''">
+			AND org.name LIKE CONCAT('%',#{agencyName},'%')
+		</if>
+		
+		GROUP BY vp.work_cycle ORDER BY vp.work_cycle 
+	</select>
 </mapper>

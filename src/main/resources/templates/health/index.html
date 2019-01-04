@@ -52,7 +52,7 @@
                                 <li class="user-header">
                                     <img src="/static/image/user.png" class="img-circle" alt="User Image" />
                                     <p th:text="${user.userName}"></p>
-                                    <p><small th:text="${user.isSystemAdmin}? '系统管理员' : '普通用户'"></small></p>
+                                    <p><small th:text="${user.agencyId}? '普通用户':'系统管理员'"></small></p>
                                 </li>
                                 <li class="user-footer">
                                     <div class="pull-left">
@@ -383,6 +383,20 @@
                 text: "视频播放统计",
                 icon: "fa fa-circle-o",
                 url: "video/play/publish/index",
+                targetType: "iframe-tab"
+            },
+            {
+                id: "90054",
+                text: "视频播放记录按年统计",
+                icon: "fa fa-circle-o",
+                url: "video/play/count/index",
+                targetType: "iframe-tab"
+            },
+            {
+                id: "90055",
+                text: "视频播放记录机构历年统计",
+                icon: "fa fa-circle-o",
+                url: "video/play/count/agency/index",
                 targetType: "iframe-tab"
             }]
      } 

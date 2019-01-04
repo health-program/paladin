@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="publicity-material-type,grant-target-type"/>
+    <input type="hidden" name="year"/>
+    <section class="content-header">
+        <h1>视频播放记录按年统计</h1>
+    </section>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-search"></i>
+                <h3 class="box-title">查询</h3>
+            </div>
+            <div class="box-body">
+                <form id="searchbar" class="form-horizontal">
+                <div class="input-group" style="width:100%">
+                     <label for="agencyName"  class="col-md-1 control-label">机构名称</label>
+	                    <div class="col-md-2">
+	                       <input type="text" id="agencyName" name="agencyName" class="form-control" placeholder="请输入机构" >
+	                    </div>
+	                   <label for="workCycle"  class="col-md-1 control-label">工作周期</label>
+	                    <div class="col-md-2">
+	                       <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year autocomplete="off"" placeholder="请选择时间" >
+	                    </div> 
+                   </div>
+                        
+                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                    <input type="text" style="display:none">
+                </form>
+                <div class="col-md-12">
+                    <div class="pull-right">
+                        <button type="button" style="width:100px" class="btn btn-primary " onclick="query()"><i class="fa fa-search"></i>查询</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                    </div>
+                </div>
+                <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+                <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+            </div>
+        </div>
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">结果</h3>
+            </div>
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-list-alt"></i>
+                <h3 class="box-title">图表</h3>
+            </div>
+            <div id="result" class="box-body">
+                <div id="toolbar">
+                    <div class="col-sm-12">
+					<div id="chart" style="height: 350px"></div>
+				</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table;
+    $(function() {
+    	 charts(chart);
+        initDataGrid();
+       
+    });
+    
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "机构名称", align: "center", field: "agencyName" },
+					{ title: "观看总人数", align: "center", field: "visitorCount" },
+					{ title: "观看总时长", align: "center", field: "duration" }
+                ]
+            ],
+            url: '/health/video/play/count/year',
+            searchbar: '#searchbar',
+            showColumns: true,
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            clickToSelect: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+    
+
+	function charts() {
+		var workCycle = $("#workCycle").val();
+		var agencyName = $("#agencyName").val();
+		$.get('/health/video/play/count/year?workCycle='+ workCycle + '&agencyName=' + agencyName).done(
+				function(res) {
+					if (res.status != 1) {
+						return false
+					}
+					var chart = echarts.init(document
+							.getElementById('chart'));
+					var data = res.result;
+					if (data.length == 0) {
+						chart.dispose();
+					}
+					// 填入数据
+					var xdata = new Array();
+					var visitorCounts = new Array();
+					var durations = new Array();
+					for ( var i in data) {
+						xdata.push(data[i].agencyName);
+						visitorCounts
+								.push(data[i].visitorCount);
+						durations.push(data[i].duration);
+					}
+					var labelOption = {
+						normal : {
+							show : true,
+							position : 'top',
+							distance : 15,
+							align : 'center',
+							verticalAlign : 'top',
+							rotate : 0,
+							formatter : '{c}  {name|{a}}',
+							fontSize : 12,
+							rich : {
+								name : {
+									textBorderColor : '#fff'
+								}
+							}
+						}
+					};
+					option = {
+						color : [ '#006699', '#4cabce' ],
+						tooltip : {
+							trigger : 'axis',
+							axisPointer : {
+								type : 'shadow'
+							}
+						},
+						legend : {
+							data : [ '观看总人数', '播放总时长' ]
+						},
+						toolbox : {
+							show : true,
+							orient : 'vertical',
+							left : 'right',
+							top : 'center',
+							feature : {
+								mark : {
+									show : true
+								},
+								dataView : {
+									show : true,
+									readOnly : false
+								},
+								magicType : {
+									show : true,
+									type : [ 'line', 'bar',
+											'stack', 'tiled' ]
+								},
+								restore : {
+									show : true
+								},
+								saveAsImage : {
+									show : true
+								}
+							}
+						},
+						calculable : true,
+						xAxis : [ {
+							name: '机构名称',
+							type : 'category',
+							axisTick : {
+								show : false
+							},
+							data : xdata
+						} ],
+						yAxis : [ {
+							name: '总量',
+							type : 'value'
+						} ],
+						series : [ {
+							name : '观看总人数',
+							type : 'bar',
+							label : labelOption,
+							barGap : 0,
+							data : visitorCounts
+						}, {
+							name : '播放总时长',
+							type : 'bar',
+							label : labelOption,
+							data : durations
+						} ]
+							};
+					chart.setOption(option, true);
+					})
+						}
+	function query() {
+		charts();
+		table.refresh();
+	}
+</script>
+</body>
+
+</html>
