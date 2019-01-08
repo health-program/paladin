@@ -13,6 +13,52 @@
         </ol>
     </section>
     <section class="content">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="glyphicon glyphicon-user"></i>
+                <h3 class="box-title">新增</h3>
+                <div class="box-tools pull-right">
+                </div>
+            </div>
+            <div id="model_edit" class="box-body" >
+                <form id="model_form" action="/health/org/user/save" method="post" class="form-horizontal edit-body" >
+                    <div class="form-group">
+                        <label for="account" class="col-sm-3 control-label">账号：</label>
+                        <div class="col-sm-3">
+                            <input name="account" required data-type="account" id="account" placeholder="请输入账号,5~30位数字,字母或下划线" type="text" class="form-control"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" onclick="validateAccount()" class="btn btn-success">检测账号</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="name" class="col-sm-3 control-label">姓名：</label>
+                        <div class="col-sm-3">
+                            <input name="name"  required placeholder="请输入姓名" type="text" class="form-control"/>
+                        </div>
+                        <label for="roleId" class="col-sm-1 control-label">角色：</label>
+                        <div class="col-sm-3">
+                            <select name="roleId" required class="form-control" >
+                                <option value="">请选择</option>
+                                <option value="1">默认</option>
+                                <option value="2">机构管理员</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description" class="col-sm-3 control-label">描述：</label>
+                        <div class="col-sm-3">
+                            <textarea rows="4"  name="description"  style="resize: none;" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 col-sm-offset-3">
+                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </section>
     <div th:include="/health/footer" />
     <script type="text/javascript">
@@ -21,28 +67,39 @@
         name: "新增",
         url:"/health/org/user/save",
         columns: [
-				{ title: "角色id", name: "roleId", inputType: "TEXT" },
+				{ title: "账号", name: "account", inputType: "TEXT" },
 				{ title: "姓名", name: "name", inputType: "TEXT" },
-				{ title: "机构ID", name: "agencyId", inputType: "TEXT" },
-				{ title: "描述", name: "description", inputType: "TEXT" },
-				{ title: "账号", name: "account", inputType: "TEXT" }
+				{ title: "角色", name: "roleId", inputType: "TEXT" },
+				{ title: "描述", name: "description", inputType: "TEXT" }
 				]
-    }
+    };
 
-    $(function() {       
-        var html = generateEditHtml(options);
-        $(".content").html(html);
+    $(function() {
         var model = new tonto.Model("model", options.columns, {
-            pattern:"edit",
-            successCallback:function(){
-                $.successAlert("保存成功",function(){
+            pattern: "edit",
+            successCallback: function () {
+                $.successAlert("保存成功", function () {
                     window.location = "/health/org/user/index";
-                });
+                })
             }
         });
         model.setData(null);
-        $.initComponment();
     });
+
+    function validateAccount() {
+        var account = $("#account").val();
+        $.ajax({
+            url: "/health/org/user/validate",
+            type: "GET",
+            data: {account: account},
+            success: function (data) {
+                if (data.status === 1)
+                    layer.msg("账号可用", {icon: 1});
+                else
+                    layer.msg("账号不可用", {icon: 2});
+            }
+        });
+    }
     </script>
 </body>
 

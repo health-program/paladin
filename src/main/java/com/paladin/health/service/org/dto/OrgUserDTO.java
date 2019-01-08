@@ -1,49 +1,29 @@
 package com.paladin.health.service.org.dto;
 
-import java.util.Date;
+import javax.validation.constraints.NotEmpty;
 
 public class OrgUserDTO {
 
-	// id
-	private String id;
+    // id
+    private String id;
 
 	// 姓名
+    @NotEmpty
 	private String name;
 
 	// 角色id
+    @NotEmpty
 	private String roleId;
 
 	// 机构ID
 	private String agencyId;
 
 	// 账号
+    @NotEmpty
 	private String account;
 
 	// 描述
 	private String description;
-
-	// 创建时间
-	private Date createTime;
-
-	// 创建人
-	private String createUserId;
-
-	// 更新时间
-	private Date updateTime;
-
-	// 更新人
-	private String updateUserId;
-
-	// 是否删除
-	private Integer isDelete;
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -85,44 +65,11 @@ public class OrgUserDTO {
 		this.description = description;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdateUserId() {
-		return updateUserId;
-	}
-
-	public void setUpdateUserId(String updateUserId) {
-		this.updateUserId = updateUserId;
-	}
-
-	public Integer getIsDelete() {
-		return isDelete;
-	}
-
-	public void setIsDelete(Integer isDelete) {
-		this.isDelete = isDelete;
-	}
-
+    public void setId(String id) {
+        this.id = id;
+    }
 }

@@ -399,7 +399,19 @@
                 url: "video/play/count/agency/index",
                 targetType: "iframe-tab"
             }]
-     } 
+            },
+            {
+                id: "9006",
+                text: "系统管理",
+                icon: "fa fa-laptop",
+                children: [{
+                    id: "90061",
+                    text: "用户管理",
+                    icon: "fa fa-circle-o",
+                    url: "/org/user/index",
+                    targetType: "iframe-tab"
+                }]
+            }
         ];
 
         $('.sidebar-menu').sidebarMenu({ data: menus });
