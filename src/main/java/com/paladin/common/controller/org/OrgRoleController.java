@@ -4,14 +4,12 @@ import com.paladin.common.model.org.OrgRole;
 import com.paladin.common.service.org.OrgPermissionService;
 import com.paladin.common.service.org.OrgRolePermissionService;
 import com.paladin.common.service.org.OrgRoleService;
-import com.paladin.common.service.org.dto.OrgRoleQueryDTO;
 import com.paladin.common.service.org.dto.OrgRoleDTO;
+import com.paladin.common.service.org.dto.OrgRoleQueryDTO;
 import com.paladin.common.service.org.vo.OrgRoleVO;
-
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.framework.utils.uuid.UUIDUtil;
-
+import com.paladin.framework.web.response.CommonResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +18,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.validation.Valid;
-
 @Controller
-@RequestMapping("/common/org/role")
+@RequestMapping("/health/org/role")
 public class OrgRoleController extends ControllerSupport {
 
 	@Autowired
@@ -40,7 +37,7 @@ public class OrgRoleController extends ControllerSupport {
 
 	@RequestMapping("/index")
 	public String index() {
-		return "/common/org/org_role_index";
+		return "/health/org/org_role_index";
 	}
 
 	@RequestMapping("/find/page")
@@ -57,13 +54,13 @@ public class OrgRoleController extends ControllerSupport {
 
 	@RequestMapping("/add")
 	public String addInput() {
-		return "/common/org/org_role_add";
+		return "/health/org/org_role_add";
 	}
 
 	@RequestMapping("/detail")
 	public String detailInput(@RequestParam String id, Model model) {
 		model.addAttribute("id", id);
-		return "/common/org/org_role_detail";
+		return "/health/org/org_role_detail";
 	}
 
 	@RequestMapping("/save")
@@ -109,8 +106,8 @@ public class OrgRoleController extends ControllerSupport {
 
 	@RequestMapping("/grant")
 	@ResponseBody
-	public Object getGrantAuthorization(@RequestParam String id, Model model) {
-		Map<String, Object> result = new HashMap<>();
+	public Object getGrantAuthorization(@RequestParam String id) {
+		Map<String, Object> result = new HashMap<>(2);
 		result.put("permissions", orgPermissionService.findAll());
 		result.put("hasPermissions", orgRolePermissionService.getPermissionByRole(id));
 		return CommonResponse.getSuccessResponse(result);

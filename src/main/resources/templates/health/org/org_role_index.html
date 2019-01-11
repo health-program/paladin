@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="boolean,role-level"/>
+
+    <section class="content-header">
+        <h1>角色管理</h1>
+    </section>
+    <section class="content">
+        <div class="box box-solid" style="margin-top:20px">
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                        <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    {title: "角色名称", align: "center", field: "roleName"},
+                    {title: "角色等级", align: "center", field: "roleLevel", enumcode: "role-level"},
+                    {title: "角色描述", align: "center", field: "roleDesc"},
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .detail': function (e, value, row, index) {
+                                detail(row);
+                            },
+                            'click .grant': function (e, value, row, index) {
+                                grant(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
+                                '<button class="grant btn btn-xs btn-danger"><i class="glyphicon glyphicon-cog"></i>授权</button>';
+                        }
+                    }
+                ]
+            ],
+            url: '/health/org/role/find/page',
+            showColumns: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    function add() {
+        window.location = '/health/org/role/add';
+    }
+
+    function detail(row) {
+        window.location = '/health/org/role/detail' + (row ? ('?id=' + row.id) : '');
+    }
+
+    function grant(row) {
+        layer.open({
+            type: 1,
+            title: row.roleName,
+            maxmin: true, //开启最大化最小化按钮
+            area: $.getOpenLayerSize(500, 600),
+            content: '<div style="padding: 0px;" id="roleMenuDiv"></div>',
+            btn: ['保存'],
+            btnAlign: 'c',
+            yes: function(index, layero) {
+                var checkedNodes = tree.treeview("getChecked");
+
+                var ids = [];
+
+                if (checkedNodes && $.isArray(checkedNodes)) {
+                    checkedNodes.forEach(function (a) {
+                        ids.push(a.id);
+                    });
+                }
+
+                var data = {
+                    roleId: row.id,
+                    permissionId: ids
+                };
+                $.postAjax("/health/org/role/grant/save", data, function () {
+                    $.successMessage("保存成功");
+                    layer.close(index);
+                })
+            },
+            success: function(layero, index) {
+                $.getAjax("/health/org/role/grant?id=" + row.id, function (data) {
+                    initTree(row.id, data, $("#roleMenuDiv"));
+                });
+            }
+        });
+
+    }
+
+    // ----------------------------
+    // 权限资源树
+    // ----------------------------
+    var tree;
+    var treedata;
+
+    function initTree(roleId, data, treeDiv) {
+
+        tree = treeDiv;
+
+        if (data.permissions) {
+
+            treedata = data.permissions;
+            var hasMenu = data.hasPermissions;
+
+            function setTreeData(data){
+                let tree = data.filter(function (father) {
+                    let children = data.filter(function (child) {
+                        return father.id === child.parentId
+                    });
+                    if (children.length > 0) {
+                        father.children = children;
+                    }
+                    return father.parentId == 0;
+                });
+                return a(tree)
+            }
+             var a = function(nodes) {
+                 var arr = [];
+                 for (var i = 0; i < nodes.length;) {
+                     var node = nodes[i];
+                     if (node.isAdmin) {
+                         nodes.splice(i, 1);
+                         continue;
+                     }
+
+                     node.text = node.name + (node.isMenu ? ' [菜单]' : '');
+                     node.state = {
+                         checked: hasMenu ? ($.inArray(node.id, hasMenu) !== -1) : false,
+                         expanded: hasMenu ? ($.inArray(node.id, hasMenu) !== -1) : false //是否展开节点
+                     };
+
+                     if (node.children && node.children.length > 0) {
+                         node.nodes = a(node.children);
+                     }
+
+                     i++;
+                     arr.push(node);
+                 }
+                 return arr;
+             };
+            tree.treeview({
+                data: setTreeData(treedata),
+                showCheckbox: true,
+                onNodeChecked: nodeChecked,
+                onNodeUnchecked: nodeUnchecked,
+                levels: 5
+            });
+        }
+    }
+
+
+    function nodeCheckedChanged(node, checked) {
+    }
+
+    var nodeCheckedSilent = false;
+
+    function nodeChecked(event, node) {
+        if (nodeCheckedSilent) {
+            return;
+        }
+        nodeCheckedSilent = true;
+        checkAllParent(node);
+        checkAllSon(node);
+        nodeCheckedSilent = false;
+    }
+
+    var nodeUncheckedSilent = false;
+
+    function nodeUnchecked(event, node) {
+        if (nodeUncheckedSilent)
+            return;
+        nodeUncheckedSilent = true;
+        uncheckAllParent(node);
+        uncheckAllSon(node);
+        nodeUncheckedSilent = false;
+    }
+
+    //选中全部父节点
+    function checkAllParent(node) {
+        nodeCheckedChanged(node, true);
+        tree.treeview('checkNode', node.nodeId, {silent: true});
+        var parentNode = tree.treeview('getParent', node.nodeId);
+        console.log(parentNode)
+        if (!("nodeId" in parentNode)) {
+            return;
+        } else {
+            checkAllParent(parentNode);
+        }
+    }
+
+    //取消全部父节点
+    function uncheckAllParent(node) {
+        nodeCheckedChanged(node, false);
+        tree.treeview('uncheckNode', node.nodeId, {silent: true});
+        var siblings = tree.treeview('getSiblings', node.nodeId);
+        var parentNode = tree.treeview('getParent', node.nodeId);
+        if (!("nodeId" in parentNode)) {
+            return;
+        }
+        var isAllUnchecked = true; //是否全部没选中
+        for (var i in siblings) {
+            if (siblings[i].state.checked) {
+                isAllUnchecked = false;
+                break;
+            }
+        }
+        if (isAllUnchecked) {
+            uncheckAllParent(parentNode);
+        }
+    }
+
+    //级联选中所有子节点
+    function checkAllSon(node) {
+        nodeCheckedChanged(node, true);
+        tree.treeview('checkNode', node.nodeId, {silent: true});
+        if (node.nodes != null && node.nodes.length > 0) {
+            for (var i in node.nodes) {
+                checkAllSon(node.nodes[i]);
+            }
+        }
+    }
+
+    //级联取消所有子节点
+    function uncheckAllSon(node) {
+        nodeCheckedChanged(node, false);
+        tree.treeview('uncheckNode', node.nodeId, {silent: true});
+        if (node.nodes != null && node.nodes.length > 0) {
+            for (var i in node.nodes) {
+                uncheckAllSon(node.nodes[i]);
+            }
+        }
+    }
+
+    function remove(row) {
+        if (row) {
+            if (row.isDefault === 1) {
+                $.errorMessage("无法删除默认角色");
+                return;
+            }
+            layer.confirm('确定删除吗?', function () {
+                $.getAjax('/common/org/role/delete?id=' + row.id, function () {
+                    $.successMessage("删除成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
+
+    </script>
+</body>
+
+</html>
