@@ -1,12 +1,14 @@
 package com.paladin.health.service.videomanage.vo;
 
-public class VideoPlayCountVO {
+public class VideoPlayCountShowVO {
 	
 	private String id;
 	
 	private Integer workCycle;
 	
 	private Long duration;
+	
+	private Double durations;
 	
 	private Integer visitorCount;
 	
@@ -50,6 +52,14 @@ public class VideoPlayCountVO {
 
 	public void setAgencyName(String agencyName) {
 		this.agencyName = agencyName;
+	}
+
+	public Double getDurations() {
+		return durations;
+	}
+
+	public void setDurations(Double durations) {
+		this.durations = durations;
 	}
 	
 }

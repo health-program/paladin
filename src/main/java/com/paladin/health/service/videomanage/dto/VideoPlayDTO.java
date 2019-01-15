@@ -9,7 +9,10 @@ public class VideoPlayDTO {
 
 	// 音像id
 	private String videoId;
-
+	
+	//工作周期
+	private Integer workCycle;
+	
 	// 播放地点
 	private String playAddress;
 
@@ -18,6 +21,9 @@ public class VideoPlayDTO {
 
 	// 播放结束时间
 	private Date playEndTime;
+
+	//播放时长
+	private  Long playDuration;
 
 	// 观看人数
 	private Integer visitorCount;
@@ -101,6 +107,22 @@ public class VideoPlayDTO {
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public Integer getWorkCycle() {
+		return workCycle;
+	}
+
+	public void setWorkCycle(Integer workCycle) {
+		this.workCycle = workCycle;
+	}
+
+	public Long getPlayDuration() {
+		return playDuration;
+	}
+
+	public void setPlayDuration(Long playDuration) {
+		this.playDuration = playDuration;
 	}
 
 }

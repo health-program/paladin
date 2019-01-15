@@ -88,7 +88,7 @@
                 [
                     { title: "机构名称", align: "center", field: "agencyName" },
 					{ title: "观看总人数", align: "center", field: "visitorCount" },
-					{ title: "观看总时长", align: "center", field: "duration" }
+					{ title: "观看总时长", align: "center", field: "durations" ,formatter: function getDuration(value, row, index){return value.toFixed(2) + '小时';}}
                 ]
             ],
             url: '/health/video/play/count/year',
@@ -124,9 +124,8 @@
 					var durations = new Array();
 					for ( var i in data) {
 						xdata.push(data[i].agencyName);
-						visitorCounts
-								.push(data[i].visitorCount);
-						durations.push(data[i].duration);
+						visitorCounts.push(data[i].visitorCount);
+						durations.push((data[i].durations).toFixed(2));
 					}
 					var labelOption = {
 						normal : {
@@ -151,37 +150,28 @@
 							trigger : 'axis',
 							axisPointer : {
 								type : 'shadow'
+							},
+							formatter:function(params){
+								return params[0].name+'<br/> '
+								+ params[0].seriesName+ ':'
+								+ params[0].data + '(人次)<br/>'
+								+ params[1].seriesName+ ':' 
+								+ params[1].data + '(小时)';
 							}
 						},
 						legend : {
 							data : [ '观看总人数', '播放总时长' ]
 						},
 						toolbox : {
-							show : true,
-							orient : 'vertical',
-							left : 'right',
-							top : 'center',
-							feature : {
-								mark : {
-									show : true
-								},
-								dataView : {
-									show : true,
-									readOnly : false
-								},
-								magicType : {
-									show : true,
-									type : [ 'line', 'bar',
-											'stack', 'tiled' ]
-								},
-								restore : {
-									show : true
-								},
-								saveAsImage : {
-									show : true
-								}
-							}
-						},
+				            show : true,
+				            feature : {
+				                mark : {show: true},
+				                dataView : {show: true, readOnly: false},
+				                magicType: {show: true, type: ['line', 'bar']},
+				                restore : {show: true},
+				                saveAsImage : {show: true}
+				            }
+				        },
 						calculable : true,
 						xAxis : [ {
 							name: '机构名称',
@@ -193,7 +183,12 @@
 						} ],
 						yAxis : [ {
 							name: '总量',
-							type : 'value'
+							type : 'value',
+						    axisLabel: {                   
+		                    formatter: function (value, index) {
+		                    	return value.toFixed(2);      
+		                      }                
+			               }
 						} ],
 						series : [ {
 							name : '观看总人数',

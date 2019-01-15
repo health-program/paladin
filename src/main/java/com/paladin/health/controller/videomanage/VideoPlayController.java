@@ -1,5 +1,6 @@
 package com.paladin.health.controller.videomanage;
 
+import java.util.Calendar;
 import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.videomanage.VideoPlay;
 import com.paladin.health.service.org.OrgAgencyService;
@@ -10,7 +11,6 @@ import com.paladin.health.service.videomanage.vo.VideoPlayVO;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.framework.utils.uuid.UUIDUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import javax.validation.Valid;
 
 @Controller
@@ -55,6 +54,8 @@ public class VideoPlayController extends ControllerSupport {
     public String addInput(String id,String name,Model model) {
     	model.addAttribute("videoId", id);
     	model.addAttribute("videoName", name);
+		Calendar calendar = Calendar.getInstance();//日历对象
+		model.addAttribute("workCycle", calendar.get(Calendar.YEAR));
     	HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
 		model.addAttribute("agencyId", userSession.getAgencyId());
 		model.addAttribute("agencyList", orgAgencyService.findAll());
@@ -77,6 +78,7 @@ public class VideoPlayController extends ControllerSupport {
         VideoPlay model = beanCopy(videoPlayDTO, new VideoPlay());
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
+		model.setPlayDuration(model.getPlayEndTime().getTime() - model.getPlayStartTime().getTime());
 		if (videoPlayService.save(model) > 0) {
 			return CommonResponse.getSuccessResponse(videoPlayService.get(id));
 		}
@@ -91,6 +93,7 @@ public class VideoPlayController extends ControllerSupport {
 		}
 		String id = videoPlayDTO.getId();
 		VideoPlay model = beanCopy(videoPlayDTO, videoPlayService.get(id));
+		model.setPlayDuration(model.getPlayEndTime().getTime() - model.getPlayStartTime().getTime());
 		if (videoPlayService.update(model) > 0) {
 			return CommonResponse.getSuccessResponse(videoPlayService.get(id));
 		}

@@ -1,10 +1,12 @@
 package com.paladin.health.controller.videomanage;
 
+import java.util.List;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.videomanage.VideoPlayCountService;
 import com.paladin.health.service.videomanage.dto.VideoPlayCountQueryDTO;
+import com.paladin.health.service.videomanage.vo.VideoPlayCountShowVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,13 +29,26 @@ public class VideoPlayCountController extends ControllerSupport {
     @ResponseBody
     @QueryOutputMethod(queryClass = VideoPlayCountQueryDTO.class, paramIndex = 0)
     public Object publictyCount(VideoPlayCountQueryDTO query) {
-        return CommonResponse.getSuccessResponse(videoPlayCountService.getStatisticsByYear(query));
+    	List<VideoPlayCountShowVO>list=beanCopyList(videoPlayCountService.getStatisticsByYear(query),VideoPlayCountShowVO.class);
+    	if(!list.isEmpty()){
+    		for(VideoPlayCountShowVO videoPlayCountShowVO :list){
+    			videoPlayCountShowVO.setDurations((videoPlayCountShowVO.getDuration()/(1000*3600.0)));
+        	}
+    	}
+    	
+        return CommonResponse.getSuccessResponse(list);
     }
     
     @RequestMapping("/agency")
     @ResponseBody
     @QueryOutputMethod(queryClass = VideoPlayCountQueryDTO.class, paramIndex = 0)
     public Object publictyAgencyCount(VideoPlayCountQueryDTO query) {
-        return CommonResponse.getSuccessResponse(videoPlayCountService.getStatisticsByAgency(query));
+    	List<VideoPlayCountShowVO>list=beanCopyList(videoPlayCountService.getStatisticsByAgency(query),VideoPlayCountShowVO.class);
+    	if(!list.isEmpty()){
+    		for(VideoPlayCountShowVO videoPlayCountShowVO :list){
+    			videoPlayCountShowVO.setDurations((videoPlayCountShowVO.getDuration()/(1000*3600.0)));
+        	}
+    	}
+        return CommonResponse.getSuccessResponse(list);
     }
 }

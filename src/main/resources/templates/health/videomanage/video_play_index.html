@@ -93,33 +93,16 @@
 					{ title: "观看人数", align: "center", field: "visitorCount" },
 					{ title: "播放开始时间", align: "center", field: "playStartTime" ,formatter: "datetime" },
 					{ title: "播放结束时间", align: "center", field: "playEndTime" ,formatter: "datetime" },
-					{ title: "播放时长", align: "center", field: "duration" ,formatter: function getDuration(value, row, index){
+					{ title: "播放时长", align: "center", field: "playDuration" ,formatter: function getDuration(value, row, index){
 						 //计算播放时长
-						 var diffValue=row.playEndTime-row.playStartTime;
 						 var minute = 1000 * 60;      //把分，时，天，周，半个月，一个月用毫秒表示
-		                 var hour = minute * 60;
-		                 var day = hour * 24;
+		                 var hour = minute * 60.00;
 		                 var  resultTime = "";
-						 if(diffValue < 0){
+						 if(row.playDuration < 0){
 		                     resultTime = "数据异常";
 		                 }else{
-		                     var day2 = diffValue/day;//计算运行多少天
-		                     var lestHour = diffValue%day;//计算剩余多少小时的毫秒
-		                     var hour2 = lestHour/hour;
-		                     var lestMin = lestHour%hour;
-		                     var minute2 = lestMin/minute;
-		                     var lestSecond = lestMin%minute;
-		                     var second2 = lestSecond/1000;
-		                     
-		                     if(parseInt(minute2)==0&&parseInt(hour2)==0&&parseInt(day2)==0){
-			                     resultTime = parseInt(second2)+"秒";
-			                 }else if(parseInt(day2)==0&&parseInt(hour2)==0){
-		                         resultTime = parseInt(minute2)+"分钟"+parseInt(second2)+"秒";
-		                     }else if(parseInt(day2)==0){
-			 					 resultTime = parseInt(hour2)+"小时"+parseInt(minute2)+"分钟"+parseInt(second2)+"秒";
-		                     }else{
-								 resultTime = parseInt(day2)+"天"+parseInt(hour2)+"小时"+parseInt(minute2)+"分钟"+parseInt(second2)+"秒";
-							 }
+		                     var hour2 = (row.playDuration/hour).toFixed(2);
+			 					 resultTime = hour2+"小时";
 		                 }
 		                 return resultTime;
 					} },
@@ -157,9 +140,6 @@
     }
 
     function add() {
-    	debugger
-    	console.log($("#videoId").val());
-    	console.log($("#videoName").val());
     	$("#videoId").val()
         window.location = '/health/video/play/add?id=' + $("#videoId").val() + "&name=" + $("#videoName").val();
     }

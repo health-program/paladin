@@ -4,6 +4,7 @@
 	<select id="selectByQuery" parameterType="com.paladin.health.service.videomanage.dto.VideoPlayQueryDTO" resultType="com.paladin.health.service.videomanage.vo.VideoPlayVO">
 	    SELECT 
 		vp.id,
+		vp.work_cycle as workCycle,
 		vp.video_id as videoId,
 		v.name as videoName,
 		vp.agency_id as agencyId,
@@ -11,6 +12,7 @@
 		vp.play_address as playAddress,
 		vp.play_start_time as playStartTime,
 		vp.play_end_time as playEndTime,
+		vp.play_duration as playDuration,
 		vp.visitor_count as visitorCount,
 		vp.principal
 		FROM video_play vp
@@ -35,6 +37,7 @@
 	<select id="getOne" parameterType="string" resultType="com.paladin.health.service.videomanage.vo.VideoPlayVO">
 		SELECT 
 		vp.id,
+		vp.work_cycle as workCycle,
 		vp.video_id as videoId,
 		v.name as videoName,
 		vp.agency_id as agencyId,
@@ -42,6 +45,7 @@
 		vp.play_address as playAddress,
 		vp.play_start_time as playStartTime,
 		vp.play_end_time as playEndTime,
+		vp.play_duration as playDuration,
 		vp.visitor_count as visitorCount,
 		vp.principal,
 		vp.remarks
