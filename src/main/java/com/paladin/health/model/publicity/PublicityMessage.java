@@ -44,6 +44,8 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	
 	private String label;
 
+	private String attachments;
+	
 	private Date publishTime;
 
 	private String publishTarget;
@@ -134,6 +136,14 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
 	}
 
 }

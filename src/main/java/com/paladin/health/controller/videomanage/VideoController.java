@@ -1,5 +1,7 @@
 package com.paladin.health.controller.videomanage;
 
+import com.paladin.common.model.syst.SysAttachment;
+import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
@@ -15,6 +17,7 @@ import com.paladin.health.service.videomanage.dto.VideoDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVo;
 import com.paladin.health.service.videomanage.vo.VideoVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +25,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+
 import java.util.List;
 
 /**
@@ -40,6 +45,9 @@ public class VideoController extends ControllerSupport {
 
     @Autowired
     private VideoService videoService;
+    
+    @Autowired
+	private SysAttachmentService attachmentService;
 
     @Autowired
     private PublicityMessageService publicityMessageService;
@@ -86,10 +94,16 @@ public class VideoController extends ControllerSupport {
     
     @RequestMapping("/save")
 	@ResponseBody
-    public Object save(@Valid VideoDTO videoDTO, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
+    public Object save(@Valid VideoDTO videoDTO, BindingResult bindingResult, @RequestParam(required = false) MultipartFile[] attachmentFiles) {
+    	if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
+    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(videoDTO.getShowImage(), attachmentFiles, true);
+		if (attachments != null && attachments.size() > 4) {
+			return CommonResponse.getErrorResponse("附件数量不能超过4张");
+		}
+		videoDTO.setShowImage(attachmentService.splicingAttachmentId(attachments));
+		
         Video model = beanCopy(videoDTO, new Video());
 		model.setTop(0);
 		model.setTopOrderNo(Video.topNumber);
@@ -103,10 +117,15 @@ public class VideoController extends ControllerSupport {
 
     @RequestMapping("/update")
 	@ResponseBody
-    public Object update(@Valid VideoDTO videoDTO, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
+    public Object update(@Valid VideoDTO videoDTO, BindingResult bindingResult,@RequestParam(required = false) MultipartFile[] attachmentFiles) {
+    	if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
+    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(videoDTO.getShowImage(), attachmentFiles, true);
+		if (attachments != null && attachments.size() > 4) {
+			return CommonResponse.getErrorResponse("附件数量不能超过4张");
+		}
+		videoDTO.setShowImage(attachmentService.splicingAttachmentId(attachments));
 		String id = videoDTO.getId();
 		Video model = beanCopy(videoDTO, videoService.get(id));
 		if (videoService.update(model) > 0) {

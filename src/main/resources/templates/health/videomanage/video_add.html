@@ -22,19 +22,13 @@
             <div id="model_edit" class="box-body">
                 <form id="model_form" action="/health/video/save" method="post" class="form-horizontal edit-body">
                     <div class="form-group">
-                        <label for="showImage" class="col-sm-3 control-label">展示图片：</label>
-                        <div class="col-sm-3">
-                            <input type="text" class="form-control" name="showImage" placeholder="请输入展示图片(附件ID)" required="required" />
-                        </div>
-                        <label for="summary" class="col-sm-2 control-label">视频简介：</label>
-                        <div class="col-sm-3">
-                            <input name="summary" type="text" class="form-control" placeholder="请输入视频简介" required="required" />
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label for="name" class="col-sm-3 control-label">视频名称：</label>
                         <div class="col-sm-3">
                             <input name="name" id="name" placeholder="请输入视频名称" type="text" class="form-control" required="required" />
+                        </div>
+                         <label for="summary" class="col-sm-2 control-label">视频简介：</label>
+                        <div class="col-sm-3">
+                            <input name="summary" type="text" class="form-control" placeholder="请输入视频简介" required="required" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -61,7 +55,13 @@
                             <input name="url" placeholder="请输入视频地址" type="text" class="form-control" required="required" />
                         </div>
                     </div>
-                                        <input type="hidden" name="status" value="1"></input>
+                    <div class="form-group">
+                        <label for="attachmentFiles" class="col-sm-3 control-label">展示图片：</label>
+                        <div class="col-sm-8">
+                            <input type="file" name="attachmentFiles" multiple>
+                        </div>
+                    </div>
+                    	<input type="hidden" name="status" value="1"></input>
                     
                     <div class="form-group">
                         <div class="col-sm-2 col-sm-offset-3">
@@ -90,7 +90,7 @@
         name: "新增",
         url: "/health/video/save",
         columns: [
-            { title: "展示图片(附件ID)", name: "showImage", inputType: "TEXT" },
+            { title: "展示图片(附件ID)", name: "showImage", inputType: "ATTACHMENT", fileName: "attachmentFiles" },
             { title: "视频简介", name: "summary", inputType: "TEXT" },
             { title: "视频名称", name: "name", inputType: "TEXT" },
             { title: "标签", name: "label", inputType: "TEXT" },

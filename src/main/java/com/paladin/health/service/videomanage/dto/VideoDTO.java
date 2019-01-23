@@ -20,7 +20,7 @@ public class VideoDTO {
 
 	// 标签
 	private String label;
-
+	
 	public String getId() {
 		return id;
 	}

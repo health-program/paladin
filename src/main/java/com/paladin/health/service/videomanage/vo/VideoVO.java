@@ -1,6 +1,10 @@
 package com.paladin.health.service.videomanage.vo;
 
 import java.util.Date;
+import java.util.List;
+
+import com.paladin.common.model.syst.SysAttachment;
+import com.paladin.framework.core.container.AttachmentContainer;
 
 public class VideoVO {
 
@@ -39,6 +43,15 @@ public class VideoVO {
 
 	// 
 	private String updateUserId;
+	
+	
+	  // 获取附件文件
+    public List<SysAttachment> getAttachmentFiles() {
+        if (showImage != null && showImage.length() != 0) {
+            return AttachmentContainer.getAttachments(showImage.split(","));
+        }
+        return null;
+    }
 
 	public String getId() {
 		return id;

@@ -1,5 +1,7 @@
 package com.paladin.common.service.syst;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -10,7 +12,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+
 import javax.annotation.PostConstruct;
+
+import net.coobird.thumbnailator.Thumbnails;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,8 +82,8 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 * @param attachmentName
 	 * @return
 	 */
-	public SysAttachment createAttachment(MultipartFile file, String attachmentName) {
-		return createAttachment(file, attachmentName, null);
+	public SysAttachment createAttachment(MultipartFile file, String attachmentName ,Boolean isCompress) {
+		return createAttachment(file, attachmentName, null ,isCompress);
 	}
 
 	/**
@@ -89,7 +94,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 * @param userType
 	 * @return
 	 */
-	public SysAttachment createAttachment(MultipartFile file, String attachmentName, Integer userType) {
+	public SysAttachment createAttachment(MultipartFile file, String attachmentName, Integer userType ,Boolean isCompress) {
 		String id = UUIDUtil.createUUID();
 		String name = file.getOriginalFilename();
 		long size = file.getSize();
@@ -123,7 +128,12 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 		attachment.setUseType(userType);
 
 		try {
+			if(isCompress){
+				//压缩图片
+				saveAndCompressImage(file ,attachment,null);
+			}else{
 			saveFile(file.getBytes(), attachment);
+			}
 		} catch (IOException e) {
 			throw new SystemException("保存附件文件失败", e);
 		}
@@ -298,7 +308,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 
 		String pelativePath = subPath + "/" + filename;
 		Files.write(Paths.get(attachmentPath + pelativePath), data);
-
+		
 		attachment.setPelativePath(pelativePath);
 		attachment.setCreateTime(new Date());
 
@@ -308,7 +318,50 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 			attachmentName = attachmentName.substring(0, maxFileNameSize);
 		}
 	}
+	/**
+	 * 压缩并保存图片，缩略图
+	 * @param file
+	 * @param attachment
+	 * @param subPath
+	 * @throws IOException
+	 */
+	private void saveAndCompressImage(MultipartFile file, SysAttachment attachment, String subPath) throws IOException {
+		if (file.isEmpty() || file.getBytes().length == 0) {
+			throw new SystemException("文件为空");
+		}
 
+		if (subPath == null || subPath.length() == 0) {
+			subPath = format.format(new Date());
+		}
+
+		Path path = Paths.get(attachmentPath, subPath);
+		if (!Files.exists(path)) {
+			try {
+				Files.createDirectory(path);
+			} catch (FileAlreadyExistsException e1) {
+				// 继续
+			}
+		}
+
+		String filename = attachment.getId();
+		String suffix = attachment.getSuffix();
+		if (suffix != null) {
+			filename += suffix;
+		}
+
+		String pelativePath = subPath + "/" + filename;
+		Thumbnails.of(file.getInputStream()).size(200,200).toFile(attachmentPath + pelativePath);
+		//获取压缩之后图片的大小
+		attachment.setSize( new File(attachmentPath + pelativePath).length());
+		attachment.setPelativePath(pelativePath);
+		attachment.setCreateTime(new Date());
+
+		// 附件名称太长则截取
+		String attachmentName = attachment.getName();
+		if (attachmentName != null && attachmentName.length() > maxFileNameSize) {
+			attachmentName = attachmentName.substring(0, maxFileNameSize);
+		}
+	}
 	/**
 	 * 获取文件附件记录
 	 * 
@@ -333,12 +386,12 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 
 	/**
 	 * 通过拼接字符串查出附件或者创建新的附件
-	 * 
+	 * @param isCompress 是否压缩图片
 	 * @param idString
 	 * @param attachmentFiles
 	 * @return
 	 */
-	public List<SysAttachment> checkOrCreateAttachment(String idString, MultipartFile[] attachmentFiles) {
+	public List<SysAttachment> checkOrCreateAttachment(String idString, MultipartFile[] attachmentFiles, Boolean isCompress) {
 
 		List<SysAttachment> attIds = null;
 
@@ -352,7 +405,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 				attIds = new ArrayList<>(attachmentFiles.length);
 			}
 			for (MultipartFile file : attachmentFiles) {
-				SysAttachment a = createAttachment(file, null);
+				SysAttachment a = createAttachment(file, null, isCompress);
 				attIds.add(a);
 			}
 		}

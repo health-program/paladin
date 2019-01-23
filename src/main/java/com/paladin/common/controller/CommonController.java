@@ -61,7 +61,7 @@ public class CommonController {
 	@ResponseBody
 	public Object uploadFile(@RequestParam("file") MultipartFile file, @RequestParam(name = "filename", required = false) String name,
 			@RequestParam(name = "userType", required = false) Integer userType) {
-		return CommonResponse.getSuccessResponse(attachmentService.createAttachment(file, name, userType));
+		return CommonResponse.getSuccessResponse(attachmentService.createAttachment(file, name, userType,false));
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class CommonController {
 		for (int i = 0; i < files.length; i++) {
 			MultipartFile file = files[i];
 			String filename = (names != null && names.length > i) ? names[i] : null;
-			result[i] = attachmentService.createAttachment(file, filename, userType);
+			result[i] = attachmentService.createAttachment(file, filename, userType,false);
 		}
 		return CommonResponse.getSuccessResponse(result);
 	}

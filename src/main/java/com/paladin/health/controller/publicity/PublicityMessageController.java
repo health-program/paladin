@@ -1,7 +1,7 @@
 package com.paladin.health.controller.publicity;
 
+import java.util.List;
 import javax.validation.Valid;
-
 import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,7 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
+import org.springframework.web.multipart.MultipartFile;
+import com.paladin.common.model.syst.SysAttachment;
+import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.core.query.QueryOutputMethod;
@@ -23,7 +25,10 @@ import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
 @Controller
 @RequestMapping("/health/publicity/message")
 public class PublicityMessageController extends ControllerSupport {
-
+	
+	@Autowired
+	private SysAttachmentService attachmentService;
+	
 	@Autowired
 	private PublicityMessageService publicityMessageService;
 
@@ -136,11 +141,18 @@ public class PublicityMessageController extends ControllerSupport {
 	 */
 	@RequestMapping("/save")
 	@ResponseBody
-	public Object save(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult) {
+	public Object save(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,@RequestParam(required = false) MultipartFile[] attachmentFiles) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-
+		if (bindingResult.hasErrors()) {
+			return validErrorHandler(bindingResult);
+		}
+    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles,false);
+		if (attachments != null && attachments.size() > 4) {
+			return CommonResponse.getErrorResponse("附件数量不能超过4张");
+		}
+		publicityMessage.setAttachments(attachmentService.splicingAttachmentId(attachments));
 		return CommonResponse.getResponse(publicityMessageService.saveMessage(publicityMessage));
 	}
 
@@ -153,11 +165,15 @@ public class PublicityMessageController extends ControllerSupport {
 	 */
 	@RequestMapping("/update")
 	@ResponseBody
-	public Object update(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult) {
+	public Object update(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,@RequestParam(required = false) MultipartFile[] attachmentFiles) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-		
+    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles,false);
+		if (attachments != null && attachments.size() > 4) {
+			return CommonResponse.getErrorResponse("附件数量不能超过4张");
+		}
+		publicityMessage.setAttachments(attachmentService.splicingAttachmentId(attachments));
 		if(publicityMessageService.updateMessage(publicityMessage)) {
 			return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(publicityMessage.getId()));
 		} else {

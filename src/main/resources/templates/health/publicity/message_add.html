@@ -41,6 +41,12 @@
                         <div class="col-sm-3 tonto-radio-constant" name="type" enumcode="publicity-message-type">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-3">
+                            <input name="label" id="label" type="text" class="form-control" />
+                        </div>
+                    </div>
                     <div class="form-group" id="publishTargetGroup" style="display: none">
                         <label for="publishTarget" class="col-sm-3 control-label">发送对象：<br>
                             <font style="color:red">（不选为全部）</font>
@@ -61,9 +67,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="label" class="col-sm-3 control-label">标签：</label>
-                        <div class="col-sm-3">
-                            <input name="label" id="label" type="text" class="form-control" />
+                        <label for="attachmentFiles" class="col-sm-3 control-label">附件：</label>
+                        <div class="col-sm-8">
+                            <input type="file" name="attachmentFiles" multiple>
                         </div>
                     </div>
                     <input type="hidden" id="statusInput" name="status" />
@@ -95,6 +101,7 @@
             { title: "发布时间", name: "publishTime", inputType: "DATE" },
             { title: "内容", name: "content", inputType: "TEXT" },
             { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
+            { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles",dependency: ["type", "1", "2"] }
         ]
     }
 

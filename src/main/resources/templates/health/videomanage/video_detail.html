@@ -12,9 +12,117 @@
             <li class="active">详情</li>
         </ol>
     </section>
-    <section class="content">
-    </section>
-    <input type="hidden" id="id" th:value="${id}"/>
+	<section class="content">
+		<div class="box box-solid">
+			<div class="box-header with-border">
+				<i class="glyphicon glyphicon-user"></i>
+				<h3 class="box-title">详情</h3>
+				<div class="box-tools pull-right">
+					<a class="btn" id="model_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>
+				</div>
+			</div>
+			<div id="model_view" class="box-body">
+				<form class="form-horizontal">
+					<div class="form-group">
+						<label for="summary" class="col-sm-3 control-label">视频简介：</label>
+						<div class="col-sm-3">
+							<p name="summary" class="form-control-static description"></p>
+						</div>
+						<label for="top" class="col-sm-2 control-label">是否置顶：</label>
+						<div class="col-sm-3">
+							<p name="top" class="form-control-static description"></p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="col-sm-3 control-label">视频名称：</label>
+						<div class="col-sm-3">
+							<p name="name" class="form-control-static description"></p>
+						</div>
+						<label for="label" class="col-sm-2 control-label">标签：</label>
+						<div class="col-sm-3">
+							<p name="label" class="form-control-static description"></p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="topOrderNo" class="col-sm-3 control-label">置顶排序号：</label>
+						<div class="col-sm-3">
+							<p name="topOrderNo" class="form-control-static description"></p>
+						</div>
+						<label for="url" class="col-sm-2 control-label">视频地址：</label>
+						<div class="col-sm-3">
+							<p name="url" class="form-control-static description"></p>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="showImage" class="col-sm-3 control-label">展示图片：</label>
+						<div name="showImage" class="col-sm-8">
+							<ul class="mailbox-attachments clearfix"></ul>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div id="model_edit" class="box-body" style="display: none">
+				<form id="model_form"
+					action="/health/video/update?id=b91a92a60b2f435a9852463e212cfc78"
+					method="post" class="form-horizontal edit-body"
+					novalidate="novalidate">
+					<div class="form-group">
+						<label for="summary" class="col-sm-3 control-label">视频简介：</label>
+						<div class="col-sm-3">
+							<input name="summary" placeholder="请输入视频简介" type="text"
+								class="form-control">
+						</div>
+						<label for="top" class="col-sm-2 control-label">是否置顶：</label>
+						<div class="col-sm-3">
+							<input name="top" placeholder="请输入是否置顶" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="name" class="col-sm-3 control-label">视频名称：</label>
+						<div class="col-sm-3">
+							<input name="name" placeholder="请输入视频名称" type="text"
+								class="form-control">
+						</div>
+						<label for="label" class="col-sm-2 control-label">标签：</label>
+						<div class="col-sm-3">
+							<input name="label" placeholder="请输入标签" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="topOrderNo" class="col-sm-3 control-label">置顶排序号：</label>
+						<div class="col-sm-3">
+							<input name="topOrderNo" placeholder="请输入置顶排序号" type="text"
+								class="form-control">
+						</div>
+						<label for="url" class="col-sm-2 control-label">视频地址：</label>
+						<div class="col-sm-3">
+							<input name="url" placeholder="请输入视频地址" type="text"
+								class="form-control">
+						</div>
+					</div>
+					<div class="form-group">
+                        <label for="attachmentFiles" class="col-sm-3 control-label">展示图片：</label>
+                        <div class="col-sm-8">
+                            <input type="file" name="attachmentFiles" multiple>
+                        </div>
+                    </div>
+					<div class="form-group">
+						<div class="col-sm-2 col-sm-offset-3">
+							<button type="submit" id="model_form_submit_btn"
+								class="btn btn-primary btn-block">保存</button>
+						</div>
+						<div class="col-sm-2 col-sm-offset-1">
+							<button type="button" id="model_form_cancel_btn"
+								class="btn btn-default btn-block">取消</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</section>
+	<input type="hidden" id="id" th:value="${id}"/>
     <div th:include="/health/footer" />
     <script type="text/javascript">
 
@@ -24,19 +132,18 @@
 	        name: "详情",
 	        url:"/health/video/update?id="+$("#id").val(),
 	        columns: [
-				{ title: "展示图片", name: "showImage", inputType: "TEXT" },
+				
 				{ title: "视频简介", name: "summary", inputType: "TEXT" },
 				{ title: "是否置顶", name: "top", inputType: "TEXT" },
 				{ title: "视频名称", name: "name", inputType: "TEXT" },
 				{ title: "标签", name: "label", inputType: "TEXT" },
 				{ title: "置顶排序号", name: "topOrderNo", inputType: "TEXT" },
-				{ title: "视频地址", name: "url", inputType: "TEXT" }
+				{ title: "视频地址", name: "url", inputType: "TEXT" },
+				{ title: "展示图片(附件ID)", name: "showImage", inputType: "ATTACHMENT", fileName: "attachmentFiles" }
 				]
 	    }
     
         $.getAjax("/health/video/get?id="+$("#id").val(), function(data) {
-            var html = generateHtml(options);
-            $(".content").html(html);
             var model = new tonto.Model("model", options.columns);
             model.setData(data);
             $.initComponment();

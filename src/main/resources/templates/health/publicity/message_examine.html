@@ -44,6 +44,12 @@
                             <p name="type" class="form-control-static description"></p>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="label" class="col-sm-3 control-label">标签：</label>
+                        <div class="col-sm-3">
+                            <p id="labelP" class="form-control-static description"></p>
+                        </div>
+                    </div>
                     <div class="form-group" id="publishTargetViewGroup">
                         <label for="publishTarget" class="col-sm-3 control-label">发送对象：<br>
                         </label>
@@ -64,12 +70,12 @@
                             </p>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="label" class="col-sm-3 control-label">标签：</label>
-                        <div class="col-sm-3">
-                            <p id="labelP" class="form-control-static description"></p>
-                        </div>
-                    </div>
+                    <div class="form-group" id="attachments">
+						<label for="attchments" class="col-sm-3 control-label">附件：</label>
+						<div name="attchments" class="col-sm-8">
+							<ul class="mailbox-attachments clearfix"></ul>
+						</div>
+					</div>
                     <div class="form-group">
                         <label for="createUserName" class="col-sm-3 control-label">创建人：</label>
                         <div class="col-sm-3">
@@ -113,10 +119,9 @@
                 })
             }
             $("#labelP").html(c);
-
         } else {
             $("#publishTargetViewGroup").show();
-
+            $("#attachments").hide();
             var ns = data.publishTargetName,
                 c = "";
             if (ns) {
@@ -151,9 +156,10 @@
                 { title: "标题", name: "title", inputType: "TEXT" },
                 { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "1", "2"] },
                 { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
+                { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
                 { title: "发布时间", name: "publishTime", inputType: "DATE" },
                 { title: "内容", name: "content", inputType: "TEXT" },
-                { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
+                { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles",dependency: ["type", "1","2"] },
                 { title: "创建人", name: "createUserName", inputType: "TEXT" },
                 { title: "审核人", name: "examineUserName", inputType: "TEXT" }
             ]
