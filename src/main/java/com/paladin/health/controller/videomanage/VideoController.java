@@ -201,7 +201,12 @@ public class VideoController extends ControllerSupport {
     @RequestMapping("/play")
     public String play(@RequestParam String id,Model model) {
         Video video = videoService.get(id);
+        VideoQueryDTO queryDTO = new VideoQueryDTO();
+        queryDTO.setLimit(5);
+        queryDTO.setOffset(0);
+        PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
         model.addAttribute("video",video);
+        model.addAttribute("videosAll",videosAll.getData());
         return "/health/videomanage/video_play";
     }
 

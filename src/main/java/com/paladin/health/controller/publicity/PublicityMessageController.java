@@ -1,16 +1,5 @@
 package com.paladin.health.controller.publicity;
 
-import java.util.List;
-import javax.validation.Valid;
-import com.paladin.health.service.publicity.vo.PublicityMessageVO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import com.paladin.common.model.syst.SysAttachment;
 import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.core.ControllerSupport;
@@ -21,14 +10,26 @@ import com.paladin.health.model.publicity.PublicityMessage;
 import com.paladin.health.service.publicity.PublicityMessageService;
 import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
 import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/health/publicity/message")
 public class PublicityMessageController extends ControllerSupport {
-	
+
 	@Autowired
 	private SysAttachmentService attachmentService;
-	
+
 	@Autowired
 	private PublicityMessageService publicityMessageService;
 
@@ -103,7 +104,9 @@ public class PublicityMessageController extends ControllerSupport {
     @RequestMapping("/display/index")
     public Object display(@RequestParam String id,Model model) {
         PublicityMessageVO message = publicityMessageService.getMessage(id);
+		List<PublicityMessageVO> messages =  publicityMessageService.showDisplayMessage();
         model.addAttribute("message",message);
+		model.addAttribute("messages",messages);
         return "/health/publicity/message_display_index";
     }
 
