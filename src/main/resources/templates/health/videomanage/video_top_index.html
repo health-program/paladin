@@ -117,37 +117,39 @@
 <body class="container">
 <section class="content">
     <div class="box box-solid">
-
-            <div id="example1" class="slider-pro">
-                <div class="sp-slides" th:each="video,iter: ${videos}">
-                    <div class="sp-slide">
-                        <a th:href="${'/health/video/play?id='+ video.id}" ><img class="sp-image" data-src="/static/js/sliderPro/js/1.jpg"/></a>
-                        <p class="sp-layer sp-white sp-padding"
-                            data-vertical="5" data-horizontal="1%" data-width="98%"
-                            data-show-transition="down" data-show-delay="400" data-hide-transition="up" style="text-align: center" >
-                            <span class="hide-small-screen" th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></span>
-                    </p>
-                    </div>
+        <div id="example1" class="slider-pro" >
+            <div class="sp-slides" th:each="video,iter: ${videos}" >
+                <div class="sp-slide">
+                    <a th:href="${'/health/video/play?id='+ video.id}"><img class="sp-image"
+                        data-src="/static/js/sliderPro/js/1.jpg"/></a>
+                    <p class="sp-caption" th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></p>
+                    <!--<p class="sp-layer sp-white sp-padding"
+                       data-vertical="5" data-horizontal="1%" data-width="98%"
+                       data-show-transition="down" data-show-delay="400" data-hide-transition="up"
+                       style="text-align: center">
+                        <span class="hide-small-screen"
+                              th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></span>
+                    </p>-->
                 </div>
-                <div class="sp-thumbnails">
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
+            </div>
+            <div class="sp-thumbnails" >
+                <div class="sp-thumbnail" >
+                    <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                </div>
+                <div class="sp-thumbnail">
+                    <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                </div>
 
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
+                <div class="sp-thumbnail"  >
+                    <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                </div>
 
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
+                <div class="sp-thumbnail">
+                    <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                </div>
+                <div class="sp-thumbnail">
+                    <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
+                </div>
                 </div>
             </div>
 
@@ -196,7 +198,7 @@
             arrows: true,
             buttons: false,
             waitForLayers: true,
-            autoplayDelay: 10000,
+            autoplayDelay: 5000,
             thumbnailPointer: true,
             thumbnailWidth: 220,
             thumbnailHeight:150,
