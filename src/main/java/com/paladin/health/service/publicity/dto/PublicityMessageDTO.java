@@ -12,6 +12,8 @@ public class PublicityMessageDTO {
 
 	@NotEmpty(message = "标题不能为空")
 	private String title;
+	
+	private String thumbnail;
 
 	private String subtitle;
 
@@ -115,6 +117,14 @@ public class PublicityMessageDTO {
 
 	public void setAttachments(String attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 	

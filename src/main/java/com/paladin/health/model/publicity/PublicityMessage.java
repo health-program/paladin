@@ -31,6 +31,8 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	private String title;
 
+	private String thumbnail;
+	
 	private String subtitle;
 
 	private String summary;
@@ -144,6 +146,14 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setAttachments(String attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getThumbnail() {
+		return thumbnail;
+	}
+
+	public void setThumbnail(String thumbnail) {
+		this.thumbnail = thumbnail;
 	}
 
 }
