@@ -9,7 +9,7 @@ public class DemoController {
 	
 	@RequestMapping("/index")
 	public Object diagnoseIndex() {
-		return "/health/open/demo_index";
+		return "/health/demo/demo";
 	}
 	
 }
