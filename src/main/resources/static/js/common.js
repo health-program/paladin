@@ -132,6 +132,9 @@
         successAlert: function(msg, fun, top) {
             $.doAlert(msg, 1, fun, top);
         },
+	warnAlert: function(msg, fun, top) {
+            $.doAlert(msg, 3, fun, top);
+        },
         failAlert: function(msg, fun, top) {
             $.doAlert(msg, 2, fun, top);
         },
@@ -264,6 +267,11 @@
             }
             return false;
         },
+        ajaxResponseHandler: function(response, callback) {
+            if ($.ajaxResponseCheck(response) === true) {
+                typeof callback === 'function' && callback(response.result);
+            }
+        },
         wrapAjaxSuccessCallback: function(callback, submitBtn) {
 
             if (callback && typeof callback != 'function' && !submitBtn) {
@@ -394,6 +402,18 @@
                 }
             }
             return url;
+        },
+        locationPost: function(url, args) {
+            var form = $("<form method='post' action='" + url + "'></form>");
+            $.each(args, function(key, value) {
+                var input = $("<input type='hidden'>");
+                input.attr({ "name": key });
+                input.val(value);
+                form.append(input);
+            });
+            form.appendTo(document.body);
+            form.submit();
+            document.body.removeChild(form[0]);
         }
     });
 
@@ -984,7 +1004,7 @@ function _initTable() {
                 url: options
             };
 
-        if (!options.ajax) {
+        if (!options.ajax && options.url !== false) {
             options.ajax = function(request) {
                 if (typeof url === 'function') {
                     request.url = request.url();
@@ -1046,12 +1066,46 @@ function _initTable() {
                             col.formatter = function(value, row, index) {
                                 return (value === true || value === "true") ? "是" : "否";
                             }
-                        }
-                    }
+ 			} else if (col.formatter == 'identification') {
+                            col.formatter = function(value, row, index) {
+                                if (value) {
+                                    var l = value.length;
+                                    if (l > 7) {
+                                        var s = value.substr(0, 3);
+                                        var a = value.length - 7;
+                                        for (; a > 0; a--) s += "*";
+                                        s += value.substr(value.length - 4, 4);
+                                        return s;
+                                    } else {
+                                        return value;
+                                    }
+                                }
+                                return "";
+                            }
+                        } else if (col.formatter == 'assess-grade') {
+                            col.formatter = function(value, row, index) {
+                                if (value == 1) {
+                                    return '<span class="label label-success">优秀</span>';
+                                } else if (value == 2) {
+                                    return '<span class="label label-info">良好</span>';
+                                } else if (value == 3) {
+                                    return '<span class="label label-warning">合格</span>';
+                                } else if (value == 4) {
+                                    return '<span class="label label-danger">不合格</span>';
+                                } else if (value == 5) {
+                                    return '<span class="label label-primary">不定等次</span>';
+                                }
+                            }
+		    }
+	 }
 
                     // 枚举情况
                     if (col.enumcode && !col.formatter) {
                         col.formatter = $.getEnumColumnFormatter(window._constant_cache, col.enumcode);
+                    }
+		    
+		    if (!col.align) {
+                        col.align = "center";
                     }
                 });
             });
@@ -1369,7 +1423,7 @@ function _initEnumConstant(container, enumcodes, callback) {
             } else if ($s.is("p")) {
                 var code = $s.attr("enum-code-value");
                 if (code) {
-                    $s.html($.getConstantEnumValue(enumcode, code));
+                    $s.html($.getConstantEnumValue(enumcode, code) || "无");
                 }
             }
         }
@@ -1604,6 +1658,8 @@ function _initForm(container) {
                                 });
                             }
                         }
+                    } else {
+                        $.errorMessage("返回数据格式异常");
                     }
                 },
                 error: function(xhr, e, statusText) {
@@ -1779,863 +1835,3 @@ function getSeconds(date) {
     }
     return second;
 }
-
-
-//------------------------------------------
-//
-// 自动化编辑查看代码
-//
-// -----------------------------------------
-
-function generateHtml(options) {
-    var id = options.id,
-        name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
-
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '        <a class="btn" id="' + id + '_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>\n' +
-        '    </div>\n' +
-        '</div>\n';
-
-    html += generateViewFormHtml(options);
-    html += generateEditFormHtml(options, true);
-
-    html += '</div>\n';
-
-    return html;
-}
-
-function generateEditHtml(options) {
-    var id = options.id,
-        name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
-
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '    </div>\n' +
-        '</div>\n';
-
-    html += generateEditFormHtml(options);
-    html += '</div>';
-    return html;
-}
-
-function generateEditFormHtml(options, hide) {
-
-    var id = options.id,
-        columns = options.columns;
-
-    var html =
-        '<div id="' + id + '_edit" class="box-body" ' + (hide == true ? 'style="display: none"' : '') + '>\n' +
-        '   <form id="' + id + '_form" action="' + options.url + '" method="post" class="form-horizontal edit-body">\n';
-
-    var maxColspan = 2,
-        currentColspan = 0,
-        firstLabelSize = 3,
-        inputSize = 3,
-        labelSize = 2;
-
-    for (var i = 0; i < columns.length;) {
-        var column = columns[i++];
-        var name = column.name,
-            type = column.inputType,
-            title = column.title,
-            colspan = column.colspan || 1;
-
-        if (colspan > maxColspan) colspan = maxColspan;
-
-        if (type == 'ID') continue;
-
-        // 附件独占一行
-        var back = false;
-        if (type == 'ATTACHMENT' && currentColspan > 0) {
-            back = true;
-        }
-
-        if (currentColspan + colspan <= maxColspan) {
-            if (currentColspan == 0) {
-                html += '<div class="form-group">\n';
-            }
-
-            html += '<label for="' + name + '" class="col-sm-' + (currentColspan == 0 ? firstLabelSize : labelSize) + ' control-label">' + title + '：</label>\n';
-            if (type == 'ATTACHMENT') {
-                html += '<div class="col-sm-' + ((maxColspan - 1) * (inputSize + labelSize) + inputSize) + '"></div>\n';
-                currentColspan = maxColspan;
-            } else {
-                html += '<div class="col-sm-' + ((colspan - 1) * (inputSize + labelSize) + inputSize) + '">\n';
-
-                if (type == 'TEXT') {
-                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control"/>\n';
-                } else if (type == 'DISTRICT') {
-                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control ' + column.districtType + '"/>\n';
-                } else if (type == 'NUMBER') {
-                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="number" class="form-control"/>\n';
-                } else if (type == 'DATE') {
-                    html += '<input name="' + name + '" placeholder="请输入' + title + '" type="text" class="form-control tonto-datepicker-date"/>\n';
-                } else if (type == 'SELECT') {
-                    html += '<select name="' + name + '" class="form-control tonto-select-constant" enumcode="' + column.enum + '">\n';
-                    if (column.nullable !== false) {
-                        html += '<option value="">请选择</option>\n';
-                    }
-                    html += '</select>\n';
-                } else if (type == 'TREE') {
-                    html += '<input name="' + name + '" placeholder="请选择' + title + '" type="text" class="form-control tonto-select-constant-tree" enumcode="' + column.enum + '"/>\n';
-                }
-
-                html += '</div>\n';
-                currentColspan += colspan;
-            }
-        } else {
-            back = true;
-        }
-
-        if (back) {
-            i--;
-            currentColspan = maxColspan;
-        }
-
-        if (currentColspan >= maxColspan) {
-            html += '</div>\n';
-            currentColspan = 0;
-        }
-    }
-
-    if (currentColspan > 0) {
-        html += '</div>\n';
-        currentColspan = 0;
-    }
-
-    html +=
-        '   <div class="form-group">\n' +
-        '       <div class="col-sm-2 col-sm-offset-3">\n' +
-        '           <button type="submit" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
-        '       </div>\n';
-
-    if (hide == true) {
-        html +=
-            '       <div class="col-sm-2 col-sm-offset-1">\n' +
-            '       <button type="button" id="' + id + '_form_cancel_btn" class="btn btn-default btn-block">取消</button>\n' +
-            '       </div>\n';
-    }
-
-    html +=
-        '   </div>\n' +
-        '</form>\n' +
-        '</div>\n';
-    return html;
-}
-
-function generateViewHtml(options) {
-    var id = options.id,
-        name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
-
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '    </div>\n' +
-        '</div>\n';
-
-    html += generateViewFormHtml(options);
-    html += '</div>';
-    return html;
-}
-
-function generateViewFormHtml(options) {
-    var id = options.id,
-        columns = options.columns;
-    var html =
-        '<div id="' + id + '_view" class="box-body">\n' +
-        '    <form class="form-horizontal">\n';
-
-    var maxColspan = 2,
-        currentColspan = 0,
-        firstLabelSize = 3,
-        inputSize = 3,
-        labelSize = 2;
-
-    for (var i = 0; i < columns.length;) {
-        var column = columns[i++];
-        var name = column.name,
-            type = column.inputType,
-            title = column.title,
-            colspan = column.colspan || 1;
-
-        if (colspan > maxColspan) colspan = maxColspan;
-
-        if (type == 'ID') continue;
-
-        // 附件独占一行
-        var back = false;
-        if (type == 'ATTACHMENT' && currentColspan > 0) {
-            back = true;
-        } else if (currentColspan + colspan <= maxColspan) {
-            if (currentColspan == 0) {
-                html += '<div class="form-group">\n';
-            }
-
-            html += '<label for="' + name + '" class="col-sm-' + (currentColspan == 0 ? firstLabelSize : labelSize) + ' control-label">' + title + '：</label>\n';
-            if (type == 'ATTACHMENT') {
-                html += '<div name="' + name + '" class="col-sm-' + ((maxColspan - 1) * (inputSize + labelSize) + inputSize) + '"></div>\n';
-                currentColspan = maxColspan;
-            } else {
-                html += '<div class="col-sm-' + ((colspan - 1) * (inputSize + labelSize) + inputSize) + '">\n';
-                html += '<p name="' + name + '" class="form-control-static description"></p>\n';
-                html += '</div>\n';
-                currentColspan += colspan;
-            }
-        } else {
-            back = true;
-        }
-
-        if (back) {
-            i--;
-            currentColspan = maxColspan;
-        }
-
-        if (currentColspan >= maxColspan) {
-            html += '</div>\n';
-            currentColspan = 0;
-        }
-    }
-
-    if (currentColspan > 0) {
-        html += '</div>\n';
-        currentColspan = 0;
-    }
-
-    html +=
-        '   </form>\n' +
-        '</div>\n';
-    return html;
-}
-
-
-var _Model = function(name, column, options) {
-    var that = this;
-    that.name = name;
-    that.editBtn = $("#" + name + "_edit_btn");
-    that.addBtn = $("#" + name + "_add_btn");
-    that.status = "view";
-    that.viewBody = $("#" + name + "_view");
-    that.editBody = $("#" + name + "_edit");
-    that.formSubmitBtn = $("#" + name + "_form_submit_btn");
-    that.formCancelBtn = $("#" + name + "_form_cancel_btn");
-    that.formBody = $("#" + name + "_form");
-
-    that.editBtn.click(function() {
-        that.toEdit();
-    });
-
-    that.addBtn.click(function() {
-        that.toAdd();
-    });
-
-    that.formCancelBtn.click(function() {
-        that.toView();
-    });
-
-    that.columns = column;
-
-    // 附件列
-    that.attachmentColumn = null;
-
-    that.dependency = {};
-    that.checkboxColumn = {};
-
-    if (that.columns) {
-        that.columns.forEach(function(column) {
-            if (column.inputType === 'ATTACHMENT') {
-                that.attachmentColumn = column;
-                that.attachmentColumn.disabled = false;
-            }
-
-            if (column.inputType === 'CHECKBOX') {
-                that.checkboxColumn[column.name] = column;
-            }
-
-            if (column.dependency) {
-                that.dependency[column.name] = [{
-                    target: column.name,
-                    dependColumn: column.dependency[0],
-                    dependValue: column.dependency.slice(1, column.dependency.length + 1)
-                }];
-            }
-        });
-
-        for (var o in that.dependency) {
-            var d = that.dependency[o];
-            var fd = d[0].dependColumn;
-
-            var p = that.dependency[fd];
-            while (p) {
-                d.push(p[0]);
-                p = that.dependency[p[0].dependColumn];
-            }
-        }
-    }
-
-    that.config = $.extend({
-        pattern: "normal", // edit:只能编辑,view:只能查看
-        successCallback: function(data) {
-            $.successMessage("保存成功");
-            that.setData(data)
-            that.toView();
-        }
-    }, options);
-
-    // 创建表单提交
-    if (that.formBody) {
-        that.formBody.createForm({
-            beforeCallback: function(formData) {
-                var extraParam = that.config.extraParam;
-                if (extraParam) {
-                    if (typeof extraParam === 'function') {
-                        extraParam = extraParam();
-                    }
-
-                    for (var o in extraParam) {
-                        formData.push({
-                            name: o,
-                            value: extraParam[o],
-                            type: "text",
-                            required: false
-                        });
-                    }
-                }
-
-                if (that.attachmentColumn) {
-                    var fileCount = 0;
-
-                    // 原表单文件数据只有最后一个，这里需要手动从插件中获取File Object添加到表单数据中
-                    var i = 0;
-
-                    for (; i < formData.length; i++) {
-                        if (formData[i].name == that.attachmentColumn.fileName) {
-                            break;
-                        }
-                    }
-
-                    formData.splice(i, 1);
-
-                    if (that.attachmentColumn.disabled === false) {
-                        // 有附件时，需要替换某些参数
-                        var previews = that.inputAttachment.fileinput('getPreview');
-                        var attachments = "";
-                        if (previews && previews.config && previews.config.length > 0) {
-                            previews.config.forEach(function(p) {
-                                attachments += p.key + ",";
-                                fileCount++;
-                            });
-                        }
-
-                        // 动态加入已经上传的附件ID
-                        formData.push({
-                            name: that.attachmentColumn.name,
-                            value: attachments,
-                            type: "text",
-                            required: false
-                        });
-
-                        var files = that.inputAttachment.fileinput('getFileStack');
-                        if (files) {
-                            files.forEach(function(file) {
-                                formData.push({
-                                    name: that.attachmentColumn.fileName,
-                                    value: file,
-                                    type: "file",
-                                    required: false
-                                });
-                                fileCount++;
-                            });
-                        }
-
-                        if (fileCount > 4) {
-                            $.errorAlert("附件数量不能超过4个");
-                            return false;
-                        }
-                    }
-                }
-
-                var beforeSubmit = that.config.beforeSubmit;
-                if (beforeSubmit && typeof beforeSubmit === 'function') {
-                    return beforeSubmit(formData);
-                }
-            },
-            successCallback: that.config.successCallback
-        });
-    }
-
-    that.initEditDependency();
-
-    if(that.config.pattern == 'view') {
-        that.editBtn.hide();
-    }
-}
-
-_Model.prototype.getColumn = function(columnName) {
-    for (var i = 0; i < this.columns.length; i++) {
-        if (this.columns[i].name == columnName) {
-            return this.columns[i];
-        }
-    }
-    return null;
-}
-
-_Model.prototype.setData = function(data) {
-    var that = this;
-    that.data = data;
-
-    if (that.data) {
-        for (var o in that.checkboxColumn) {
-            var col = that.checkboxColumn[o];
-            var x = that.data[col.name];
-            if (x) {
-                that.data[col.name] = x.split(",");
-            }
-        }
-
-        // 如果列依赖不成立时，列数据应该为空
-        for (var o in that.dependency) {
-            var depends = that.dependency[o];
-            var tar = depends[0].target;
-
-            if (!that.isDependencySatisfy(depends, that.data)) {
-                that.data[tar] = null;
-            }
-        }
-
-        if (that.attachmentColumn) {
-            // 解析的附件
-            var filename = that.attachmentColumn.fileName;
-            that.data[filename] = $.parseAttachmentData(that.data[filename]);
-        }
-    }
-
-    if (that.config.pattern == 'edit') {
-        that.toEdit();
-    } else {
-        that.fillViewBody();
-    }
-}
-
-_Model.prototype.fillViewBody = function() {
-    var that = this;
-    var data = that.data;
-    if (that.columns) {
-        that.columns.forEach(function(column) {
-            var p = that.viewBody.find("[name='" + column.name + "']");
-
-            if (!p || p.length == 0 || column.inputType === 'ATTACHMENT') return;
-
-            var v = that.getColumnValue(column, data);
-
-            if (v) {
-                p.removeClass("text-muted");
-                p.text(v);
-            } else {
-                p.addClass("text-muted");
-                p.text("无");
-            }
-        });
-
-        that.fillAttachment();
-        that.checkViewDependency(that.viewBody, data);
-    }
-
-    typeof that.config.fillViewHandler === "function" && that.config.fillViewHandler(data, that);
-}
-
-_Model.prototype.getColumnValue = function(column, data) {
-    var v = data ? data[column.name] : null;
-
-    if (column.inputType === 'SELECT' || column.inputType === 'RADIO' || column.inputType === 'CHECKBOX') {
-        return $.getConstantEnumValue(column.enum, v);
-    } else if (column.inputType === 'TREE') {
-        return $.getTreeConstantEnumValue(column.enum, v);
-    } else if (column.inputType === 'DISTRICT') {
-        return $.getDistrictFullName(v);
-    } else if (column.inputType === 'DATE') {
-        if (typeof v === 'number') {
-            v = dateFormat(v);
-        }
-    }
-    return v;
-}
-
-_Model.prototype.fillEditBody = function() {
-    var that = this;
-    var data = that.currentData;
-    if (that.columns) {
-        // TODO 重构成注册形式，基于inputType建立数据模型
-        that.columns.forEach(function(column) {
-            if (column.inputType === 'RADIO') {
-                var v = data ? data[column.name] : null;
-                if (v) {
-                    that.editBody.find("input[name='" + column.name + "'][value='" + v + "']").iCheck('check');
-                }
-            } else if (column.inputType === 'CHECKBOX') {
-                var v = data ? data[column.name] : null;
-                if (v) {
-                    v = v.split(",");
-                    v.forEach(function(a) {
-                        that.editBody.find("input[name='" + column.name + "'][value='" + a + "']").iCheck('check');
-                    });
-                }
-            } else {
-                var input = that.editBody.find("[name='" + column.name + "']");
-                var ov = data ? data[column.name] : null;
-                var v = ov,
-                    isP = input.is("p");
-
-
-                if (!input || column.inputType === 'ATTACHMENT') return;
-
-                if (column.inputType === 'TREE') {
-                    if (!isP) {
-                        input.data("Tree_Select").setCurrent($.getTreeConstantEnumValue(column.enum, v));
-                        return;
-                    }
-                }
-
-                if (column.inputType === 'DISTRICT') {
-                    if (!isP) {
-                        input.data("District_Select").setCurrent($.getDistrict(v));
-                        return;
-                    } else {
-                        input.text($.getDistrict(v).name);
-                        return;
-                    }
-                }
-
-                if (column.inputType === 'SELECT') {
-                    v = $.getConstantEnumValue(column.enum, v);
-                } else if (column.inputType === 'DATE') {
-                    if (typeof v === 'number') {
-                        v = dateFormat(v);
-                    }
-                }
-
-                if (v) {
-                    if (isP) {
-                        input.removeClass("text-muted");
-                        input.text(v);
-                    } else {
-                        if (column.inputType === 'SELECT') {
-                            input.val(ov);
-                        } else {
-                            input.val(v);
-                        }
-                    }
-                } else {
-                    if (isP) {
-                        input.addClass("text-muted");
-                        input.text("无");
-                    } else {
-                        if (input.is("SELECT")) {
-                            input[0].options[0].selected = true;
-                        } else {
-                            input.val("");
-                        }
-                    }
-                }
-            }
-        });
-
-        that.checkEditDependency();
-    }
-
-    typeof that.config.fillEditHandler === "function" && that.config.fillEditHandler(data, that);
-}
-
-_Model.prototype.toAdd = function() {
-    var that = this;
-    that.currentData = null;
-    that.addBtn.hide();
-    that.viewBody.hide();
-    that.editBody.show();
-    that.fillEditBody();
-    that.initAttachmentUploader();
-}
-
-_Model.prototype.toEdit = function() {
-    var that = this;
-    that.currentData = that.data;
-
-    that.editBtn.hide();
-    that.viewBody.hide();
-    that.editBody.show();
-    that.fillEditBody();
-    that.initAttachmentUploader();
-}
-
-_Model.prototype.toView = function() {
-    var that = this;
-    that.editBtn.show();
-    that.addBtn.show();
-    that.viewBody.show();
-    that.editBody.hide();
-}
-
-_Model.prototype.fillAttachment = function() {
-    var that = this;
-    if (that.attachmentColumn) {
-        var name = that.attachmentColumn.name;
-        var atts = that.data[that.attachmentColumn.fileName];
-
-        if (atts) {
-
-            // 方案1
-            // var attDiv = that.viewBody.find('[name="' + name + '"]');
-            // var html = '<label class="col-sm-3 control-label"><i class="icon fa fa-download"></i>附件下载：</label><div class="col-sm-6"><ul class="products-list product-list-in-box">';
-            // for (var i = 0; i < atts.length; i++) {
-            //     var b = atts[i];
-            //     html += '<li class="item"><a target="_blank" href="' + b.url + '" download="' + b.filename + '">' + b.filename + '</a></li>';
-            // }
-            // html += "</ul></div>";
-            // attDiv.html(html);
-
-            // 方案2
-            var attDiv = that.viewBody.find('[name="' + name + '"]');
-            var html = '<ul class="mailbox-attachments clearfix">';
-            for (var i = 0; i < atts.length; i++) {
-                var b = atts[i];
-                var k = b.filename.lastIndexOf(".");
-                var suffix = "";
-                if (k >= 0) {
-                    suffix = b.filename.substring(k + 1).toLowerCase();
-                }
-
-                var header = "";
-                if (suffix == "jpeg" || suffix == "jpg" || suffix == "png" || suffix == "gif") {
-                    header = '<span class="mailbox-attachment-icon has-img"><img src="' + b.url + '" alt="Attachment"></span>';
-                } else {
-                    var iconMap = {
-                        txt: "fa-file-text-o",
-                        xls: "fa-file-excel-o",
-                        xlsx: "fa-file-excel-o",
-                        pdf: "fa-file-pdf-o",
-                        doc: "fa-file-word-o",
-                        docx: "fa-file-word-o",
-                        rar: "fa-file-zip-o",
-                        zip: "fa-file-zip-o"
-                    }
-                    var icon = iconMap[suffix] || "fa-file-o";
-                    header = '<span class="mailbox-attachment-icon"><i class="fa ' + icon + '"></i></span>';
-                }
-
-                html +=
-                    '<li>' + header +
-                    '    <div class="mailbox-attachment-info">' +
-                    '        <a target="_blank" href="' + b.url + '" class="mailbox-attachment-name"><i class="fa fa-camera"></i>' + b.filename + '</a>' +
-                    '        <span class="mailbox-attachment-size">' + (Math.floor(b.size / 1024) + "KB") + '<a target="_blank" download="' + b.filename + '" href="' + b.url + '" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a></span>' +
-                    '    </div>' +
-                    '</li>';
-            }
-            html += "</ul>";
-            attDiv.html(html);
-        }
-    }
-}
-
-_Model.prototype.initAttachmentUploader = function(fileInput, files) {
-    var that = this;
-    if (that.attachmentColumn) {
-        var name = that.attachmentColumn.fileName;
-        var atts = that.currentData ? that.currentData[name] : null;
-        var fileInput = that.formBody.find('[name="' + name + '"]');
-
-        var initialPreview = [];
-        var initialPreviewConfig = [];
-        if (atts) {
-            atts.forEach(function(att) {
-                initialPreview.push(att.url);
-                initialPreviewConfig.push({
-                    caption: att.filename,
-                    size: att.size,
-                    //url:"/common/constant?code=sex",
-                    key: att.id
-                });
-            });
-        }
-
-        if (that.inputAttachment) {
-            that.inputAttachment.fileinput('destroy');
-        }
-
-        that.inputAttachment = $(fileInput).fileinput({
-            language: 'zh',
-            uploadUrl: '/common/upload/files',
-            showUpload: false,
-            layoutTemplates: {
-                actionUpload: '' //去除上传预览缩略图中的上传图片；
-            },
-            uploadAsync: false,
-            maxFileCount: 4,
-            allowedFileExtensions: that.attachmentColumn.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],
-            overwriteInitial: false,
-            ajaxDelete: false, // 扩展定义配置，不进行后台删除操作
-            initialPreview: initialPreview,
-            initialPreviewAsData: true, // allows you to set a raw markup
-            initialPreviewFileType: 'image', // image is the default and can be overridden in config below
-            initialPreviewConfig: initialPreviewConfig
-        });
-    }
-}
-
-_Model.prototype.isInDependencyValues = function(val, vals) {
-    if (val != null && val != undefined && val !== "") {
-        if ($.isArray(val)) {
-            for (var i = 0; i < val.length; i++) {
-                var v = val[i];
-                for (var j = 0; j < vals.length; j++) {
-                    if (v == vals[s]) {
-                        return true;
-                    }
-                }
-            }
-        } else {
-            for (var i = 0; i < vals.length; i++) {
-                if (val == vals[i]) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-_Model.prototype.isDependencySatisfy = function(dependencies, data) {
-    for (var i = 0; i < dependencies.length; i++) {
-        var dep = dependencies[i];
-        if (!this.isInDependencyValues(data[dep.dependColumn], dep.dependValue)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-_Model.prototype.checkViewDependency = function(container, data) {
-    var that = this;
-    for (var o in that.dependency) {
-        var depends = that.dependency[o];
-        var tar = depends[0].target;
-        var tc = that.getColumn(tar);
-        var div;
-
-        if (tc.inputType == 'ATTACHMENT') {
-            div = container.find("[name='" + tc.fileName + "']:eq(0)").parents(".form-group");
-        } else {
-            div = container.find("[name='" + tar + "']:eq(0)").parents(".form-group");
-        }
-
-        if (!that.isDependencySatisfy(depends, data)) {
-            if (!div.hasClass("hidden-column")) {
-                div.addClass("hidden-column");
-            }
-        } else {
-            if (div.hasClass("hidden-column")) {
-                div.removeClass("hidden-column");
-            }
-        }
-    }
-}
-
-_Model.prototype.checkEditDependency = function() {
-    var that = this;
-    for (var o in that.dependency) {
-        var dependencies = that.dependency[o];
-        var isOk = true;
-
-        for (var i = 0; i < dependencies.length; i++) {
-            var dep = dependencies[i];
-            var val;
-            var dc = that.getColumn(dep.dependColumn);
-            if (dc.inputType == 'RADIO' || dc.inputType == 'CHECKBOX') {
-                val = that.editBody.find("input[name='" + dep.dependColumn + "']:checked").val();
-            } else {
-                val = that.editBody.find("[name='" + dep.dependColumn + "']").val();
-            }
-
-            if (!that.isInDependencyValues(val, dep.dependValue)) {
-                isOk = false;
-                break;
-            }
-        }
-
-        var tc = that.getColumn(dependencies[0].target);
-        var input;
-        if (tc.inputType == 'ATTACHMENT') {
-            input = that.editBody.find("[name='" + tc.fileName + "']");
-        } else {
-            input = that.editBody.find("[name='" + tc.name + "']");
-        }
-
-        var div = input.parents(".form-group");
-        if (isOk) {
-            if (div.hasClass("hidden-column")) {
-                div.removeClass("hidden-column");
-            }
-
-            if (tc.inputType == 'ATTACHMENT') {
-                //input.fileinput('enable');
-                tc.disabled = false;
-            } else {
-                input.removeAttr("disabled");
-            }
-
-        } else {
-            if (!div.hasClass("hidden-column")) {
-                div.addClass("hidden-column");
-            }
-
-            if (tc.inputType == 'ATTACHMENT') {
-                //input.fileinput('disable');
-                tc.disabled = true;
-            } else {
-                input.attr("disabled", true);
-            }
-        }
-    }
-}
-
-_Model.prototype.initEditDependency = function() {
-    var that = this;
-    var cache = {};
-    for (var o in that.dependency) {
-        var depend = that.dependency[o][0];
-        if (cache[depend.dependColumn]) {
-            continue;
-        }
-        var dc = that.getColumn(depend.dependColumn);
-        if (dc.inputType == 'RADIO' || dc.inputType == 'CHECKBOX') {
-            // 这里使用icheck 所以调用ifChecked事件
-            that.editBody.find("input[name='" + depend.dependColumn + "']").on('ifChecked', function() {
-                that.checkEditDependency();
-            });
-        } else {
-            that.editBody.find("[name='" + depend.dependColumn + "']").change(function() {
-                that.checkEditDependency();
-            });
-        }
-        cache[depend.dependColumn] = 1;
-    }
-}
-
-if (!window.toton) window.toton = {};
-window.tonto.Model = _Model;
