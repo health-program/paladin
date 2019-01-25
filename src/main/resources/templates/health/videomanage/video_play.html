@@ -1,40 +1,52 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="/health/header"/>
-
-<body >
-<section>
+<style>
+ .video-list {
+        list-style: none;
+        text-align:center;
+    }
+ .video-li {
+        margin-bottom:20px;
+        float:left;
+        width:32%;
+    }
+    
+</style>
+<body class="container">
+<section class="content">
     <input type="hidden" id="url" th:value="${video.url}">
     <input type="hidden" id="id" th:value="${video.id}">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8" style="left: 80px">
-                <div class="box box-solid">
-                    <h2 th:text="${video.name}" style="text-align: center"></h2>
-                    <h5 th:text="|视频发布时间:  ${#dates.format(video.createTime,'yyyy-MM-dd')}|" style="text-align: right"></h5>
-                    <div id="my-video" class="media-object">Loading the video...</div>
-                   <!-- <p th:text="|视频简介:  ${video.summary}|"></p>-->
-                </div>
-            </div>
-            <div class="col-sm-3" style="top: 20px;left: 60px">
-                <div class="box box-solid">
-                    <ul class="list-group" >
-                        <a class="list-group-item" th:each="video,iter: ${videosAll}" th:href="${'/health/video/play?id='+ video.id}" >
-                            <div class="media">
-                                <div class="media-left">
-                                    <img src="/static/js/sliderPro/js/3.jpg" class="media-object" style="width: 70px;height: 58px; " >
-                                </div>
-                                <div class="media-body">
-                                    <h4 class="media-heading" th:text="${video.name}"></h4>
-                                    <p  th:text="|标签:${video.label != null ? video.label:'无'}|"></p>
-                                </div>
-                            </div>
-                        </a>
-                    </ul>
-                </div>
-            </div>
+    <input type="hidden" id="showImageUrl" th:value="${video.showImageUrl}">
+        <div class="box-body">
+        <div class="col-sm-12" style="left:25px">
+            <h2 th:text="${video.name}" style="text-align: center;margin-right:60px"></h2>
+            <h5 th:text="|视频发布时间:  ${#dates.format(video.createTime,'yyyy-MM-dd')}|" style="text-align: right;margin-right:60px"></h5>
+            <div id="my-video" class="media-object">Loading the video...</div>
+            <p style="color:#3c8dbc;margin-top:20px">视频简介：</p>
+            <p th:text="${video.summary}"></p>
+            <p style="color:#3c8dbc;margin-top:50px">其他视频</p>
         </div>
-    </div>
+      </div>
+          <div class="box-body">
+             <ul class="video-list">
+                 <li class="video-li"  th:each="video,iter: ${videosAll}">
+                      <a th:href="${'/health/video/play?id='+ video.id}">
+						<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%"/>
+				 </a>
+				 <div class="detail">
+				 <div>
+				 <strong>
+				 <a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a>
+				 </strong>
+                      </div>
+                      <div>
+                      <span>发布时间：</span><span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
+                      </div>
+                    </div>
+                </li>
+            </ul>
+         </div>
 </section>
 <div th:include="/health/footer"/>
 <script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
@@ -42,14 +54,15 @@
     /*<![CDATA[*/
     $(function () {
             var url =$("#url").val();
+            var showImageUrl ="/file/"+$("#showImageUrl").val();
         jwplayer("my-video").setup({
-            //flashplayer: '/static/js/jwplayer/player.swf',
+            flashplayer: '/static/js/jwplayer/player.swf',
             file: url,
-            title: '标题0',
-            image: "/static/js/sliderPro/js/1.jpg",
+            title: '',
+            image: showImageUrl,
             overstretch: true,
-            width: 750,
-            height: 440,
+            width: 1000,
+            height: 500,
             showdigits: false,
             bufferlength: 10,
             // playlist: [

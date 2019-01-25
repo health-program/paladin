@@ -66,11 +66,18 @@ public class PublicityMessageVO {
         }
         return null;
     }
-
+    
 	 // 获取缩略图
     public List<SysAttachment> getThumbnailImage() {
         if (thumbnail != null && thumbnail.length() != 0) {
             return AttachmentContainer.getAttachments(thumbnail.split(","));
+        }
+        return null;
+    }
+    
+    public String getThumbnailUrl() {
+        if (thumbnail != null && thumbnail.length() != 0) {
+            return AttachmentContainer.getAttachments(thumbnail.split(",")).get(0).getPelativePath();
         }
         return null;
     }

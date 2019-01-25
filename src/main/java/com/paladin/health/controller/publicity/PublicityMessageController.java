@@ -11,6 +11,7 @@ import com.paladin.health.service.publicity.PublicityMessageService;
 import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
 import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMessageVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +22,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Controller
 @RequestMapping("/health/publicity/message")
@@ -105,7 +109,22 @@ public class PublicityMessageController extends ControllerSupport {
     public Object display(@RequestParam String id,Model model) {
         PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messages =  publicityMessageService.showDisplayMessage();
+		PublicityMessageVO preMessage = new PublicityMessageVO();
+		PublicityMessageVO nextMessage = new PublicityMessageVO();
+		for (int i=0; i< messages.size();i++){  
+			if(messages.get(i).getId().equals(message.getId())){
+				if(messages.size()>1){
+				if(i==0){
+					nextMessage=messages.get(i+1);
+				}else if(i == messages.size()-1){
+					preMessage = messages.get(i-1);
+				}
+			}
+			}
+        };  
         model.addAttribute("message",message);
+        model.addAttribute("preMessage",preMessage);
+        model.addAttribute("nextMessage",nextMessage);
 		model.addAttribute("messages",messages);
         return "/health/publicity/message_display_index";
     }

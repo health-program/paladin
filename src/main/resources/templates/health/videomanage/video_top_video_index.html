@@ -4,10 +4,14 @@
 <head th:include="/health/header" />
 <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
 <style>
-    .notice-list {
+    .video-list {
         list-style: none;
+        text-align:center;
     }
-
+ 	.notice-list {
+        list-style: none;
+        text-align:center;
+    }
     .right-tool {
         float: right;
     }
@@ -71,210 +75,162 @@
         border-color: #1ddc50
     }
 
-    .p-number strong {
-        font-size: 24px
+    .video-li {
+        margin-bottom:20px;
+        float:left;
+        width:32%;
     }
-
-    .ul-dashed {
-        border-bottom: 1px dashed #dddddd;
-        padding-left: 12px;
-        line-height: 14px;
-        margin-right: 21px;
+    
+     .notice-li {
+        text-height:200px;
+        height:200px;
     }
-
-    .notice-li {
-        margin-bottom: 6px;
+    .notice-box{
+	    display:inline-block;
+	    width:76%;
+	    text-align:left;
+	    text-height:200px;
+	    padding-left:20px;
+	    vertical-align: top;
     }
-
-    .info-box-text {
-        font-size: 20px;
+    #noticeContent{
+	    height:70px;
+		overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+		text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
     }
-
-    .info-box-content {
-        padding: 5px 25px;
-    }
-
-    .text-view {
-        margin-left: 90px;
-        text-align: right;
-        margin-right: 19px;
-    }
-
-    #noticeContent p {
-        margin-left: 15px;
-    }
-
-    .content {
-        min-height: 250px;
-        padding: 30px;
-        margin-right: auto;
-        margin-left: auto;
-        padding-left: 30px;
-        padding-right: 30px;
+    .btn-detail{
+    	margin-top:15px;
+    	border: none;
+    	float:right;
+    	color:#3c8dbc
     }
 </style>
 
 <body class="container">
 <section class="content">
-    <div class="box box-solid">
+    	<div id="example1" class="slider-pro">
+		<div class="sp-slides" th:each="video,iter: ${videos}">
+			<div class="sp-slide">
+				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl}}"
+				th:onclick="|javascript:window.location.href='/health/video/play?id=${video.id}'|"/>
+				
+				<p class="sp-layer sp-white sp-padding" style="text-align: center" 
+					data-horizontal="17%" data-vertical="5" data-width="50%"
+					data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200"
+					th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
+				</p> 
+			</div>
+		</div>
 
-            <div id="example1" class="slider-pro">
-                <div class="sp-slides" th:each="video,iter: ${videos}">
-                    <div class="sp-slide">
-                        <input type="hidden" th:id="|url${iter.index+1}|" th:value="${video.url}">
-                        <div  th:id="|video${iter.index+1}|"  class="media-object">Loading the video...</div>
-                        <p class="sp-layer sp-white sp-padding"
-                           data-vertical="5" data-horizontal="1%" data-width="98%"
-                           data-show-transition="down" data-show-delay="400" data-hide-transition="up" style="text-align: center" >
-                            <span class="hide-small-screen" th:text="${video.summary.length()>30}?${#strings.substring(video.summary,0,30)+'.........'}:${video.summary}"></span>
-                        </p>
-                    </div>
-                </div>
-                <div class="sp-thumbnails">
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-
-                    <div class="sp-thumbnail">
-                        <img class="sp-thumbnail-image" src="/static/js/sliderPro/js/3.jpg"/>
-                    </div>
-                </div>
-            </div>
-
+		<div class="sp-thumbnails">
+			<div class="sp-thumbnail" th:each="video,iter: ${videos}">
+				
+				<div class="sp-thumbnail-description">
+				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl}}" />
+				</div>
+				<!-- <div class="sp-thumbnail-title">Lorem ipsum</div> -->
+			</div>
+		</div>
     </div>
+    
     <div class="box box-solid">
-        <ul id="myTab" class="nav nav-tabs">
-            <li class="active">
-                <a href="#info" data-toggle="tab" ><i class="glyphicon glyphicon-list-alt"></i>&nbsp;&nbsp;信息发布</a>
-            </li>
-            <li>
-                <a href="#video" data-toggle="tab"><i class="glyphicon glyphicon-facetime-video"></i>&nbsp;&nbsp;视频列表</a>
-            </li>
-        </ul>
+        <div class="box-header with-border">
+				<h4 align='center'><strong>视频列表<strong/></h4>
+				<div class="box-tools pull-right">
+					<a class="btn" id="model_edit_btn" href="javascript:void(0)">查看更多></a>
+				</div>
+			</div>
         <div class="box-body">
-            <div id="myTabContent" class="tab-content">
-                <div class="tab-pane fade in active" id="info">
-                    <ul class="notice-list ul-dashed" th:each="message,iter: ${messages}">
-                        <li class="notice-li">
-                            <strong><a class="name" th:href="${'/health/publicity/message/display/index?id='+ message.id}" th:text="${message.title}"></a></strong><img th:if="${iter.index <= 2}" src="/static/image/hot.gif" style="position: absolute;z-index: 1001;margin-left: 3px;margin-top: -3px">
-                            <div class="right-tool">
-                                <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span>
+        	<div class="tab-content">
+          	   <div>
+                    <ul class="video-list ul-dashed" >
+                        <li class="video-li" th:each="video,iter: ${videosAll}">
+                             <a th:href="${'/health/video/play?id='+ video.id}">
+      							<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%">
+     						 </a>
+     						 <div class="detail">
+     						 <div>
+     						 <strong>
+     						 <a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a>
+     						 </strong>
+                             </div>
+                             <div>
+                             <span>发布时间：</span><span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
+                             </div>
                             </div>
                         </li>
                     </ul>
-                </div>
-                <div class="tab-pane fade" id="video">
-                    <ul class="notice-list ul-dashed" th:each="video,iter: ${videosAll}">
-                        <li class="notice-li">
-                            <strong><a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a></strong><img th:if="${iter.index <= 2}" src="/static/image/hot.gif" style="position: absolute;z-index: 1001;margin-left: 3px;margin-top: -3px">
-                            <div class="right-tool">
-                                <span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
+            	</div>
             </div>
         </div>
+        <div class="box box-solid">
+        <div class="box-header with-border">
+				<h4 align='center'><strong>公告列表<strong/></h4>
+				<div class="box-tools pull-right">
+					<a class="btn" id="model_edit_btn" href="javascript:void(0)">查看更多></a>
+				</div>
+			</div>
+        <div class="box-body">
+        	<div class="tab-content">
+          	   <div>
+                    <ul class="notice-list ul-dashed" th:each="message,iter: ${messages}">
+                        <li class="notice-li">
+      							<img  th:src="@{'/file/'+${message.thumbnailUrl}}" alt="ATTACHMENT" style="width:20%">
+     						 <div class="notice-box">
+     						 <div>
+     						 <h4 ><strong th:text="${message.title}"><strong/></h4>
+                             </div>
+                             <div style="font-size:10px; color:#999">
+                             <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
+                             <span th:text="${message.label}"></span>
+                             </div>
+                             <div id="noticeContent" th:utext="${message.content}"></div>
+                             <div class="btnContent">
+                             <a class="btn-detail" th:onclick="|javascript:window.location.href='/health/publicity/message/display/index?id=${message.id}'|">查看详情</a>
+                             </div>
+                            </div>
+                        </li>
+                    </ul>
+            	</div>
+            </div>
+        </div>        
+                
 </section>
 <div th:include="/health/footer" />
 <script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
 <script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
 <script type="text/javascript">
-    $(function () {
-        $( '#example1' ).sliderPro({
-            width: 1110,
-            height: 600,
-            arrows: true,
-            buttons: false,
-            waitForLayers: true,
-            autoplayDelay: 10000,
-            thumbnailPointer: true,
-            thumbnailWidth: 220,
-            thumbnailHeight:150,
-            breakpoints: {
-                500: {
-                    thumbnailWidth: 120,
-                    thumbnailHeight: 50
-                }
-            }
-        });
-        _initVideo1($("#url1").val());
-        _initVideo2($("#url2").val());
-        _initVideo3($("#url3").val());
-        _initVideo4($("#url4").val());
-        _initVideo5($("#url5").val());
-    });
-    function _initVideo1(url) {
-        jwplayer("video1").setup({
-            flashplayer: '/static/js/jwplayer/player.swf',
-            file: url,
-            image: "/static/js/sliderPro/js/1.jpg",
-            overstretch: true,
-            width: 1110,
-            height: 653,
-            showdigits : false,
-            bufferlength: 10
-        });
-    }
-    function _initVideo2(url) {
-        jwplayer("video2").setup({
-            flashplayer: '/static/js/jwplayer/player.swf',
-            file: url,
-            image: "/static/js/sliderPro/js/1.jpg",
-            overstretch: true,
-            width: 1110,
-            height: 653,
-            showdigits : false,
-            bufferlength: 10
-        });
-    }
-    function _initVideo3(url) {
-        jwplayer("video3").setup({
-            flashplayer: '/static/js/jwplayer/player.swf',
-            file: url,
-            image: "/static/js/sliderPro/js/1.jpg",
-            overstretch: true,
-            width: 1110,
-            height: 653,
-            showdigits : false,
-            bufferlength: 10
-        });
-    }
-    function _initVideo4(url) {
-        jwplayer("video4").setup({
-            flashplayer: '/static/js/jwplayer/player.swf',
-            file: url,
-            image: "/static/js/sliderPro/js/1.jpg",
-            overstretch: true,
-            width: 1110,
-            height: 653,
-            showdigits : false,
-            bufferlength: 10
-        });
-    }
-    function _initVideo5(url) {
-        jwplayer("video5").setup({
-            flashplayer: '/static/js/jwplayer/player.swf',
-            file: url,
-            image: "/static/js/sliderPro/js/1.jpg",
-            overstretch: true,
-            width: 1110,
-            height: 653,
-            showdigits : false,
-            bufferlength: 10
-        });
-    }
+$( document ).ready(function() {
+	$( '#example1' ).sliderPro({
+		width: screen.width,
+		height: 900,
+		thumbnailsPosition: 'right',
+		arrows: true,
+		buttons: false,
+		imageScaleMode:'cover',
+		waitForLayers: true,
+		thumbnailWidth: 200,
+		thumbnailHeight: 150,
+		thumbnailPointer: true,
+		autoplay: true,
+		autoScaleLayers: false,
+		breakpoints: {
+			800: {
+	            thumbnailsPosition: 'bottom',
+	            thumbnailWidth: 270,
+	            thumbnailHeight: 100
+	        },
+	        500: {
+	            orientation: 'vertical',
+	            thumbnailsPosition: 'bottom',
+	            thumbnailWidth: 120,
+	            thumbnailHeight: 50
+	        }
+
+		}
+	});
+});
+        
 </script>
 </body>
 

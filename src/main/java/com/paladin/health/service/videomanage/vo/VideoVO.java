@@ -53,6 +53,13 @@ public class VideoVO {
         return null;
     }
 
+    public String getShowImageUrl() {
+        if (showImage != null && showImage.length() != 0) {
+            return AttachmentContainer.getAttachments(showImage.split(",")).get(0).getPelativePath();
+        }
+        return null;
+    }
+    
 	public String getId() {
 		return id;
 	}

@@ -2,6 +2,8 @@ package com.paladin.health.service.videomanage.vo;
 
 import java.util.Date;
 
+import com.paladin.framework.core.container.AttachmentContainer;
+
 /**
  * <>
  *
@@ -27,6 +29,13 @@ public class VideoShowVo {
     private String label;
 
     private Date createTime;
+    
+    public String getShowImageUrl() {
+        if (showImage != null && showImage.length() != 0) {
+            return AttachmentContainer.getAttachments(showImage.split(",")).get(0).getPelativePath();
+        }
+        return null;
+    }
 
     public String getId() {
         return id;
