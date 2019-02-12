@@ -2,7 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:include="/health/header" />
-<link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+  <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
 <style>
     .video-list {
         list-style: none;
@@ -106,7 +109,42 @@
     }
 </style>
 
-<body class="container">
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+
+  <header class="main-header" style="background-color:#43c7a8">
+    <nav class="navbar navbar-static-top">
+      <div class="container">
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+           <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">宣传内容<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">疾病查询</a></li>
+                <li><a href="#">疾病知识</a></li>
+                <li><a href="#">症状知识</a></li>
+                <li><a href="#">健康处方</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>
+  <!-- Full Width Column -->
+  <div class="content-wrapper">
+    <div class="container">
+      <!-- Content Header (Page header) -->
+      <section class="content-header" style="height:50px;">
+        <img id="logo"/>
+        <ol class="breadcrumb" style="float:left">
+          <li><a href="#"><i class="fa fa-home"></i> 当前所在的位置：主页</a></li>
+          <li><a href="/health/video/topVideo">宣传教育</a></li>
+        </ol>
+      </section>
 <section class="content">
     	<div id="example1" class="slider-pro">
 		<div class="sp-slides" th:each="video,iter: ${videos}">
@@ -118,17 +156,15 @@
 					data-horizontal="17%" data-vertical="5" data-width="50%"
 					data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200"
 					th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
-				</p> 
+				</p>
 			</div>
 		</div>
 
 		<div class="sp-thumbnails">
 			<div class="sp-thumbnail" th:each="video,iter: ${videos}">
-				
 				<div class="sp-thumbnail-description">
-				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl}}" />
+				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl}}"/>
 				</div>
-				<!-- <div class="sp-thumbnail-title">Lorem ipsum</div> -->
 			</div>
 		</div>
     </div>
@@ -137,7 +173,7 @@
         <div class="box-header with-border">
 				<h4 align='center'><strong>视频列表<strong/></h4>
 				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="javascript:void(0)">查看更多></a>
+					<a class="btn" id="model_edit_btn" href="/health/publicity/public/center/video/index">查看更多></a>
 				</div>
 			</div>
         <div class="box-body">
@@ -167,9 +203,9 @@
         <div class="box-header with-border">
 				<h4 align='center'><strong>公告列表<strong/></h4>
 				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="javascript:void(0)">查看更多></a>
+					<a class="btn" id="model_edit_btn" href="/health/publicity/public/center/message/index">查看更多></a>
 				</div>
-			</div>
+		</div>
         <div class="box-body">
         	<div class="tab-content">
           	   <div>
@@ -196,6 +232,10 @@
         </div>        
                 
 </section>
+</div>
+</div>
+</div>
+
 <div th:include="/health/footer" />
 <script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
 <script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>

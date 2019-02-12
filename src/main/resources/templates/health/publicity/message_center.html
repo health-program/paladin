@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header"/>
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
+<link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
+  <style>
+	  .list_left{
+	   	text-align:center;
+	  	float:left;
+	  	padding:30px;
+	  }
+  
+      .list_right{
+  		float:right;
+  		padding:30px;
+  	  }
+  	  
+  	  .list_c_tit{
+  	  
+  	  }
+  	 
+  	  .list_c_show{
+  	  	list-style:none;
+  	  	-webkit-padding-start: 0px;
+  	  	width:230px;
+  	  	border:  #d2d2d2 1px solid;
+  	  	border-radius:5px;
+  	  }
+  	  
+  	  .list_c_show > li{
+  	  	padding:8px;
+  	  	border-bottom: #d2d2d2 1px dashed
+  	  }
+  	  .list_c_show > li:last-child{
+  	  	border-bottom: 0px
+  	  }
+  	  .list_a_tit{
+  	  	display:inline-block;
+  	  }
+  	  
+  	  .list_a_time{
+  	  	display:inline-block;
+  	  	padding-left:200px;	
+  	  }
+  	  
+  	  .fht-cell ,.th-inner{
+  	  	display:none;
+  	  }
+  	  
+  	  .fixed-table-toolbar,.fixed-table-container tbody td , .fixed-table-container, .bootstrap-table .table ,#dataGrid>thead>tr>td{
+		border:0px white;
+  	  }
+  	  
+  	  thead{
+  	  	display:none  	  
+  	  }
+  	  
+  	  .fixed-table-container tbody tr{
+  	  	border-bottom:#d2d2d2 1px dashed;
+  	  }
+      
+  </style>
+  
+<body class="hold-transition skin-blue layout-top-nav">
+	<div class="wrapper">
+		<header class="main-header" style="background-color: #43c7a8">
+			<nav class="navbar navbar-static-top">
+				<div class="container">
+
+					<!-- Collect the nav links, forms, and other content for toggling -->
+					<div class="collapse navbar-collapse pull-left"
+						id="navbar-collapse">
+						<ul class="nav navbar-nav">
+							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">宣传内容<span class="caret"></span></a>
+								<ul class="dropdown-menu" role="menu">
+									<li><a href="#">疾病查询</a></li>
+									<li><a href="#">疾病知识</a></li>
+									<li><a href="#">症状知识</a></li>
+									<li><a href="#">健康处方</a></li>
+								</ul>
+							</li>
+							<!-- <li><a href="#">link</a></li> -->
+						</ul>
+					</div>
+					<div class="navbar-custom-menu">
+					</div>
+					<!-- /.navbar-custom-menu -->
+				</div>
+				<!-- /.container-fluid -->
+			</nav>
+		</header>
+		<!-- Full Width Column -->
+		<div class="content-wrapper">
+			<div class="container">
+
+				<section>
+					<div class="list_left">
+						<div class="list_category">
+							<div class="list_c_tit">信息中心</div>
+							<ul class="list_c_show">
+								<li><a href="/health/publicity/public/center/message/index">公告</a></li>
+								<li><a href="/health/publicity/public/center/video/index">视频</a></li>
+								<li><a
+									href="/home/list?secondnodeid=9EF9D4C8-4F56-4593-8366-3C30B5CDE9E5">健康活动</a></li>
+								<li><a
+									href="/home/list?secondnodeid=AE359865-B396-4260-9B90-32AD0DBC5284">基层风采</a></li>
+								
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section>
+				<div class="content-header" style="height: 50px;">
+					<ol class="breadcrumb" style="float: left">
+						<li><a href="#"><i class="fa fa-home"></i> 当前所在位置：主页</a></li>
+						<li><a href="/health/video/topVideo">宣传宣传教育</a></li>
+						<li class="active">健康宣传教育信息中心</li>
+					</ol>
+				</div>
+					<div  style="float: right">
+						<table id="dataGrid"></table>
+					</div>
+				</section>
+			</div>
+		</div>
+	<div th:include="/health/footer" />
+    <script type="text/javascript">
+    /*<![CDATA[*/
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { field: "title",align:"left",width:"88%"},
+                    { field: "publishTime", formatter: "date" }
+                ]
+            ],
+            url: '/health/publicity/message/find',
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            onClickRow:function (e) {
+            	window.location = '/health/publicity/message/display/index' + (e ? ('?id=' + e.id) : '');
+            }
+        });
+    }
+
+    /*]]>*/
+    </script>
+</body>
+</html>

@@ -11,6 +11,7 @@
 	    v.name,
 	    v.summary,
 	    v.label,
+	    v.update_time updateTime,
 	    vpp.total as count
 		FROM  video v
 		LEFT JOIN  

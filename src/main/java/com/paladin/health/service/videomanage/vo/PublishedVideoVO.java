@@ -1,5 +1,7 @@
 package com.paladin.health.service.videomanage.vo;
 
+import java.util.Date;
+
 /**
  * @author 蒋恒 
  *  已发布视频展示
@@ -16,6 +18,8 @@ public class PublishedVideoVO {
 
 	// 标签
 	private String label;
+	
+	private Date updateTime;
 
 	// 播放次数
 	private Integer count;
@@ -58,6 +62,14 @@ public class PublishedVideoVO {
 
 	public void setCount(Integer count) {
 		this.count = count;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 }
