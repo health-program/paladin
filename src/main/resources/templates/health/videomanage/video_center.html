@@ -5,61 +5,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
 <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
+<link rel="stylesheet" type="text/css" href="/static/css/message-center.css" media="screen"/>
+
   <style>
-	  .list_left{
-	   	text-align:center;
-	  	float:left;
-	  	padding:30px;
-	  }
-  
-      .list_right{
-  		float:right;
-  		padding:30px;
-  	  }
-  	  
-  	  .list_c_tit{
-  	  
-  	  }
-  	 
-  	  .list_c_show{
-  	  	list-style:none;
-  	  	-webkit-padding-start: 0px;
-  	  	width:230px;
-  	  	border:  #d2d2d2 1px solid;
-  	  	border-radius:5px;
-  	  }
-  	  
-  	  .list_c_show > li{
-  	  	padding:8px;
-  	  	border-bottom: #d2d2d2 1px dashed
-  	  }
-  	  .list_c_show > li:last-child{
-  	  	border-bottom: 0px
-  	  }
-  	  .list_a_tit{
-  	  	display:inline-block;
-  	  }
-  	  
-  	  .list_a_time{
-  	  	display:inline-block;
-  	  	padding-left:200px;	
-  	  }
-  	  
-  	  .fht-cell ,.th-inner{
-  	  	display:none;
-  	  }
-  	  
-  	  .fixed-table-toolbar,.fixed-table-container tbody td , .fixed-table-container, .bootstrap-table .table ,#dataGrid>thead>tr>td{
-		border:0px white;
-  	  }
-  	  
-  	  thead{
-  	  	display:none  	  
-  	  }
-  	  
-  	  .fixed-table-container tbody tr{
-  	  	border-bottom:#d2d2d2 1px dashed;
-  	  }
+	  
       
   </style>
   
@@ -92,16 +41,16 @@
 			</nav>
 		</header>
 		<!-- Full Width Column -->
-		<div class="content-wrapper">
+		<div class="content-wrapper">		
 			<div class="container">
-
+				<div class="list_container">
 				<section>
 					<div class="list_left">
 						<div class="list_category">
 							<div class="list_c_tit">信息中心</div>
 							<ul class="list_c_show">
-								<li><a href="/health/publicity/public/center/message/index">公告</a></li>
-								<li><a href="/health/publicity/public/center/video/index">视频</a></li>
+								<li><a href="/open/health/message/center/message/index">公告</a></li>
+								<li><a href="/open/health/message/center/video/index">视频</a></li>
 								<li><a
 									href="/home/list?secondnodeid=9EF9D4C8-4F56-4593-8366-3C30B5CDE9E5">健康活动</a></li>
 								<li><a
@@ -109,20 +58,37 @@
 								
 							</ul>
 						</div>
+						<!-- 图片轮播 -->
+						<div class="image_slip">
+							 <div id="myCarousel" class="carousel slide">
+							    <div class="carousel-inner">
+							        <div class="item active">
+							             <img src="/static/image/gif.gif" alt="one slide">
+							        </div>
+							        <div class="item">
+							            <img src="/static/image/gif.gif" alt="two slide">
+							        </div>
+							        <div class="item">
+							             <img src="/static/image/gif.gif" alt="three slide">
+							        </div>
+							    </div>
+							  </div>
+						</div>
 					</div>
 				</section>
-				<section>
-				<div class="content-header" style="height: 50px;">
-					<ol class="breadcrumb" style="float: left">
-						<li><a href="#"><i class="fa fa-home"></i> 当前所在位置：主页</a></li>
-						<li><a href="/health/video/topVideo">宣传宣传教育</a></li>
-						<li class="active">健康宣传教育视频中心</li>
-					</ol>
-				</div>
-					<div  style="float: right">
-						<table id="dataGrid"></table>
+					<section>
+					<div class="content-header" style="height: 50px;">
+						<ol class="breadcrumb" style="float: left">
+							<li><a href="#"><i class="fa fa-home"></i> 当前所在位置：主页</a></li>
+							<li><a href="/open/health/message/center/topVideo">宣传宣传教育</a></li>
+							<li class="active">健康宣传教育视频中心</li>
+						</ol>
 					</div>
-				</section>
+						<div class="list_table" style="float: right">
+							<table id="dataGrid"></table>
+						</div>
+					</section>
+				</div>				
 			</div>
 		</div>
 	<div th:include="/health/footer" />
@@ -146,12 +112,12 @@
                     { field: "updateTime", formatter: "date" }
                 ]
             ],
-            url: '/health/video/play/publish/find/page',
+            url: '/open/health/message/center/find/page',
             pageSize: limit || undefined,
             pageNumber: page || 1,
             pagination: true,
             onClickRow:function (e) {
-            	window.location = '/health/video/play' + (e ? ('?id=' + e.id) : '');
+            	window.location = '/open/health/message/center/play' + (e ? ('?id=' + e.id) : '');
             }
         });
     }

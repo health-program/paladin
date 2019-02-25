@@ -17,4 +17,6 @@ public interface PublicityMessageMapper extends CustomMapper<PublicityMessage> {
 	public PublicityMessageVO getMessage(@Param("id") String id);
 
     List<PublicityMessageVO> findDisplay();
+    
+    List<PublicityMessageVO> findPublishedMessage(PublicityMessageQueryDTO query);
 }

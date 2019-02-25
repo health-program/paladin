@@ -174,7 +174,17 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 		return findMessage(query);
 	}
+	
+	/**
+	 * 对外展示的信息列表
+	 * 
+	 * @param query
+	 * @return
+	 */
+	public PageResult<PublicityMessageVO> findPublishedMessages(PublicityMessageQueryDTO query) {
 
+		return findPublishedMessage(query);
+	}
 	/**
 	 * 
 	 * 分页查询
@@ -190,6 +200,18 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return findMessage(query);
 	}
 
+	/**
+	 * 对外查询信息
+	 * 
+	 * @param query
+	 * @return
+	 */
+	private PageResult<PublicityMessageVO> findPublishedMessage(PublicityMessageQueryDTO query) {
+		Page<PublicityMessageVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		publicityMessageMapper.findPublishedMessage(query);
+		return new PageResult<>(page);
+	}
+	
 	/**
 	 * 查询信息
 	 * 

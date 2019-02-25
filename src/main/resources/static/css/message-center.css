@@ -1,0 +1,146 @@
+.breadcrumb .fa-home{
+	color: #048423;
+	font-size: 15px;
+}
+
+.list_table #dataGrid thead{
+	display:none !important;
+}
+
+
+
+.list_table .fixed-table-container tbody tr{
+	cursor:pointer;
+	border-bottom: 1.5px dashed #d2d2d2;
+}
+
+.list_table .fixed-table-container tbody tr td{
+	border:none;
+}
+
+.list_table .fixed-table-container tbody tr:last-child{
+	border-bottom: none;
+}
+
+.list_table .pagination .active a{
+	background-color: #048423;
+    border-color: #048423;
+}
+
+.list_table .dropdown-menu .active a{
+	background-color: #048423;
+}
+    
+
+.list_table #dataGrid tr td:nth-child(1){
+	position:relative;
+	padding-left: 15px;
+}
+
+.list_table #dataGrid tr td:nth-child(1):before{
+	content: '';
+	width: 5px;
+	height: 5px;
+	background:#555;
+	border-radius: 50%;
+	position: absolute;
+	left: 0;
+	top: 15px;
+}
+
+.content-wrapper{
+	position: relative;
+    padding-top: 40px;
+}
+
+.list_container{
+	overflow: hidden;
+	padding: 30px 50px;
+	border-radius: 10px;
+	box-shadow: 0 0 8px #888;
+}
+
+
+.list_left {
+	text-align: center;
+	float: left;
+	width: 230px;
+    padding-top: 30px;
+}
+
+.list_right {
+	float: right;
+	padding: 30px;
+}
+.list_c_show {
+	list-style: none;
+	-webkit-padding-start: 0px;
+    width: 218px;
+    margin: auto;
+    border: #d2d2d2 1px solid;
+    border-radius: 0 0 5px 5px;
+    border-top: none;
+}
+
+.list_c_show>li {
+	padding: 8px;
+	border-bottom: #d2d2d2 1px dashed
+}
+
+.list_c_show>li:last-child {
+	border-bottom: 0px
+}
+
+.list_c_show>li a{
+	color:#666;
+}
+
+.list_c_show>li a:hover{
+	color:#f00;
+}
+
+.list_a_tit {
+	display: inline-block;
+}
+
+.list_a_time {
+	display: inline-block;
+	padding-left: 200px;
+}
+
+.fht-cell, .th-inner {
+	display: none;
+}
+
+.fixed-table-toolbar, .fixed-table-container tbody td,
+	.fixed-table-container, .bootstrap-table .table, #dataGrid>thead>tr>td
+	{
+	border: 0px white;
+}
+
+thead {
+	display: none
+}
+
+.fixed-table-container tbody tr {
+	border-bottom: #d2d2d2 1px dashed;
+}
+
+.list_c_tit {
+	height: 52px;
+	background: url('/static/image/list_nav.png') no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    line-height: 40px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.image_slip{
+	width: 220px;
+	margin:20px auto 0;
+	border:1px solid #d2d2d2;
+	border-radius: 5px;
+	padding:2px;
+}

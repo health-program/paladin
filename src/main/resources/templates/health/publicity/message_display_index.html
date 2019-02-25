@@ -42,7 +42,7 @@
         <img id="logo"/>
         <ol class="breadcrumb" style="float:left">
           <li><a href="#"><i class="fa fa-home"></i> 当前所在的位置：主页</a></li>
-          <li><a href="/health/video/topVideo">宣传宣传教育</a></li>
+          <li><a href="/open/health/message/center/topVideo">宣传宣传教育</a></li>
           <li class="active">宣传宣传教育信息</li>
         </ol>
       </section>
@@ -58,11 +58,11 @@
             </div>
             <div>
             	<p th:if="${preMessage.id != null}">
-            	    <a th:href="${'/health/publicity/message/display/index?id='+ preMessage.id}" th:text="|上一篇：${preMessage.title}|"></a>
+            	    <a th:href="${'/open/health/message/center/display/index?id='+ preMessage.id}" th:text="|上一篇：${preMessage.title}|"></a>
             	</p>
                 <p th:if="${preMessage.id == null}" th:text="上一篇：到顶了"></p>
             	<p th:if="${nextMessage.id != null}">
-            	    <a  th:href="${'/health/publicity/message/display/index?id='+ nextMessage.id}" th:text="|下一篇：${nextMessage.title}|"></a>
+            	    <a  th:href="${'/open/health/message/center/display/index?id='+ nextMessage.id}" th:text="|下一篇：${nextMessage.title}|"></a>
             	</p>
             	<p th:if="${nextMessage.id == null}" th:text="下一篇：到底了"></p>
             </div>
@@ -70,8 +70,8 @@
         <div class="col-sm-3" style="top:20px;left: 60px;margin-left:30px;">
             <div class="box box-solid">
                 <ul>
-                <li th:each="message,iter: ${messages}" class="list-title">
-                <a style="color:black;font-size:16px" th:href="${'/health/publicity/message/display/index?id='+ message.id}"
+                <li th:each="message,iter: ${messageList}" class="list-title">
+                <a style="color:black;font-size:16px" th:href="${'/open/health/message/center/display/index?id='+ message.id}"
                 th:text="${message.title}"></a>
                 </li>
                 </ul>

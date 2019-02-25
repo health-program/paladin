@@ -49,7 +49,7 @@
         <img id="logo"/>
         <ol class="breadcrumb" style="float:left">
           <li><a href="#"><i class="fa fa-home"></i> 当前所在的位置：主页</a></li>
-          <li><a href="/health/video/topVideo">宣传宣传教育</a></li>
+          <li><a href="/open/health/message/center/topVideo">宣传宣传教育</a></li>
           <li class="active"><a href="#">健康宣传视频</a></li>
         </ol>
       </section>
@@ -71,13 +71,13 @@
           <div class="box-body">
              <ul class="video-list">
                  <li class="video-li"  th:each="video,iter: ${videosAll}">
-                      <a th:href="${'/health/video/play?id='+ video.id}">
+                      <a th:href="${'/open/health/message/center/play?id='+ video.id}">
 						<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%"/>
 				 </a>
 				 <div class="detail">
 				 <div>
 				 <strong>
-				 <a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a>
+				 <a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a>
 				 </strong>
                       </div>
                       <div>
@@ -118,7 +118,7 @@
         });
         /* 更新播放次数 */
     
-        $.getAjax("/health/video/play/publish/updateCount?videoId="+$("#id").val(), function(data) {
+        $.getAjax("/open/health/message/center/updateCount?videoId="+$("#id").val(), function(data) {
            
         });
     })

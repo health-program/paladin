@@ -142,7 +142,7 @@
         <img id="logo"/>
         <ol class="breadcrumb" style="float:left">
           <li><a href="#"><i class="fa fa-home"></i> 当前所在的位置：主页</a></li>
-          <li><a href="/health/video/topVideo">宣传教育</a></li>
+          <li><a href="/open/health/message/center/topVideo">宣传教育</a></li>
         </ol>
       </section>
 <section class="content">
@@ -150,7 +150,7 @@
 		<div class="sp-slides" th:each="video,iter: ${videos}">
 			<div class="sp-slide">
 				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl}}"
-				th:onclick="|javascript:window.location.href='/health/video/play?id=${video.id}'|"/>
+				th:onclick="|javascript:window.location.href='/open/health/message/center/play?id=${video.id}'|"/>
 				
 				<p class="sp-layer sp-white sp-padding" style="text-align: center" 
 					data-horizontal="17%" data-vertical="5" data-width="50%"
@@ -173,7 +173,7 @@
         <div class="box-header with-border">
 				<h4 align='center'><strong>视频列表<strong/></h4>
 				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="/health/publicity/public/center/video/index">查看更多></a>
+					<a class="btn" id="model_edit_btn" href="/open/health/message/center/video/index">查看更多></a>
 				</div>
 			</div>
         <div class="box-body">
@@ -181,13 +181,13 @@
           	   <div>
                     <ul class="video-list ul-dashed" >
                         <li class="video-li" th:each="video,iter: ${videosAll}">
-                             <a th:href="${'/health/video/play?id='+ video.id}">
+                             <a th:href="${'/open/health/message/center/play?id='+ video.id}">
       							<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%">
      						 </a>
      						 <div class="detail">
      						 <div>
      						 <strong>
-     						 <a class="name" th:href="${'/health/video/play?id='+ video.id}" th:text="${video.name}"></a>
+     						 <a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a>
      						 </strong>
                              </div>
                              <div>
@@ -203,7 +203,7 @@
         <div class="box-header with-border">
 				<h4 align='center'><strong>公告列表<strong/></h4>
 				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="/health/publicity/public/center/message/index">查看更多></a>
+					<a class="btn" id="model_edit_btn" href="/open/health/message/center/message/index">查看更多></a>
 				</div>
 		</div>
         <div class="box-body">
@@ -222,7 +222,7 @@
                              </div>
                              <div id="noticeContent" th:utext="${message.content}"></div>
                              <div class="btnContent">
-                             <a class="btn-detail" th:onclick="|javascript:window.location.href='/health/publicity/message/display/index?id=${message.id}'|">查看详情</a>
+                             <a class="btn-detail" th:onclick="|javascript:window.location.href='/open/health/message/center/display/index?id=${message.id}'|">查看详情</a>
                              </div>
                             </div>
                         </li>
