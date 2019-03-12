@@ -8,11 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
-import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
-import com.paladin.framework.mybatis.CustomJoinMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomJoinMapper;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 import tk.mybatis.mapper.entity.Example;
@@ -117,8 +117,8 @@ public class ServiceSupportComplex<Model, JoinModel extends Model> extends Servi
 	 * @return
 	 */
 	public PageResult<JoinModel> findJoinPage(int offset, int limit, boolean simple) {
-		if (limit > maxPageSize) {
-			limit = maxPageSize;
+		if (limit > OffsetPage.MAX_LIMIT) {
+			limit = OffsetPage.MAX_LIMIT;
 		}
 
 		Page<JoinModel> page = PageHelper.offsetPage(offset, limit);
@@ -282,8 +282,8 @@ public class ServiceSupportComplex<Model, JoinModel extends Model> extends Servi
 	 */
 	public PageResult<JoinModel> searchJoinPage(Object searchParam, int offset, int limit, boolean simple) {
 
-		if (limit > maxPageSize) {
-			limit = maxPageSize;
+		if (limit > OffsetPage.MAX_LIMIT) {
+			limit = OffsetPage.MAX_LIMIT;
 		}
 
 		Page<JoinModel> page = PageHelper.offsetPage(offset, limit);

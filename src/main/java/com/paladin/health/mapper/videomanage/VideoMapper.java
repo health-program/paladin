@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface VideoMapper extends CustomMapper<Video>{
 

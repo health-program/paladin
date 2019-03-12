@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
 import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.utils.EnumUtil;
 import com.paladin.framework.web.response.CommonResponse;

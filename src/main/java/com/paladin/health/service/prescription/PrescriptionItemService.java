@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.paladin.health.mapper.prescription.PrescriptionItemMapper;
 import com.paladin.health.model.prescription.PrescriptionItem;
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 
@@ -22,7 +22,7 @@ public class PrescriptionItemService extends ServiceSupport<PrescriptionItem>{
 	}
 	
 	public List<PrescriptionItem> findItemByType(Integer type) {		
-        return searchAll(new GeneralCriteriaBuilder.Condition(PrescriptionItem.COLUMN_FIELD_TYPE, QueryType.EQUAL, type));
+        return searchAll(new Condition(PrescriptionItem.COLUMN_FIELD_TYPE, QueryType.EQUAL, type));
 	}
 	
 	

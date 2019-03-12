@@ -9,12 +9,7 @@ public class WebUtil {
 
 	public static boolean isAjaxRequest(HttpServletRequest request) {
 		// 判断是不是APP,是的话返回状态码，不返回登录页
-		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With")) || request.getHeader("isApp") != null;
-	}
-
-	public static boolean isApp(HttpServletRequest request) {
-		// 判断是不是APP
-		return request.getHeader("isApp") != null;
+		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
 	}
 
 	public static String getServletPath(HttpServletRequest request) {

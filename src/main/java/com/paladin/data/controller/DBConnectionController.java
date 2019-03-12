@@ -2,39 +2,43 @@ package com.paladin.data.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.common.service.cache.SysVisitCacheService;
-import com.paladin.data.controller.dto.ColumnDTO;
 import com.paladin.data.controller.dto.GenerateTableOptionDTO;
-import com.paladin.data.controller.dto.GenerateTableOptionDTO.GenerateColumnOptionDTO;
 import com.paladin.data.database.DataBaseSource;
-import com.paladin.data.database.model.Column;
 import com.paladin.data.database.model.DataBase;
 import com.paladin.data.database.model.Table;
 import com.paladin.data.generate.GenerateColumnOption;
 import com.paladin.data.generate.GenerateTableOption;
 import com.paladin.data.generate.build.BuilderType;
 import com.paladin.data.model.DBConnection;
+import com.paladin.data.model.build.DbBuildColumn;
+import com.paladin.data.model.build.DbBuildTable;
 import com.paladin.data.service.DBConnectionService;
 import com.paladin.data.service.GenerateService;
-import com.paladin.framework.common.OffsetPage;
+import com.paladin.data.service.build.DbBuildTableService;
+import com.paladin.data.service.dto.DBConnectionDTO;
+import com.paladin.data.service.dto.DBConnectionQueryDTO;
+import com.paladin.data.service.vo.DBConnectionVO;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
 
 @Controller
@@ -46,61 +50,72 @@ public class DBConnectionController extends ControllerSupport {
 
 	@Autowired
 	private GenerateService generateService;
+	
+	@Autowired
+	private DbBuildTableService buildTableService;
+	
 
-	@RequestMapping(value = "/index")
+	@GetMapping(value = "/index")
 	public String index(HttpServletRequest request) {
-		return "/data/connection/index";
+		return "/data/connection/db_connection_index";
 	}
 
-	@RequestMapping("/search")
+	@RequestMapping("/find/page")
 	@ResponseBody
-	public Object searchAll(OffsetPage query) {
+	public Object findPage(DBConnectionQueryDTO query) {
 		return CommonResponse.getSuccessResponse(connectionService.searchPage(query));
 	}
 
-	@RequestMapping("/view")
-	public String view(@RequestParam String name, Model model) {
-		DBConnection connection = connectionService.get(name);
-
-		if (connection == null) {
-			connection = new DBConnection();
-		}
-
-		model.addAttribute("connection", connection);
-		return "data/connection/view";
-	}
-
-	@RequestMapping("/add/input")
-	public String addInput(Model model) {
-		model.addAttribute("connection", new DBConnection());
-		return "data/connection/form";
-	}
-
-	@RequestMapping("/edit/input")
-	public String editInput(@RequestParam String name, Model model) {
-		DBConnection connection = connectionService.get(name);
-
-		if (connection == null) {
-			connection = new DBConnection();
-		}
-
-		model.addAttribute("connection", connection);
-		return "data/connection/form";
-	}
-
-	@RequestMapping("/save")
+	@GetMapping("/get")
 	@ResponseBody
-	public Object save(@Valid DBConnection connection, BindingResult bindingResult) {
+	public Object getDetail(@RequestParam String id, Model model) {
+		return CommonResponse.getSuccessResponse(beanCopy(connectionService.get(id), new DBConnectionVO()));
+	}
+
+	@GetMapping("/add")
+	public String addInput() {
+		return "/data/connection/db_connection_add";
+	}
+
+	@GetMapping("/detail")
+	public String detailInput(@RequestParam String id, Model model) {
+		model.addAttribute("id", id);
+		return "/data/connection/db_connection_detail";
+	}
+
+	@PostMapping("/save")
+	@ResponseBody
+	public Object save(@Valid DBConnectionDTO dbConnectionDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-		return CommonResponse.getResponse(connectionService.saveOrUpdate(connection));
+		DBConnection model = beanCopy(dbConnectionDTO, new DBConnection());
+		String id = UUIDUtil.createUUID();
+		model.setName(id);
+		if (connectionService.save(model) > 0) {
+			return CommonResponse.getSuccessResponse(beanCopy(connectionService.get(id), new DBConnectionVO()));
+		}
+		return CommonResponse.getFailResponse();
 	}
 
-	@RequestMapping("/delete")
+	@PostMapping("/update")
 	@ResponseBody
-	public Object delete(@RequestParam String name) {
-		return CommonResponse.getResponse(connectionService.removeByPrimaryKey(name), "删除失败");
+	public Object update(@Valid DBConnectionDTO dbConnectionDTO, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return validErrorHandler(bindingResult);
+		}
+		String id = dbConnectionDTO.getName();
+		DBConnection model = beanCopy(dbConnectionDTO, connectionService.get(id));
+		if (connectionService.update(model) > 0) {
+			return CommonResponse.getSuccessResponse(beanCopy(connectionService.get(id), new DBConnectionVO()));
+		}
+		return CommonResponse.getFailResponse();
+	}
+
+	@PostMapping("/delete")
+	@ResponseBody
+	public Object delete(@RequestParam String id) {
+		return CommonResponse.getResponse(connectionService.removeByPrimaryKey(id));
 	}
 
 	@RequestMapping("/connect")
@@ -135,11 +150,7 @@ public class DBConnectionController extends ControllerSupport {
 	@RequestMapping("/db/column")
 	@ResponseBody
 	public Object tableList(@RequestParam String dbName, @RequestParam String tableName) {
-
-		Column[] columns = connectionService.getDBTableColumns(dbName, tableName);
-		List<ColumnDTO> columnVOs = beanCopyList(Arrays.asList(columns), ColumnDTO.class);
-
-		return CommonResponse.getSuccessResponse(columnVOs);
+		return CommonResponse.getSuccessResponse(generateService.getBuildColumn(dbName, tableName));
 	}
 
 	@RequestMapping("/db/build/input")
@@ -147,45 +158,22 @@ public class DBConnectionController extends ControllerSupport {
 
 		model.addAttribute("dbName", dbName);
 		model.addAttribute("tableName", tableName);
+		
+		DbBuildTable buildTable = buildTableService.getDbBuildColumn(dbName, tableName);
+		
+		String title = tableName;
+		if(buildTable != null) {
+			title = buildTable.getTableTitle();
+		}
+		
+		model.addAttribute("tableTitle", title);		
 		model.addAttribute("projectPath", visitCacheService.getCache(request, CACHE_PROJECT_PATH));
 
 		return "/data/connection/build";
 	}
 
-	@RequestMapping("/db/build")
-	@ResponseBody
-	public Object build(@RequestBody GenerateTableOptionDTO option) {
-
-		String dbName = option.getDbName();
-		String tableName = option.getTableName();
-
-		DataBaseSource dataBaseSource = connectionService.getDataBaseSource(dbName);
-
-		if (dataBaseSource == null) {
-			throw new BusinessException("不存在数据库：" + dbName);
-		}
-
-		DataBase dataBase = dataBaseSource.getDataBase(false);
-		Table table = dataBase.getChild(tableName);
-
-		if (table == null) {
-			throw new BusinessException("不存在表：" + tableName);
-		}
-
-		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
-
-		beanCopy(option, tableOption);
-
-		HashMap<String, String> contentMap = new HashMap<>();
-		contentMap.put("model", generateService.buildFileContent(tableOption, BuilderType.MODEL));
-		contentMap.put("mapper", generateService.buildFileContent(tableOption, BuilderType.MAPPER));
-		contentMap.put("service", generateService.buildFileContent(tableOption, BuilderType.SERVICE));
-
-		return CommonResponse.getSuccessResponse(null, contentMap);
-	}
-
 	@Autowired
-	SysVisitCacheService visitCacheService;
+	private SysVisitCacheService visitCacheService;
 
 	private final static String CACHE_PROJECT_PATH = "data_project_path";
 
@@ -212,11 +200,11 @@ public class DBConnectionController extends ControllerSupport {
 		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
 
 		beanCopy(option, tableOption);
-		
-		List<GenerateColumnOptionDTO>  columnOptionDTOs = option.getColumnOptions();
-		for(GenerateColumnOptionDTO columnOptionDTO : columnOptionDTOs) {
-			GenerateColumnOption columnOption = tableOption.getColumnOption(columnOptionDTO.getColumnName());
-			beanCopy(columnOptionDTO, columnOption);
+
+		List<DbBuildColumn> columnBuildOptions = option.getColumnBuildOptions();
+		for (DbBuildColumn columnBuildOption : columnBuildOptions) {
+			GenerateColumnOption columnOption = tableOption.getColumnOption(columnBuildOption.getColumnName());
+			columnOption.setBuildColumnOption(columnBuildOption);
 		}
 
 		String projectPath = option.getProjectPath();
@@ -241,6 +229,63 @@ public class DBConnectionController extends ControllerSupport {
 
 		visitCacheService.putCache(request, CACHE_PROJECT_PATH, projectPath);
 
+		generateService.saveBuildOption(tableOption, dbName);
+		
+		return CommonResponse.getSuccessResponse();
+	}
+
+	@RequestMapping("/db/build/file")
+	@ResponseBody
+	public Object buildFile(HttpServletRequest request, HttpServletResponse response, @RequestBody GenerateTableOptionDTO option) {
+
+		String dbName = option.getDbName();
+		String tableName = option.getTableName();
+
+		DataBaseSource dataBaseSource = connectionService.getDataBaseSource(dbName);
+
+		if (dataBaseSource == null) {
+			throw new BusinessException("不存在数据库：" + dbName);
+		}
+
+		DataBase dataBase = dataBaseSource.getDataBase(false);
+		Table table = dataBase.getChild(tableName);
+
+		if (table == null) {
+			throw new BusinessException("不存在表：" + tableName);
+		}
+
+		GenerateTableOption tableOption = new GenerateTableOption(table, dataBaseSource.getDataBaseConfig().getType());
+
+		beanCopy(option, tableOption);
+
+		List<DbBuildColumn> columnBuildOptions = option.getColumnBuildOptions();
+		for (DbBuildColumn columnBuildOption : columnBuildOptions) {
+			GenerateColumnOption columnOption = tableOption.getColumnOption(columnBuildOption.getColumnName());
+			columnOption.setBuildColumnOption(columnBuildOption);
+		}
+
+		String projectPath = option.getFilePath();
+
+		if (projectPath == null || projectPath.length() == 0) {
+			throw new BusinessException("项目路径不能为空");
+		}
+
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL_VO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MODEL_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.QUERY_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.MAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.SERVICE, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.CONTROLLER, projectPath);
+
+		generateService.buildProjectFile(tableOption, BuilderType.SQLMAPPER, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.JAVASCRIPT, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_INDEX, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_ADD, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.PAGE_DETAIL, projectPath);
+
+		generateService.saveBuildOption(tableOption, dbName);
+		
 		return CommonResponse.getSuccessResponse();
 	}
 

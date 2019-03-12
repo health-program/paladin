@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.regex.RegexUtil;
 
@@ -92,7 +92,7 @@ public class ObjectMessageTemplate implements MessageTemplate {
 					matcher.find();
 					Object value = mapObj.get(name);
 					if (value != null) {
-						sb.append(msg, i, matcher.start()).append(StringParser.toString(value));
+						sb.append(msg, i, matcher.start()).append(StringUtil.toString(value));
 						i = matcher.end();
 					} else {
 						sb.append(msg, i, matcher.end());
@@ -120,7 +120,7 @@ public class ObjectMessageTemplate implements MessageTemplate {
 					}
 
 					if (value != null) {
-						sb.append(msg, i, matcher.start()).append(StringParser.toString(value));
+						sb.append(msg, i, matcher.start()).append(StringUtil.toString(value));
 						i = matcher.end();
 					} else {
 						sb.append(msg, i, matcher.end());

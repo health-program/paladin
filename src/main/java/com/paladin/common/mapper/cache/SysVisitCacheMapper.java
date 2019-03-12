@@ -3,7 +3,7 @@ package com.paladin.common.mapper.cache;
 import org.apache.ibatis.annotations.Param;
 
 import com.paladin.common.model.cache.SysVisitCache;
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface SysVisitCacheMapper extends CustomMapper<SysVisitCache>{
 	

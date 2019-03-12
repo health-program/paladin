@@ -8,6 +8,9 @@ package com.paladin.framework.common;
  */
 public interface UnDelete {
 
+	public static final int STATUS_DELETE = 1;
+	public static final int STATUS_UNDELETE = 0;
+	
 	public static final String COLUMN_FIELD_IS_DELETE = "isDelete";
 
 	public Integer getIsDelete();

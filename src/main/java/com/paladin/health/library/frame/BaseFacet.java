@@ -1,6 +1,6 @@
 package com.paladin.health.library.frame;
 
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.health.library.Condition;
 import com.paladin.health.library.Relation;
 import com.paladin.health.library.RelationUtil;
@@ -26,7 +26,7 @@ public class BaseFacet implements Facet{
 		this.relation = relation;
 		this.itemValue = itemValue;
 		
-		this.content = relation.name() + StringParser.toString(itemValue);
+		this.content = relation.name() + StringUtil.toString(itemValue);
 	}
 
 	@Override

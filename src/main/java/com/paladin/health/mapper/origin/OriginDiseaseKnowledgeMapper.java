@@ -4,7 +4,7 @@ import com.paladin.health.model.origin.OriginDiseaseKnowledge;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface OriginDiseaseKnowledgeMapper extends CustomMapper<OriginDiseaseKnowledge>{
 	

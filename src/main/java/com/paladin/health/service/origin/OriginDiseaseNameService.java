@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.paladin.health.model.origin.OriginDiseaseName;
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryType;
@@ -15,9 +15,8 @@ import com.paladin.framework.core.ServiceSupport;
 public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> {
 
 	public OriginDiseaseName getDiseaseName(String diseaseKey) {
-		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE),
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, diseaseKey) });
+		List<OriginDiseaseName> names = searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE),
+				new Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, diseaseKey));
 
 		if (names == null || names.size() == 0) {
 			return null;
@@ -25,11 +24,10 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 
 		return names.get(0);
 	}
-	
+
 	public String getDiseaseByName(String diseaseName) {
-		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE),
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME, QueryType.EQUAL, diseaseName) });
+		List<OriginDiseaseName> names = searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE),
+				new Condition(OriginDiseaseName.COLUMN_FIELD_NAME, QueryType.EQUAL, diseaseName));
 
 		if (names == null || names.size() == 0) {
 			return null;
@@ -39,9 +37,8 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 	}
 
 	public OriginDiseaseName getSymptomName(String symptomKey) {
-		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM),
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, symptomKey) });
+		List<OriginDiseaseName> names = searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM),
+				new Condition(OriginDiseaseName.COLUMN_FIELD_NAME_KEY, QueryType.EQUAL, symptomKey));
 
 		if (names == null || names.size() == 0) {
 			return null;
@@ -49,11 +46,10 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 
 		return names.get(0);
 	}
-	
+
 	public String getSymptomByName(String symptomName) {
-		List<OriginDiseaseName> names = searchAll(new GeneralCriteriaBuilder.Condition[] {
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM),
-				new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_NAME, QueryType.EQUAL, symptomName) });
+		List<OriginDiseaseName> names = searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM),
+				new Condition(OriginDiseaseName.COLUMN_FIELD_NAME, QueryType.EQUAL, symptomName));
 
 		if (names == null || names.size() == 0) {
 			return null;
@@ -63,21 +59,19 @@ public class OriginDiseaseNameService extends ServiceSupport<OriginDiseaseName> 
 	}
 
 	public List<OriginDiseaseName> findAllDiseaseName() {
-		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE));
+		return searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE));
 	}
 
 	public PageResult<OriginDiseaseName> findPageDiseaseName(OffsetPage page) {
-		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE), page);
+		return searchPage(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_DISEASE), page);
 	}
 
 	public PageResult<OriginDiseaseName> findPageSymptomName(OffsetPage page) {
-		return searchPage(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM), page);
+		return searchPage(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM), page);
 	}
 
 	public List<OriginDiseaseName> findAllSymptomName() {
-		return searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM));
+		return searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, OriginDiseaseName.TYPE_SYMPTOM));
 	}
-
-	
 
 }

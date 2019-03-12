@@ -2,6 +2,8 @@ package com.paladin.data.controller.dto;
 
 import java.util.List;
 
+import com.paladin.data.model.build.DbBuildColumn;
+
 /**
  * @see com.paladin.data.generate.GenerateTableOption
  * @author TontoZhou
@@ -22,8 +24,10 @@ public class GenerateTableOptionDTO {
 	private String subModel;
 
 	private String projectPath;
+	
+	private String filePath;
 
-	private List<GenerateColumnOptionDTO> columnOptions;
+	private List<DbBuildColumn> columnBuildOptions;
 
 	public String getDbName() {
 		return dbName;
@@ -39,14 +43,6 @@ public class GenerateTableOptionDTO {
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
-	}
-
-	public List<GenerateColumnOptionDTO> getColumnOptions() {
-		return columnOptions;
-	}
-
-	public void setColumnOptions(List<GenerateColumnOptionDTO> columnOptions) {
-		this.columnOptions = columnOptions;
 	}
 
 	public String getModel() {
@@ -73,142 +69,6 @@ public class GenerateTableOptionDTO {
 		this.subModel = subModel;
 	}
 
-	/**
-	 * @see com.paladin.data.generate.GenerateColumnOption
-	 * @author TontoZhou
-	 * @since 2018年4月11日
-	 */
-	public static class GenerateColumnOptionDTO {
-
-		private String columnName;
-
-		/**
-		 * 标题
-		 */
-		private String title;
-
-		/**
-		 * 常量类型
-		 */
-		private String constantType;
-
-		/**
-		 * 必填
-		 */
-		private boolean required;
-		
-		/**
-		 * 是否列表显示
-		 */
-		private boolean tableable;
-
-		/**
-		 * 可编辑
-		 */
-		private boolean editable;
-
-		/**
-		 * 可新增
-		 */
-		private boolean addable;
-
-		/**
-		 * 最大长度
-		 */
-		private int maxLength;
-
-		/**
-		 * 正则表达式
-		 */
-		private String regularExpression;
-
-		/**
-		 * 正则类型，例如日期，邮箱，电话等
-		 */
-		private String regularType;
-
-		public String getTitle() {
-			return title;
-		}
-
-		public void setTitle(String title) {
-			this.title = title;
-		}
-
-		public boolean isRequired() {
-			return required;
-		}
-
-		public void setRequired(boolean required) {
-			this.required = required;
-		}
-
-		public boolean isEditable() {
-			return editable;
-		}
-
-		public void setEditable(boolean editable) {
-			this.editable = editable;
-		}
-
-		public boolean isAddable() {
-			return addable;
-		}
-
-		public void setAddable(boolean addable) {
-			this.addable = addable;
-		}
-
-		public int getMaxLength() {
-			return maxLength;
-		}
-
-		public void setMaxLength(int maxLength) {
-			this.maxLength = maxLength;
-		}
-
-		public String getRegularExpression() {
-			return regularExpression;
-		}
-
-		public void setRegularExpression(String regularExpression) {
-			this.regularExpression = regularExpression;
-		}
-
-		public String getRegularType() {
-			return regularType;
-		}
-
-		public void setRegularType(String regularType) {
-			this.regularType = regularType;
-		}
-
-		public String getColumnName() {
-			return columnName;
-		}
-
-		public void setColumnName(String columnName) {
-			this.columnName = columnName;
-		}
-
-		public String getConstantType() {
-			return constantType;
-		}
-
-		public void setConstantType(String constantType) {
-			this.constantType = constantType;
-		}
-
-		public boolean isTableable() {
-			return tableable;
-		}
-
-		public void setTableable(boolean tableable) {
-			this.tableable = tableable;
-		}
-
-	}
-
 	public String getProjectPath() {
 		return projectPath;
 	}
@@ -223,6 +83,22 @@ public class GenerateTableOptionDTO {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
+	public List<DbBuildColumn> getColumnBuildOptions() {
+		return columnBuildOptions;
+	}
+
+	public void setColumnBuildOptions(List<DbBuildColumn> columnBuildOptions) {
+		this.columnBuildOptions = columnBuildOptions;
 	}
 
 }

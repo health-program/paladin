@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Param;
 
 import com.paladin.common.model.org.OrgRolePermission;
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface OrgRolePermissionMapper extends CustomMapper<OrgRolePermission> {
 

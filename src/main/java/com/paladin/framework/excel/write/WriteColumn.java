@@ -88,7 +88,7 @@ public abstract class WriteColumn implements WriteComponent {
 	 * 
 	 * <h2>获取填入的值</h2>
 	 * <p>
-	 * 优先考虑{@link com.netmatch.tonto.excel.write.annotation.ValueFormator}
+	 * 优先考虑{@link com.paladin.tonto.excel.write.annotation.ValueFormator}
 	 * 实例的转化方法,该方法用于缺省情况下
 	 * </p>
 	 * 

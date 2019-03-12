@@ -7,6 +7,11 @@ body {
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
+pre {
+white-space: pre-wrap;
+word-wrap: break-word;
+}
+
 p,
 dd {
     line-height: 1.7
@@ -93,4 +98,13 @@ dd {
 
 .radio-label {
 	margin-right:10px;
+}
+
+.required-label{
+	color:red;
+	margin-right:2px;
+}
+
+.btn-back{
+	margin-bottom:40px;
 }

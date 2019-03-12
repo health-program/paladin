@@ -1,7 +1,5 @@
 package com.paladin.common.service.org.vo;
 
-import java.util.Date;
-
 public class OrgRoleVO {
 
 	// id
@@ -21,21 +19,6 @@ public class OrgRoleVO {
 
 	// 是否启用 1是0否
 	private Integer enable;
-
-	// 创建时间
-	private Date createTime;
-
-	// 创建人
-	private String createUserId;
-
-	// 更新时间
-	private Date updateTime;
-
-	// 更新人
-	private String updateUserId;
-
-	// 是否删除
-	private Integer isDelete;
 
 	public String getId() {
 		return id;
@@ -83,46 +66,6 @@ public class OrgRoleVO {
 
 	public void setEnable(Integer enable) {
 		this.enable = enable;
-	}
-
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdateUserId() {
-		return updateUserId;
-	}
-
-	public void setUpdateUserId(String updateUserId) {
-		this.updateUserId = updateUserId;
-	}
-
-	public Integer getIsDelete() {
-		return isDelete;
-	}
-
-	public void setIsDelete(Integer isDelete) {
-		this.isDelete = isDelete;
 	}
 
 }

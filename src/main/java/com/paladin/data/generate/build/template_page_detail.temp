@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="/health/header" />
+<head th:include="/${mainModel}/header" />
 
 <body>
     ${enumcodes}
@@ -14,8 +14,11 @@
     </section>
     <section class="content">
     </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+    	<a href="${indexUrl}" class="btn btn-primary btn-block">返回</a>
+    </div>
     <input type="hidden" id="id" th:value="${r'${id}'}"/>
-    <div th:include="/health/footer" />
+    <div th:include="/${mainModel}/footer" />
     <script type="text/javascript">
 
     $(function() {
@@ -31,7 +34,7 @@
             $(".content").html(html);
             var model = new tonto.Model("model", options.columns);
             model.setData(data);
-            $.initComponment();
+            $.initComponment($(".content"));
         });
     });
     </script>

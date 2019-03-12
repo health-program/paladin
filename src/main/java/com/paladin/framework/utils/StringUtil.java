@@ -1,5 +1,6 @@
 package com.paladin.framework.utils;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 
 public class StringUtil {
@@ -49,15 +50,48 @@ public class StringUtil {
 		return ((st > 0) || (len < val.length)) ? str.substring(st, len) : str;
 	}
 
+	/**
+	 * 拼接成字符串
+	 * @param coll
+	 * @return
+	 */
 	public static String splitString(Collection<?> coll) {
 		return splitString(coll, ",");
 	}
 
+	/**
+	 * 拼接成字符串
+	 * @param coll
+	 * @param separator 分隔符
+	 * @return
+	 */
 	public static String splitString(Collection<?> coll, String separator) {
 		StringBuilder sb = new StringBuilder();
 		for (Object obj : coll) {
 			sb.append(obj.toString()).append(separator);
 		}
 		return sb.toString();
+	}
+	
+	/**
+	 * 转为字符串
+	 * @param obj
+	 * @return
+	 */
+	public static String toString(Object obj) {
+		if (obj == null)
+			return "null";
+
+		if (obj.getClass().isArray()) {
+			int size = Array.getLength(obj);
+			StringBuilder sb = new StringBuilder("[");
+			for (int i = 0; i < size; i++)
+				sb.append(toString(Array.get(obj, i))).append(",");
+			if (size > 0)
+				sb.deleteCharAt(sb.length() - 1);
+			return sb.append("]").toString();
+		}
+
+		return obj.toString();
 	}
 }

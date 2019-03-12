@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.regex.Matcher;
 
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.framework.utils.reflect.PathGetter;
 
 
@@ -56,7 +56,7 @@ public class ComplexObjectMessageTemplate extends ObjectMessageTemplate{
 				matcher.find();
 				Object value = PathGetter.get(obj, name);
 				if (value != null) {
-					sb.append(msg, i, matcher.start()).append(StringParser.toString(value));
+					sb.append(msg, i, matcher.start()).append(StringUtil.toString(value));
 					i = matcher.end();
 				} else {
 					sb.append(msg, i, matcher.end());

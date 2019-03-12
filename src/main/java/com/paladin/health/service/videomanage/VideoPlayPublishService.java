@@ -39,7 +39,7 @@ public class VideoPlayPublishService extends ServiceSupport<VideoPlayPublish> {
 		videoPlayPublish.setYear(calendar.get(Calendar.YEAR));
 		videoPlayPublish.setMonth(calendar.get(Calendar.MONTH));
 		videoPlayPublish.setDay(calendar.get(Calendar.DAY_OF_MONTH));
-		return videoPlayPublishMapper.insert(videoPlayPublish);
+		return save(videoPlayPublish);
 	}
 	
 	public List<VideoPlayPublishVO> getStatistics(VideoPlayPublishDTO videoPlayPublishDTO){

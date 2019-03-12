@@ -5,6 +5,8 @@ import javax.persistence.Id;
 
 public class OrgPermission extends UnDeleteBaseModel {
 
+	public static final String COLUMN_FIELD_GRANTABLE = "grantable";
+	
 	// id
 	@Id
 	private String id;
@@ -12,11 +14,9 @@ public class OrgPermission extends UnDeleteBaseModel {
 	// 权限名称
 	private String name;
 
-	// 表现形式1：URL2：CODE
-	private Integer expressionType;
+	private String url;
 
-	// 表现内容
-	private String expressionContent;
+	private String code;
 
 	// 是否菜单
 	private Integer isMenu;
@@ -35,6 +35,9 @@ public class OrgPermission extends UnDeleteBaseModel {
 
 	// 是否系统管理员权限
 	private Integer isAdmin;
+	
+	// 是否可授权
+	private Integer grantable;
 
 	public String getId() {
 		return id;
@@ -50,22 +53,6 @@ public class OrgPermission extends UnDeleteBaseModel {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public Integer getExpressionType() {
-		return expressionType;
-	}
-
-	public void setExpressionType(Integer expressionType) {
-		this.expressionType = expressionType;
-	}
-
-	public String getExpressionContent() {
-		return expressionContent;
-	}
-
-	public void setExpressionContent(String expressionContent) {
-		this.expressionContent = expressionContent;
 	}
 
 	public Integer getIsMenu() {
@@ -114,6 +101,30 @@ public class OrgPermission extends UnDeleteBaseModel {
 
 	public void setIsAdmin(Integer isAdmin) {
 		this.isAdmin = isAdmin;
+	}
+
+	public Integer getGrantable() {
+		return grantable;
+	}
+
+	public void setGrantable(Integer grantable) {
+		this.grantable = grantable;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
 	}
 
 	

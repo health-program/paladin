@@ -12,7 +12,7 @@ import com.chenlb.mmseg4j.Dictionary;
 import com.chenlb.mmseg4j.MMSeg;
 import com.chenlb.mmseg4j.Seg;
 import com.chenlb.mmseg4j.Word;
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 
 public class Tokenizer {
 
@@ -69,10 +69,11 @@ public class Tokenizer {
 		String str = "我在昆山上班";
 		List<String> result = t.segWords(str);
 		HashSet<String> set = new HashSet<>();
-		
-		for(String s : result) set.add(s);
-		
-		System.out.println(StringParser.toString(set));
+
+		for (String s : result)
+			set.add(s);
+
+		System.out.println(StringUtil.toString(set));
 
 	}
 

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.health.data.parser.DietPageParser;
 import com.paladin.health.data.parser.DietPageParser.DietElement;
@@ -36,7 +36,7 @@ public class OriginDiseaseDietReader {
 	public void readDiseaseDiet() {
 
 		final List<OriginDiseaseName> names = diseaseNameService
-				.searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, 1));
+				.searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, 1));
 
 		int count = names.size();
 		int i = 0;

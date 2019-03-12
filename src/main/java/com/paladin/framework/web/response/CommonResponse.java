@@ -1,5 +1,8 @@
 package com.paladin.framework.web.response;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CommonResponse {
 
 	private int status;
@@ -17,6 +20,17 @@ public class CommonResponse {
 		this.status = status;
 		this.result = result;
 		this.message = msg;
+	}
+
+	public Map<String, Object> toMap() {
+		return toMap(new HashMap<String, Object>());
+	}
+
+	public Map<String, Object> toMap(Map<String, Object> map) {
+		map.put("status", status);
+		map.put("message", message);
+		map.put("result", result);
+		return map;
 	}
 
 	public String getMessage() {

@@ -20,8 +20,11 @@ import java.util.Set;
 import com.paladin.data.generate.GenerateColumnOption;
 import com.paladin.data.generate.GenerateEnvironment;
 import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.model.build.DbBuildColumn;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
+
+import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 
 @Component
 public class ModelClassBuilder extends SpringBootClassBuilder {
@@ -124,6 +127,10 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 
 			if (!clazz.isPrimitive() && !clazz.getName().matches("^java.lang.[^.]"))
 				importClassSet.add(clazz);
+
+			if (judgeLargeText(columnOption.getBuildColumnOption())) {
+				importClassSet.add(IgnoreInMultipleResult.class);
+			}
 		}
 
 		String tab = "\t";
@@ -158,6 +165,10 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 
 			if (columnOption.isPrimary()) {
 				sb.append(tab).append("@Id").append("\n");
+			}
+
+			if (judgeLargeText(columnOption.getBuildColumnOption())) {
+				sb.append(tab).append("@IgnoreInMultipleResult").append("\n");
 			}
 
 			sb.append(tab).append("private ").append(columnOption.getFieldType().getSimpleName()).append(" ").append(columnOption.getFieldName())
@@ -196,6 +207,13 @@ public class ModelClassBuilder extends SpringBootClassBuilder {
 	@Override
 	public String getClassName(GenerateTableOption tableOption) {
 		return tableOption.getModelName();
+	}
+
+	private boolean judgeLargeText(DbBuildColumn dbBuildColumn) {
+		if (dbBuildColumn == null)
+			return false;
+		Integer i = dbBuildColumn.getLargeText();
+		return i != null && i == 1;
 	}
 
 }

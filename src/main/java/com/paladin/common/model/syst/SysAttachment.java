@@ -11,6 +11,7 @@ public class SysAttachment {
 
 	public static final String COLUMN_FIELD_ID = "id";
 	public static final String COLUMN_FIELD_USER_TYPE = "userType";
+	
 	@Id
 	private String id;
 	
@@ -25,6 +26,8 @@ public class SysAttachment {
 	private Long size;
 
 	private String pelativePath;
+	
+	private String thumbnailPelativePath;
 	
 	private Date createTime;
 
@@ -92,6 +95,14 @@ public class SysAttachment {
 
 	public void setUseType(Integer useType) {
 		this.useType = useType;
+	}
+
+	public String getThumbnailPelativePath() {
+		return thumbnailPelativePath;
+	}
+
+	public void setThumbnailPelativePath(String thumbnailPelativePath) {
+		this.thumbnailPelativePath = thumbnailPelativePath;
 	}
 
 }

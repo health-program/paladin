@@ -4,10 +4,6 @@ import java.util.Date;
 
 import javax.persistence.OrderBy;
 
-import com.paladin.health.model.org.OrgUser;
-
-import tk.mybatis.mapper.annotation.ColumnType;
-
 public abstract class BaseModel {
 	
 	public final static String COLUMN_FIELD_CREATE_TIME = "createTime";
@@ -19,12 +15,10 @@ public abstract class BaseModel {
 	@OrderBy("DESC")
 	private Date createTime;
 
-	@ColumnType(foreignClass = OrgUser.class)
     private String createUserId;
 
     private Date updateTime;
     
-	@ColumnType(foreignClass = OrgUser.class)
     private String updateUserId;
 
 	public Date getCreateTime() {

@@ -24,7 +24,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeException;
 import org.apache.ibatis.type.TypeHandler;
 
-import com.paladin.framework.mybatis.CustomJoinMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomJoinMapper;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 import tk.mybatis.mapper.MapperException;

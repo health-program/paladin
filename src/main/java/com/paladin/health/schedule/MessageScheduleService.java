@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
-import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
 import com.paladin.health.model.publicity.PublicityMessage;
 import com.paladin.health.model.publicity.PublicityMessagePush;
 import com.paladin.health.service.publicity.PublicityMessagePushService;
@@ -64,6 +64,8 @@ public class MessageScheduleService {
 			int result = 0;
 
 			int channel = messagePush.getChannel();
+			
+			// TODO 发送信息
 //			if (channel == PublicityMessagePush.CHANNEL_APP) {
 //				logger.info("发送消息给APP[" + id + "]");
 //				result = PublicityMessagePush.STATUS_SEND_SUCCESS;

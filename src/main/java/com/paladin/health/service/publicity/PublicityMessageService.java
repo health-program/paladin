@@ -126,7 +126,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 */
 	public boolean removeMessage(String id) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
-		if (session.isSystemAdmin()) {
+		if (session.isAdminRoleLevel()) {
 			return removeByPrimaryKey(id) > 0;
 		}
 
@@ -137,7 +137,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 		Integer status = message.getStatus();
 		if (status == PublicityMessage.STATUS_EXAMINE_FAIL || status == PublicityMessage.STATUS_TEMP) {
-			if (session.getUserId().equals(message.getCreateUserId()) || session.isAdminDataLevel()) {
+			if (session.getUserId().equals(message.getCreateUserId())) {
 				return removeByPrimaryKey(id) > 0;
 			} else {
 				throw new BusinessException("您不能删除别人的公告信息");
@@ -165,7 +165,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 */
 	public PageResult<PublicityMessageVO> findSelfMessage(PublicityMessageQueryDTO query) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
-		if (!session.isAdminDataLevel()) {
+		if (!session.isAdminRoleLevel()) {
 			if (query != null) {
 				query = new PublicityMessageQueryDTO();
 			}
@@ -174,7 +174,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 		return findMessage(query);
 	}
-	
+
 	/**
 	 * 对外展示的信息列表
 	 * 
@@ -185,6 +185,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 		return findPublishedMessage(query);
 	}
+
 	/**
 	 * 
 	 * 分页查询
@@ -211,7 +212,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		publicityMessageMapper.findPublishedMessage(query);
 		return new PageResult<>(page);
 	}
-	
+
 	/**
 	 * 查询信息
 	 * 
@@ -224,5 +225,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return new PageResult<>(page);
 	}
 
-    public List<PublicityMessageVO> showDisplayMessage() { return publicityMessageMapper.findDisplay(); }
+	public List<PublicityMessageVO> showDisplayMessage() {
+		return publicityMessageMapper.findDisplay();
+	}
 }

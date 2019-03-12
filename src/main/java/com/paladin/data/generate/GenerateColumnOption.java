@@ -3,7 +3,7 @@ package com.paladin.data.generate;
 import com.paladin.data.database.DataBaseType;
 import com.paladin.data.database.DataTypeUtil;
 import com.paladin.data.database.model.Column;
-import com.paladin.framework.common.QueryType;
+import com.paladin.data.model.build.DbBuildColumn;
 import com.paladin.framework.utils.reflect.NameUtil;
 
 public class GenerateColumnOption {
@@ -39,59 +39,9 @@ public class GenerateColumnOption {
 	private String fieldName;
 
 	/**
-	 * 标题
+	 * 构建列配置
 	 */
-	private String title;
-	
-	/**
-	 * 是否列表显示
-	 */
-	private boolean tableable;
-
-	/**
-	 * 必填
-	 */
-	private boolean required;
-
-	/**
-	 * 可编辑
-	 */
-	private boolean editable;
-
-	/**
-	 * 可新增
-	 */
-	private boolean addable;
-
-	/**
-	 * 可查询
-	 */
-	private boolean queryable;
-
-	/**
-	 * 查询类型
-	 */
-	private QueryType queryType;
-
-	/**
-	 * 常量类型
-	 */
-	private String constantType;
-
-	/**
-	 * 最大长度
-	 */
-	private int maxLength;
-
-	/**
-	 * 正则表达式
-	 */
-	private String regularExpression;
-
-	/**
-	 * 正则类型，例如日期，邮箱，电话等
-	 */
-	private String regularType;
+	private DbBuildColumn buildColumnOption;
 
 	public GenerateColumnOption(Column column, DataBaseType dataBaseType) {
 		this.column = column;
@@ -99,16 +49,7 @@ public class GenerateColumnOption {
 		this.isPrimary = column.isPrimary();
 
 		this.fieldType = DataTypeUtil.getJavaType(column, dataBaseType);
-		this.fieldName = NameUtil.underline2hump(column.getName());
-
-		// this.regularType = GenerateEnvironment.getRegularType(fieldType);
-
-		if (fieldType == String.class) {
-			Integer length = column.getDataLength();
-			if (length != null) {
-				this.maxLength = length;
-			}
-		}
+		this.fieldName = NameUtil.underline2hump(column.getName());		
 	}
 
 	public Column getColumn() {
@@ -121,62 +62,6 @@ public class GenerateColumnOption {
 
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public boolean isRequired() {
-		return required;
-	}
-
-	public void setRequired(boolean required) {
-		this.required = required;
-	}
-
-	public boolean isEditable() {
-		return editable;
-	}
-
-	public void setEditable(boolean editable) {
-		this.editable = editable;
-	}
-
-	public boolean isAddable() {
-		return addable;
-	}
-
-	public void setAddable(boolean addable) {
-		this.addable = addable;
-	}
-
-	public int getMaxLength() {
-		return maxLength;
-	}
-
-	public void setMaxLength(int maxLength) {
-		this.maxLength = maxLength;
-	}
-
-	public String getRegularExpression() {
-		return regularExpression;
-	}
-
-	public void setRegularExpression(String regularExpression) {
-		this.regularExpression = regularExpression;
-	}
-
-	public String getRegularType() {
-		return regularType;
-	}
-
-	public void setRegularType(String regularType) {
-		this.regularType = regularType;
 	}
 
 	public DataBaseType getDataBaseType() {
@@ -203,44 +88,12 @@ public class GenerateColumnOption {
 		this.generatedType = generatedType;
 	}
 
-	public boolean isQueryable() {
-		return queryable;
+	public DbBuildColumn getBuildColumnOption() {
+		return buildColumnOption;
 	}
 
-	public void setQueryable(boolean queryable) {
-		this.queryable = queryable;
+	public void setBuildColumnOption(DbBuildColumn buildColumnOption) {
+		this.buildColumnOption = buildColumnOption;
 	}
-
-	public QueryType getQueryType() {
-		return queryType;
-	}
-
-	public void setQueryType(QueryType queryType) {
-		this.queryType = queryType;
-	}
-
-	/**
-	 * 是否常量
-	 * @return
-	 */
-	public boolean isConstant() {
-		return constantType != null && constantType.length() > 0;
-	}
-
-	public String getConstantType() {
-		return constantType;
-	}
-
-	public void setConstantType(String constantType) {
-		this.constantType = constantType;
-	}
-
-	public boolean isTableable() {
-		return tableable;
-	}
-
-	public void setTableable(boolean tableable) {
-		this.tableable = tableable;
-	}
-
+	
 }

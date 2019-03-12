@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import com.paladin.framework.core.VersionContainer;
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.health.core.factor.PeopleCondition;
 import com.paladin.health.core.factor.FactorAnalyzer.FactorResult;
 import com.paladin.health.model.prescription.PrescriptionFactor;
@@ -416,7 +416,7 @@ public class HealthPrescriptionContainer implements VersionContainer {
 
 				return new PrescriptionResult(prescriptions, factors, terminologies);
 			} catch (IOException e1) {
-				logger.error("搜索健康处方异常:" + StringParser.toString(args), e1);
+				logger.error("搜索健康处方异常:" + StringUtil.toString(args), e1);
 			}
 		}
 

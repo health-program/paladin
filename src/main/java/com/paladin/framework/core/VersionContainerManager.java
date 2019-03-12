@@ -12,9 +12,9 @@ import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.paladin.framework.core.configuration.CustomProperties;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 
@@ -23,11 +23,14 @@ public class VersionContainerManager implements SpringContainer {
 
 	private static Logger logger = LoggerFactory.getLogger(VersionContainerManager.class);
 
-	Map<String, VersionObject> versionObjectMap = new HashMap<>();
-	List<VersionObject> versionObjects = new ArrayList<>();
+	private Map<String, VersionObject> versionObjectMap = new HashMap<>();
+	private List<VersionObject> versionObjects = new ArrayList<>();
 
-	@Value("${container.version.run}")
-	private boolean doRun;
+	private CustomProperties customProperties;
+
+	public VersionContainerManager(CustomProperties customProperties) {
+		this.customProperties = customProperties;
+	}
 
 	private VersionContainerDAO versionContainerDAO;
 
@@ -39,9 +42,9 @@ public class VersionContainerManager implements SpringContainer {
 		manager = this;
 
 		Map<String, VersionContainer> versionContainerMap = SpringBeanHelper.getBeansByType(VersionContainer.class);
-		
+
 		// 尝试去spring寻找bean
-		if(versionContainerDAO == null) {
+		if (versionContainerDAO == null) {
 			versionContainerDAO = SpringBeanHelper.getFirstBeanByType(VersionContainerDAO.class);
 		}
 
@@ -70,7 +73,7 @@ public class VersionContainerManager implements SpringContainer {
 
 			checkVersion();
 
-			if (doRun) {
+			if (customProperties.isContainerVersionRun()) {
 				logger.info("===>启动版本容器管理定时任务<===");
 				startTimer();
 			}
@@ -88,7 +91,7 @@ public class VersionContainerManager implements SpringContainer {
 	public int order() {
 		return 0;
 	}
-	
+
 	/**
 	 * 检测版本
 	 */

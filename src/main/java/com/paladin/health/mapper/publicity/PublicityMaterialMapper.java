@@ -4,7 +4,7 @@ import java.util.List;
 import com.paladin.health.model.publicity.PublicityMaterial;
 import com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialVO;
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface PublicityMaterialMapper extends CustomMapper<PublicityMaterial>{
 	public List<PublicityMaterialVO> selectByQuery(PublicityMaterialQueryDTO query);

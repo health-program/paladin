@@ -4,7 +4,7 @@ import com.paladin.health.model.publicity.PublicityMessagePush;
 
 import java.util.List;
 
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface PublicityMessagePushMapper extends CustomMapper<PublicityMessagePush> {
 	/**

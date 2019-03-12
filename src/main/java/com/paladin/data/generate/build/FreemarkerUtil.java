@@ -11,7 +11,7 @@ public class FreemarkerUtil {
 
 	static {
 		templateConfig = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
-		templateConfig.setClassForTemplateLoading(FreemarkerUtil.class, "");
+		templateConfig.setClassForTemplateLoading(FreemarkerUtil.class, "/com/paladin/data/generate/build/");
 	}
 
 	public static Template getTemplate(String name) {

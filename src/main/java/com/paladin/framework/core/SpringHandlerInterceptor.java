@@ -37,7 +37,10 @@ public class SpringHandlerInterceptor implements HandlerInterceptor {
 
 			if (shell.queryMethod != null) {
 				QueryInputMethod queryMethod = shell.queryMethod;
-				modelAndView.addObject(queryMethod.viewName(), SecurityUtils.getSubject().getSession().getAttribute(queryMethod.queryClass().getName()));
+				Object object = SecurityUtils.getSubject().getSession().getAttribute(queryMethod.queryClass().getName());
+				if (object != null) {
+					modelAndView.addObject(queryMethod.viewName(), object);
+				}
 			}
 
 		}

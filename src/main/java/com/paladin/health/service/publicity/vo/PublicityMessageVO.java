@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.paladin.common.core.AttachmentContainer;
 import com.paladin.common.model.syst.SysAttachment;
-import com.paladin.framework.core.container.AttachmentContainer;
 import com.paladin.health.core.HealthPrescriptionContainer;
 import com.paladin.health.model.prescription.PrescriptionFactor;
 

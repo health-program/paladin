@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.ServiceSupportComplex;
-import com.paladin.framework.mybatis.CustomMapper;
-import com.paladin.framework.mybatis.CustomJoinMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomJoinMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
 /**
  * 
- * 业务支持类容器，启动时为{@link com.netmatch.service.ServiceSupport}自动注入SqlMapper
+ * 业务支持类容器，启动时为{@link com.paladin.service.ServiceSupport}自动注入SqlMapper
  * 
  * @author TontoZhou
  *
@@ -127,7 +127,7 @@ public class ServiceSupportConatiner implements SpringContainer {
 
 	@Override
 	public int order() {
-		return 0;
+		return -1;
 	}
 
 }

@@ -136,8 +136,7 @@ public abstract class CommonDataBase extends DataBaseSource {
 					ColumnConstraint columnConstraint;
 
 					if (type == ConstraintType.REFERENCE) {
-						columnConstraint = tableConstraint.addRefrencedConstraint(tableName, columnName, referencedTableName,
-								referencedColumnName);
+						columnConstraint = tableConstraint.addRefrencedConstraint(tableName, columnName, referencedTableName, referencedColumnName);
 					} else {
 						columnConstraint = tableConstraint.addConstraint(tableName, columnName);
 					}
@@ -195,7 +194,7 @@ public abstract class CommonDataBase extends DataBaseSource {
 					column.setNullable("YES".equals(nullable));
 					column.setDefaultValue(defaultValue);
 					column.setOrderIndex(orderIndex);
-					column.setComment(comment);				
+					column.setComment(comment);
 					column.setUnsigned(unsigned.contains("unsigned"));
 
 					if (extra != null) {
@@ -267,8 +266,7 @@ public abstract class CommonDataBase extends DataBaseSource {
 					ColumnConstraint columnConstraint;
 
 					if (type == ConstraintType.REFERENCE) {
-						columnConstraint = tableConstraint.addRefrencedConstraint(tableName, columnName, referencedTableName,
-								referencedColumnName);
+						columnConstraint = tableConstraint.addRefrencedConstraint(tableName, columnName, referencedTableName, referencedColumnName);
 					} else {
 						columnConstraint = tableConstraint.addConstraint(tableName, columnName);
 					}
@@ -316,16 +314,16 @@ public abstract class CommonDataBase extends DataBaseSource {
 				String url = config.getUrl();
 
 				int i = url.indexOf('?');
-				String s = "";
+				String s = url.substring(0, i);
 				if (i > 0)
-					s = url.substring(url.lastIndexOf('/') + 1, i);
+					s = s.substring(s.lastIndexOf('/') + 1, i);
 				else
-					s = url.substring(url.lastIndexOf('/') + 1);
+					s = s.substring(s.lastIndexOf('/') + 1);
 
 				dataBase = queryTableFromMySql(s);
 			} else {
 				// do not
-				throw new RuntimeException("Not support DataBase Type = ["+type+"] yet");
+				throw new RuntimeException("Not support DataBase Type = [" + type + "] yet");
 			}
 
 		} catch (SQLException e) {

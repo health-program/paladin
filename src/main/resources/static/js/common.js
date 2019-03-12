@@ -132,7 +132,7 @@
         successAlert: function(msg, fun, top) {
             $.doAlert(msg, 1, fun, top);
         },
-	warnAlert: function(msg, fun, top) {
+        warnAlert: function(msg, fun, top) {
             $.doAlert(msg, 3, fun, top);
         },
         failAlert: function(msg, fun, top) {
@@ -173,7 +173,7 @@
                 success: options.success
             });
 
-            layer.open(options);
+            return layer.open(options);
         },
         openUrlLayerOrLocate: function(url, options) {
             if (options && options.data) {
@@ -205,7 +205,7 @@
                 success: options.success
             })
 
-            layer.open(options);
+            return layer.open(options);
         },
         getOpenLayerSize: function(w, h) {
             w = w || 0.8;
@@ -241,9 +241,8 @@
             // 暂时跳转主页面到登录页面，有时间可以做弹出登录窗口登录，成功后继续执行ajax请求处理
 
             $.failAlert("请先登录", function() {
-                top.location.href = "/health/login";
+                top.location.href = "/hf/login";
             })
-
         },
         ajaxResponseCheck: function(response) {
             if (typeof response === 'string') {
@@ -528,8 +527,8 @@
     if (window.needInitComponet !== false) {
         $.initComponment();
     }
-
 })(jQuery);
+
 
 function _initCommon() {
 
@@ -619,6 +618,16 @@ function _initCommon() {
             //filterPlaceholder: '输入查询内容', // 没有查询条件时显示文本
         });
     });
+
+    // 搜索按钮回车
+    $('.tonto-btn-search').each(function() {
+        var a = $(this);
+        $(document).keyup(function(event) {
+            if (event.keyCode == 13) {
+                a.click();
+            }
+        });
+    })
 
     $.extend({
         createTreeSelectComponment: function(input, type) {
@@ -766,7 +775,6 @@ function _initCommon() {
             return com;
         }
     });
-
 }
 
 function _initValidator() {
@@ -966,13 +974,13 @@ function _initValidator() {
         },
         addRequiredStyle: function() {
             // 添加必填样式
-            var target = $(this);
-            var inputGroupParent = target.parent(".input-group");
-            if (inputGroupParent.length > 0) {
-                inputGroupParent.children(":last-child").css("border-right", "2px solid red");
-            } else {
-                target.css("border-right", "2px solid red");
-            }
+            // var target = $(this);
+            // var inputGroupParent = target.parent(".input-group");
+            // if (inputGroupParent.length > 0) {
+            //     inputGroupParent.children(":last-child").css("border-right", "2px solid red");
+            // } else {
+            //     target.css("border-right", "2px solid red");
+            // }
         },
         removeRequiredStyle: function() {
             // 移除必填样式
@@ -1066,7 +1074,7 @@ function _initTable() {
                             col.formatter = function(value, row, index) {
                                 return (value === true || value === "true") ? "是" : "否";
                             }
- 			} else if (col.formatter == 'identification') {
+                        } else if (col.formatter == 'identification') {
                             col.formatter = function(value, row, index) {
                                 if (value) {
                                     var l = value.length;
@@ -1096,17 +1104,26 @@ function _initTable() {
                                     return '<span class="label label-primary">不定等次</span>';
                                 }
                             }
-		    }
-	 }
+
+                        }
+
+
+                    }
 
                     // 枚举情况
                     if (col.enumcode && !col.formatter) {
                         col.formatter = $.getEnumColumnFormatter(window._constant_cache, col.enumcode);
                     }
-		    
-		    if (!col.align) {
+
+                    if (!col.align) {
                         col.align = "center";
                     }
+
+                    if (!col.valign) {
+                        col.valign = "middle";
+                    }
+
+
                 });
             });
         }
@@ -1121,6 +1138,11 @@ function _initTable() {
         }
 
         options = $.extend(selfOptions, options);
+        if (!options.pageSize || options.pageSize * 1 <= 0) {
+            options.pageSize = 10;
+        } else if (options.pageSize * 1 > 100) {
+            options.pageSize = 100;
+        }
 
         if (options.searchbar) {
             var q = options.queryParams;
@@ -1604,6 +1626,7 @@ function _initForm(container) {
             var formConfig = {
                 url: submitBtn.data('action') ? submitBtn.data('action') : form.attr('action'),
                 dataType: 'json',
+                type: 'post',
                 beforeSubmit: function(arr, $form, options) {
                     submitBtn.each(function() {
                         var that = $(this);
@@ -1636,16 +1659,27 @@ function _initForm(container) {
                     } else if (status.FAIL === resStatus) {
                         $.errorMessage(data.message || "操作失败");
                     } else if (status.FAIL_VALID === resStatus) {
-                        error = data.result;
-                        if ($.isArray(error)) {
+                        // $.errorMessage(data.message || "数据验证异常");
+                        var errorHtml, error = data.result;
+                        if (!data.message && $.isArray(error)) {
+                            var errorHtml = "<ul>数据验证失败："
                             error.forEach(function(item) {
                                 var el = item[1];
                                 var errorMsg = item[2];
-                                form.find("#" + el + ",[name='" + el + "']").each(function() {
-                                    layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
-                                });
+
+                                // 存在可能对不上input输入框，加上存在前端验证保证大部分情况正确，所以这里才有用户体验稍差的方式
+                                // form.find("#" + el + ",[name='" + el + "']").each(function() {
+                                //     layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
+                                // });
+
+                                errorHtml += "<li>" + errorMsg + "</li>";
                             });
+                            errorHtml += "</ul>"
+                        } else {
+                            errorHtml = data.message || error || "数据验证异常";
                         }
+
+                        $.errorAlert(errorHtml);
                     } else if (status.SUCCESS === resStatus) {
                         var handler = formConfig.successCallback || form[0].submitSuccessHandler || form.data("submitSuccessHandler");
                         if (handler) {
@@ -1750,7 +1784,7 @@ function _initAttachment() {
 
 // ------------------------------------------
 //
-// 页面处理
+// HANGFENG 特有
 //
 // -----------------------------------------
 

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
@@ -54,7 +54,7 @@ public class OriginDiseaseSummaryReader {
 		logger.info("开始读取疾病简介数据");
 
 		final List<OriginDiseaseName> names = diseaseNameService
-				.searchAll(new GeneralCriteriaBuilder.Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, 1));
+				.searchAll(new Condition(OriginDiseaseName.COLUMN_FIELD_TYPE, QueryType.EQUAL, 1));
 
 		int count = names.size();
 		int i = 0;

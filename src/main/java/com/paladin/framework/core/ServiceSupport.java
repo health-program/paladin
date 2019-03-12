@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.BaseModel;
 import com.paladin.framework.common.CommonCondition;
 import com.paladin.framework.common.CommonConditions;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.GeneralCriteriaBuilder;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.OrderType;
@@ -22,8 +23,9 @@ import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryOrderBy;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.common.UnDelete;
-import com.paladin.framework.common.GeneralCriteriaBuilder.Condition;
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
+import com.paladin.framework.core.exception.SystemException;
+import com.paladin.framework.core.session.UserSession;
 import com.paladin.framework.utils.ParseUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
@@ -38,7 +40,7 @@ import tk.mybatis.mapper.mapperhelper.EntityHelper;
  * 提供一些简单业务方法
  * </p>
  * <p>
- * 通过{@link com.netmatch.core.conatiner.ServiceSupportConatiner}自动注册sqlMapper
+ * 通过{@link com.paladin.core.conatiner.ServiceSupportConatiner}自动注册sqlMapper
  * </p>
  * 
  * @author TontoZhou
@@ -60,8 +62,6 @@ public abstract class ServiceSupport<Model> {
 		}
 		modelType = (Class<Model>) clazz;
 	}
-
-	protected static int maxPageSize = 100; // 最大分页大小，防止恶意分页
 
 	// -------------------------- 初始化配置 --------------------------
 
@@ -223,6 +223,7 @@ public abstract class ServiceSupport<Model> {
 
 	/**
 	 * 获取主键
+	 * 
 	 * @param model
 	 * @return
 	 */
@@ -452,8 +453,8 @@ public abstract class ServiceSupport<Model> {
 	 * @return
 	 */
 	public PageResult<Model> findPage(int offset, int limit, boolean simple) {
-		if (limit > maxPageSize) {
-			limit = maxPageSize;
+		if (limit > OffsetPage.MAX_LIMIT) {
+			limit = OffsetPage.MAX_LIMIT;
 		}
 
 		Page<Model> page = PageHelper.offsetPage(offset, limit);
@@ -466,6 +467,16 @@ public abstract class ServiceSupport<Model> {
 		} finally {
 			PageHelper.clearPage();
 		}
+	}
+
+	/**
+	 * 条件过滤查询(非简单模式)
+	 * 
+	 * @param conditions
+	 * @return
+	 */
+	public List<Model> searchAll(Condition... conditions) {
+		return searchAll(conditions, false);
 	}
 
 	/**
@@ -542,14 +553,38 @@ public abstract class ServiceSupport<Model> {
 				example = buildDynamicCondition(example);
 			}
 
-			example = buildOrderBy(example);
 		}
+
+		example = buildOrderBy(example);
 
 		if (example == null) {
 			return getSqlMapper().selectAll();
 		} else {
 			return getSqlMapper().selectByExample(example);
 		}
+	}
+
+	/**
+	 * 条件过滤分页查询（非简单模式）
+	 * 
+	 * @param offset
+	 * @param limit
+	 * @param conditions
+	 * @return
+	 */
+	public PageResult<Model> searchPage(int offset, int limit, Condition... conditions) {
+		return searchPage(conditions, offset, limit, false);
+	}
+
+	/**
+	 * 条件过滤分页查询（非简单模式）
+	 * 
+	 * @param page
+	 * @param conditions
+	 * @return
+	 */
+	public PageResult<Model> searchPage(OffsetPage page, Condition... conditions) {
+		return searchPage(conditions, page.getOffset(), page.getLimit(), false);
 	}
 
 	/**
@@ -616,8 +651,8 @@ public abstract class ServiceSupport<Model> {
 	 * @return
 	 */
 	public PageResult<Model> searchPage(Object searchParam, int offset, int limit, boolean simple) {
-		if (limit > maxPageSize) {
-			limit = maxPageSize;
+		if (limit > OffsetPage.MAX_LIMIT) {
+			limit = OffsetPage.MAX_LIMIT;
 		}
 
 		Page<Model> page = PageHelper.offsetPage(offset, limit);
@@ -642,10 +677,87 @@ public abstract class ServiceSupport<Model> {
 		int limit = query.getLimit();
 		int offset = query.getOffset();
 
-		if (limit > maxPageSize) {
-			limit = maxPageSize;
+		if (limit > OffsetPage.MAX_LIMIT) {
+			limit = OffsetPage.MAX_LIMIT;
 		}
 		return PageHelper.offsetPage(offset, limit);
+	}
+
+	/**
+	 * 查询记录数
+	 * 
+	 * @param searchParam
+	 * @return
+	 */
+	public int searchAllCount(Object searchParam) {
+		return searchAllCount(searchParam, false);
+	}
+
+	/**
+	 * 查询记录数
+	 * 
+	 * @param searchParam
+	 * @param simple
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public int searchAllCount(Object searchParam, boolean simple) {
+
+		Example example = null;
+
+		if (searchParam instanceof Example) {
+
+			example = (Example) searchParam;
+
+		} else if (searchParam instanceof Condition) {
+
+			Condition condition = (Condition) searchParam;
+			example = GeneralCriteriaBuilder.buildAnd(modelType, condition);
+
+		} else {
+
+			Class<?> clazz = searchParam.getClass();
+
+			if (List.class.isAssignableFrom(clazz)) {
+				List<Condition> list = (List<Condition>) searchParam;
+				/*
+				 * 对于list，array暂时只处理Condition情况，对于其他多条件传入日后补充
+				 */
+				example = GeneralCriteriaBuilder.buildAnd(modelType, list);
+			} else if (clazz.isArray()) {
+				Condition[] array = (Condition[]) searchParam;
+				example = GeneralCriteriaBuilder.buildAnd(modelType, Arrays.asList(array));
+			} else {
+				example = GeneralCriteriaBuilder.buildQuery(modelType, searchParam);
+			}
+		}
+
+		// 如果是简单模式，则不考虑通用条件和动态条件
+		if (!simple) {
+
+			if (hasCommonCondition) {
+
+				if (example != null) {
+					example = GeneralCriteriaBuilder.buildAnd(example, commonConditions);
+				}
+
+				if (hasDynamicCondition) {
+					example = buildDynamicCondition(example);
+				} else {
+					if (example == null) {
+						return getSqlMapper().selectCountByExample(commonExample);
+					}
+				}
+			} else if (hasDynamicCondition) {
+				example = buildDynamicCondition(example);
+			}
+		}
+
+		if (example == null) {
+			example = new Example(modelType);
+		}
+
+		return getSqlMapper().selectCountByExample(example);
 	}
 
 	// -----------------------------------------------------
@@ -680,7 +792,7 @@ public abstract class ServiceSupport<Model> {
 		if (isUnDelete) {
 			Model model = getSqlMapper().selectByPrimaryKey(pk);
 			if (model != null) {
-				((UnDelete) model).setIsDelete(1);
+				((UnDelete) model).setIsDelete(UnDelete.STATUS_DELETE);
 				updateModelWrap(model);
 				return getSqlMapper().updateByPrimaryKey(model);
 			}
@@ -688,6 +800,95 @@ public abstract class ServiceSupport<Model> {
 		}
 
 		return getSqlMapper().deleteByPrimaryKey(pk);
+	}
+
+	/**
+	 * 根据条件删除
+	 * 
+	 * @param conditions
+	 * @return
+	 */
+	public int removeByCondition(Condition... conditions) {
+		return removeByExample(conditions, false);
+	}
+
+	/**
+	 * 根据条件删除
+	 * 
+	 * @param searchParam
+	 * @return
+	 */
+	public int removeByExample(Object searchParam) {
+		return removeByExample(searchParam, false);
+	}
+
+	/**
+	 * 根据条件删除
+	 * 
+	 * @param searchParam
+	 *            <ul>
+	 *            <li>{@link Condition}单个条件或者它的数组和集合</li>
+	 *            <li>基于注解和{@link GeneralCriteriaBuilder}的查询类实例</li>
+	 *            </ul>
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public int removeByExample(Object searchParam, boolean simple) {
+		Example example = null;
+
+		if (searchParam instanceof Example) {
+			example = (Example) searchParam;
+		} else if (searchParam instanceof Condition) {
+			Condition condition = (Condition) searchParam;
+			example = GeneralCriteriaBuilder.buildAnd(modelType, condition);
+		} else {
+			Class<?> clazz = searchParam.getClass();
+
+			if (List.class.isAssignableFrom(clazz)) {
+				List<Condition> list = (List<Condition>) searchParam;
+				/*
+				 * 对于list，array暂时只处理Condition情况，对于其他多条件传入日后补充
+				 */
+				example = GeneralCriteriaBuilder.buildAnd(modelType, list);
+			} else if (clazz.isArray()) {
+				Condition[] array = (Condition[]) searchParam;
+				example = GeneralCriteriaBuilder.buildAnd(modelType, Arrays.asList(array));
+			} else {
+				example = GeneralCriteriaBuilder.buildQuery(modelType, searchParam);
+			}
+		}
+
+		// 如果是简单模式，则不考虑通用条件和动态条件
+		if (!simple) {
+			if (hasCommonCondition) {
+				if (example != null) {
+					example = GeneralCriteriaBuilder.buildAnd(example, commonConditions);
+				}
+
+				if (hasDynamicCondition) {
+					example = buildDynamicCondition(example);
+				} else {
+					if (example == null) {
+						return getSqlMapper().selectCountByExample(commonExample);
+					}
+				}
+			} else if (hasDynamicCondition) {
+				example = buildDynamicCondition(example);
+			}
+		}
+
+		if (isUnDelete) {
+			try {
+				Model model = modelType.newInstance();
+				((UnDelete) model).setIsDelete(UnDelete.STATUS_DELETE);
+				updateModelWrap(model);
+				return getSqlMapper().updateByExampleSelective(model, example);
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new SystemException("该model无法创建默认实体，没法兼容该方法");
+			}
+		} else {
+			return getSqlMapper().deleteByExample(example);
+		}
 	}
 
 	/**
@@ -733,6 +934,11 @@ public abstract class ServiceSupport<Model> {
 		Page page = new Page(offsetPage.getOffset(), offsetPage.getLimit());
 		page.setTotal(0L);
 		return new PageResult(page);
+	}
+
+	public <T> PageResult<T> getEmptyPageResult(Page<T> page) {
+		page.setTotal(0L);
+		return new PageResult<T>(page);
 	}
 
 }

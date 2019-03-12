@@ -5,7 +5,7 @@ package com.paladin.framework.core.exception;
  * @author TontZhou
  *
  */
-public class BusinessException extends RollbackException{
+public class BusinessException extends RuntimeException{
 
 	private static final long serialVersionUID = -8265596521676533679L;
 	

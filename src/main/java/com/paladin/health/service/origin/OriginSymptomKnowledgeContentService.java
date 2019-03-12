@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.paladin.health.model.origin.OriginSymptomKnowledgeContent;
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 
@@ -15,11 +15,11 @@ public class OriginSymptomKnowledgeContentService extends ServiceSupport<OriginS
 	
 	
 	public List<OriginSymptomKnowledgeContent> findKnowledgeContent(String knowledgeId) {
-		return searchAll(new GeneralCriteriaBuilder.Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_KNOWLEDGE_ID, QueryType.EQUAL, knowledgeId));
+		return searchAll(new Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_KNOWLEDGE_ID, QueryType.EQUAL, knowledgeId));
 	}
 
 	public List<OriginSymptomKnowledgeContent> findSymptomContent(String symptomKey) {
-		return searchAll(new GeneralCriteriaBuilder.Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_SYMPTOM_KEY, QueryType.EQUAL, symptomKey));
+		return searchAll(new Condition(OriginSymptomKnowledgeContent.COLUMN_FIELD_SYMPTOM_KEY, QueryType.EQUAL, symptomKey));
 	}
 
 	public String findRelatedDisease(String[] symptomKeys) {

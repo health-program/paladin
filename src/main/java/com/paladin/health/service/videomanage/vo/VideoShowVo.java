@@ -2,7 +2,8 @@ package com.paladin.health.service.videomanage.vo;
 
 import java.util.Date;
 
-import com.paladin.framework.core.container.AttachmentContainer;
+import com.paladin.common.core.AttachmentContainer;
+
 
 /**
  * <>

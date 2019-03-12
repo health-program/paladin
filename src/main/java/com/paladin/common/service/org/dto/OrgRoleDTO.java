@@ -1,11 +1,14 @@
 package com.paladin.common.service.org.dto;
 
+import javax.validation.constraints.NotEmpty;
+
 public class OrgRoleDTO {
 
 	// id
 	private String id;
 
 	// 角色名称
+	@NotEmpty(message = "角色名称不能为空")
 	private String roleName;
 
 	// 角色等级（考核权限等级）
@@ -13,9 +16,6 @@ public class OrgRoleDTO {
 
 	// 角色说明
 	private String roleDesc;
-
-	// 是否默认角色（1是0否）
-	private Integer isDefault;
 
 	// 是否启用 1是0否
 	private Integer enable;
@@ -52,14 +52,6 @@ public class OrgRoleDTO {
 		this.roleDesc = roleDesc;
 	}
 
-	public Integer getIsDefault() {
-		return isDefault;
-	}
-
-	public void setIsDefault(Integer isDefault) {
-		this.isDefault = isDefault;
-	}
-
 	public Integer getEnable() {
 		return enable;
 	}
@@ -67,6 +59,5 @@ public class OrgRoleDTO {
 	public void setEnable(Integer enable) {
 		this.enable = enable;
 	}
-
 
 }

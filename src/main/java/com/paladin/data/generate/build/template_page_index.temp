@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="/health/header" />
+<head th:include="/${mainModel}/header" />
 
 <body>
     ${enumcodes}
@@ -44,7 +44,7 @@
             </div>
         </div>
     </section>
-    <div th:include="/health/footer" />
+    <div th:include="/${mainModel}/footer" />
     <script type="text/javascript">
     var table;
     $(function() {

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.health.data.parser.knowledge.ArticleElement;
 import com.paladin.health.data.parser.knowledge.ArticleElement.ElementType;
@@ -139,9 +139,7 @@ public class OriginSymptomKnowledgeReader {
 			String symptomName = name.getName();
 
 			if (symptomKnowledgeService
-					.searchAll(new GeneralCriteriaBuilder.Condition[] { new GeneralCriteriaBuilder.Condition("symptomKey", QueryType.EQUAL, symptom),
-							new GeneralCriteriaBuilder.Condition("categoryKey", QueryType.EQUAL, categoryKey) })
-					.size() > 0) {
+					.searchAll(new Condition("symptomKey", QueryType.EQUAL, symptom), new Condition("categoryKey", QueryType.EQUAL, categoryKey)).size() > 0) {
 				logger.info("已经存在数据[" + symptomName + ":" + symptom + "][类型:" + categoryKey + "]");
 				continue;
 			}
@@ -207,7 +205,7 @@ public class OriginSymptomKnowledgeReader {
 			String symptom = name.getNameKey();
 			String symptomName = name.getName();
 
-			if (!isNew && symptomKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("symptomKey", QueryType.EQUAL, symptom)).size() > 0) {
+			if (!isNew && symptomKnowledgeService.searchAll(new Condition("symptomKey", QueryType.EQUAL, symptom)).size() > 0) {
 				continue;
 			} else {
 				isNew = true;
@@ -600,6 +598,5 @@ public class OriginSymptomKnowledgeReader {
 		}
 
 	}
-
 
 }

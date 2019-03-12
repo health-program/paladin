@@ -385,24 +385,5 @@ public class GeneralCriteriaBuilder {
 
 	}
 
-	/**
-	 * 简单查询条件描述
-	 * 
-	 * @author TontoZhou
-	 * @since 2018年1月18日
-	 */
-	public static class Condition {
-
-		String name;
-		Object value;
-		QueryType type;
-
-		public Condition(String name, QueryType type, Object value) {
-			this.name = name;
-			this.value = value;
-			this.type = type;
-		}
-
-	}
 
 }

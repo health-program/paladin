@@ -13,7 +13,7 @@ import com.paladin.framework.core.ServiceSupport;
 public class SysVisitCacheService extends ServiceSupport<SysVisitCache> {
 
 	@Autowired
-	SysVisitCacheMapper visitCacheMapper;
+	private SysVisitCacheMapper visitCacheMapper;
 
 	public int putCache(HttpServletRequest request, String key, String content) {
 

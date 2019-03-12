@@ -91,16 +91,17 @@ public class PublicityMessageController extends ControllerSupport {
 		return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(id));
 	}
 
-    /**
-     * 功能描述: <br>
-     * 〈发布信息前台展示页面〉
-     * @param id
-     * @param model
-     * @return  java.lang.Object
-     * @author  Huangguochen
-     * @date  2018/12/28
-     */
-    @RequestMapping("/display/index")
+	/**
+	 * 功能描述: <br>
+	 * 〈发布信息前台展示页面〉
+	 * 
+	 * @param id
+	 * @param model
+	 * @return java.lang.Object
+	 * @author Huangguochen
+	 * @date 2018/12/28
+	 */
+	@RequestMapping("/display/index")
 	public Object display(@RequestParam String id, Model model) {
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messages = publicityMessageService.showDisplayMessage();
@@ -116,7 +117,8 @@ public class PublicityMessageController extends ControllerSupport {
 					}
 				}
 			}
-		};
+		}
+		;
 		model.addAttribute("message", message);
 		model.addAttribute("preMessage", preMessage);
 		model.addAttribute("nextMessage", nextMessage);
@@ -159,23 +161,22 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/save")
 	@ResponseBody
 	public Object save(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,
-			@RequestParam(required = false) MultipartFile[] attachmentFiles,
-			@RequestParam(required = false) MultipartFile[] thumbnailImage) {
-		
+			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailImage) {
+
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-		
-		List<SysAttachment> thumbnail = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), thumbnailImage,true);
-		if (thumbnail != null && thumbnail.size() > 1) {
-			return CommonResponse.getErrorResponse("缩略图只能有一张");
+
+		if (thumbnailImage != null) {
+			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailImage, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
+			publicityMessage.setThumbnail(thumbnail.getId());
 		}
-		
-    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles,false);
+
+		List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles);
 		if (attachments != null && attachments.size() > 4) {
 			return CommonResponse.getErrorResponse("附件数量不能超过4张");
 		}
-		publicityMessage.setThumbnail(attachmentService.splicingAttachmentId(thumbnail));
+
 		publicityMessage.setAttachments(attachmentService.splicingAttachmentId(attachments));
 		return CommonResponse.getResponse(publicityMessageService.saveMessage(publicityMessage));
 	}
@@ -190,27 +191,27 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/update")
 	@ResponseBody
 	public Object update(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,
-			@RequestParam(required = false) MultipartFile[] attachmentFiles,
-			@RequestParam(required = false) MultipartFile[] thumbnailImage) {
+			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailImage) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-		List<SysAttachment> thumbnail = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), thumbnailImage,true);
-		if (thumbnail != null && thumbnail.size() > 1) {
-			return CommonResponse.getErrorResponse("缩略图只能有一张");
+
+		if (thumbnailImage != null) {
+			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailImage, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
+			publicityMessage.setThumbnail(thumbnail.getId());
 		}
-		
-    	List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles,false);
+
+		List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMessage.getAttachments(), attachmentFiles);
 		if (attachments != null && attachments.size() > 4) {
 			return CommonResponse.getErrorResponse("附件数量不能超过4张");
 		}
-		publicityMessage.setThumbnail(attachmentService.splicingAttachmentId(thumbnail));
 		publicityMessage.setAttachments(attachmentService.splicingAttachmentId(attachments));
-		if(publicityMessageService.updateMessage(publicityMessage)) {
+
+		if (publicityMessageService.updateMessage(publicityMessage)) {
 			return CommonResponse.getSuccessResponse(publicityMessageService.getMessage(publicityMessage.getId()));
 		} else {
 			return CommonResponse.getFailResponse();
-		}	
+		}
 	}
 
 	/**

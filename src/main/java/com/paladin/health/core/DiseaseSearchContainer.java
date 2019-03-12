@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 
 import com.paladin.framework.core.VersionContainer;
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.health.model.origin.OriginDiseaseName;
 import com.paladin.health.model.origin.OriginDiseaseTag;
 import com.paladin.health.service.origin.OriginDiseaseNameService;
@@ -167,7 +167,7 @@ public class DiseaseSearchContainer implements VersionContainer {
 
 			return new DiseaseSearchResult(result, topDocs.totalHits);
 		} catch (IOException e1) {
-			logger.error("搜索疾病异常:" + StringParser.toString(args), e1);
+			logger.error("搜索疾病异常:" + StringUtil.toString(args), e1);
 		}
 
 		return null;

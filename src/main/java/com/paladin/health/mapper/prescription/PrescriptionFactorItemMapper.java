@@ -4,7 +4,7 @@ import com.paladin.health.model.prescription.PrescriptionFactorItem;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface PrescriptionFactorItemMapper extends CustomMapper<PrescriptionFactorItem>{
 

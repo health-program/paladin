@@ -1,6 +1,6 @@
 package com.paladin.health.mapper.publicity;
 
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.health.model.publicity.PublicityMessage;
 import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMessageVO;

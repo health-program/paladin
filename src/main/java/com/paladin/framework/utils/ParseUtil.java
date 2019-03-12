@@ -15,11 +15,10 @@ import java.util.Map;
  */
 public class ParseUtil {
 
-
 	private static final SimpleDateFormat default_date_format = new SimpleDateFormat("yyyy-MM-dd");
 	private static final SimpleDateFormat default_date_time_format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private static final Map<String, Class<?>> primitives = new HashMap<String,Class<?>>(8);
+	private static final Map<String, Class<?>> primitives = new HashMap<String, Class<?>>(8);
 
 	static {
 		primitives.put("byte", Byte.TYPE);
@@ -39,23 +38,21 @@ public class ParseUtil {
 	 * @return
 	 */
 	public static Object parseString(String str, Class<?> type) {
-		
-		if (str == null || type == null)
+
+		if (str == null || str.length() == 0 || type == null)
 			return null;
-		
+
 		if (type == String.class) {
 			return str;
 		}
-		
-		if("".equals(str))
-			return null;
-	
+
 		if (type == Date.class) {
 
 			try {
 				long time = Long.parseLong(str);
 				return new Date(time);
 			} catch (Exception e) {
+
 			}
 
 			try {
@@ -68,11 +65,11 @@ public class ParseUtil {
 				}
 			}
 		}
-	
+
 		try {
-			
+
 			Class<?> newType = primitives.get(type.getSimpleName());
-			
+
 			if (newType != null) {
 				type = newType;
 			}
@@ -92,7 +89,7 @@ public class ParseUtil {
 			} else if (type == Character.class) {
 				return str.charAt(0);
 			} else if (type == BigDecimal.class) {
-				return new BigDecimal(str);		
+				return new BigDecimal(str);
 			}
 
 		} catch (Exception e) {
@@ -101,20 +98,18 @@ public class ParseUtil {
 
 		return null;
 	}
-	
+
 	public static String parse2String(Object value) {
-		
-		if(value == null)
+
+		if (value == null)
 			return null;
-		
-		if(value instanceof Date)
-		{
-			return default_date_time_format.format((Date)value);
+
+		if (value instanceof Date) {
+			return default_date_time_format.format((Date) value);
 		}
-		
+
 		return value.toString();
-		
+
 	}
-	
 
 }

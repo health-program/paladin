@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.paladin.common.core.permission.PermissionContainer;
 import com.paladin.common.mapper.org.OrgRolePermissionMapper;
 import com.paladin.common.model.org.OrgRolePermission;
 import com.paladin.framework.core.ServiceSupport;
@@ -31,6 +32,7 @@ public class OrgRolePermissionService extends ServiceSupport<OrgRolePermission> 
 			orgRolePermissionMapper.insertByBatch(roleId, permissionIds);
 		}
 
+		PermissionContainer.updateData();
 		return true;
 	}
 

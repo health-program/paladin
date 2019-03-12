@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.common.GeneralCriteriaBuilder;
+import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.QueryType;
 import com.paladin.health.data.parser.knowledge.ArticleElement;
 import com.paladin.health.data.parser.knowledge.ArticleElement.ElementType;
@@ -145,7 +145,7 @@ public class OriginDiseaseKnowledgeReader {
 			for (String[] category : categories) {
 				String categoryKey = category[0];
 
-				if (!isNew && diseaseKnowledgeService.searchAll(new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease)).size() > 0) {
+				if (!isNew && diseaseKnowledgeService.searchAll(new Condition("diseaseKey", QueryType.EQUAL, disease)).size() > 0) {
 					continue;
 				} else {
 					isNew = true;
@@ -280,9 +280,7 @@ public class OriginDiseaseKnowledgeReader {
 			String diseaseName = name.getName();
 
 			if (diseaseKnowledgeService
-					.searchAll(new GeneralCriteriaBuilder.Condition[] { new GeneralCriteriaBuilder.Condition("diseaseKey", QueryType.EQUAL, disease),
-							new GeneralCriteriaBuilder.Condition("categoryKey", QueryType.EQUAL, categoryKey) })
-					.size() > 0) {
+					.searchAll(new Condition("diseaseKey", QueryType.EQUAL, disease), new Condition("categoryKey", QueryType.EQUAL, categoryKey)).size() > 0) {
 				logger.info("已经存在数据[" + diseaseName + ":" + disease + "][类型:" + categoryKey + "]");
 				continue;
 			}
@@ -548,10 +546,10 @@ public class OriginDiseaseKnowledgeReader {
 			if (type == ElementType.TYPE_CONTENT) {
 				item.contents.add(element.getContent());
 			} else if (type == ElementType.TYPE_TITLE) {
-				
+
 				ArticleTitle title = element.getTitle();
 				int index = title.getIndex();
-				
+
 				if (ignoreError && item.isCategory && item.islink) {
 					title.setIndex(1);
 				} else {
@@ -791,6 +789,5 @@ public class OriginDiseaseKnowledgeReader {
 		}
 
 	}
-
 
 }

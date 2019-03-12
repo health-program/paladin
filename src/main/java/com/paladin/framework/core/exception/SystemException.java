@@ -5,7 +5,7 @@ package com.paladin.framework.core.exception;
  * @author TontZhou
  *
  */
-public class SystemException extends RollbackException{
+public class SystemException extends RuntimeException{
 	
 	private static final long serialVersionUID = 7388296648211140775L;
 
@@ -48,6 +48,7 @@ public class SystemException extends RollbackException{
 		this.errorCode = errorCode;
 	}
 
+	
 	public String getMessage() {
 		return "系统异常[代码：" + errorCode + "]";
 	}

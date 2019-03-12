@@ -8,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import com.paladin.framework.core.container.ConstantsContainer;
+import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.excel.ConvertException;
 import com.paladin.framework.excel.ICell;
 import com.paladin.framework.excel.PropertyValidate;
 import com.paladin.framework.excel.Validate;
-import com.paladin.framework.utils.StringParser;
+import com.paladin.framework.utils.StringUtil;
 import com.paladin.framework.utils.reflect.Entity;
 import com.paladin.framework.utils.reflect.EntityField;
 import com.paladin.framework.utils.validate.ValidateUtil;
@@ -76,7 +76,7 @@ public class DefaultReadColumn extends ReadColumn {
 			return "值不能大于" + value;
 
 		if (intEnum != null && intEnum.length > 0 && !ValidateUtil.validContainInt(value, intEnum))
-			return "值必须在" + StringParser.toString(intEnum) + "之中";
+			return "值必须在" + StringUtil.toString(intEnum) + "之中";
 
 		return null;
 	}
@@ -91,7 +91,7 @@ public class DefaultReadColumn extends ReadColumn {
 			if (isEnum) {
 				String name = cell.getString();
 				if (name != null && name.length() > 0) {
-					Integer key = ConstantsContainer.getTypeKey(enumType, name);
+					String key = ConstantsContainer.getTypeKey(enumType, name);
 					if (key == null) {
 						throw new ExcelReadException("第" + (cellIndex + 1) + "列值[" + name + "]为无效值");
 					}

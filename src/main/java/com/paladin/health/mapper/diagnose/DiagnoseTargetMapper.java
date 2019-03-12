@@ -1,7 +1,8 @@
 package com.paladin.health.mapper.diagnose;
 
+
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
-import com.paladin.framework.mybatis.CustomMapper;
 
 public interface DiagnoseTargetMapper extends CustomMapper<DiagnoseTarget>{
 

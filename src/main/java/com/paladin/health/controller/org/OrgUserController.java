@@ -2,17 +2,14 @@ package com.paladin.health.controller.org;
 
 import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.core.query.QueryOutputMethod;
-import com.paladin.health.model.org.OrgUser;
 import com.paladin.health.service.org.OrgUserService;
 import com.paladin.health.service.org.dto.OrgUserQueryDTO;
 import com.paladin.health.service.org.dto.OrgUserDTO;
 import com.paladin.health.service.org.vo.OrgUserVO;
-
+import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.framework.utils.uuid.UUIDUtil;
 
-import com.paladin.health.service.syst.SysUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -77,15 +74,7 @@ public class OrgUserController extends ControllerSupport {
         if (bindingResult.hasErrors()) {
             return validErrorHandler(bindingResult);
         }
-        OrgUser model = beanCopy(orgUserDTO, new OrgUser());
-        String id = UUIDUtil.createUUID();
-        model.setId(id);
-        if (sysUserService.createUserAccount(orgUserDTO.getAccount(), id) > 0) {
-            if (orgUserService.save(model) > 0) {
-                return CommonResponse.getSuccessResponse(orgUserService.get(id));
-            }
-        }
-        return CommonResponse.getFailResponse();
+        return CommonResponse.getSuccessResponse(orgUserService.createUser(orgUserDTO));
 	}
 
     @RequestMapping("/update")
@@ -94,12 +83,7 @@ public class OrgUserController extends ControllerSupport {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-		String id = orgUserDTO.getId();
-		OrgUser model = beanCopy(orgUserDTO, orgUserService.get(id));
-		if (orgUserService.update(model) > 0) {
-			return CommonResponse.getSuccessResponse(orgUserService.get(id));
-		}
-		return CommonResponse.getFailResponse();
+		return CommonResponse.getSuccessResponse(orgUserService.updateUser(orgUserDTO));
 	}
 
     @RequestMapping("/reset")

@@ -1,39 +1,189 @@
-<!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>宣教登录</title>
-    <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
-    <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
-    <script type="text/javascript" src="/static/assets/bootstrap3/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <title>健康宣教系统</title>
+    <style type="text/css">
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    #wrap {
+        height: 88.5vh;
+        width: 100%;
+        background-image: url(/static/img/loginbg.jpg);
+        background-repeat: no-repeat;
+        background-position: center center;
+        position: relative;
+        background-size: cover;
+    }
+
+    #wrap .logGet {
+        height: 408px;
+        width: 468px;
+        background-color: #FFFFFF;
+        margin: auto;
+        box-shadow: 0px 4px 7px 0px #dad8d8;
+    }
+
+    .logC a button {
+        width: 100%;
+        height: 45px;
+        border: none;
+        color: white;
+        font-size: 18px;
+        background: url(/static/img/loginbtn.png) no-repeat;
+    }
+
+    .logGet .logD.logDtip .p1 {
+        display: inline-block;
+        font-size: 28px;
+        margin-top: 30px;
+        width: 100%;
+        text-align: center;
+    }
+
+    #wrap .logGet .logD.logDtip {
+        width: 86%;
+        margin-bottom: 30px;
+        margin-top: 0px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .logGet .lgD img {
+        position: absolute;
+        top: 12px;
+        left: 8px;
+    }
+
+    .logGet .lgD input {
+        width: 100%;
+        height: 42px;
+        text-indent: 2.5rem;
+    }
+
+    #wrap .logGet .lgD {
+        width: 86%;
+        position: relative;
+        margin-bottom: 30px;
+        margin-top: 30px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    #wrap .logGet .logC {
+        width: 86%;
+        margin-top: 0px;
+        margin-right: auto;
+        margin-bottom: 0px;
+        margin-left: auto;
+    }
+
+    #head {
+        height: 120px;
+        width: 80vw;
+        color: #0b752b;
+        line-height: 120px;
+        margin: auto;
+        font-size: 48px;
+    }
+
+    .vh10 {
+        width: 100%;
+        height: 10vh;
+    }
+
+    #body {
+        overflow-x: hidden;
+        overflow-y: hidden;
+    }
+
+    .logGet .and {
+        width: 86%;
+        position: relative;
+        margin-bottom: 3vw;
+        margin-top: 30px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .logGet .ander {
+        float: right;
+    }
+
+    input {
+        border: 1px solid #5da21e;
+    }
+
+    /*隐藏掉我们模型的checkbox*/
+    .my_protocol .input_agreement_protocol {
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        outline: none !important;
+        display: none !important;
+    }
+
+    /*未选中时*/
+    .my_protocol .input_agreement_protocol+span {
+        width: 16px;
+        height: 16px;
+        background-color: red;
+        display: inline-block;
+        background: url(/static/img/icon_checkbox.png) no-repeat;
+        background-position-x: 0px;
+        background-position-y: -25px;
+        position: relative;
+        top: 3px;
+    }
+
+    /*选中checkbox时,修改背景图片的位置*/
+    .my_protocol .input_agreement_protocol:checked+span {
+        background-position: 0 0px
+    }
+    </style>
 </head>
 
-<body>
-        <div id="loginModal" class="modal show">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="text-center text-primary">登录</h4>
-                    </div>
-                    <div class="modal-body" style="height:200px">
-                        <form class="form col-md-12 center-block" action="/health/login" method="post">
-                            <div class="form-group has-feedback">
-                                <input type="text" id="username" name="username" class="form-control" placeholder="用户名" /> <span class="glyphicon glyphicon-user form-control-feedback"></span>
-                            </div>
-                            <div class="form-group has-feedback">
-                                <input type="password" id="password" name="password" class="form-control" placeholder="密码" /> <span class="glyphicon glyphicon-lock form-control-feedback"></span>
-                            </div>
-                            <div th:if="${isError == true}" class="alert alert-danger alert-dismissable">登录账号或密码错误</div>
-                            <div class="form-group">
-                                <button class="btn btn-primary btn-lg btn-block">立刻登录</button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                    </div>
-                </div>
+<body id="body">
+    <div class="header" id="head">
+        昆山市健康宣教系统
+    </div>
+    <div class="wrap" id="wrap">
+        <div class="vh10"></div>
+        <div class="logGet">
+            <!-- 头部提示信息 -->
+            <div class="logD logDtip">
+                <p class="p1">用户登录</p>
             </div>
+            <!-- 输入框 -->
+            <form action="/health/login">
+            <div class="lgD">
+                <img src="/static/img/logName.png" width="20" height="20" alt=""/>
+                <input type="text" name="username" placeholder="请输入用户名" />
+            </div>
+            <div class="lgD">
+                <img src="/static/img/logPwd.png" width="20" height="20" alt=""/>
+                <input type="text" type="password" name="password" placeholder="请输入密码" />
+            </div>
+            <div class="and">
+                <span class="mobile">
+               <label class="my_protocol">
+                      <input class="input_agreement_protocol" type="checkbox" style="display: none!important"/>
+                      <span></span>
+                </label>
+                &nbsp;记住密码
+                </span>
+            </div>
+            <div class="logC">
+                <a href="index.html" target="_self">
+                <button>登 录</button>
+            </a>
+            </div>
+            </form>
         </div>
+    </div>
 </body>
 
 </html>

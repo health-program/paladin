@@ -4,7 +4,7 @@ import java.util.List;
 import com.paladin.health.model.videomanage.VideoPlay;
 import com.paladin.health.service.videomanage.dto.VideoPlayQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoPlayVO;
-import com.paladin.framework.mybatis.CustomMapper;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 
 public interface VideoPlayMapper extends CustomMapper<VideoPlay>{
 	public List<VideoPlayVO>selectByQuery(VideoPlayQueryDTO videoPlayQueryDTO);

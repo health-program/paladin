@@ -1,107 +1,92 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="/data/header"/>
+
+<head th:include="/data/header" />
+<link href="/static/assets/bootstrap3-editable/css/bootstrap-editable.css" rel="stylesheet">
+</link>
 
 <body class="layout-boxed sidebar-mini">
-<input type="hidden" id="dbName" th:value="${dbName}"/>
-<input type="hidden" id="tableName" th:value="${tableName}"/>
-<div class="wrapper curtain">
-    <section class="content-header">
-        <h1>
+    <input type="hidden" id="dbName" th:value="${dbName}" />
+    <input type="hidden" id="tableName" th:value="${tableName}" />
+    <div class="wrapper curtain">
+        <section class="content-header">
+            <h1>
             <span th:text="${dbName}"></span>
             <small th:text="${tableName}"/>
         </h1>
-        <ol class="breadcrumb">
-            <li><a href="/data/index"><i class="fa fa-home"></i> 主页</a></li>
-            <li><a href="/data/connection/index"> 数据库管理</a></li>
-            <li><a th:href="@{'/data/connection/db/index?dbName='+${dbName}}" th:text="${dbName}"></a></li>
-            <li class="active" th:text="${tableName}"/>
-        </ol>
-    </section>
-    <section class="content">
-        <div class="box box-solid">
-            <div class="box-body">
-                <ul class="products-list product-list-in-box">
-                    <li class="item">
-                        <table id="dataGrid"></table>
-                    </li>
-                    <li class="item">
-                        <form class="form-horizontal tonto-form-validate">                        
-                            <div class="form-group">
-                                <label for="basePackage" class="col-md-2 control-label">基础包路径</label>
-                                <div class="col-md-5">
-                                    <input type="text" name="basePackage" class="form-control" required="required"
-                                           placeholder="请输入基础包路径"/>
+            <ol class="breadcrumb">
+                <li><a href="/data/connection/index"> 数据库管理</a></li>
+                <li><a th:href="@{'/data/connection/db/index?dbName='+${dbName}}" th:text="${dbName}"></a></li>
+                <li class="active" th:text="${tableName}" />
+            </ol>
+        </section>
+        <section class="content">
+            <div class="box box-solid">
+                <div class="box-body">
+                    <ul class="products-list product-list-in-box">
+                        <li class="item">
+                            <table id="dataGrid"></table>
+                        </li>
+                        <li class="item">
+                            <form class="form-horizontal tonto-form-validate">
+                                <div class="form-group">
+                                    <label for="tableTitle" class="col-sm-2 control-label">表标题</label>
+                                    <div class="col-sm-5">
+                                        <input name="tableTitle" id="tableTitle" class="form-control" th:value="${tableTitle}" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="model" class="col-md-2 control-label">主模块</label>
-                                <div class="col-md-2">
-                                    <input type="text" name="model" class="form-control" placeholder="请输入主模块"/>
+                                <div class="form-group">
+                                    <label for="basePackage" class="col-md-2 control-label">基础包路径</label>
+                                    <div class="col-md-5">
+                                        <input type="text" name="basePackage" class="form-control" required="required" placeholder="请输入基础包路径" />
+                                    </div>
                                 </div>
-                                <label for="subModel" class="col-md-1 control-label">子模块</label>
-                                <div class="col-md-2">
-                                    <input type="text" name="subModel" class="form-control" placeholder="请输入子模块"/>
+                                <div class="form-group">
+                                    <label for="model" class="col-md-2 control-label">主模块</label>
+                                    <div class="col-md-2">
+                                        <input type="text" name="model" class="form-control" placeholder="请输入主模块" />
+                                    </div>
+                                    <label for="subModel" class="col-md-1 control-label">子模块</label>
+                                    <div class="col-md-2">
+                                        <input type="text" name="subModel" class="form-control" placeholder="请输入子模块" />
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                    </li>
-                    <li class="item">
-                        <button onclick="build()" type="button" class="btn btn-primary btn-block submitBtn">预览</button>
-                    </li>
-                    <li class="item">
-                        <form class="form-horizontal tonto-form-validate">
-                            <div class="form-group">
-                                <label for="projectPath" class="col-md-2 control-label">Boot项目路径</label>
-                                <div class="col-md-5">
-                                    <input type="text" name="projectPath" th:value="${projectPath}" class="form-control"
-                                           required="required" placeholder="请输入基础包路径"/>
+                            </form>
+                        </li>
+                        <li class="item">
+                            <form class="form-horizontal tonto-form-validate">
+                                <div class="form-group">
+                                    <label for="projectPath" class="col-md-2 control-label">文件路径</label>
+                                    <div class="col-md-5">
+                                        <input type="text" name="filePath" class="form-control" required="required" placeholder="请输入文件路径" />
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                    </li>
-                    <li class="item">
-                        <button onclick="build2boot()" type="button" class="btn btn-primary btn-block submitBtn">SPRING
-                            BOOT项目生成
-                        </button>
-                    </li>
-                </ul>
+                            </form>
+                            <button onclick="buildFile()" type="button" class="btn btn-primary btn-block submitBtn">生成文件</button>
+                        </li>
+                        <li class="item">
+                            <form class="form-horizontal tonto-form-validate">
+                                <div class="form-group">
+                                    <label for="projectPath" class="col-md-2 control-label">Boot项目路径</label>
+                                    <div class="col-md-5">
+                                        <input type="text" name="projectPath" th:value="${projectPath}" class="form-control" required="required" placeholder="请输入基础包路径" />
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+                        <li class="item">
+                            <button onclick="build2boot()" type="button" class="btn btn-primary btn-block submitBtn">SPRING
+                                BOOT项目生成
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </section>
-</div>
-
-<div th:include="/data/footer"></div>
-<link rel="stylesheet" href="/static/assets/highlight/styles/dark.css">
-<style>
-    pre {
-        padding: 0;
-        margin: 0;
-        border: 0;
-        border-radius: 0;
-        height: 100%;
-    }
-
-    code {
-        height: 100%;
-    }
-
-    .layui-layer-title {
-        box-sizing: content-box;
-        -moz-box-sizing: content-box;
-        /* Firefox */
-        -webkit-box-sizing: content-box;
-        /* Safari */
-    }
-
-    .layui-layer-content li,
-    ul {
-        margin: 0;
-        padding: 0;
-    }
-
-</style>
-<script type="text/javascript" src="/static/assets/highlight/highlight.pack.js"></script>
+        </section>
+    </div>
+    <div th:include="/data/footer"></div>
+    <script type="text/javascript" src="/static/assets/bootstrap3-editable/js/bootstrap-editable.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap3-editable/js/bootstrap-table-editable.min.js"></script>
 </body>
 <script type="text/javascript">
 var table;
@@ -110,7 +95,10 @@ var tableName;
 $(function() {
     dbName = $("#dbName").val();
     tableName = $("#tableName").val();
-    initDataGrid();
+    // 偷懒
+    $.getAjax("/common/sys/constant/find/all/key", function(keys) {
+        initDataGrid(keys);
+    });
 });
 
 var defaultColumns = {
@@ -125,8 +113,7 @@ function isDefaultColumn(name) {
     return defaultColumns[name] ? true : false;
 }
 
-function initDataGrid() {
-
+function initDataGrid(keys) {
     table = $.createTable("#dataGrid", {
         idField: "id",
         columns: [
@@ -136,16 +123,64 @@ function initDataGrid() {
                 { title: "数据类型", field: "dataType" },
                 {
                     title: "字段标题",
-                    field: "comment",
+                    field: "title",
                     formatter: function(value, row, index) {
-                        return '<input class="form-control t_' + row.name + '" name="title" value="' + (value ? value : row.name) + '"/>';
+                        row.title = row.title || row.comment || row.name || '无';
+                        return row.title;
+                    },
+                    editable: {
+                        type: "text",
+                        title: "请输入字段标题",
+                        emptytext: "无"
                     }
                 },
                 {
                     title: "常量类型",
-                    field: "constantType",
+                    field: "enumCode",
                     formatter: function(value, row, index) {
-                        return '<input class="form-control t_' + row.name + '" name="constantType"/>';
+                        return row.enumCode || "无";
+                    },
+                    editable: {
+                        type: "text",
+                        title: "请输入常量CODE",
+                        emptytext: "无"
+                    }
+                }, {
+                    title: "最大长度",
+                    field: "maxLength",
+                    formatter: function(value, row, index) {
+                        return row.maxLength || row.dataLength || "无";
+                    },
+                    editable: {
+                        type: "text",
+                        title: "请输入最大长度",
+                        emptytext: "无"
+                    }
+                },
+                {
+                    title: "是否多选",
+                    formatter: function(value, row, index) {
+                        var checked = row.multiSelect === 1;
+                        return '<input class="t_' + row.name + '" name="multiSelect" type="checkbox" ' + (checked ? 'checked="true"' : '') + '>';
+                    }
+                },
+                {
+                    title: "是否附件",
+                    formatter: function(value, row, index) {
+                        var checked = row.isAttachment === 1;
+                        return '<input class="t_' + row.name + '" name="isAttachment" type="checkbox" ' + (checked ? 'checked="true"' : '') + '>';
+                    }
+                },
+                {
+                    title: "附件最大数",
+                    field: "attachmentCount",
+                    formatter: function(value, row, index) {
+                        return row.attachmentCount || "无";
+                    },
+                    editable: {
+                        type: "text",
+                        title: "请输入附件最大数",
+                        emptytext: "无"
                     }
                 },
                 {
@@ -175,6 +210,13 @@ function initDataGrid() {
                         var checked = !(row.isPrimary || row.isForeignKey || row.isUnique || row.nullable || isDefaultColumn(row.name));
                         return '<input class="t_' + row.name + '" name="required" type="checkbox" ' + (checked ? 'checked="true"' : '') + '>';
                     }
+                },
+                {
+                    title: "大文本",
+                    formatter: function(value, row, index) {
+                        var checked = row.largeText === 1 || (row.dataLength && row.dataLength > 500);
+                        return '<input class="t_' + row.name + '" name="largeText" type="checkbox" ' + (checked ? 'checked="true"' : '') + '>';
+                    }
                 }
             ]
         ],
@@ -182,9 +224,41 @@ function initDataGrid() {
         queryParams: function() {
             return { dbName: dbName, tableName: tableName }
         },
+        responseHandler: function(res) {
+            res = res || [];
+            if ($.isArray(res)) {
+                res.forEach(function(a) {
+                    $.extend(a, a.column);
+                })
+                var x = {};
+                x["data"] = res;
+                x["total"] = res.length;
+
+                if ($.isArray(keys)) {
+                    res.forEach(function(a) {
+                        var i = 0
+                        for (; i < keys.length; i++) {
+                            var key = keys[i];
+                            if (key == a.name || a.name + "-type" == key || a.name + "_type" == key) {
+                                a.enumCode = key;
+                                break;
+                            }
+                        }
+                        if (i == keys.length) {
+                            if (a.name.startsWith("is_")) {
+                                a.enumCode = "boolean";
+                            }
+                        }
+                    });
+                }
+
+                return x;
+            } else {
+                return res;
+            }
+        },
         pagination: false
     });
-
 }
 
 function buildParams() {
@@ -195,29 +269,40 @@ function buildParams() {
     }
 
     var params = [];
+    var gg = function(a) {
+        if (a == '无') return null;
+        return a;
+    }
+
     for (var i = 0; i < rows.length; i++) {
         var column = rows[i];
         var param = {
-            columnName: column.name
+            columnName: column.name,
+            attachmentCount: gg(column.attachmentCount),
+            maxLength: gg(column.maxLength),
+            enumCode: gg(column.enumCode),
+            title: gg(column.title)
         };
         $(".t_" + column.name).each(function() {
             var input = $(this);
             var field = input.attr("name");
             if (field) {
                 if (input[0].type == "checkbox") {
-                    param[field] = input.is(':checked');
+                    param[field] = input.is(':checked') ? 1 : 0;
                 } else {
                     param[field] = input.val();
                 }
             }
         });
+
         params.push(param);
     }
 
     params = {
         dbName: dbName,
         tableName: tableName,
-        columnOptions: params
+        title: $("#tableTitle").val(),
+        columnBuildOptions: params
     }
 
     $("form").serializeObject(params);
@@ -234,45 +319,14 @@ function build2boot() {
     }
 }
 
-function build() {
+function buildFile() {
     var params = buildParams();
     if (params) {
-        $.postJsonAjax("/data/connection/db/build", params, show, $(".submitBtn"));
+        $.postJsonAjax("/data/connection/db/build/file", params, function() {
+            $.successMessage("创建成功");
+        }, $(".submitBtn"));
     }
 }
-
-function show(result) {
-    layer.tab({
-        area: ['700px', '780px'],
-        maxmin: true,
-        tab: [{
-            title: 'Model',
-            content: '<pre><code class="java">' + result.model + '</code></pre>'
-        }, {
-            title: 'Mapper',
-            content: '<pre><code class="java">' + result.mapper + '</code></pre>'
-        }, {
-            title: 'Service',
-            content: '<pre><code class="java">' + result.service + '</code></pre>'
-        }],
-        change: function(index) {
-            var h = $(".layui-layer-content").height();
-            $(".layui-layer-tabli").each(function() {
-                var a = $(this);
-                if (a.css("display") == "list-item") {
-                    a.css("display", "block");
-                    a.height(h + "px");
-                }
-            });
-        },
-        success: function(layero, index) {
-            $(layero).find("pre code").each(function() {
-                hljs.highlightBlock($(this)[0]);
-            });
-        }
-    });
-}
-
 </script>
 
 </html>

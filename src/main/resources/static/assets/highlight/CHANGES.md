@@ -154,7 +154,7 @@ highlight.js: even boring things keep getting better (even if slow).
 - JavaScript updated with `=>` functions, highlighted object attributes and
   parsing within template string substitution blocks (`${...}`).
 - Fixed another corner case with self-closing `<tag/>` in JSX.
-- Added `HEALTHCHECK` directive in Docker.
+- Added `hfCHECK` directive in Docker.
 - Delphi updated with new Free Pascal keywords.
 - Fixed digit separator parsing in C++.
 - C# updated with new keywords and fixed to allow multiple identifiers within

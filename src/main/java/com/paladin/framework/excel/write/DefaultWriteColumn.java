@@ -1,6 +1,6 @@
 package com.paladin.framework.excel.write;
 
-import com.paladin.framework.core.container.ConstantsContainer;
+import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.utils.reflect.EntityField;
 
 /**
@@ -38,6 +38,6 @@ public class DefaultWriteColumn extends WriteColumn {
 	public String getEnumName(Object value) {
 		if (value == null)
 			return "";
-		return ConstantsContainer.getTypeValue(getEnumType(), (Integer) value);
+		return ConstantsContainer.getTypeValue(getEnumType(), value.toString());
 	}
 }

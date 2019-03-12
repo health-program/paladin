@@ -1,66 +1,60 @@
 package com.paladin.common.core.permission;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+
 import com.paladin.common.model.org.OrgPermission;
 import com.paladin.framework.common.BaseModel;
 
 public class MenuPermission {
 
-	private String id;
-	// 菜单名称
-	private String name;
-	// URL
-	private String url;
-	// 图标
-	private String icon;
-	// 父ID
-	private String parentId;
-	// 列表顺序
-	private int listOrder;
-	// 是否系统管理员权限
-	private boolean isAdmin;
+	private OrgPermission source;
+
 	// 是否拥有
 	private boolean owned;
-	
+	// 是否菜单
+	private boolean isMenu;
+
+	private int listOrder;
+
+	private Collection<MenuPermission> children;
+
 	public MenuPermission(OrgPermission orgPermission, boolean owned) {
-		if (orgPermission.getIsMenu() == BaseModel.BOOLEAN_YES) {
-			this.id = orgPermission.getId();
-			this.name = orgPermission.getName();
-			this.url = orgPermission.getExpressionContent();
-			this.isAdmin = orgPermission.getIsAdmin() == BaseModel.BOOLEAN_YES;
-			this.icon = orgPermission.getMenuIcon();
-			this.parentId = orgPermission.getParentId();
-			this.owned = owned;
-		} else {
-			throw new RuntimeException("非菜单权限");
+		this.source = orgPermission;
+		this.isMenu = orgPermission.getIsMenu() == BaseModel.BOOLEAN_YES;
+		this.owned = owned;
+		Integer listOrder = orgPermission.getListOrder();
+		this.listOrder = listOrder == null ? 0 : listOrder.intValue();
+		this.children = new HashSet<>();
+	}
+
+	public void init() {
+		if (children.size() > 0) {
+			ArrayList<MenuPermission> list = new ArrayList<>(children);
+			Collections.sort(list, new Comparator<MenuPermission>() {
+				@Override
+				public int compare(MenuPermission mr1, MenuPermission mr2) {
+					return mr1.listOrder - mr2.listOrder;
+				}
+			});
+			
+			for(MenuPermission mp : children) {
+				mp.init();
+			}
+			
+			children = list;
 		}
 	}
 
+	public void addChild(MenuPermission child) {
+		children.add(child);
+	}
+
 	public String getId() {
-		return id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public String getIcon() {
-		return icon;
-	}
-
-	public String getParentId() {
-		return parentId;
-	}
-
-	public int getListOrder() {
-		return listOrder;
-	}
-
-	public boolean isAdmin() {
-		return isAdmin;
+		return source.getId();
 	}
 
 	public boolean isOwned() {
@@ -69,6 +63,36 @@ public class MenuPermission {
 
 	public void setOwned(boolean owned) {
 		this.owned = owned;
+	}
+
+	public OrgPermission getSource() {
+		return source;
+	}
+
+	public boolean isMenu() {
+		return isMenu;
+	}
+
+	public Collection<MenuPermission> getChildren() {
+		return children;
+	}
+
+	@Override
+	public int hashCode() {
+		return getId().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof MenuPermission) {
+			MenuPermission mp = (MenuPermission) obj;
+			return getId().equals(mp.getId());
+		}
+		return false;
+	}
+
+	public int getListOrder() {
+		return listOrder;
 	}
 
 }

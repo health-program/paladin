@@ -8,7 +8,7 @@ function generateHtml(options) {
     var id = options.id,
         name = options.name,
         columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
+        icon = options.icon || 'fa fa-list';
 
     var html =
         '<div class="box box-solid">\n' +
@@ -32,7 +32,7 @@ function generateEditHtml(options) {
     var id = options.id,
         name = options.name,
         columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
+        icon = options.icon || 'fa fa-list';
 
     var html =
         '<div class="box box-solid">\n' +
@@ -134,7 +134,7 @@ function generateViewHtml(options) {
     var id = options.id,
         name = options.name,
         columns = options.columns,
-        icon = options.icon || 'glyphicon glyphicon-user';
+        icon = options.icon || 'fa fa-list';
 
     var html =
         '<div class="box box-solid">\n' +
@@ -604,7 +604,7 @@ var _FieldBuilder = function(name, interfaces) {
             if (!p || p.length == 0) return;
             var v = data ? data[column.name] : null;
 
-            if (v) {
+            if (v || v === 0) {
                 p.removeClass("text-muted");
                 p.text(v);
             } else {
@@ -667,7 +667,7 @@ var _FieldBuilder = function(name, interfaces) {
             var v = data ? data[column.name] : null,
                 isP = input.is("p");
 
-            if (v) {
+            if (v || v === 0) {
                 if (isP) {
                     input.removeClass("text-muted");
                     input.text(v);
@@ -952,11 +952,11 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
         var p = model.viewBody.find("[name='" + column.name + "']");
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
-        if (column.enum && v) {
+        if (column.enum && (v || v === 0)) {
             v = $.getConstantEnumValue(column.enum, v);
         }
 
-        if (v) {
+        if (v || v === 0) {
             p.removeClass("text-muted");
             p.text(v);
         } else {
@@ -975,10 +975,10 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
 
         var ov = data ? data[column.name] : null,
             isP = input.is("p"),
-            v = column.enum && ov ? $.getConstantEnumValue(column.enum, ov) : null;
+            v = column.enum && (ov || ov === 0) ? $.getConstantEnumValue(column.enum, ov) : null;
 
         if (isP) {
-            if (v) {
+            if (v || v === 0) {
                 input.removeClass("text-muted");
                 input.text(v);
             } else {
@@ -986,7 +986,7 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
                 input.text("无");
             }
         } else {
-            if (ov) {
+            if (ov || ov === 0) {
                 input.val(ov);
             } else {
                 input.find("option:first").prop("selected", 'selected');
@@ -1052,11 +1052,10 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
         // 原表单文件数据只有最后一个，这里需要手动从插件中获取File Object添加到表单数据中
         for (; i < formData.length; i++) {
             if (formData[i].name == fileName) {
-                break;
+                formData.splice(i, 1);
+                i--;
             }
         }
-
-        formData.splice(i, 1);
 
         if (column.editDisplay !== "hide") {
             // 有附件时，需要替换某些参数
@@ -1281,7 +1280,7 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
                 actionUpload: '' //去除上传预览缩略图中的上传图片；
             },
             uploadAsync: false,
-            maxFileCount: 4,
+            maxFileCount: column.maxFileCount || 4,
             allowedFileExtensions: column.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],
             overwriteInitial: false,
             ajaxDelete: false, // 扩展定义配置，不进行后台删除操作
@@ -1362,11 +1361,11 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
         var p = model.viewBody.find("[name='" + column.name + "']");
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
-        if (column.enum && v) {
+        if (column.enum && (v || v === 0)) {
             v = $.getConstantEnumValue(column.enum, v);
         }
 
-        if (v) {
+        if (v || v === 0) {
             p.removeClass("text-muted");
             p.text(v);
         } else {
@@ -1385,10 +1384,10 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
 
         var ov = data ? data[column.name] : null,
             isP = input.is("p"),
-            v = column.enum && ov ? $.getConstantEnumValue(column.enum, ov) : null;
+            v = column.enum && (ov || ov === 0) ? $.getConstantEnumValue(column.enum, ov) : null;
 
         if (isP) {
-            if (v) {
+            if (v || v === 0) {
                 input.removeClass("text-muted");
                 input.text(v);
             } else {

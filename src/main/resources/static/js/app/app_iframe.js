@@ -1927,6 +1927,31 @@ var addTabs = function (options) {
 
     var pageId = options.id;
 
+    // edit by TontoZhou 取消tab框直接显示页面
+
+    App.blockUI({
+        target: '#tab-content',
+        boxed: true,
+        message: '加载中......'//,
+        // animate: true
+    });
+
+    var $iframe = $("<iframe></iframe>").attr("src", options.url).css("width", "100%").attr("frameborder", "no").attr("id", "iframe_" + pageId).addClass("tab_iframe").attr(pageIdField, pageId);
+    //frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes"  allowtransparency="yes"
+
+    //iframe 加载完成事件
+    $iframe.load(function () {
+        App.unblockUI('#tab-content');//解锁界面
+        App.fixIframeCotent();//修正高度
+    });
+
+    $("#tab-content").empty();
+    $("#tab-content").append($iframe);
+
+    return;
+    // edit over TontoZhou 
+
+
     //判断这个id的tab是否已经存在,不存在就新建一个
     if (findTabPanel(pageId) === null) {
 
@@ -2322,11 +2347,11 @@ $(function () {
             init($menu_ul, options.data, level);
         }
         else {
-            if (!options.url) return;
-            $.getJSON(options.url, options.param, function (data) {
-
-                init($menu_ul, data, level);
-            });
+            if (options.url) {
+                $.getJSON(options.url, options.param, function (data) {
+                    init($menu_ul, data, level);
+                });
+            }    
         }
 
         function init($menu_ul, data, level) {

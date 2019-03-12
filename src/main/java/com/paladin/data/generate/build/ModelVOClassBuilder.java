@@ -1,5 +1,6 @@
 package com.paladin.data.generate.build;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.paladin.data.generate.GenerateColumnOption;
 import com.paladin.data.generate.GenerateTableOption;
+import com.paladin.data.model.build.DbBuildColumn;
 import com.paladin.framework.utils.reflect.NameUtil;
 import com.paladin.framework.utils.reflect.ReflectUtil;
 
@@ -22,7 +24,14 @@ public class ModelVOClassBuilder extends SpringBootClassBuilder {
 
 		Set<Class<?>> importClassSet = new HashSet<>();
 
-		List<GenerateColumnOption> columnOptions = tableOption.getColumnOptions();
+		List<GenerateColumnOption> originColumnOptions = tableOption.getColumnOptions();
+
+		List<GenerateColumnOption> columnOptions = new ArrayList<>(originColumnOptions.size());
+		for (GenerateColumnOption columnOption : originColumnOptions) {
+			if (need(columnOption)) {
+				columnOptions.add(columnOption);
+			}
+		}
 
 		Collections.sort(columnOptions, new Comparator<GenerateColumnOption>() {
 			@Override
@@ -107,6 +116,11 @@ public class ModelVOClassBuilder extends SpringBootClassBuilder {
 	@Override
 	public String getClassName(GenerateTableOption tableOption) {
 		return tableOption.getModelName() + "VO";
+	}
+
+	protected boolean need(GenerateColumnOption columnOption) {
+		DbBuildColumn buildColumn = columnOption.getBuildColumnOption();
+		return columnOption.isPrimary() || buildColumn != null;
 	}
 
 }

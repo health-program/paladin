@@ -42,10 +42,10 @@ public class DefaultCell implements ICell {
 			}
 
 			try {
-				return DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd").parse(str);
+				return DateFormatUtil.getThreadSafeFormat("yyyy/MM/dd").parse(str);
 			} catch (ParseException e) {
 				try {
-					return DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd  HH:mm:ss").parse(str);
+					return DateFormatUtil.getThreadSafeFormat("yyyy/MM/dd  HH:mm:ss").parse(str);
 				} catch (ParseException e1) {
 					throw new ConvertException("转化为时间失败");
 				}

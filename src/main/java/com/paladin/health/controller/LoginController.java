@@ -4,110 +4,100 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.exception.BusinessException;
-import com.paladin.framework.utils.WebUtil;
+import com.paladin.framework.core.session.UserSession;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.service.syst.SysUserService;
+
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 @Controller
 @RequestMapping("/health/")
 public class LoginController extends ControllerSupport {
 
 	@Autowired
-	SysUserService sysUserService;
+	private SysUserService sysUserService;
 
-	@RequestMapping(value = "/index")
-	public Object index(HttpServletRequest request) {
-		return new ModelAndView("/health/index","user", HealthUserSession.getCurrentUserSession());
-	}
-
-	@RequestMapping(value = "/main")
+	@ApiOperation(value = "主页面")
+	@GetMapping(value = "/index")
 	public Object main(HttpServletRequest request) {
-		return new ModelAndView("/health/index","user", HealthUserSession.getCurrentUserSession());
-
-	}
-	
-	/**
-	 * 登录入口
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(value = "/login", method = RequestMethod.GET)
-	public Object loginInput(HttpServletRequest request, HttpServletResponse response) {
-		Subject subject = SecurityUtils.getSubject();
-		boolean isAjax = WebUtil.isAjaxRequest(request);
-		if (subject.isAuthenticated()) {
-			if (isAjax) {
-				WebUtil.sendJson(response, CommonResponse.getSuccessResponse("登录成功"));
-				return null;
-			} else {
-				return index(request);
-			}
-		}
-
-		return "/health/login";
+		UserSession userSession = UserSession.getCurrentUserSession();
+		ModelAndView model = new ModelAndView("/common/index");
+		model.addObject("user", userSession.getUserForView());
+		return model;
 	}
 
-	/**
-	 * 登录验证，交由shiro做
-	 * @param request
-	 * @param response
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
-	public Object login(HttpServletRequest request, HttpServletResponse response, Model model) {
-
-		Subject subject = SecurityUtils.getSubject();
-		boolean isAjax = WebUtil.isAjaxRequest(request);
-
-		if (subject.isAuthenticated()) {
-			if (isAjax) {
-				WebUtil.sendJson(response, CommonResponse.getSuccessResponse("登录成功"));
-				return null;
-			} else {
-				return null;
-			}
-		} else {
-			if (isAjax) {
-				WebUtil.sendJson(response, CommonResponse.getFailResponse("登录失败,用户名或密码错误！"));
-				return null;
-			} else {
-				model.addAttribute("isError", true);
-				return "/health/login";
-			}
-		}
-	}
-
-	/**
-	 * 更新密码
-	 * 
-	 * @param newPassword
-	 * @param oldPassword
-	 * @return
-	 */
-	@RequestMapping(value = "/update/password")
+	@ApiOperation(value = "修改密码", response = CommonResponse.class)
+	@ApiImplicitParams({ @ApiImplicitParam(name = "newPassword", value = "新密码", required = true), @ApiImplicitParam(name = "oldPassword", value = "旧密码") })
+	@RequestMapping(value = "/update/password", method = { RequestMethod.GET, RequestMethod.POST })
 	@ResponseBody
 	public Object updatePassword(@RequestParam String newPassword, @RequestParam String oldPassword) {
 		return CommonResponse.getResponse(sysUserService.updateSelfPassword(newPassword, oldPassword));
 	}
 
-	@RequestMapping(value = "/test/error")
-	public Object testError() {
-		throw new BusinessException("测试异常页面");
+	@ApiOperation(value = "登录页面")
+	@GetMapping("/login")
+	public Object loginInput(HttpServletRequest request, HttpServletResponse response) {
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isAuthenticated()) {
+			return main(request);
+		}
+		return "/health/login";
+	}
+
+	@ApiOperation(value = "用户认证")
+	@RequestMapping(value = "/login", method = RequestMethod.POST, produces = MediaType.TEXT_HTML_VALUE)
+	public Object login(HttpServletRequest request, HttpServletResponse response, Model model) {
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isAuthenticated()) {
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+			if (username != null && username.length() != 0 && password != null && password.length() != 0) {
+				subject.login(new UsernamePasswordToken(username, password));
+			}
+		}
+
+		if (subject.isAuthenticated()) {
+			return main(request);
+		} else {
+			model.addAttribute("isError", true);
+			return "/health/login";
+		}
+	}
+
+	@ApiOperation(value = "用户认证")
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@ResponseBody
+	public Object ajaxLogin(HttpServletRequest request, HttpServletResponse response, Model model) {
+		Subject subject = SecurityUtils.getSubject();
+		if (subject.isAuthenticated()) {
+			String username = request.getParameter("username");
+			String password = request.getParameter("password");
+			if (username != null && username.length() != 0 && password != null && password.length() != 0) {
+				subject.login(new UsernamePasswordToken(username, password));
+			}
+		}
+
+		if (subject.isAuthenticated()) {
+			return CommonResponse.getSuccessResponse("登录成功", UserSession.getCurrentUserSession().getUserForView());
+		} else {
+			return CommonResponse.getFailResponse("登录失败");
+		}
 	}
 
 }

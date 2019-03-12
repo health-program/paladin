@@ -157,4 +157,8 @@ public class GenerateTableOption {
 		return title == null || title.length() == 0 ? table.getName() : title;
 	}
 
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
 }
