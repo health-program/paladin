@@ -35,6 +35,17 @@ public class PublicityMessageCenterController extends ControllerSupport {
 
 	@Autowired
 	private VideoPlayPublishService videoPlayPublishService;
+	
+	/**
+	 * app首页列表展示
+	 * 
+	 * @return
+	 */
+	
+	@RequestMapping("/app/index")
+	public String app() {
+		return "/health/open/app/index";
+	}
 
 	/**
 	 * 对外首页展示
@@ -55,11 +66,12 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		model.addAttribute("videos", pages.getData());
 		model.addAttribute("videosAll", videosAll.getData());
 		model.addAttribute("messages", messages);
-		return "/health/videomanage/video_top_video_index";
+		return "/health/open/video_top_video_index";
 	}
 
+	
 	/**
-	 * 对外视频首页列表展示
+	 * 移动端首页跳转
 	 * 
 	 * @return
 	 */
@@ -73,7 +85,6 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		map.put("videosAll", videosAll);
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
 	
 	/**
 	 * 对外移动端视频图片轮播展示
@@ -191,7 +202,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		model.addAttribute("preMessage", preMessage);
 		model.addAttribute("nextMessage", nextMessage);
 		model.addAttribute("messageList", messageList);
-		return "/health/publicity/message_display_index";
+		return "/health/open/message_display_index";
 	}
 
 	/**
@@ -233,7 +244,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
 		model.addAttribute("video", videoVO);
 		model.addAttribute("videosAll", videosAll.getData());
-		return "/health/videomanage/video_play";
+		return "/health/open/video_play";
 	}
 	
 	/**
@@ -274,7 +285,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 */
 	@RequestMapping("/message/index")
 	public String messageIndex() {
-		return "/health/publicity/message_center";
+		return "/health/open/message_center";
 	}
 	
 	/**
@@ -295,7 +306,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 */
 	@RequestMapping("/video/index")
 	public String videoIndex() {
-		return "/health/videomanage/video_center";
+		return "/health/open/video_center";
 	}
 	
 

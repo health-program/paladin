@@ -150,7 +150,7 @@
 		<div class="sp-slides" th:each="video,iter: ${videos}">
 			<div class="sp-slide">
 				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl}}"
-				th:onclick="|javascript:window.location.href='/open/health/message/center/play?id=${video.id}'|"/>
+				th:onclick="play([[${video.id}]])"/>
 				
 				<p class="sp-layer sp-white sp-padding" style="text-align: center" 
 					data-horizontal="17%" data-vertical="5" data-width="50%"
@@ -222,7 +222,7 @@
                              </div>
                              <div id="noticeContent" th:utext="${message.content}"></div>
                              <div class="btnContent">
-                             <a class="btn-detail" th:onclick="|javascript:window.location.href='/open/health/message/center/display/index?id=${message.id}'|">查看详情</a>
+                             <a class="btn-detail" th:onclick="detail([[${message.id}]])">查看详情</a>
                              </div>
                             </div>
                         </li>
@@ -271,6 +271,12 @@ $( document ).ready(function() {
 	});
 });
         
+   function play(value){
+   		window.location.href="/open/health/message/center/play?id="+value;
+   }
+   function detail(value){
+  		window.location.href="/open/health/message/center/display/index?id="+value;
+  }
 </script>
 </body>
 
