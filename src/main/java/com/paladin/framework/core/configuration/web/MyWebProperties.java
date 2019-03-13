@@ -28,7 +28,7 @@ public class MyWebProperties {
 	/**
 	 * root view
 	 */
-	private String rootView = "redirect:/index";
+	private String rootView = "redirect:/health/index";
 
 	public String getFilePath() {
 		return filePath;

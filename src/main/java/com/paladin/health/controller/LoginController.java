@@ -37,17 +37,9 @@ public class LoginController extends ControllerSupport {
 	@GetMapping(value = "/index")
 	public Object main(HttpServletRequest request) {
 		UserSession userSession = UserSession.getCurrentUserSession();
-		ModelAndView model = new ModelAndView("/common/index");
+		ModelAndView model = new ModelAndView("/health/index");
 		model.addObject("user", userSession.getUserForView());
 		return model;
-	}
-
-	@ApiOperation(value = "修改密码", response = CommonResponse.class)
-	@ApiImplicitParams({ @ApiImplicitParam(name = "newPassword", value = "新密码", required = true), @ApiImplicitParam(name = "oldPassword", value = "旧密码") })
-	@RequestMapping(value = "/update/password", method = { RequestMethod.GET, RequestMethod.POST })
-	@ResponseBody
-	public Object updatePassword(@RequestParam String newPassword, @RequestParam String oldPassword) {
-		return CommonResponse.getResponse(sysUserService.updateSelfPassword(newPassword, oldPassword));
 	}
 
 	@ApiOperation(value = "登录页面")
@@ -100,4 +92,13 @@ public class LoginController extends ControllerSupport {
 		}
 	}
 
+	@ApiOperation(value = "修改密码", response = CommonResponse.class)
+	@ApiImplicitParams({ @ApiImplicitParam(name = "newPassword", value = "新密码", required = true), @ApiImplicitParam(name = "oldPassword", value = "旧密码") })
+	@RequestMapping(value = "/update/password", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Object updatePassword(@RequestParam String newPassword, @RequestParam String oldPassword) {
+		return CommonResponse.getResponse(sysUserService.updateSelfPassword(newPassword, oldPassword));
+	}
+
+	
 }

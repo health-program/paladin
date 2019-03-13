@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @ApiIgnore
 @Controller
-@RequestMapping("/org/permission")
+@RequestMapping("/common/org/permission")
 public class OrgPermissionController extends ControllerSupport {
 
     

@@ -29,7 +29,7 @@ import javax.validation.Valid;
 
 @ApiIgnore
 @Controller
-@RequestMapping("/org/role")
+@RequestMapping("/common/org/role")
 public class OrgRoleController extends ControllerSupport {
 
 	@Autowired

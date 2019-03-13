@@ -1,5 +1,5 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="utf-8">
@@ -104,8 +104,8 @@
     .logGet .and {
         width: 86%;
         position: relative;
-        margin-bottom: 3vw;
-        margin-top: 30px;
+        margin-bottom: 20px;
+        margin-top: 20px;
         margin-right: auto;
         margin-left: auto;
     }
@@ -143,6 +143,14 @@
     .my_protocol .input_agreement_protocol:checked+span {
         background-position: 0 0px
     }
+
+    .lgE{
+        background-color:red;
+        padding:10px;
+        height:25px;
+        color:#fff;
+        text-align: center;
+    }
     </style>
 </head>
 
@@ -158,15 +166,16 @@
                 <p class="p1">用户登录</p>
             </div>
             <!-- 输入框 -->
-            <form action="/health/login">
+            <form action="/health/login" method="post">
             <div class="lgD">
                 <img src="/static/img/logName.png" width="20" height="20" alt=""/>
                 <input type="text" name="username" placeholder="请输入用户名" />
             </div>
             <div class="lgD">
                 <img src="/static/img/logPwd.png" width="20" height="20" alt=""/>
-                <input type="text" type="password" name="password" placeholder="请输入密码" />
+                <input type="password" name="password" placeholder="请输入密码" />
             </div>
+            <div class="lgE" th:if="${isError == true}">登录账号或密码错误</div>
             <div class="and">
                 <span class="mobile">
                <label class="my_protocol">

@@ -8,7 +8,7 @@
     <section class="content-header">
         <h1>角色管理</h1>
         <ol class="breadcrumb">
-            <li><a href="/org/role/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li><a href="/common/org/role/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">新增</li>
         </ol>
     </section>
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div id="model_edit" class="box-body">
-                <form id="model_form" action="/org/role/save" method="post" class="form-horizontal edit-body">
+                <form id="model_form" action="/common/org/role/save" method="post" class="form-horizontal edit-body">
                     <div class="form-group">
                         <label for="roleName" class="col-sm-3 control-label">角色名称：</label>
                         <div class="col-sm-3">
@@ -75,7 +75,7 @@
             pattern: "edit",
             successCallback: function() {
                 $.successAlert("保存成功", function() {
-                    window.location = "/org/role/index";
+                    window.location = "/common/org/role/index";
                 });
             }
         });

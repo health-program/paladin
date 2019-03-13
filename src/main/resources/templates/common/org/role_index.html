@@ -60,7 +60,7 @@
                     }
                 ]
             ],
-            url: '/org/role/find/all',
+            url: '/common/org/role/find/all',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,
@@ -73,15 +73,15 @@
     }
 
     function add() {
-        window.location = '/org/role/add';
+        window.location = '/common/org/role/add';
     }
 
     function detail(row) {
-        window.location = '/org/role/detail' + (row ? ('?id=' + row.id) : '');
+        window.location = '/common/org/role/detail' + (row ? ('?id=' + row.id) : '');
     }
 
     function grant(row) {
-        window.location = '/org/role/grant/index?id=' + row.id;
+        window.location = '/common/org/role/grant/index?id=' + row.id;
     }
 
     function getSelectRow(notShowError) {

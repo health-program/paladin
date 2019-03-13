@@ -2,15 +2,16 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>宣教系统</title>
+    <title>Common System</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
     <link rel="stylesheet" href="/static/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/ionicons.min.css">
+    <link rel="stylesheet" href="/static/css/iconfont.css">
     <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css">
+    <link rel="stylesheet" href="/static/css/skins/skin-blue.min.css">
     <style type="text/css">
     html {
         overflow: hidden;
@@ -26,50 +27,44 @@
     </style>
 </head>
 
-<body class="hold-transition skin-green-light sidebar-mini fixed">
+<body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
         <header class="main-header">
-            <a href="index2.html" class="logo">
-                <span class="logo-mini"><b>宣</b>教</span>
-                <span class="logo-lg"><b>宣教</b>系统</span>
+            <a href="javascript:void(0)" class="logo">
+                <span class="logo-mini"><b>宣教</b></span>
+                <span class="logo-lg">健康<b>宣教</b>监管系统</span>
             </a>
             <nav class="navbar navbar-static-top">
-                <!-- <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
+                <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                     <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </a> -->
+                </a>
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <li class="dropdown user user-menu">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <img src="/static/image/user.png" class="user-image" alt="User Image"/>
-                                <span class="hidden-xs" th:text="${user.userName}"></span>
-                            </a>
+                                <img src="/static/image/role_be_assessed.png" style="background: #fff" class="user-image" alt="User Image" />
+                                <span class="hidden-xs" th:text="${user.username}"></span>
+                                </a>
                             <ul class="dropdown-menu">
                                 <!-- The user image in the menu -->
                                 <li class="user-header">
-                                    <img src="/static/image/user.png" class="img-circle" alt="User Image" />
-                                    <p th:text="${user.userName}"></p>
-                                    <p><small th:text="${user.agencyId}? '普通用户':'系统管理员'"></small></p>
+                                    <img src="/static/image/role_be_assessed.png" style="background: #fff" class="img-circle" alt="User Image" />
+                                    <p th:text="${user.username}"></p>
                                 </li>
                                 <li class="user-footer">
                                     <div class="pull-left">
-                                        <a href="#" class="btn btn-default btn-flat">修改密码</a>
+                                        <a href="javascript:see()" class="btn btn-default btn-flat">修改密码</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="#" class="btn btn-default btn-flat">登出</a>
+                                        <a href="/logout" class="btn btn-default btn-flat">登出</a>
                                     </div>
                                 </li>
                             </ul>
                         </li>
                         <li>
-                            <a href="/health/logout" alt="登出"><i class="fa fa-sign-out"></i></a>
-                        </li>
-                        <!-- Control Sidebar Toggle Button -->
+                            <a href="javascript:goHome()" alt="主页"><i class="glyphicon glyphicon-home"></i></a> </li>
                         <li>
-                            <a href="#" alt="设置" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
+                            <a href="/logout" alt="登出"><i class="fa fa-sign-out"></i></a>
                         </li>
                     </ul>
                 </div>
@@ -78,29 +73,54 @@
         <aside class="main-sidebar">
             <section class="sidebar">
                 <div class="user-panel">
-                    <div class="pull-left image">
-                        <img src="/static/image/user.png" class="img-circle" alt="User Image">
+                    <div class="pull-left image" style="background-color: white; border-radius: 23px;">
+                        <img src="/static/image/role_be_assessed.png" style="background: #fff" class="img-circle" alt="User Image" />
                     </div>
-                    <div class="pull-left info">
-                        <p th:text="${user.userName}"></p>
-                        <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                        <div class="pull-left info">
+                            <p th:text="${user.username}"></p>
+                        </div>
                     </div>
-                </div>
-                <form action="#" method="get" class="sidebar-form">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search...">
-                        <span class="input-group-btn">
-                <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()"><i
-                        class="fa fa-search"></i>
-                </button>
-              </span>
-                    </div>
-                </form>
-                <ul class="sidebar-menu"></ul>
+                    <!-- Sidebar Menu -->
+                    <ul class="sidebar-menu">
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-dashboard"></i><span>信息管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="javascript:go('9100','publicity/message/index','信息发布')"><i class="fa fa-circle-o"></i>信息发布</a></li>
+                                <li><a href="javascript:go('9200','publicity/message/examine/index','信息审核')"><i class="fa fa-circle-o"></i>信息审核</a></li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-dashboard"></i><span>宣传资料管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="javascript:go('8100','publicity/material/index','宣传资料管理')"><i class="fa fa-circle-o"></i>宣传资料管理</a></li>
+                                <li><a href="javascript:go('8200','publicity/material/grant/index','宣传资料发放')"><i class="fa fa-circle-o"></i>宣传资料发放</a></li>
+                                <li><a href="javascript:go('8300','publicity/material/grant/count/agency/index','宣传资料机构历年统计')"><i class="fa fa-circle-o"></i>宣传资料机构历年统计</a></li>
+                                <li><a href="javascript:go('8400','publicity/material/grant/count/index','宣传资料发放按年统计')"><i class="fa fa-circle-o"></i>宣传资料发放按年统计</a></li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-dashboard"></i><span>视频管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="javascript:go('7100','video/index','视频管理')"><i class="fa fa-circle-o"></i>视频管理</a></li>
+                                <li><a href="javascript:go('7200','video/examine/index','视频审核')"><i class="fa fa-circle-o"></i>视频审核</a></li>
+                                <li><a href="javascript:go('7300','video/play/list','视频播放管理')"><i class="fa fa-circle-o"></i>视频播放管理</a></li>
+                                <li><a href="javascript:go('7400','video/play/publish/index','视频播放统计')"><i class="fa fa-circle-o"></i>视频播放统计</a></li>
+                                <li><a href="javascript:go('7500','video/play/count/index','视频播放记录按年统计')"><i class="fa fa-circle-o"></i>视频播放记录按年统计</a></li>
+                                <li><a href="javascript:go('7600','video/play/count/agency/index','视频播放记录机构历年统计')"><i class="fa fa-circle-o"></i>视频播放记录机构历年统计</a></li>
+                            </ul>
+                        </li>
+                        <li class="treeview">
+                            <a href="#"><i class="fa fa-dashboard"></i><span>系统管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
+                            <ul class="treeview-menu">
+                                <li><a href="javascript:go('1100','/health/org/user/index','用户管理')"><i class="fa fa-circle-o"></i>用户管理</a></li>
+                                <li><a href="javascript:go('1200','../common/org/role/index','角色管理')"><i class="fa fa-circle-o"></i>角色管理</a></li>
+                            </ul>
+                        </li>
+                    </ul>
             </section>
         </aside>
         <div class="content-wrapper" id="content-wrapper" style="min-height: 421px;">
-            <div class="content-tabs">
+            <!-- <div class="content-tabs">
                 <button class="roll-nav roll-left tabLeft" onclick="scrollTabLeft()">
                     <i class="fa fa-backward"></i>
                 </button>
@@ -123,63 +143,44 @@
                     </ul>
                 </div>
                 <button class="roll-nav roll-right fullscreen" onclick="App.handleFullScreen()"><i class="fa fa-arrows-alt"></i></button>
-            </div>
+            </div> -->
             <div class="content-iframe" style="background-color: #ecf0f5;">
-                <div class="tab-content" id="tab-content">
+                <div class="tab-content" id="tab-content" style="background-color: #ecf0f5;">
                 </div>
             </div>
         </div>
-        <footer class="main-footer">
-            <div class="pull-right hidden-xs"><b>Version</b> 1.0.0</div>
-            <strong>Copyright &copy; 2018 <a href="http://www.netintech.cn">网进科技</a>.</strong> All rights reserved.
-        </footer>
-        <aside class="control-sidebar control-sidebar-dark">
-            <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
-                <li class="active"><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
-                <li><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-home"></i></a></li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane" id="control-sidebar-home-tab">
-                </div>
-                <div class="tab-pane" id="control-sidebar-stats-tab">Stats Tab Content</div>
-                <div class="tab-pane active" id="control-sidebar-settings-tab">
-                    <div>
-                        <h4 class="control-sidebar-heading">Layout Options</h4>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-layout="fixed" class="pull-right" /> Fixed layout</label>
-                            <p>Activate the fixed layout. You can't use fixed and boxed layouts together</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-layout="layout-boxed" class="pull-right" /> Boxed Layout</label>
-                            <p>Activate the boxed layout</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-layout="sidebar-collapse" class="pull-right" /> Toggle Sidebar</label>
-                            <p>Toggle the left sidebar's state (open or collapse)</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-enable="expandOnHover" class="pull-right" /> Sidebar Expand on Hover</label>
-                            <p>Let the sidebar mini expand on hover</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-controlsidebar="control-sidebar-open" class="pull-right" /> Toggle Right Sidebar Slide</label>
-                            <p>Toggle between slide over content and push content effects</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="control-sidebar-subheading">
-                                <input type="checkbox" data-sidebarskin="toggle" class="pull-right" /> Toggle Right Sidebar Skin</label>
-                            <p>Toggle between dark and light skins for the right sidebar</p>
-                        </div>
-                    </div>
+        <div class="control-sidebar-bg"></div>
+        <div id="updatePsd" style="display: none">
+            <div class="form-group" style="height: 32px; display: block; margin-top: 10px;">
+                <label for="username" class="col-sm-2 control-label" style="height: 34px; display: inline-block; line-height: 34px;">用户名</label>
+                <div class="col-sm-10">
+                    <input type="text" name="username" readonly="readonly" class="form-control" id="username" th:value="${name}" />
                 </div>
             </div>
-        </aside>
-        <div class="control-sidebar-bg"></div>
+            <div class="form-group" style="height: 32px; display: block;">
+                <label for="oldPassword" class="col-sm-2 control-label" style="height: 34px; display: inline-block; line-height: 34px;">原始密码:</label>
+                <div class="col-sm-10">
+                    <input type="password" name="oldPassword" class="form-control" id="oldPassword" placeholder="请输入原始密码" />
+                </div>
+            </div>
+            <div class="form-group" style="height: 32px; display: block;">
+                <label for="newPassword" class="col-sm-2 control-label" style="height: 34px; display: inline-block; line-height: 34px;">新密码:</label>
+                <div class="col-sm-10">
+                    <input type="password" name="newPassword" class="form-control" id="newPassword" placeholder="请输入6-20位由数字，字母或下划线组成的密码" />
+                </div>
+            </div>
+            <div class="form-group" style="height: 32px; display: block;">
+                <label for="confirmNewPassword" class="col-sm-2 control-label" style="height: 34px; display: inline-block; line-height: 34px;">确认新密码:</label>
+                <div class="col-sm-10">
+                    <input type="password" name="confirmNewPassword" class="form-control" id="iConfirmNewPassword" placeholder="请输入6-20位由数字，字母或下划线组成的密码" />
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-2">
+                    <button type="button" id="submitted" class="btn btn-primary btn-block">提交</button>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- ./wrapper -->
     <!-- REQUIRED JS SCRIPTS -->
@@ -189,260 +190,101 @@
     <script src="/static/assets/adminLTE/components/fastclick/lib/fastclick.js"></script>
     <script src="/static/js/app/app.min.js"></script>
     <script src="/static/js/app/app_iframe.min.js"></script>
+    <script src="/static/assets/jquery-asidenav/js/asidenav.js"></script>
+    <script src="/static/assets/layer/layer.js"></script>
     <script type="text/javascript">
-    /**
-     * 本地搜索菜单
-     */
-    function search_menu() {
-        //要搜索的值
-        var text = $('input[name=q]').val();
+    $(function() {
+        goHome();
 
-        var $ul = $('.sidebar-menu');
-        $ul.find("a.nav-link").each(function() {
-            var $a = $(this).css("border", "");
+        //密码修改后提交
+        $("#submitted").click(
+            function() {
+                var oldPassword = $.trim(window.parent.document
+                    .getElementById('oldPassword').value);
+                var newPassword = $.trim(window.parent.document
+                    .getElementById('newPassword').value);
+                var confirmNewPassword = $.trim(window.parent.document
+                    .getElementById('iConfirmNewPassword').value);
 
-            //判断是否含有要搜索的字符串
-            if ($a.children("span.menu-text").text().indexOf(text) >= 0) {
+                if (oldPassword == '' || oldPassword == 'null') {
+                    layer.msg('原始密码不能为空!');
+                } else if (newPassword == '' || newPassword == 'null') {
+                    layer.msg('新密码不能为空!');
+                } else if (newPassword == oldPassword) {
+                    layer.msg('新密码不能和原始密码一样!');
+                } else if (newPassword.length < 6 || newPassword.length > 20) {
+                    layer.msg('新密码长度应该在6-20');
+                } else if (confirmNewPassword == '' || confirmNewPassword == 'null') {
+                    layer.msg('确认新密码不能为空！');
+                } else if (confirmNewPassword.length < 6 || confirmNewPassword.length > 20) {
+                    layer.msg('确认新密码长度应该在6-20');
+                } else if (confirmNewPassword != newPassword) {
+                    layer.msg('两次新密码输入不一致！');
+                } else {
+                    $.post("/health/update/password", {
+                        'oldPassword': oldPassword,
+                        'newPassword': newPassword
+                    }, function(response) {
+                        if (response.status == 1) {
+                            layer.alert("修改成功", function() {
+                                window.location = "/logout";
+                            });
+                        } else {
+                            layer.alert("修改失败", function() {
 
-                //如果a标签的父级是隐藏的就展开
-                $ul = $a.parents("ul");
+                            });
+                        }
 
-                if ($ul.is(":hidden")) {
-                    $a.parents("ul").prev().click();
+                    });
                 }
+            })
+    });
 
-                //点击该菜单
-                $a.click().css("border", "1px solid");
-            }
+
+    function go(id, url, title) {
+        addTabs({
+            id: id || "0000",
+            title: title || "",
+            close: true,
+            url: url,
+            urlType: 'relative',
+            targetType: "iframe-tab"
         });
     }
 
-    $(function() {
+    //修改密码弹框
+    function see() {
+        layer.open({
+            type: 1,
+            title: '修改密码',
+            shadeClose: false,
+            shade: false,
+            area: getOpenLayerSize(700, 300),
+            content: $("#updatePsd")
+        });
+    };
 
-        //App.setbasePath("/");
-        //App.setGlobalImgPath("/static/image/");
+    function getOpenLayerSize(w, h) {
+        w = w || 0.8;
+        h = h || 0.9;
 
-        App.fixIframeCotent();
+        var ww = $(window).width();
+        var wh = $(window).height();
 
-        /*         addTabs({
-                    id: "90011",
-                    text: "疾病查询",
-                    icon: "fa fa-circle-o",
-                    url: "search/index",
-                    targetType: "iframe-tab"
-                }); */
+        if (w > ww) {
+            w = ww * 0.8;
+        } else if (w <= 1) {
+            w = ww * w;
+        }
 
-        var menus = [{
-                id: "9000",
-                text: "菜单",
-                icon: "",
-                isHeader: true
-            },
-            {
-                id: "9001",
-                text: "知识库",
-                icon: "fa fa-laptop",
-                children: [{
-                        id: "90011",
-                        text: "疾病查询",
-                        icon: "fa fa-circle-o",
-                        url: "search/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90012",
-                        text: "疾病知识管理",
-                        icon: "fa fa-circle-o",
-                        url: "knowledge/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90013",
-                        text: "症状知识管理",
-                        icon: "fa fa-circle-o",
-                        url: "symptom/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90014",
-                        text: "标准管理",
-                        icon: "fa fa-circle-o",
-                        url: "index/index",
-                        targetType: "iframe-tab"
-                    }
-                ]
-            },
-            {
-                id: "9002",
-                text: "健康处方",
-                icon: "fa fa-laptop",
-                children: [{
-                        id: "90021",
-                        text: "健康处方查看",
-                        icon: "fa fa-circle-o",
-                        url: "prescription/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90022",
-                        text: "健康处方分析",
-                        icon: "fa fa-circle-o",
-                        url: "prescription/analyze/trial/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90023",
-                        text: "健康处方准则",
-                        icon: "fa fa-circle-o",
-                        url: "prescription/basis",
-                        targetType: "iframe-tab"
-                    }
-                ]
-            },
-            {
-                id: "9003",
-                text: "信息管理",
-                icon: "fa fa-laptop",
-                children: [{
-                        id: "90031",
-                        text: "信息发布",
-                        icon: "fa fa-circle-o",
-                        url: "publicity/message/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90032",
-                        text: "信息审核",
-                        icon: "fa fa-circle-o",
-                        url: "publicity/message/examine/index",
-                        targetType: "iframe-tab"
-                    }
-                ]
-            },
-            {
-                id: "9004",
-                text: "宣传资料管理",
-                icon: "fa fa-laptop",
-                children: [{
-                        id: "90041",
-                        text: "宣传资料管理",
-                        icon: "fa fa-circle-o",
-                        url: "/publicity/material/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90043",
-                        text: "宣传资料发放",
-                        icon: "fa fa-circle-o",
-                        url: "/publicity/material/grant/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90044",
-                        text: "宣传资料发放按年统计",
-                        icon: "fa fa-circle-o",
-                        url: "/publicity/material/grant/count/index",
-                        targetType: "iframe-tab"
-                    },
-                    {
-                        id: "90045",
-                        text: "宣传资料机构历年统计",
-                        icon: "fa fa-circle-o",
-                        url: "/publicity/material/grant/count/agency/index",
-                        targetType: "iframe-tab"
-                    }
-                ]
-            },
-            { 
-            id: "9005",
-            text: "视频管理",
-            icon: "fa fa-laptop",
-            children: [{
-                id: "90051",
-                text: "视频管理",
-                icon: "fa fa-circle-o",
-                url: "video/index",
-                targetType: "iframe-tab"
-            },
-            {
-                id: "900532",
-                text: "视频审核",
-                icon: "fa fa-circle-o",
-                url: "video/examine/index",
-                targetType: "iframe-tab"
-            },
-            {
-                id: "90052",
-                text: "视频播放管理",
-                icon: "fa fa-circle-o",
-                url: "video/play/list",
-                targetType: "iframe-tab"
-            },
-            {
-                id: "90053",
-                text: "视频播放统计",
-                icon: "fa fa-circle-o",
-                url: "video/play/publish/index",
-                targetType: "iframe-tab"
-            },
-            {
-                id: "90054",
-                text: "视频播放记录按年统计",
-                icon: "fa fa-circle-o",
-                url: "video/play/count/index",
-                targetType: "iframe-tab"
-            },
-            {
-                id: "90055",
-                text: "视频播放记录机构历年统计",
-                icon: "fa fa-circle-o",
-                url: "video/play/count/agency/index",
-                targetType: "iframe-tab"
-            }]
-            },
-            {
-                id: "9006",
-                text: "系统管理",
-                icon: "fa fa-laptop",
-                children: [{
-                    id: "90061",
-                    text: "用户管理",
-                    icon: "fa fa-circle-o",
-                    url: "org/user/index",
-                    targetType: "iframe-tab"
-                },
-                {
-                    id: "90062",
-                    text: "角色管理",
-                    icon: "fa fa-circle-o",
-                    url: "org/role/index",
-                    targetType: "iframe-tab"
-                }
-                ]
-            }
-        ];
+        if (h > wh) {
+            h = wh * 0.9;
+        } else if (h <= 1) {
+            h = wh * h;
+        }
 
-        $('.sidebar-menu').sidebarMenu({ data: menus });
-
-
-        // 动态创建菜单后，可以重新计算 SlimScroll
-        // $.AdminLTE.layout.fixSidebar();
-
-        /*if ($.AdminLTE.options.sidebarSlimScroll) {
-            if (typeof $.fn.slimScroll != 'undefined') {
-                //Destroy if it exists
-                var $sidebar = $(".sidebar");
-                $sidebar.slimScroll({destroy: true}).height("auto");
-                //Add slimscroll
-                $sidebar.slimscroll({
-                    height: ($(window).height() - $(".main-header").height()) + "px",
-                    color: "rgba(0,0,0,0.2)",
-                    size: "3px"
-                });
-            }
-        }*/
-
-    });
+        return [w + "px", h + "px"];
+    }
     </script>
 </body>
 

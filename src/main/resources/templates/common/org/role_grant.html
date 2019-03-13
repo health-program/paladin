@@ -18,7 +18,7 @@
     <section class="content-header">
         <h1>角色管理</h1>
         <ol class="breadcrumb">
-            <li><a href="/org/role/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li><a href="/common/org/role/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">授权</li>
         </ol>
     </section>
@@ -41,7 +41,7 @@
     var roleId;
     $(function() {
         roleId = $("#roleId").val();
-        $.getAjax("/org/role/grant/find/permission?id=" + roleId, function(data) {
+        $.getAjax("/common/org/role/grant/find/permission?id=" + roleId, function(data) {
             initTree(roleId, data, $("#permissionTree"));
         });
     });
@@ -116,9 +116,9 @@
                     permissionId: ids
                 }
 
-                $.postAjax("/org/role/grant", data, function() {
+                $.postAjax("/common/org/role/grant", data, function() {
                     $.successAlert("保存成功", function() {
-                        window.location = "/org/role/index";
+                        window.location = "/common/org/role/index";
                     });
                 })
 

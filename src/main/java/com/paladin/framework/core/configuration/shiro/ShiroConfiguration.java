@@ -231,6 +231,7 @@ public class ShiroConfiguration {
 							for (String ap : authPrefixs) {
 								if (requestUrl.startsWith(ap)) {
 									super.doFilterInternal(servletRequest, servletResponse, chain);
+									return;
 								}
 							}
 
@@ -246,6 +247,7 @@ public class ShiroConfiguration {
 								}
 							}
 							super.doFilterInternal(servletRequest, servletResponse, chain);
+							return;
 						}
 					}					
 					// -------------- add by TontoZhou -----------------					

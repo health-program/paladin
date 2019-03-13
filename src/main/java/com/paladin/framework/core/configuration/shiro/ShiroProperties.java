@@ -38,7 +38,7 @@ public class ShiroProperties {
 	/**
 	 * 需要验证资源前缀，如果为空，表示除静态资源外所有
 	 */
-	private String authResourcePrefix = "/health/";
+	private String authResourcePrefix = "/health/,/common/";
 	
 	/**
 	 * 登录URL
