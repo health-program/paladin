@@ -1,0 +1,40 @@
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><script src=https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js></script><script src=./static/js/mui.min.js></script><title>宣教</title><link href=./static/css/app.4e67f2fffa8fab285993f821317ba1fd.css rel=stylesheet></head><body class=body><div id=app></div><script>// 禁止用户使用手指进行缩放
+      document.documentElement.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, false);
+
+
+      document.addEventListener('plusready', function() {
+        var webview = plus.webview.currentWebview();
+        plus.key.addEventListener('backbutton', function() {
+          webview.canBack(function(e) {
+            if(e.canBack) {
+              webview.back();
+            } else {
+              //webview.close(); //hide,quit
+              //plus.runtime.quit();
+              mui.plusReady(function() {
+                //首页返回键处理
+                //处理逻辑：1秒内，连续两次按返回键，则退出应用；
+                var first = null;
+                plus.key.addEventListener('backbutton', function() {
+                  //首次按键，提示‘再按一次退出应用’
+                  if (!first) {
+                    first = new Date().getTime();
+                    mui.toast('再按一次退出应用');
+                    setTimeout(function() {
+                      first = null;
+                    }, 1000);
+                  } else {
+                    if (new Date().getTime() - first < 1500) {
+                      plus.runtime.quit();
+                    }
+                  }
+                }, false);
+              });
+            }
+          })
+        });
+      });</script><script type=text/javascript src=./static/js/manifest.142d41910a830e55fbf5.js></script><script type=text/javascript src=./static/js/vendor.024248d9ee083239d6f4.js></script><script type=text/javascript src=./static/js/app.0e2c6c172f878242e87a.js></script></body></html>

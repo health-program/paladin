@@ -1,0 +1,61 @@
+@charset "UTF-8";
+body, div, ul, li, ol, h1, h2, h3, h4, h5, h6, input, textarea, select, p, dl, dt, dd, a, img, button, form, table, th, tr, td, tbody, article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+  margin: 0;
+  padding: 0; }
+
+/* 根元素是10px;     16*62.5%=10  默认在pc端根元素会解析成12px    */
+body {
+  font: 12px/1.5 'Microsoft YaHei','宋体', Tahoma, Arial, sans-serif;
+  color: #333;
+  background: #F5F5F5; }
+
+em, i {
+  font-style: normal; }
+
+ul, li {
+  list-style-type: none; }
+
+strong {
+  font-weight: normal; }
+
+.clearfix:after {
+  content: "";
+  display: block;
+  visibility: hidden;
+  height: 0;
+  clear: both; }
+
+/*# sourceMappingURL=basic.css.map */
+img {
+  width: 100%;
+  height: 100%; }
+
+.text-overflow {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis; }
+
+.con-overflow {
+  height: 20px;
+  overflow: hidden;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1; }
+
+.van-swipe {
+  height: 100%; }
+
+#home .van-tabs__wrap {
+  position: fixed !important;
+  top: 50% !important; }
+#home .van-tabs__line {
+  display: none !important; }
+#home .van-tab--active {
+  color: #6EAFFF; }
+
+.vjs-custom-skin > .video-js .vjs-big-play-button {
+  font-size: 2em !important; }
+
+/*# sourceMappingURL=main.css.map */
