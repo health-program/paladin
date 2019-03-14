@@ -183,7 +183,7 @@ public class VideoController extends ControllerSupport {
 		model.addAttribute("videos", pages.getData());
 		model.addAttribute("videosAll", videosAll.getData());
 		model.addAttribute("messages", messages);
-		return "/health/videomanage/video_top_video_index";
+		return "/health/open/video_top_video_index";
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class VideoController extends ControllerSupport {
 		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
 		model.addAttribute("video", videoVO);
 		model.addAttribute("videosAll", videosAll.getData());
-		return "/health/videomanage/video_play";
+		return "/health/open/video_play";
 	}
 
 	/**
