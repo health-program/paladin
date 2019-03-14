@@ -54,7 +54,7 @@ public class VideoService extends ServiceSupport<Video> {
 			Video video = new Video();
 			video.setTop(1);
 			video.setId(id);
-			video.setTopOrderNo(Integer.valueOf(topNo));
+			video.setTopOrderNo(Integer.valueOf(topNo.trim()));
 			if (oldVideos != null && oldVideos.size() > 0) {
 				Video oldVideo = oldVideos.get(0);
 				if (!id.equals(oldVideo.getId())) {
