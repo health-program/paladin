@@ -102,7 +102,7 @@ public class VideoController extends ControllerSupport {
 
 		Video model = beanCopy(videoDTO, new Video());
 		model.setTop(0);
-		model.setTopOrderNo(Video.topNumber);
+		model.setTopOrderNo(Video.TOP_NUMBER);
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
 		if (videoService.save(model) > 0) {
@@ -124,7 +124,13 @@ public class VideoController extends ControllerSupport {
 		}
 
 		String id = videoDTO.getId();
-		Video model = beanCopy(videoDTO, videoService.get(id));
+		Video oldVideo = videoService.get(id);
+		if ( videoDTO.getTop() == 0 && oldVideo.getTop() == 1){
+			oldVideo.setTopOrderNo(Video.TOP_NUMBER);
+		}else if (videoDTO.getTop() == 1 && oldVideo.getTop() == 0){
+			oldVideo.setTopOrderNo(Video.TOP_NOT_SORT_NUMBER);
+		}
+		Video model = beanCopy(videoDTO, oldVideo);
 		if (videoService.update(model) > 0) {
 			return CommonResponse.getSuccessResponse(videoService.get(id));
 		}
@@ -183,7 +189,7 @@ public class VideoController extends ControllerSupport {
 		model.addAttribute("videos", pages.getData());
 		model.addAttribute("videosAll", videosAll.getData());
 		model.addAttribute("messages", messages);
-		return "/health/videomanage/video_top_video_index";
+		return "/health/open/video_top_video_index";
 	}
 
 	/**
@@ -205,7 +211,7 @@ public class VideoController extends ControllerSupport {
 		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
 		model.addAttribute("video", videoVO);
 		model.addAttribute("videosAll", videosAll.getData());
-		return "/health/videomanage/video_play";
+		return "/health/open/video_play";
 	}
 
 	/**
@@ -221,21 +227,6 @@ public class VideoController extends ControllerSupport {
 	@ResponseBody
 	public Object sort(@RequestParam("ids[]") String[] ids) {
 		return CommonResponse.getResponse(videoService.updateByOrderNo(ids));
-	}
-
-	/**
-	 * 功能描述: <br>
-	 * 〈取消置顶〉
-	 * 
-	 * @param id
-	 * @return java.lang.Object
-	 * @author Huangguochen
-	 * @date 2019/1/2
-	 */
-	@RequestMapping("/cancel")
-	@ResponseBody
-	public Object cancel(@RequestParam String id) {
-		return CommonResponse.getResponse(videoService.cancelTopById(id));
 	}
 
 	/**

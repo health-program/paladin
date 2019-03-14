@@ -4,7 +4,7 @@
 <head th:include="/common/header" />
 
 <body>
-    <tt:constant enumcode="boolean-type,role-level-type" />
+    <tt:constant enumcode="boolean,role-level" />
     <section class="content-header">
         <h1>角色管理</h1>
         <ol class="breadcrumb">
@@ -60,7 +60,7 @@
                     <div class="form-group">
                         <label for="roleLevel" class="col-sm-3 control-label">角色权限等级：</label>
                         <div class="col-sm-8">
-                            <select name="roleLevel" class="form-control tonto-select-constant" enumcode="role-level-type">
+                            <select name="roleLevel" class="form-control tonto-select-constant" enumcode="role-level">
                                 <option value="">请选择</option>
                             </select>
                         </div>
@@ -68,7 +68,7 @@
                     <div class="form-group">
                         <label for="enable" class="col-sm-3 control-label">是否启用：</label>
                         <div class="col-sm-8">
-                            <div name="enable" class="tonto-radio-constant" enumcode="boolean-type"></div>
+                            <div name="enable" class="tonto-radio-constant" enumcode="boolean"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -99,13 +99,13 @@
             url: "/common/org/role/update",
             columns: [
                 { title: "角色名称", name: "roleName", inputType: "TEXT" },
-                { title: "角色权限等级", name: "roleLevel", inputType: "SELECT", enum: "role-level-type", colspan: 2 },
-                { title: "是否启用", name: "enable", inputType: "RADIO", enum: "boolean-type", colspan: 2 },
+                { title: "角色权限等级", name: "roleLevel", inputType: "SELECT", enum: "role-level", colspan: 2 },
+                { title: "是否启用", name: "enable", inputType: "RADIO", enum: "boolean", colspan: 2 },
                 { title: "角色说明", name: "roleDesc", inputType: "TEXTAREA" }
             ]
         }
 
-        $.getAjax("/org/role/get?id=" + $("#id").val(), function(data) {
+        $.getAjax("/common/org/role/get?id=" + $("#id").val(), function(data) {
             var model = new tonto.Model("model", options.columns, {
                 extraParam: {
                     id: $("#id").val()
