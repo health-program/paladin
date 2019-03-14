@@ -20,7 +20,11 @@ public class VideoDTO {
 
 	// 标签
 	private String label;
-	
+
+	// 是否置顶（boolean）
+	private Integer top;
+
+
 	public String getId() {
 		return id;
 	}
@@ -69,4 +73,11 @@ public class VideoDTO {
 		this.label = label;
 	}
 
+	public Integer getTop() {
+		return top;
+	}
+
+	public void setTop(Integer top) {
+		this.top = top;
+	}
 }

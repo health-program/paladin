@@ -111,8 +111,10 @@
                     { title: "视频名称", align: "center", field: "name" },
                     { title: "标签", align: "center", field: "label" },
                     { title: "置顶排序号", align: "center", field: "topOrderNo" ,formatter:function (value, row, index) {
-                            if (value === 6){
+                            if (value === 7){
                                 return '待置顶'
+                            } else if (value === 6) {
+                                return '待排序';
                             } else {
                                 return value;
                             }
@@ -128,7 +130,7 @@
                     {
                         title: "操作",
                         align: "center",
-                        width: "27%",
+                        width: "20%",
                         events: {
                             'click .detail': function(e, value, row, index) {
                                 detail(row);
@@ -144,9 +146,6 @@
                             },
                             'click .confirm': function(e, value, row, index) {
                                 publish(row);
-                            },
-                            'click .cancel': function(e, value, row, index) {
-                                cancelTop(row);
                             }
                         },
                         formatter: operateFormatter
@@ -191,9 +190,6 @@
                 '</button>',
                 '<button class="sort btn btn-xs btn-success" style="margin-right:10px">' ,
                 '<i class="glyphicon glyphicon-sort"></i>排序' ,
-                '</button>',
-                '<button class="cancel btn btn-xs btn-warning" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-ban-circle"></i>取消置顶' ,
                 '</button>',
                 '<button class="confirm btn btn-xs btn-info">' ,
                 '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
@@ -287,16 +283,6 @@
             layer.confirm('确定删除吗?', function() {
                 $.getAjax('/health/video/delete?id=' + row.id, function() {
                     $.successMessage("删除成功");
-                    table.refresh();
-                });
-            });
-        }
-    }
-    function cancelTop(row) {
-        if (row) {
-            layer.confirm('确定取消吗?', function() {
-                $.getAjax('/health/video/cancel?id=' + row.id, function() {
-                    $.successMessage("取消成功");
                     table.refresh();
                 });
             });

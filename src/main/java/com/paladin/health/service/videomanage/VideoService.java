@@ -105,7 +105,7 @@ public class VideoService extends ServiceSupport<Video> {
 		Video model = new Video();
 		model.setId(id);
 		model.setTop(0);
-		model.setTopOrderNo(Video.topNumber);
+		model.setTopOrderNo(Video.TOP_NUMBER);
 		return updateSelective(model);
 	}
 }

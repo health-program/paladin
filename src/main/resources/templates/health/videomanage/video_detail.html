@@ -4,7 +4,7 @@
 <head th:include="/health/header" />
 
 <body>
-    
+<tt:constant enumcode="boolean"/>
     <section class="content-header">
         <h1>视频管理</h1>
         <ol class="breadcrumb">
@@ -63,7 +63,7 @@
 			</div>
 			<div id="model_edit" class="box-body" style="display: none">
 				<form id="model_form"
-					action="/health/video/update?id=b91a92a60b2f435a9852463e212cfc78"
+					action="/health/video/update"
 					method="post" class="form-horizontal edit-body"
 					novalidate="novalidate">
 					<div class="form-group">
@@ -74,8 +74,10 @@
 						</div>
 						<label for="top" class="col-sm-2 control-label">是否置顶：</label>
 						<div class="col-sm-3">
-							<input name="top" placeholder="请输入是否置顶" type="text"
-								class="form-control">
+							<select name="top" class="form-control" >
+								<option value="0">否</option>
+								<option value="1">是</option>
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -91,13 +93,8 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="topOrderNo" class="col-sm-3 control-label">置顶排序号：</label>
-						<div class="col-sm-3">
-							<input name="topOrderNo" placeholder="请输入置顶排序号" type="text"
-								class="form-control">
-						</div>
-						<label for="url" class="col-sm-2 control-label">视频地址：</label>
-						<div class="col-sm-3">
+						<label for="url" class="col-sm-3 control-label">视频地址：</label>
+						<div class="col-sm-5">
 							<input name="url" placeholder="请输入视频地址" type="text"
 								class="form-control">
 						</div>
@@ -134,7 +131,7 @@
 	        columns: [
 				
 				{ title: "视频简介", name: "summary", inputType: "TEXT" },
-				{ title: "是否置顶", name: "top", inputType: "TEXT" },
+				{ title: "是否置顶", name: "top", inputType: "SELECT",enum: "boolean" },
 				{ title: "视频名称", name: "name", inputType: "TEXT" },
 				{ title: "标签", name: "label", inputType: "TEXT" },
 				{ title: "置顶排序号", name: "topOrderNo", inputType: "TEXT" },
@@ -144,7 +141,19 @@
 	    }
     
         $.getAjax("/health/video/get?id="+$("#id").val(), function(data) {
-            var model = new tonto.Model("model", options.columns);
+            var model = new tonto.Model("model", options.columns,{
+				successCallback : function() {
+					$.successAlert("修改成功", function() {
+						window.location = "/health/video/index";
+					});
+				},
+				extraParam: {
+					id: $("#id").val()
+				}
+			});
+			if (data.topOrderNo === 6 || data.topOrderNo === 7) {
+				data.topOrderNo = '未排序'
+			}
             model.setData(data);
             $.initComponment();
         });

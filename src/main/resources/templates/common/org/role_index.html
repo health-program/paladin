@@ -4,7 +4,7 @@
 <head th:include="/common/header" />
 
 <body>
-    <tt:constant enumcode="boolean-type,role-level-type" />
+    <tt:constant enumcode="boolean,role-level" />
     <section class="content-header">
         <h1>角色管理</h1>
     </section>
@@ -37,9 +37,9 @@
             columns: [
                 [
                     { title: "角色名称", align: "center", field: "roleName" },
-                    { title: "角色权限等级", align: "center", field: "roleLevel", enumcode: "role-level-type" },
-                    { title: "是否启用", align: "center", field: "enable", enumcode: "boolean-type" },
-                    { title: "是否默认角色", align: "center", field: "isDefault", enumcode: "boolean-type" },
+                    { title: "角色权限等级", align: "center", field: "roleLevel", enumcode: "role-level" },
+                    { title: "是否启用", align: "center", field: "enable", enumcode: "boolean" },
+                    { title: "是否默认角色", align: "center", field: "isDefault", enumcode: "boolean" },
                     { title: "角色说明", align: "center", field: "roleDesc" },
                     {
                         title: "操作",

@@ -8,8 +8,9 @@ public class Video extends BaseModel {
 
     public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
 
-    public static final Integer topNumber = 6;
-    
+    public static final Integer TOP_NUMBER = 7;
+    public static final Integer TOP_NOT_SORT_NUMBER = 6;
+
     /**
      * 待审核
      */
