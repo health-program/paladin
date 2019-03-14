@@ -112,11 +112,11 @@
                     { title: "标签", align: "center", field: "label" },
                     { title: "置顶排序号", align: "center", field: "topOrderNo" ,formatter:function (value, row, index) {
                             if (value === 7){
-                                return '待置顶'
+                                return '<span class="label label-primary">待置顶</span>'
                             } else if (value === 6) {
-                                return '待排序';
+                                return '<span class="label label-success">待排序</span>'
                             } else {
-                                return value;
+                                return '<span class="badge">'+value+'</span>';
                             }
                         } },
                     {
