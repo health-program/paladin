@@ -56,7 +56,7 @@
                                         <a href="javascript:see()" class="btn btn-default btn-flat">修改密码</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="/logout" class="btn btn-default btn-flat">登出</a>
+                                        <a href="/health/logout" class="btn btn-default btn-flat">登出</a>
                                     </div>
                                 </li>
                             </ul>
@@ -228,7 +228,7 @@
                     }, function(response) {
                         if (response.status == 1) {
                             layer.alert("修改成功", function() {
-                                window.location = "/logout";
+                                window.location = "/health/logout";
                             });
                         } else {
                             layer.alert("修改失败", function() {
