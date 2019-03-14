@@ -56,7 +56,7 @@
                                         <a href="javascript:see()" class="btn btn-default btn-flat">修改密码</a>
                                     </div>
                                     <div class="pull-right">
-                                        <a href="/logout" class="btn btn-default btn-flat">登出</a>
+                                        <a href="/health/logout" class="btn btn-default btn-flat">登出</a>
                                     </div>
                                 </li>
                             </ul>
@@ -64,7 +64,7 @@
                         <li>
                             <a href="javascript:goHome()" alt="主页"><i class="glyphicon glyphicon-home"></i></a> </li>
                         <li>
-                            <a href="/logout" alt="登出"><i class="fa fa-sign-out"></i></a>
+                            <a href="/health/logout" alt="登出"><i class="fa fa-sign-out"></i></a>
                         </li>
                     </ul>
                 </div>
@@ -195,7 +195,6 @@
     <script src="/static/assets/layer/layer.js"></script>
     <script type="text/javascript">
     $(function() {
-        goHome();
 
         //密码修改后提交
         $("#submitted").click(
@@ -228,7 +227,7 @@
                     }, function(response) {
                         if (response.status == 1) {
                             layer.alert("修改成功", function() {
-                                window.location = "/logout";
+                                window.location = "/health/logout";
                             });
                         } else {
                             layer.alert("修改失败", function() {
@@ -241,6 +240,9 @@
             })
     });
 
+    function  goHome(){
+        window.location = "/health/index";
+    }
 
     function go(id, url, title) {
         addTabs({
