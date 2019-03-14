@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="boolean,sex-type,family-hypertension-type" />
+    <div class="container">
+        <section class="content-header">
+            <h1>健康处方获取</h1>
+        </section>
+        <section class="content">
+        </section>
+    </div>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "评估信息",
+        columns: [
+            { name: "name", title: "姓名", inputType: "TEXT" },
+            { name: "identificationId", title: "身份证号码", inputType: "TEXT" },
+            { name: "cellphone", title: "手机号码", inputType: "TEXT", enum: "publicity-message-type" },
+            { name: "age", title: "年龄", inputType: "TEXT" },
+            { name: "sex ", title: "性别", inputType: "RADIO", enum: "sex-type", colspan: 2 },
+            { name: "height", title: "身高", inputType: "TEXT", unit:"cm"},
+            { name: "weight", title: "体重", inputType: "TEXT" },
+            { name: "dbp", title: "低压（舒张压）", inputType: "TEXT" },
+            { name: "sbp", title: "高压（收缩压）", inputType: "TEXT" },
+            { name: "pbg", title: "餐后血糖", inputType: "TEXT" },
+            { name: "fbc", title: "空腹血糖", inputType: "TEXT" },
+            { name: "waistline", title: "腰围", inputType: "TEXT" },
+            { name: "diabetes", title: "是否患糖尿病", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "strokeOrTia", title: "是否发作过中风或脑缺血", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "tc_mmol", title: "空腹血清总胆固醇", inputType: "TEXT" },
+            { name: "smoke", title: "是否吸烟", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "idl", title: "低密度脂蛋白", inputType: "TEXT" },
+            { name: "hdl", title: "高密度脂蛋白", inputType: "TEXT" },
+            { name: "family_cvd", title: "CVD家族史", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "sports", title: "每天是否锻炼30分钟以上", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "vegOrFruits", title: "每天是否吃水果或输出", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "dyazide", title: "是否服用降压药", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "hyperglycemia", title: "是否高血糖", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "family_diabetes", title: "是否有糖尿病家族史", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "hormone", title: "是否连续6个月以上服用激素类药品", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "menopause", title: "45岁前是否绝经", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "drinking", title: "是否饮酒", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "diarrhea", title: "腹泻、腹痛或大便习惯", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "rarelyBask", title: "不经常晒太阳", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "rarelysports", title: "不经常参加运动锻炼", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "family_osteoporosis", title: "是否有质疏松家族史", inputType: "RADIO", enum: "boolean", colspan: 2 },
+            { name: "family_hypertension", title: "是否有高血压家族史", inputType: "RADIO", enum: "family-hypertension-type", colspan: 2 }
+        ]
+    }
+
+    $(function() {
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        var model = new tonto.Model("model", options.columns);
+        model.setData(null);
+        $.initComponment($(".content"));
+
+    });
+    </script>
+</body>
+
+</html>

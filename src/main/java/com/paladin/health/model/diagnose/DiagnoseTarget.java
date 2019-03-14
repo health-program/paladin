@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class DiagnoseTarget {
 	
 	public static final int SEX_MAN = 1;
-	public static final int SEX_WOMAN = 2;
+	public static final int SEX_WOMAN =0;
 	
 	
 	@Id

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,7 +16,12 @@ import com.paladin.health.core.IndexContainer;
 import com.paladin.health.core.factor.PeopleCondition;
 import com.paladin.health.service.core.HealthPrescriptionService;
 
-@Controller
+/**
+ * 该接口方法为最初设想，已经作废
+ * @author TontoZhou
+ * @since 2019年3月13日
+ */
+//@Controller
 @RequestMapping("/open")
 public class DiagnoseController {
 

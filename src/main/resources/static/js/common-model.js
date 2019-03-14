@@ -739,7 +739,29 @@ var _FieldBuilder = function(name, interfaces) {
 }
 
 // 文本域构建器
-var _textFieldBuilder = new _FieldBuilder("TEXT", {});
+var _textFieldBuilder = new _FieldBuilder("TEXT", {
+});
+
+// 数字域构建器
+var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
+
+
+
+    // generateEditFormHtml: function(column, isFirst, options) {
+    //     if (typeof column.generateEditFormHtml === 'function') {
+    //         return column.generateEditFormHtml(column, isFirst, options);
+    //     }
+    //     var colspan = column.colspan || 1,
+    //         html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
+    //     html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+    //     html += '<div name="' + column.name + '" class="tonto-radio-constant" enumcode="' + column.enum + '"></div>\n';
+    //     html += '</div>\n';
+    //     return {
+    //         colspan: colspan,
+    //         html: html
+    //     };
+    // }
+});
 
 // 大文本域构建器
 var _textAreaFieldBuilder = new _FieldBuilder("TEXTAREA", {
