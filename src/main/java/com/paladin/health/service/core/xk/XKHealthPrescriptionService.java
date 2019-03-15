@@ -30,4 +30,10 @@ public class XKHealthPrescriptionService {
 		return knowledgeServlet.getRequest(url, null, Map.class);
 	}
 
+	@SuppressWarnings("rawtypes")
+	public Map getEvaluation(XKEvaluateCondition condition) {
+		String  url = "http://dlopen.xikang.com/openapi/evaluate/diseasePrediction";
+		return knowledgeServlet.postJsonRequest(url, condition, Map.class);
+	}
+
 }

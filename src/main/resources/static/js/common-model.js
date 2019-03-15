@@ -739,28 +739,95 @@ var _FieldBuilder = function(name, interfaces) {
 }
 
 // 文本域构建器
-var _textFieldBuilder = new _FieldBuilder("TEXT", {
-});
+var _textFieldBuilder = new _FieldBuilder("TEXT", {});
 
 // 数字域构建器
 var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
+    fillView: function(column, data, model) {
+        // VIEW页面填充值时候调用
+        if (typeof column.fillView === 'function') {
+            return column.fillView(column, data, model);
+        }
 
+        var p = model.viewBody.find("[name='" + column.name + "']");
+        if (!p || p.length == 0) return;
+        var v = data ? data[column.name] : null;
 
+        if (v || v === 0) {
+            p.removeClass("text-muted");
+            if (column.unit) {
+                p.text(v + column.unit);
+            } else {
+                p.text(v);
+            }
+        } else {
+            p.addClass("text-muted");
+            p.text("无");
+        }
+    },
+    hideEdit: function(column, model) {
+        if (column.editDisplay === "hide") {
+            return;
+        }
 
-    // generateEditFormHtml: function(column, isFirst, options) {
-    //     if (typeof column.generateEditFormHtml === 'function') {
-    //         return column.generateEditFormHtml(column, isFirst, options);
-    //     }
-    //     var colspan = column.colspan || 1,
-    //         html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-    //     html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-    //     html += '<div name="' + column.name + '" class="tonto-radio-constant" enumcode="' + column.enum + '"></div>\n';
-    //     html += '</div>\n';
-    //     return {
-    //         colspan: colspan,
-    //         html: html
-    //     };
-    // }
+        // EDIT页面列隐藏时候调用
+        if (typeof column.hideEdit === 'function') {
+            column.hideEdit(column, model);
+            column.editDisplay = "hide";
+            return;
+        }
+
+        var p = model.editBody.find("[name='" + column.name + "']");
+        if (!p || p.length == 0) return;
+
+        if (column.unit || column.unitIcon) {
+            var d = p.parent().parent,
+                f = d.parent();
+            d.hide();
+            d.prev().hide();
+            if (f.children(":visible").length == 0) {
+                f.hide();
+            }
+        } else {
+            var d = p.parent(),
+                f = d.parent();
+            d.hide();
+            d.prev().hide();
+            if (f.children(":visible").length == 0) {
+                f.hide();
+            }
+        }
+
+        column.editDisplay = "hide";
+    },
+    generateEditFormHtml: function(column, isFirst, options) {
+        if (typeof column.generateEditFormHtml === 'function') {
+            return column.generateEditFormHtml(column, isFirst, options);
+        }
+        var colspan = column.colspan || 1,
+            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+        if (column.unit || column.unitIcon) {
+            html += '<div class="input-group">';
+            html += '<input name="' + column.name + '" class="form-control" type="number"></input>\n';
+            if (column.unitIcon) {
+                html += '<div class="input-group-addon">';
+                html += '       <i class="' + column.unitIcon + '"></i>';
+                html += '</div>';
+            } else {
+                html += '   <span class="input-group-addon">' + column.unit + '</span>';
+            }
+            html += '</div>';
+        } else {
+            html += '<input name="' + column.name + '" type="number"></input>\n';
+        }
+
+        html += '</div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
+    }
 });
 
 // 大文本域构建器
