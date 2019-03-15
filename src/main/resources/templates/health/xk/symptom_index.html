@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+
+<body>
+    <section class="content">
+        <div>
+        	<input type="hidden" id="symptomKey" th:value="${symptomKey}"/>
+        	<input type="hidden" id="symptomName" th:value="${symptomName}"/>        
+            <div class="col-md-12">
+            	<div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="symptomInput" placeholder="请输入症状名称或拼音" /> 
+                        <span class="input-group-btn">
+			                <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()"><i class="fa fa-search"></i>
+			                </button>
+			                <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                            </ul>
+			             </span>                                          
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病名称</h3>
+                        </div>
+                        <div id="dn" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                  <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">所属科室</h3>
+                        </div>
+                        <div id="ad" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                  <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病描述</h3>
+                        </div>
+                        <div id="dm" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                  <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病分类</h3>
+                        </div>
+                        <div id="dc" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-病因</h3>
+                        </div>
+                        <div id="dd_c" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-症状</h3>
+                        </div>
+                        <div id="dd_s" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-风险或并发症</h3>
+                        </div>
+                        <div id="dd_r" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-生活方式</h3>
+                        </div>
+                        <div id="dd_l" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-饮食建议</h3>
+                        </div>
+                        <div id="dd_d" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-运动建议</h3>
+                        </div>
+                        <div id="dd_sa" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                 <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-医疗保健</h3>
+                        </div>
+                        <div id="dd_m" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-就医复查指南</h3>
+                        </div>
+                        <div id="dd_g" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="box box-solid" style="margin-top:20px">
+                        <div class="box-header with-border">
+                            <i class="fa fa-info-circle"></i>
+                            <h3 class="box-title">疾病详情-生活常识</h3>
+                        </div>
+                        <div id="dd_n" class="box-body">
+                        </div>
+                    </div>                
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    <script type="text/javascript" src="/static/js/health/xk/symptom_index.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap-suggest/bootstrap-suggest.js"></script>
+</body>
+
+</html>

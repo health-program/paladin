@@ -1,12 +1,12 @@
 $(function() {
     if ($("#symptomInput").length > 0) {
-        $.getAjax("/health/disease/symptom/list", initCatalog);
+    	 
+        $.getAjax("/xk/dict", initCatalog);
     }
     var symptomKey = $("#symptomKey").val();
     if (symptomKey) {
         var symptomName = $("#symptomName").val();
         currentSymptom = symptomKey;
-        getSymptomKnowledge();
         $("#symptomInput").val(symptomName);
     }
 });
@@ -17,17 +17,19 @@ var currentZSID;
 var selectedKnowledgeId;
 
 function initCatalog(data) {
+	 
     catalog = data;
+	
     var dataList = {
         value: catalog
     };
 
     $("#symptomInput").bsSuggest({
-        idField: "nameKey",
-        keyField: "name",
-        effectiveFields: ["name"],
-        effectiveFieldsAlias: { name: "症状名称" },
-        searchFields: ["name", "nameKey"],
+        idField: "key",
+        keyField: "value",
+        effectiveFields: ["value"],
+        effectiveFieldsAlias: { value: "症状名称" },
+        searchFields: ["value", "key"],
         data: dataList,
         clearable: false,
         autoSelect: false,
@@ -36,19 +38,12 @@ function initCatalog(data) {
         //showBtn: false,        
         showHeader: true
     }).on('onSetSelectValue', function(e, keyword, data) {
-        currentSymptom = data.nameKey;
-        getSymptomKnowledge();
-        $("#symptomInput").val(data.name);
+        currentSymptom = data.key;
+        $("#symptomInput").val(data.value);
     });
 }
 
 var currentSymptom;
-
-function getSymptomKnowledge() {
-    if (currentSymptom) {
-        $.postAjax("/health/symptom/list/symptom", { symptomKey: currentSymptom }, initKnowledgeTree);
-    }
-}
 
 var g = function(nodeItems, data, level) {
     level = level || 1;
@@ -180,4 +175,27 @@ function initCategoryDetailContent(treedata) {
         });
 
     });
+}
+
+function search_menu(){
+	if (!currentSymptom) {
+        return;
+    }
+	
+	 $.postAjax("/xk/symptom", { code: currentSymptom }, function(data) {
+		 console.log(data.dn);
+	        $("#dn").html('<p style="text-indent:2em;">' + data.dn + "</p>");
+	        $("#ad").html('<p style="text-indent:2em;">' + data.ad + "</p>");
+	        $("#dm").html('<p style="text-indent:2em;">' + data.dm + "</p>");
+	        $("#dc").html('<p style="text-indent:2em;">' + data.dc + "</p>");
+	        $("#dd_c").html('<p style="text-indent:2em;">' + data.dd_c + "</p>");
+	        $("#dd_s").html('<p style="text-indent:2em;">' + data.dd_s + "</p>");
+	        $("#dd_r").html('<p style="text-indent:2em;">' + data.dd_r + "</p>");
+	        $("#dd_l").html('<p style="text-indent:2em;">' + data.dd_l + "</p>");
+	        $("#dd_d").html('<p style="text-indent:2em;">' + data.dd_d + "</p>");
+	        $("#dd_sa").html('<p style="text-indent:2em;">' + data.dd_sa + "</p>");
+	        $("#dd_m").html('<p style="text-indent:2em;">' + data.dd_m + "</p>");
+	        $("#dd_g").html('<p style="text-indent:2em;">' + data.dd_g + "</p>");
+	        $("#dd_n").html('<p style="text-indent:2em;">' + data.dd_n + "</p>");
+	        });
 }

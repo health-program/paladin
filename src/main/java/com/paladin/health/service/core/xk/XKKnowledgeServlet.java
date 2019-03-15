@@ -28,9 +28,9 @@ public class XKKnowledgeServlet {
 	// 熙康环境auth访问地址
 	private String authUrl = "http://dlpassport.xikang.com/oauth/token";
 	// 熙康环境clientId名称
-	private String clientId = "xk_kunshan";
+	private String clientId = "xiande_ningbo";
 	// 熙康环境clientSecret名称
-	private String clientSecret = "njneid(BH!kjdoue";
+	private String clientSecret = "Sx5do2Yetx38N";
 
 	// token 获取参数
 	private MultiValueMap<String, Object> tokenRequestParamMap;
