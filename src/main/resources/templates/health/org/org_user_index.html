@@ -52,15 +52,6 @@
     <div th:include="/health/footer" />
     <script type="text/javascript">
     var table;
-    var roleMap = {
-        "1": "默认",
-        "2": "机构管理员"
-    };
-    let 卫计委信息科 = "卫计委信息科";
-    var agencyMap = {
-        "8abdb2047b8a4ebabfbb775b6cc8e8d3": "昆山健康促进中心",
-        "1333e2a2c25f4b90bd1f97e5d84ca84e": "卫计委信息科"
-    }
     $(function() {
         initDataGrid();
     });
@@ -76,7 +67,14 @@
                 [
                     { title: "姓名", align: "center", field: "name" },
                     { title: "账号", align: "center", field: "account" },
-                    { title: "角色", align: "center", field: "roleId", formatter: function(value, row) { return roleMap[value] } },
+                    { title: "角色", align: "center", field: "roleName" },
+                    { title: "所属机构", align: "center", field: "agencyName",formatter:function (value, row, index) {
+                            if (!value) {
+                                return '无';
+                            } else {
+                                return value;
+                            }
+                        }},
                     { title: "描述", align: "center", field: "description" ,formatter:function (value, row, index) {
                             if (value)
                                 return value;
@@ -93,12 +91,16 @@
                             },
                             'click .reset': function(e, value, row, index) {
                                 reset(row);
+                            },
+                            'click .remove': function(e, value, row, index) {
+                                remove(row);
                             }
+
                         },
                         formatter: function operateFormatter(value, row, index) {
                             return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
-                                '<button class="reset btn btn-xs btn-danger"><i class="glyphicon glyphicon-refresh"></i>密码重置</button>';
-
+                                '<button class="reset btn btn-xs btn-warning" style="margin-right:10px"><i class="glyphicon glyphicon-refresh"></i>密码重置</button>'+
+                            '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
                         }
                     }
                 ]
@@ -133,6 +135,18 @@
             });
         }
     }
+
+    function remove(row) {
+        if (row) {
+            layer.confirm('确定删除吗?', function() {
+                $.getAjax('/health/org/user/delete?id=' + row.id, function() {
+                    $.successMessage("删除成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
     </script>
 </body>
 

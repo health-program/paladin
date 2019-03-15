@@ -5,6 +5,8 @@ import javax.persistence.Id;
 
 public class OrgUser extends UnDeleteBaseModel {
 
+	public static final String COLUMN_FIELD_AGENCY_ID = "agencyId";
+
 	// id
 	@Id
 	private String id;

@@ -1,7 +1,6 @@
 package com.paladin.health.service.core.xk;
 
 import java.util.List;
-import java.util.Map;
 
 public class XKPeopleCondition {
 	
@@ -13,7 +12,7 @@ public class XKPeopleCondition {
 	
 	private List<String> diseases;
 	
-	private Map<String, Object> condition;
+	private XKEvaluateCondition condition;
 
 	public String getName() {
 		return name;
@@ -47,14 +46,15 @@ public class XKPeopleCondition {
 		this.diseases = diseases;
 	}
 
-	public Map<String, Object> getCondition() {
+	public XKEvaluateCondition getCondition() {
 		return condition;
 	}
 
-	public void setCondition(Map<String, Object> condition) {
+	public void setCondition(XKEvaluateCondition condition) {
 		this.condition = condition;
 	}
 
+	
 	
 	
 }

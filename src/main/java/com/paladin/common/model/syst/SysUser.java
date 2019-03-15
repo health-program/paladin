@@ -1,13 +1,12 @@
 package com.paladin.common.model.syst;
 
-import java.io.Serializable;
-import java.util.Date;
+import com.paladin.framework.common.UnDeleteBaseModel;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-
-import com.paladin.framework.common.UnDeleteBaseModel;
+import java.io.Serializable;
+import java.util.Date;
 
 public class SysUser extends UnDeleteBaseModel implements Serializable {
 
@@ -33,6 +32,8 @@ public class SysUser extends UnDeleteBaseModel implements Serializable {
 	
 
 	public final static String COLUMN_FIELD_ACCOUNT = "account";
+
+	public final static String COLUMN_FIELD_USER_ID = "userId";
 
 	@Id
 	@Column(name = "id")

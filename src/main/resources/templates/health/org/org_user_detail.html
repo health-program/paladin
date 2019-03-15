@@ -36,7 +36,13 @@
 
                         <label for="roleName" class="col-sm-1 control-label">角色：</label>
                         <div class="col-sm-3">
-                            <p name="roleName" class="form-control-static description"></p>
+                            <p name="roleName" class="form-control-static description" th:text="${roleName == null} ? '无' : ${roleName}"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyName" class="col-sm-3 control-label">所属机构：</label>
+                        <div class="col-sm-3">
+                            <p name="agencyName" class="form-control-static description" th:text="${agencyName == null} ? '无' : ${agencyName}"></p>
                         </div>
                     </div>
                     <div class="form-group">
@@ -63,9 +69,17 @@
                         <label for="roleId" class="col-sm-1 control-label">角色：</label>
                         <div class="col-sm-3">
                             <select name="roleId" required class="form-control" >
-                                <option value="">请选择</option>
-                                <option value="1">默认</option>
-                                <option value="2">机构管理员</option>
+                                <option value="">请选择角色</option>
+                                <option th:each="role:${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyId" class="col-sm-3 control-label">所属机构：</label>
+                        <div class="col-sm-3">
+                            <select id="agencyId" name="agencyId"  class="form-control"  required>
+                                <option value="">请选择机构</option>
+                                <option th:each="agency:${agencies}" th:value="${agency.id}" th:text="${agency.name}"></option>
                             </select>
                         </div>
                     </div>
@@ -90,15 +104,6 @@
     <input type="hidden" id="id" th:value="${id}" />
     <div th:include="/health/footer" />
     <script type="text/javascript">
-    var roleMap = {
-        "1": "默认",
-        "2": "机构管理员"
-    };
-    var agencyMap = {
-        "8abdb2047b8a4ebabfbb775b6cc8e8d3": "昆山健康促进中心",
-        "1333e2a2c25f4b90bd1f97e5d84ca84e": "卫计委信息科"
-    };
-
     $(function() {
         var options = {
             id: "model",
@@ -107,8 +112,8 @@
             columns: [
                 { title: "账号", name: "account", inputType: "TEXT" },
                 { title: "姓名", name: "name", inputType: "TEXT" },
-                { title: "角色", name: "roleName", inputType: "TEXT" },
-                { title: "角色Id", name: "roleId", inputType: "TEXT" },
+                { title: "角色Id", name: "roleId", inputType: "SELECT" },
+                { title: "所属机构", name: "agencyId", inputType: "SELECT" },
                 { title: "描述", name: "description", inputType: "TEXT" }
             ]
         }
@@ -126,13 +131,6 @@
             }
         });
         $.getAjax("/health/org/user/get?id=" + $("#id").val(), function(data) {
-            if (data) {
-                try {
-                    data.roleName = roleMap[data.roleId];
-                } catch (e) {
-
-                }
-            }
             model.setData(data);
         });
     });
