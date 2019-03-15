@@ -9,21 +9,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.ConstantsContainer.KeyValue;
-import com.paladin.common.service.syst.SysConstantService;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.core.xk.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 
 /**
- * 基于熙康知识�?
+ * 基于熙康知识库
  * 
  * @author TontoZhou
- * @since 2019�?�?3�?
+ * @since 2019/03/14
  */
 @Api("熙康疾病百科")
 @Controller
@@ -35,12 +33,6 @@ public class XKDiagnoseController {
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
 	
-	@ApiOperation(value = "疾病评估输入信息页面跳转")
-	@GetMapping("/diagnose/input")
-
-
-	@Autowired
-	private XKHealthPrescriptionService healthPrescriptionService;
 
 	@RequestMapping("/evaluate/get/demo")
 	@ResponseBody
@@ -84,18 +76,11 @@ public class XKDiagnoseController {
 		return "/health/xk/evaluate_input";
 	}
 
-	
-	@ApiOperation(value = "")
-	//@ApiImplicitParam(name = "code", value = "CODE", required = true, dataType = "String", allowMultiple = true)
-	@GetMapping("/diagnose")
-
-
 	@RequestMapping("/evaluate")
 	@ResponseBody
 	public Object getEvaluation(XKEvaluateCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getEvaluation(condition));
 	}
-
 	
 	@ApiOperation(value = "疾病百科搜索展示页面")
 	@GetMapping("/symptom/index")
@@ -111,7 +96,7 @@ public class XKDiagnoseController {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledgeOfDisease(code));
 	}
 	
-	@ApiOperation(value = "为搜索加载疾病字�?, response = List.class, responseContainer = "List")
+	@ApiOperation(value = "为搜索加载疾病字", response = List.class, responseContainer = "List")
 	@GetMapping("/dict")
 	@ResponseBody
 	public Object dict() {
