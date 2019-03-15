@@ -39,9 +39,17 @@
                         <label for="roleId" class="col-sm-1 control-label">角色：</label>
                         <div class="col-sm-3">
                             <select name="roleId" required class="form-control" >
-                                <option value="">请选择</option>
-                                <option value="1">默认</option>
-                                <option value="2">机构管理员</option>
+                                <option value="">请选择角色</option>
+                                <option th:each="role:${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agencyId" class="col-sm-3 control-label">所属机构：</label>
+                        <div class="col-sm-3">
+                            <select id="agencyId" name="agencyId"  class="form-control"  required>
+                                <option value="">请选择机构</option>
+                                <option th:each="agency:${agencies}" th:value="${agency.id}" th:text="${agency.name}"></option>
                             </select>
                         </div>
                     </div>
@@ -69,6 +77,7 @@
         columns: [
 				{ title: "账号", name: "account", inputType: "TEXT" },
 				{ title: "姓名", name: "name", inputType: "TEXT" },
+				{ title: "所属机构", name: "agencyId", inputType: "SELECT" },
 				{ title: "角色", name: "roleId", inputType: "TEXT" },
 				{ title: "描述", name: "description", inputType: "TEXT" }
 				]

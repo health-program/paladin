@@ -2,4 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.org.OrgUserMapper">
 
+    <select id="orsearchAllUsersByQuery" resultType="com.paladin.health.service.org.vo.OrgUserVO">
+        SELECT
+        u.id,
+        u.`name`,
+        u.role_id AS roleId,
+        u.account,
+        u.description,
+        a.`name` AS agencyName,
+        r.role_name AS  roleName
+        FROM
+        org_user AS u
+        LEFT JOIN org_agency AS a ON u.agency_id = a.id
+        LEFT JOIN org_role AS r ON  u.role_id = r.id
+        where u.is_delete = 0
+        <if test="query.name != null and query.name != ''">
+            AND u.`name` = #{query.name}
+        </if>
+         <if test="agencyId != null">
+             AND u.agencyId = #{agencyId}
+         </if>
+    </select>
 </mapper>

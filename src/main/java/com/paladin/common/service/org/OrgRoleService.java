@@ -1,12 +1,5 @@
 package com.paladin.common.service.org;
 
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.paladin.common.core.permission.PermissionContainer;
 import com.paladin.common.model.org.OrgRole;
 import com.paladin.common.service.org.dto.OrgRoleDTO;
@@ -16,6 +9,11 @@ import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.copy.SimpleBeanCopier.SimpleBeanCopyUtil;
 import com.paladin.framework.core.exception.BusinessException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.Valid;
+import java.util.List;
 
 @Service
 public class OrgRoleService extends ServiceSupport<OrgRole> {
@@ -24,10 +22,10 @@ public class OrgRoleService extends ServiceSupport<OrgRole> {
 		/**
 		 * 只能获取数据等级小于等于自己的角色
 		 */
-		return searchAll(new Condition[] { 
+		return searchAll(
 				new Condition(OrgRole.COLUMN_FIELD_IS_DEFAULT, QueryType.EQUAL, defaultabled ? 1 : 0),
-				new Condition(OrgRole.COLUMN_FIELD_ROLE_LEVEL, QueryType.LESS_EQUAL, roleLevel) }
-		);
+				new Condition(OrgRole.COLUMN_FIELD_ROLE_LEVEL, QueryType.LESS_EQUAL, roleLevel),
+				new Condition(OrgRole.COLUMN_FIELD_ENABLE,QueryType.EQUAL,1));
 	}
 
 	@Transactional

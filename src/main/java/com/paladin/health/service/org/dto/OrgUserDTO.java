@@ -16,6 +16,7 @@ public class OrgUserDTO {
 	private String roleId;
 
 	// 机构ID
+	@NotEmpty
 	private String agencyId;
 
 	// 账号

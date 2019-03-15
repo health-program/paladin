@@ -1,7 +1,11 @@
 package com.paladin.health.controller.org;
 
+import com.paladin.framework.common.Condition;
+import com.paladin.framework.common.QueryType;
 import com.paladin.health.model.org.OrgAgency;
+import com.paladin.health.model.org.OrgUser;
 import com.paladin.health.service.org.OrgAgencyService;
+import com.paladin.health.service.org.OrgUserService;
 import com.paladin.health.service.org.dto.OrgAgencyQueryDTO;
 import com.paladin.health.service.org.dto.OrgAgencyDTO;
 import com.paladin.health.service.org.vo.OrgAgencyVO;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/health/org/agency")
@@ -26,6 +31,9 @@ public class OrgAgencyController extends ControllerSupport {
 
     @Autowired
     private OrgAgencyService orgAgencyService;
+
+    @Autowired
+    private OrgUserService orgUserService;
 
     @RequestMapping("/index")
     public String index() {
@@ -88,6 +96,11 @@ public class OrgAgencyController extends ControllerSupport {
     @RequestMapping("/delete")
     @ResponseBody
     public Object delete(@RequestParam String id) {
+        List<OrgUser> users = orgUserService.searchAll(new Condition(OrgUser.COLUMN_FIELD_AGENCY_ID, QueryType.EQUAL, id));
+    if (users != null && users.size() > 0) {
+        return  CommonResponse.getFailResponse("该机构下有关联人员,无法删除!");
+    }else {
         return CommonResponse.getResponse(orgAgencyService.removeByPrimaryKey(id));
+    }
     }
 }

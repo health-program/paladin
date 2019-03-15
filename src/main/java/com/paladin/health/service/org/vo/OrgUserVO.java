@@ -10,8 +10,14 @@ public class OrgUserVO {
 	// 姓名
 	private String name;
 
+	// 角色名称
+	private String roleName;
+
 	// 角色id
 	private String roleId;
+
+	// 机构
+	private String agencyName;
 
 	// 机构ID
 	private String agencyId;
@@ -125,4 +131,19 @@ public class OrgUserVO {
 		this.isDelete = isDelete;
 	}
 
+	public String getAgencyName() {
+		return agencyName;
+	}
+
+	public void setAgencyName(String agencyName) {
+		this.agencyName = agencyName;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
 }
