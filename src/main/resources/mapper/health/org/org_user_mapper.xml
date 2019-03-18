@@ -20,7 +20,7 @@
             AND u.`name` = #{query.name}
         </if>
          <if test="agencyId != null">
-             AND u.agencyId = #{agencyId}
+             AND u.agency_id = #{agencyId}
          </if>
     </select>
 </mapper>
