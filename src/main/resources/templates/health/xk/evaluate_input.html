@@ -118,10 +118,20 @@
             '    <dt>风险等级：</dt>' +
             '    <dd><span class="label label-' + color + '">' + data.riskLevel + '</span></dd>' +
             '    <dt>分析建议：</dt>' +
-            parseContent(data.suggest) +
+            parseContent1(data.suggest) +
             '</dl>';
     }
+    function parseContent1(content) {
+    	 var arr = content.split(/[@#]/g);
+    	 
+    	 var s = "";
+    	 arr.forEach(function(a) {
+             s += "<dd>" + a + "</dd>";
+         });
 
+         return s;
+    }
+    
     function parseContent(content) {
         var s = content.replace(/(\d+[\.\)])/g, "\n$1");
         var arr = s.split(/[\n,]/g);
