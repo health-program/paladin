@@ -112,9 +112,9 @@
                     { title: "标签", align: "center", field: "label" },
                     { title: "置顶排序号", align: "center", field: "topOrderNo" ,formatter:function (value, row, index) {
                             if (value === 7){
-                                return '<span class="label label-primary">待置顶</span>'
+                                return '<span class="label label-primary"><i class="fa fa-clock-o"></i>&nbsp;待置顶</span>'
                             } else if (value === 6) {
-                                return '<span class="label label-success">待排序</span>'
+                                return '<span class="label label-success"><i class="fa fa-clock-o"></i>&nbsp;待排序</span>'
                             } else {
                                 return '<span class="badge">'+value+'</span>';
                             }
