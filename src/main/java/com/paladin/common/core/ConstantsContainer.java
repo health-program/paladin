@@ -90,6 +90,10 @@ public class ConstantsContainer implements VersionContainer {
 		}
 		return result;
 	}
+	
+	public static List<KeyValue> getType(String typeCode) {
+		return constantMap.get(typeCode);
+	}
 
 	/**
 	 * 根据类型和名称得到常量KEY

@@ -344,6 +344,20 @@
             // 发送ajax请求 对应$.ajax()
             var callback = options.success;
             options.success = $.wrapAjaxSuccessCallback(callback, options.submitBtn);
+            if (!options.complete && options.submitBtn) {
+                options.complete = function() {
+                    $(options.submitBtn).each(function() {
+                        var that = $(this);
+                        var text = that.text();
+                        that.removeClass('disabled').prop('disabled', false).text(that.data("orginText"));
+                    });
+                };
+            }
+            if (!options.error) {
+                options.error = function(xhr, e) {
+                    $.errorMessage("系统异常:" + xhr.status);
+                }
+            }
             $.ajax(options);
         },
         getAjax: function(url, callback, submitBtn) {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.diagnose.DiagnoseTargetFactorMapper">
+	<delete id="deleteByTarget">
+		DELETE FROM diagnose_target_factor WHERE target_id =#{targetId}
+	</delete>
+
+	<insert id="insertByBatch">
+		INSERT INTO diagnose_target_factor (target_id,factor_code,factor_type,factor_level,create_time) VALUES
+		<foreach collection="coll" item="item" index="index" separator=",">
+			(#{item.targetId}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime})
+		</foreach>
+	</insert>
+</mapper>

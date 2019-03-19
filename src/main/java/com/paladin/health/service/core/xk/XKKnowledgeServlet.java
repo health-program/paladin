@@ -41,10 +41,9 @@ public class XKKnowledgeServlet {
 	private MultiValueMap<String, Object> tokenRequestParamMap;
 	private RestTemplate restTemplate;
 
-	private volatile String accessToken;
+	private String accessToken;
 	// TODO 超时时间，用于辅助判断token是否超时，需要看熙康是否能返回
-	@SuppressWarnings("unused")
-	private volatile long expiresTime = 0;
+	private long expiresTime;
 
 	public XKKnowledgeServlet() {
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -59,9 +58,9 @@ public class XKKnowledgeServlet {
 	 * @return
 	 */
 	public String getAssessToken() {
-		if (accessToken == null) {
+		if (accessToken == null || expiresTime < System.currentTimeMillis()) {
 			synchronized (XKKnowledgeServlet.class) {
-				if (accessToken == null) {
+				if (accessToken == null || expiresTime < System.currentTimeMillis()) {
 					updateAssessToken(null);
 					if (accessToken == null) {
 						throw new BusinessException("连接熙康知识库异常！");
@@ -78,7 +77,7 @@ public class XKKnowledgeServlet {
 	@SuppressWarnings("rawtypes")
 	public void updateAssessToken(String errorToken) {
 		synchronized (XKKnowledgeServlet.class) {
-			if (accessToken == null || accessToken.equals(errorToken)) {
+			if (accessToken == null || expiresTime < System.currentTimeMillis() || accessToken.equals(errorToken)) {
 				try {
 					if (tokenRequestParamMap == null) {
 						tokenRequestParamMap = new LinkedMultiValueMap<>();
@@ -94,6 +93,9 @@ public class XKKnowledgeServlet {
 						if (accessToken == null) {
 							logger.error("获取熙康获取token异常，token返回空");
 							throw new BusinessException("连接熙康知识库异常！");
+						} else {
+							// 熙康人员回复token超时时间12小时，不确定是否请求后刷新生命周期
+							expiresTime = System.currentTimeMillis() + 12 * 60 * 60 * 1000;
 						}
 					} else {
 						logger.error("获取熙康获取token异常，返回状态[" + response.getStatusCode() + "]");
@@ -285,50 +287,10 @@ public class XKKnowledgeServlet {
 	}
 
 	public static void main(String[] args) {
-		// String code = "CM.0140";
-		// String url =
-		// "http://dlopen.xikang.com/openapi/evaluate/diseaseEncyclopedia/"+ code;
-		//
-		// System.out.println(new XKKnowledgeServlet().getRequest(url, null,Map.class));
+		String code = "HY.CJJB";
+		String url = "http://dlopen.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
 
-		//
-		// String url = "http://dlopen.xikang.com/openapi/evaluate/diseasePrediction";
-		//
-		// XKEvaluateCondition diseasePredictionParticipationVo = new
-		// XKEvaluateCondition();
-		// diseasePredictionParticipationVo.setAge("47");
-		// diseasePredictionParticipationVo.setDbp("90");
-		// diseasePredictionParticipationVo.setDiabetes("1");
-		// diseasePredictionParticipationVo.setDiarrhea("1");
-		// diseasePredictionParticipationVo.setDrinking("1");
-		// diseasePredictionParticipationVo.setDyazide("1");
-		// diseasePredictionParticipationVo.setFamily_cvd("1");
-		// diseasePredictionParticipationVo.setFamily_diabetes("1");
-		// diseasePredictionParticipationVo.setFamily_hypertension("0");
-		// diseasePredictionParticipationVo.setFamily_osteoporosis("1");
-		// diseasePredictionParticipationVo.setFbc("10.8");
-		// diseasePredictionParticipationVo.setHdl("4.5");
-		// diseasePredictionParticipationVo.setHeight("178");
-		// diseasePredictionParticipationVo.setHormone("1");
-		// diseasePredictionParticipationVo.setHyperglycemia("1");
-		// diseasePredictionParticipationVo.setIdl("4.12");
-		// diseasePredictionParticipationVo.setMenopause("1");
-		// diseasePredictionParticipationVo.setPbg("16.1");
-		// diseasePredictionParticipationVo.setRarelyBask("1");
-		// diseasePredictionParticipationVo.setRarelysports("1");
-		// diseasePredictionParticipationVo.setSbp("156");
-		// diseasePredictionParticipationVo.setSex("1");
-		// diseasePredictionParticipationVo.setSmoke("1");
-		// diseasePredictionParticipationVo.setSports("1");
-		// diseasePredictionParticipationVo.setStrokeOrTia("1");
-		// diseasePredictionParticipationVo.setTc_mmol("7.8");
-		// diseasePredictionParticipationVo.setVegOrFruits("1");
-		// diseasePredictionParticipationVo.setWaistline("100");
-		// diseasePredictionParticipationVo.setWeight("95");
-		//
-		// System.out.println(new XKKnowledgeServlet().postJsonRequest(url,
-		// diseasePredictionParticipationVo, Map.class));
-
+		System.out.println(new XKKnowledgeServlet().getRequest(url, null, Map.class));
 	}
 
 }

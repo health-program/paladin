@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.ConstantsContainer.KeyValue;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.service.core.xk.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
+import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 
 @Controller
 @RequestMapping("/open/xk")

@@ -1,4 +1,4 @@
-package com.paladin.health.service.core.xk;
+package com.paladin.health.service.core.xk.request;
 
 public class XKEvaluateCondition {
 
@@ -26,6 +26,7 @@ public class XKEvaluateCondition {
 	private String strokeOrTia;
 	// 空腹血清总胆固醇 单位：mmol/l
 	private String tc_mmol;
+
 	// 是否吸烟 值域：1:是 0:否
 	private String smoke;
 	// 低密度脂蛋白 单位：mmol/l
@@ -50,6 +51,7 @@ public class XKEvaluateCondition {
 	private String menopause;
 	// 是否饮酒 值域：1:是 0:否
 	private String drinking;
+
 	// 腹泻、腹痛或大便习惯 值域：1:是 0:否
 	private String diarrhea;
 	// 不经常晒太阳 值域：1:是 0:否
