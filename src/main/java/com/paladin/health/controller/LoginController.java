@@ -3,6 +3,9 @@ package com.paladin.health.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.paladin.common.core.permission.MenuPermission;
+import com.paladin.common.model.org.OrgPermission;
+import com.paladin.health.core.HealthUserSession;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -26,6 +29,8 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.Collection;
+
 @Controller
 @RequestMapping("/health/")
 public class LoginController extends ControllerSupport {
@@ -36,10 +41,50 @@ public class LoginController extends ControllerSupport {
 	@ApiOperation(value = "主页面")
 	@GetMapping(value = "/index")
 	public Object main(HttpServletRequest request) {
-		UserSession userSession = UserSession.getCurrentUserSession();
+		HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
 		ModelAndView model = new ModelAndView("/health/index");
 		model.addObject("user", userSession.getUserForView());
+		Collection<MenuPermission> menus = userSession.getMenuResources();
+		StringBuilder sb = new StringBuilder("<li class=\"header\">菜单</li>");
+		createMenuHtml(menus, sb);
+		model.addObject("menuHtml", sb.toString());
 		return model;
+	}
+
+	private void createMenuHtml(Collection<MenuPermission> menus, StringBuilder sb) {
+		for (MenuPermission menu : menus) {
+			OrgPermission op = menu.getSource();
+			Collection<MenuPermission> children = menu.getChildren();
+
+			String href = menu.isMenu() && menu.isOwned() ? op.getUrl() : null;
+
+			String icon = op.getMenuIcon();
+			if (icon != null && icon.length() > 0) {
+				icon = "fa iconfont icon-" + icon;
+			} else {
+				icon = "fa fa-circle-o";
+			}
+
+			if (children.size() > 0) {
+				sb.append("<li class=\"treeview\"><a class=\"nav-link\"");
+				if (href != null) {
+					sb.append(" onclick=\"addTabs({id:'").append(op.getId()).append("',title: '").append(op.getName()).append("',close: true,url: '")
+							.append(href).append("',urlType: 'relative'});\"");
+				}
+
+				sb.append("><i class=\"").append(icon).append("\"></i><span>").append(op.getName()).append(
+						"</span><span class=\"pull-right-container\"><i class=\"fa fa-angle-left pull-right\"></i></span></a><ul class=\"treeview-menu\">");
+				createMenuHtml(children, sb);
+				sb.append("</ul></li>");
+			} else {
+				sb.append("<li><a class=\"nav-link\"");
+				if (href != null) {
+					sb.append(" onclick=\"addTabs({id:'").append(op.getId()).append("',title: '").append(op.getName()).append("',close: true,url: '")
+							.append(href).append("',urlType: 'relative'});\"");
+				}
+				sb.append("><i class=\"").append(icon).append("\"></i> <span>").append(op.getName()).append("</span></a></li>");
+			}
+		}
 	}
 
 	@ApiOperation(value = "登录页面")
