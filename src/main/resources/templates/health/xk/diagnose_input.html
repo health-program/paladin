@@ -190,7 +190,106 @@
 
         $.postJsonAjax("/xk/diagnose", request, function(data) {
             console.log(data);
+            var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
+            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
+            $.openPageLayer(html);
+
         }, $("#diagnoseBtn"))
+    }
+
+    function createEvaluateHtml(data) {
+        var html = "";
+
+        data.forEach(function(item) {
+            html += createEvaluateItemHtml(item);
+        });
+
+        return "<fieldset><legend>风险评估</legend><div>" + html + "</div></fieldset>";
+    }
+
+    function createEvaluateItemHtml(data) {
+
+        var level = data.riskLevel;
+        if (level <= 2) {
+            color = 'success';
+        } else if (level <= 3) {
+            color = 'warning';
+        } else {
+            color = 'danger';
+        }
+
+        return '<dl class="dl-horizontal" style="padding-bottom:20px;">' +
+            '    <dt>评估名称：</dt>' +
+            '    <dd>' + data.name + '</dd>' +
+            '    <dt>风险等级：</dt>' +
+            '    <dd><span class="label label-' + color + '">' + data.riskLevelName + '</span></dd>' +
+            '    <dt>分析建议：</dt>' +
+            parseEvaluateContent(data.suggest) +
+            '</dl>';
+    }
+
+    function parseEvaluateContent(content) {
+        var arr = content.split(/[@#]/g);
+
+        var s = "";
+        arr.forEach(function(a) {
+            s += "<dd>" + a + "</dd>";
+        });
+
+        return s;
+    }
+
+    function createKnowledgeHtml(data) {
+        var html = "";
+
+        data.forEach(function(item) {
+            html += createKnowledgeItemHtml(item);
+        });
+
+        return "<fieldset><legend>体检百科</legend><div>" + html + "</div></fieldset>";
+    }
+
+    function createKnowledgeItemHtml(data) {
+        var knowledge = data.knowledge;
+        return '<dl class="dl-horizontal" style="padding-bottom:20px;">' +
+            '    <dt>名称：</dt>' +
+            '    <dd>' + data.name + '</dd>' +
+            '    <dt>类型：</dt>' +
+            '    <dd><span class="label label-info">' + (data.type == 'index' ? '指标' : '疾病') + '</span></dd>' +
+            parseKnowledgeContent("所属科室", knowledge['ad']) +
+            parseKnowledgeContent("描述", knowledge['dm']) +
+            parseKnowledgeContent("分类/判断标准", knowledge['dc']) +
+            parseKnowledgeContent("病因", knowledge['dd_c']) +
+            parseKnowledgeContent("症状", knowledge['dd_s']) +
+            parseKnowledgeContent("风险或并发症", knowledge['dd_r']) +
+            parseKnowledgeContent("生活方式", knowledge['dd_l']) +
+            parseKnowledgeContent("饮食建议", knowledge['dd_d']) +
+            parseKnowledgeContent("饮食宜吃", knowledge['dd_d_s']) +
+            parseKnowledgeContent("饮食忌吃", knowledge['dd_d_a']) +
+            parseKnowledgeContent("运动建议", knowledge['dd_sa']) +
+            parseKnowledgeContent("运动宜做", knowledge['dd_sa_s']) +
+            parseKnowledgeContent("运动忌做", knowledge['dd_sa_a']) +
+            parseKnowledgeContent("医疗保健", knowledge['dd_m']) +
+            parseKnowledgeContent("就医复查指南", knowledge['dd_g']) +
+            parseKnowledgeContent("生活常识", knowledge['dd_n']) +
+            '</dl>';
+    }
+
+    function parseKnowledgeContent(name, data) {
+        if (data) {
+            data = data.split("#@");
+            if (data.length > 1) {
+                var d = "";
+                data.forEach(function(i) {
+                    d += i + "<br>";
+                });
+                data = d;
+            } else {
+                data = data[0];
+            }
+        }
+
+        return '<dt>' + name + '：</dt><dd>' + data + '</dd>';
     }
     </script>
 </body>

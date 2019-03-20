@@ -31,11 +31,11 @@ public class XKKnowledgeServlet {
 	private static Logger logger = LoggerFactory.getLogger(XKKnowledgeServlet.class);
 
 	// 熙康环境auth访问地址
-	private String authUrl = "http://dlpassport.xikang.com/oauth/token";
+	private String authUrl = "http://passport.xikang.com/oauth/token";
 	// 熙康环境clientId名称
-	private String clientId = "xiande_ningbo";
+	private String clientId = "xk_kunshan";
 	// 熙康环境clientSecret名称
-	private String clientSecret = "Sx5do2Yetx38N";
+	private String clientSecret = "njneid(BH!kjdoue";
 
 	// token 获取参数
 	private MultiValueMap<String, Object> tokenRequestParamMap;

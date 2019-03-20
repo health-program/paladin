@@ -17,7 +17,7 @@ public class XKPeopleCondition {
 
 	private Date birthday;
 		
-	private Boolean sendMessage;
+	private Integer sendMessage;
 	
 	private String senderName;
 	
@@ -65,11 +65,11 @@ public class XKPeopleCondition {
 		this.condition = condition;
 	}
 
-	public Boolean getSendMessage() {
+	public Integer getSendMessage() {
 		return sendMessage;
 	}
 
-	public void setSendMessage(Boolean sendMessage) {
+	public void setSendMessage(Integer sendMessage) {
 		this.sendMessage = sendMessage;
 	}
 

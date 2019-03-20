@@ -25,6 +25,10 @@ public class JsonUtil {
 		}
 	}
 
+	public static <T> T parseJson(String json, Class<T> valueType) throws IOException {
+		return objectMapper.readValue(json, valueType);
+	}
+
 	public static void writeJson(Writer writer, Object value) throws IOException {
 		objectMapper.writeValue(writer, value);
 	}

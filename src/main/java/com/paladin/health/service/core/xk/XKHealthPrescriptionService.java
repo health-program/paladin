@@ -1,9 +1,9 @@
 package com.paladin.health.service.core.xk;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.ConstantsContainer.KeyValue;
+import com.paladin.framework.common.BaseModel;
 import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
@@ -63,26 +64,26 @@ public class XKHealthPrescriptionService {
 	public XKHealthPrescription diagnose(XKPeopleCondition condition) {
 		XKHealthPrescription result = new XKHealthPrescription();
 
-		Map<String, XKDiseaseKnowledge> diseaseKnowledge = null;
+		List<XKDiseaseKnowledge> diseaseKnowledge = null;
 		List<XKEvaluation> evaluationResultList = null;
 
 		// 疾病或指标知识获取
 		List<String> diseases = condition.getDiseases();
 		if (diseases != null && diseases.size() > 0) {
 			Set<String> diseaseSet = new HashSet<>(diseases);
-			diseaseKnowledge = new HashMap<>();
+			diseaseKnowledge = new ArrayList<>();
 			for (String disease : diseaseSet) {
 				String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, disease);
 				if (diseaseName != null && diseaseName.length() > 0) {
 					Map knowledge = getKnowledgeOfDisease(disease);
 					if (knowledge != null) {
-						diseaseKnowledge.put(disease, new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge));
+						diseaseKnowledge.add(new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge));
 					}
 				} else {
 					diseaseName = ConstantsContainer.getTypeValue(CONSTANT_INDEX_TYPE, disease);
 					Map knowledge = getKnowledgeOfDisease(disease);
 					if (knowledge != null) {
-						diseaseKnowledge.put(disease, new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge));
+						diseaseKnowledge.add(new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge));
 					}
 				}
 			}
@@ -111,7 +112,24 @@ public class XKHealthPrescriptionService {
 						continue;
 					}
 
-					String riskLevelName = (String) single.get("riskLevel");
+					String riskResultStr = (String) single.get("result");
+					if (riskResultStr == null || riskResultStr.length() == 0) {
+						continue;
+					}
+
+					Map riskResult = null;
+					try {
+						riskResult = JsonUtil.parseJson(riskResultStr, Map.class);
+					} catch (IOException e) {
+						logger.error("评估[" + name + "]时非法解析json字符串格式：" + riskResultStr);
+						continue;
+					}
+
+					if (riskResult == null) {
+						continue;
+					}
+
+					String riskLevelName = (String) riskResult.get("riskLevel");
 					int riskLevel = 0;
 
 					// 熙康返回的是中文危险等级名称，这里对其归纳总结给出等级
@@ -130,7 +148,7 @@ public class XKHealthPrescriptionService {
 						continue;
 					}
 
-					String suggest = (String) single.get("suggest");
+					String suggest = (String) riskResult.get("suggest");
 					evaluationResultList.add(new XKEvaluation(code, name, riskLevel, riskLevelName, suggest));
 				}
 
@@ -202,7 +220,7 @@ public class XKHealthPrescriptionService {
 			List<DiagnoseTargetFactor> targetFactors = new ArrayList<>();
 
 			if (diseaseKnowledge != null && diseaseKnowledge.size() > 0) {
-				for (XKDiseaseKnowledge knowledge : diseaseKnowledge.values()) {
+				for (XKDiseaseKnowledge knowledge : diseaseKnowledge) {
 					String type = knowledge.getType();
 					int factorType = XKDiseaseKnowledge.TYPE_DISEASE.equals(type) ? DiagnoseTargetFactor.FACTOR_TYPE_DISEASE
 							: DiagnoseTargetFactor.FACTOR_TYPE_INDEX;
@@ -236,8 +254,8 @@ public class XKHealthPrescriptionService {
 			record.setPrescription(JsonUtil.getJson(result));
 			record.setType(DiagnoseRecord.TYPE_XK);
 			record.setCreateTime(now);
-			
-			diagnoseRecordService.save(record);			
+
+			diagnoseRecordService.save(record);
 			result.setId(diagnoseId);
 		}
 
@@ -252,10 +270,10 @@ public class XKHealthPrescriptionService {
 	 */
 	private void sendPrescriptionMessage(XKHealthPrescription prescription, XKPeopleCondition condition) {
 		String cellphone = condition.getCellphone();
-		Boolean doSend = condition.getSendMessage();
+		boolean doSend = condition.getSendMessage() != null && condition.getSendMessage() == BaseModel.BOOLEAN_YES;
 		String senderName = condition.getSenderName();
 
-		if (cellphone != null && cellphone.length() > 0 && doSend != null && doSend && senderName != null && senderName.length() > 0) {
+		if (cellphone != null && cellphone.length() > 0 && doSend && senderName != null && senderName.length() > 0) {
 			// TODO 发送短信
 			System.out.println("发送短信啦！！！！！！！！！");
 			prescription.setHasSended(true);
@@ -265,12 +283,12 @@ public class XKHealthPrescriptionService {
 	}
 
 	public Map getKnowledgeOfDisease(String code) {
-		String url = "http://dlopen.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
 		return knowledgeServlet.getRequest(url, null, Map.class);
 	}
 
 	public Map getEvaluation(XKEvaluateCondition condition) {
-		String url = "http://dlopen.xikang.com/openapi/evaluate/diseasePrediction";
+		String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
 		return knowledgeServlet.postJsonRequest(url, condition, Map.class);
 	}
 
