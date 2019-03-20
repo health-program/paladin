@@ -81,42 +81,7 @@
                         </div>
                     </div>
                     <!-- Sidebar Menu -->
-                    <ul class="sidebar-menu">
-                        <li class="treeview">
-                            <a href="#"><i class="fa fa-dashboard"></i><span>信息管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                            <ul class="treeview-menu">
-                                <li><a href="javascript:go('9100','publicity/message/index','信息发布')"><i class="fa fa-circle-o"></i>信息发布</a></li>
-                                <li><a href="javascript:go('9200','publicity/message/examine/index','信息审核')"><i class="fa fa-circle-o"></i>信息审核</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="#"><i class="fa fa-dashboard"></i><span>宣传资料管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                            <ul class="treeview-menu">
-                                <li><a href="javascript:go('8100','publicity/material/index','宣传资料管理')"><i class="fa fa-circle-o"></i>宣传资料管理</a></li>
-                                <li><a href="javascript:go('8200','publicity/material/grant/index','宣传资料发放')"><i class="fa fa-circle-o"></i>宣传资料发放</a></li>
-                                <li><a href="javascript:go('8300','publicity/material/grant/count/agency/index','宣传资料统计')"><i class="fa fa-circle-o"></i>宣传资料统计</a></li>
-                                <!-- <li><a href="javascript:go('8400','publicity/material/grant/count/index','宣传资料发放按年统计')"><i class="fa fa-circle-o"></i>宣传资料发放按年统计</a></li> -->
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="#"><i class="fa fa-dashboard"></i><span>视频管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                            <ul class="treeview-menu">
-                                <li><a href="javascript:go('7100','video/index','视频管理')"><i class="fa fa-circle-o"></i>视频管理</a></li>
-                                <li><a href="javascript:go('7200','video/examine/index','视频审核')"><i class="fa fa-circle-o"></i>视频审核</a></li>
-                                <li><a href="javascript:go('7300','video/play/list','视频播放管理')"><i class="fa fa-circle-o"></i>视频播放管理</a></li>
-                                <li><a href="javascript:go('7400','video/play/publish/index','视频播放统计')"><i class="fa fa-circle-o"></i>视频播放统计</a></li>
-                                <li><a href="javascript:go('7500','video/play/count/index','视频播放记录按年统计')"><i class="fa fa-circle-o"></i>视频播放记录按年统计</a></li>
-                                <li><a href="javascript:go('7600','video/play/count/agency/index','视频播放记录机构历年统计')"><i class="fa fa-circle-o"></i>视频播放记录机构历年统计</a></li>
-                            </ul>
-                        </li>
-                        <li class="treeview">
-                            <a href="#"><i class="fa fa-dashboard"></i><span>系统管理</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
-                            <ul class="treeview-menu">
-                                <li><a href="javascript:go('1100','org/user/index','用户管理')"><i class="fa fa-circle-o"></i>用户管理</a></li>
-                                <li><a href="javascript:go('1200','../common/org/role/index','角色管理')"><i class="fa fa-circle-o"></i>角色管理</a></li>
-                                <li><a href="javascript:go('1300','org/agency/index','机构管理')"><i class="fa fa-circle-o"></i>机构管理</a></li>
-                            </ul>
-                        </li>
+                    <ul class="sidebar-menu" th:utext="${menuHtml}">
                     </ul>
             </section>
         </aside>
