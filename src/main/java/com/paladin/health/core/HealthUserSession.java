@@ -28,6 +28,7 @@ public class HealthUserSession extends UserSession implements AuthorizationInfo 
 	public HealthUserSession(String userId, String userName, String account, boolean isSystemAdmin) {
 		super(userId, userName, account);
 		this.isSystemAdmin = isSystemAdmin;
+		this.roleLevel = ROLE_LEVEL_ADMIN;
 	}
 	
 	public HealthUserSession(OrgUser orgUser, Role role) {

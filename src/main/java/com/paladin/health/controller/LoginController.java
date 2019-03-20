@@ -60,14 +60,14 @@ public class LoginController extends ControllerSupport {
 
 			String icon = op.getMenuIcon();
 			if (icon != null && icon.length() > 0) {
-				icon = "fa iconfont icon-" + icon;
+				icon = "fa iconfont icon" + icon;
 			} else {
 				icon = "fa fa-circle-o";
 			}
 
 			if (children.size() > 0) {
 				sb.append("<li class=\"treeview\"><a class=\"nav-link\"");
-				if (href != null) {
+				if (href != null && href.length() >0) {
 					sb.append(" onclick=\"addTabs({id:'").append(op.getId()).append("',title: '").append(op.getName()).append("',close: true,url: '")
 							.append(href).append("',urlType: 'relative'});\"");
 				}
