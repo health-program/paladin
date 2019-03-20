@@ -61,7 +61,8 @@ function generateEditFormHtml(options, hide) {
             maxColspan: 2,
             firstLabelSize: 3,
             inputSize: 3,
-            labelSize: 2
+            labelSize: 2,
+            server: true
         },
         currentColspan = 0;
 
@@ -113,7 +114,7 @@ function generateEditFormHtml(options, hide) {
     html +=
         '   <div class="form-group">\n' +
         '       <div class="col-sm-2 col-sm-offset-3">\n' +
-        '           <button type="submit" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
+        '           <button type="' + (options.server === false ? 'button' : 'submit') + '" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
         '       </div>\n';
 
     if (hide == true) {
@@ -264,6 +265,14 @@ var _Model = function(name, column, options) {
             that.toView();
         }
     }, options);
+
+
+    // 如果非服务端
+    if (typeof that.config.submitClick === 'function') {
+        that.formSubmitBtn.click(function(){
+            that.config.submitClick(that);
+        });
+    }
 
     // 创建表单提交
     if (that.formBody) {

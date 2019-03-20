@@ -3,19 +3,18 @@ package com.paladin.health.controller.xk;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
-import java.util.List;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.common.core.ConstantsContainer;
-import com.paladin.common.core.ConstantsContainer.KeyValue;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.service.core.xk.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
+import com.paladin.health.service.core.xk.XKPeopleCondition;
+import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 
 /**
  * 基于熙康知识库
@@ -28,12 +27,10 @@ import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 @RequestMapping("/xk/")
 public class XKDiagnoseController {
 
-	private final static String TYPES ="xk-index-type";
-	
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
-	
 
+	// TODO 后期删除
 	@RequestMapping("/evaluate/get/demo")
 	@ResponseBody
 	public Object getEvaluationDemo() {
@@ -71,38 +68,47 @@ public class XKDiagnoseController {
 	}
 
 	@RequestMapping("/evaluate/input")
-
 	public Object input() {
 		return "/health/xk/evaluate_input";
 	}
 
+	@ApiOperation(value = "熙康健康评估接口")
+	@ApiImplicitParam(value = "评估条件", required = true)
 	@RequestMapping("/evaluate")
 	@ResponseBody
 	public Object getEvaluation(XKEvaluateCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getEvaluation(condition));
 	}
-	
-	@ApiOperation(value = "疾病百科搜索展示页面")
+
 	@GetMapping("/symptom/index")
 	public Object index() {
 		return "/health/xk/symptom_index";
 	}
-	
-	@ApiOperation(value = "通过code获取疾病详情")
-	@ApiImplicitParam(name = "code", value = "熙康疾病代码", required = true, dataType = "String")
+
+	@ApiOperation(value = "熙康体检百科接口")
+	@ApiImplicitParam(value = "熙康疾病或指标编码", required = true)
 	@PostMapping("/symptom")
 	@ResponseBody
 	public Object symptom(String code) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledgeOfDisease(code));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledge(code));
 	}
-	
-	@ApiOperation(value = "为搜索加载疾病字", response = List.class, responseContainer = "List")
-	@GetMapping("/dict")
+
+	@ApiOperation(value = "疾病和指标数据接口")
+	@GetMapping("/symptom/code")
 	@ResponseBody
 	public Object dict() {
-		Map<String, List<KeyValue>>typeList= ConstantsContainer.getTypeChildren(TYPES);
-		List<KeyValue>list=typeList.get(TYPES);
-		return CommonResponse.getSuccessResponse(list);
+		return CommonResponse.getSuccessResponse(ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE,XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
+	}
+	
+	@RequestMapping("/diagnose/input")
+	public Object diagnoseInput() {
+		return "/health/xk/diagnose_input";
+	}
+	
+	@PostMapping("/diagnose")
+	@ResponseBody
+	public Object diagnose(@RequestBody XKPeopleCondition condition) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
 	}
 	
 }

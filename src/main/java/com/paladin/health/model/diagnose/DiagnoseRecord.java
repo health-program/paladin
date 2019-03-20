@@ -7,10 +7,14 @@ import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 
 public class DiagnoseRecord {
 
+	public final static String TYPE_XK = "XK";
+	
 	@Id
 	private String id;
 
 	private String targetId;
+	
+	private String factors;
 
 	@IgnoreInMultipleResult
 	private String targetCondition;
@@ -18,6 +22,8 @@ public class DiagnoseRecord {
 	private String prescription;
 	@IgnoreInMultipleResult
 	private String correctPrescription;
+	
+	private String type;
 
 	private Date createTime;
 
@@ -67,6 +73,22 @@ public class DiagnoseRecord {
 
 	public void setTargetCondition(String targetCondition) {
 		this.targetCondition = targetCondition;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getFactors() {
+		return factors;
+	}
+
+	public void setFactors(String factors) {
+		this.factors = factors;
 	}
 
 }

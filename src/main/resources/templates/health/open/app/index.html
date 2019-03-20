@@ -1,60 +1,40 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE html><html><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no"><script src=https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js></script><script src=./static/js/mui.min.js></script><title>宣教</title><link href=/static/app/static/css/app.5843a28efe012ef1fb6df3c1ce265966.css rel=stylesheet></head><body class=body><div id=app></div><script>// 禁止用户使用手指进行缩放
+      document.documentElement.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+          event.preventDefault();
+        }
+      }, false);
 
-	<head>
-		<meta charset=utf-8>
-		<meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
-		<script src=/static/app/static/js/mui.min.js></script>
-		<title>宣教</title>
-		<link href=/static/app/static/css/app.d6241483e78e444afd0fe4133ed8cff3.css rel=stylesheet>
-	</head>
 
-	<body class=body>
-		<div id=app></div>
-		<script>
-			// 禁止用户使用手指进行缩放
-			document.documentElement.addEventListener('touchstart', function(event) {
-				if(event.touches.length > 1) {
-					event.preventDefault();
-				}
-			}, false);
-
-			document.addEventListener('plusready', function() {
-				var webview = plus.webview.currentWebview();
-				plus.key.addEventListener('backbutton', function() {
-					webview.canBack(function(e) {
-						if(e.canBack) {
-							webview.back();
-						} else {
-							//webview.close(); //hide,quit
-							//plus.runtime.quit();
-							mui.plusReady(function() {
-								//首页返回键处理
-								//处理逻辑：1秒内，连续两次按返回键，则退出应用；
-								var first = null;
-								plus.key.addEventListener('backbutton', function() {
-									//首次按键，提示‘再按一次退出应用’
-									if(!first) {
-										first = new Date().getTime();
-										mui.toast('再按一次退出应用');
-										setTimeout(function() {
-											first = null;
-										}, 1000);
-									} else {
-										if(new Date().getTime() - first < 1500) {
-											plus.runtime.quit();
-										}
-									}
-								}, false);
-							});
-						}
-					})
-				});
-			});
-		</script>
-		<script type=text/javascript src=/static/app/static/js/manifest.930ff653ecdf9ed01357.js></script>
-		<script type=text/javascript src=/static/app/static/js/vendor.ab473d2e1136bb6fc20a.js></script>
-		<script type=text/javascript src=/static/app/static/js/app.bbd8877de76db332046e.js></script>
-	</body>
-
-</html>
+      document.addEventListener('plusready', function() {
+        var webview = plus.webview.currentWebview();
+        plus.key.addEventListener('backbutton', function() {
+          webview.canBack(function(e) {
+            if(e.canBack) {
+              webview.back();
+            } else {
+              //webview.close(); //hide,quit
+              //plus.runtime.quit();
+              mui.plusReady(function() {
+                //首页返回键处理
+                //处理逻辑：1秒内，连续两次按返回键，则退出应用；
+                var first = null;
+                plus.key.addEventListener('backbutton', function() {
+                  //首次按键，提示‘再按一次退出应用’
+                  if (!first) {
+                    first = new Date().getTime();
+                    mui.toast('再按一次退出应用');
+                    setTimeout(function() {
+                      first = null;
+                    }, 1000);
+                  } else {
+                    if (new Date().getTime() - first < 1500) {
+                      plus.runtime.quit();
+                    }
+                  }
+                }, false);
+              });
+            }
+          })
+        });
+      });</script><script type=text/javascript src=/static/app/static/js/manifest.5264ab25ce464cc772d0.js></script><script type=text/javascript src=/static/app/static/js/vendor.403fd3b9909dda6953bf.js></script><script type=text/javascript src=/static/app/static/js/app.1261f54c760ae9376f3b.js></script></body></html>

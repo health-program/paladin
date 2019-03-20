@@ -1,4 +1,4 @@
-package com.paladin.health.service.core.xk;
+package com.paladin.health.service.core.xk.request;
 
 public class XKEvaluateCondition {
 

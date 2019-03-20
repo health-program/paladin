@@ -1,6 +1,9 @@
 package com.paladin.health.service.core.xk;
 
+import java.util.Date;
 import java.util.List;
+
+import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 
 public class XKPeopleCondition {
 	
@@ -9,6 +12,14 @@ public class XKPeopleCondition {
 	private String identificationId;
 	
 	private String cellphone;
+	
+	private Integer sex;
+
+	private Date birthday;
+		
+	private Integer sendMessage;
+	
+	private String senderName;
 	
 	private List<String> diseases;
 	
@@ -52,6 +63,38 @@ public class XKPeopleCondition {
 
 	public void setCondition(XKEvaluateCondition condition) {
 		this.condition = condition;
+	}
+
+	public Integer getSendMessage() {
+		return sendMessage;
+	}
+
+	public void setSendMessage(Integer sendMessage) {
+		this.sendMessage = sendMessage;
+	}
+
+	public String getSenderName() {
+		return senderName;
+	}
+
+	public void setSenderName(String senderName) {
+		this.senderName = senderName;
+	}
+
+	public Integer getSex() {
+		return sex;
+	}
+
+	public void setSex(Integer sex) {
+		this.sex = sex;
+	}
+
+	public Date getBirthday() {
+		return birthday;
+	}
+
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
 	

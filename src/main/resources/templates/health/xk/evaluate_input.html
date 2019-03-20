@@ -7,7 +7,7 @@
     <tt:constant enumcode="boolean,sex-type,family-hypertension-type" />
     <div class="container">
         <section class="content-header">
-            <h1>健康处方获取</h1>
+            <h1>健康评估</h1>
         </section>
         <section class="content">
             <div id="evaluate">
@@ -118,8 +118,75 @@
             '    <dt>风险等级：</dt>' +
             '    <dd><span class="label label-' + color + '">' + data.riskLevel + '</span></dd>' +
             '    <dt>分析建议：</dt>' +
-            '    <dd>' + data.suggest + '</dd>' +
+            parseContent1(data.suggest) +
             '</dl>';
+    }
+    function parseContent1(content) {
+    	 var arr = content.split(/[@#]/g);
+    	 
+    	 var s = "";
+    	 arr.forEach(function(a) {
+             s += "<dd>" + a + "</dd>";
+         });
+
+         return s;
+    }
+    
+    function parseContent(content) {
+        var s = content.replace(/(\d+[\.\)])/g, "\n$1");
+        var arr = s.split(/[\n,]/g);
+
+        var r = g(arr);
+        var s = "";
+        r.forEach(function(a) {
+            s += "<dd>" + (a.index > 0 ? a.index + a.suffix : '') + a.content + "</dd>";
+        });
+
+        return s;
+    }
+
+    function g(arr) {
+        var r = [];
+        for (var i = 0; i < arr.length; i++) {
+            var a = arr[i];
+            if (a) {
+                var index;
+                if (isNumber(a[0])) {
+                    if (isNumber(a[1])) {
+                        index = a[0] * 10 + a[1] * 1;
+                        if (a[2] == '.' || a[2] == ')') {
+                            r.push({
+                                index: index,
+                                suffix: a[2],
+                                content: a.substring(3)
+                            });
+                            continue;
+                        }
+                    } else {
+                        index = a[0] * 1;
+                        if (a[1] == '.' || a[1] == ')') {
+                            r.push({
+                                index: index,
+                                suffix: a[1],
+                                content: a.substring(3)
+                            });
+                            continue;
+                        }
+                    }
+                }
+
+                r.push({
+                    index: -1,
+                    content: a
+                });
+            }
+        }
+        return r;
+    }
+
+    function isNumber(c) {
+        var d = c * 1;
+        return d && d > 0 && d < 10;
     }
     </script>
 </body>
