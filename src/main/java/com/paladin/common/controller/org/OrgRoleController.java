@@ -113,7 +113,7 @@ public class OrgRoleController extends ControllerSupport {
 
 	@RequestMapping("/grant")
 	@ResponseBody
-	public Object grantAuthorization(@RequestParam("roleId") String roleId, @RequestParam("permissionId[]") String[] permissionIds) {
+	public Object grantAuthorization(@RequestParam("roleId") String roleId, @RequestParam(required = false, name = "permissionId[]") String[] permissionIds) {
 		return CommonResponse.getResponse(orgRolePermissionService.grantAuthorization(roleId, permissionIds));
 	}
 }
