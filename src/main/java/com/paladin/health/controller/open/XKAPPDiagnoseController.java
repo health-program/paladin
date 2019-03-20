@@ -36,7 +36,7 @@ public class XKAPPDiagnoseController {
 	@RequestMapping("/symptom")
 	@ResponseBody
 	public Object symptom(String code) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledgeOfDisease(code));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledge(code));
 	}
 	
 	
