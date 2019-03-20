@@ -190,7 +190,7 @@
 
         $.postJsonAjax("/xk/diagnose", request, function(data) {
             console.log(data);
-            var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
+            var html = createKnowledgeHtml(data.knowledge) + createEvaluateHtml(data.evaluation);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
 
@@ -229,11 +229,11 @@
     }
 
     function parseEvaluateContent(content) {
-        var arr = content.split(/[@#]/g);
+        var arr = content.split('@#');
 
         var s = "";
         arr.forEach(function(a) {
-            s += "<dd>" + a + "</dd>";
+            s += "<dd>&nbsp;&nbsp;" + a + "</dd>";
         });
 
         return s;
@@ -276,20 +276,40 @@
     }
 
     function parseKnowledgeContent(name, data) {
+        var html = "";
+
         if (data) {
-            data = data.split("#@");
-            if (data.length > 1) {
-                var d = "";
-                data.forEach(function(i) {
-                    d += i + "<br>";
-                });
-                data = d;
-            } else {
-                data = data[0];
-            }
+            data = data.split("@#");
+            data.forEach(function(it) {
+
+                var ii = it.split("#@"),
+                    h = "";
+                if (ii.length == 1) {
+                    h = ii[0];
+                } else {
+                    var b = true;
+                    for (var i = 0; i < ii.length;) {
+                        if (b) {
+                            if (i < ii.length - 1) {
+                                var m = ii[i],
+                                    n = ii[++i];
+                                h += "<b>" + m + "：</b>" + n;
+                            } else {
+                                var k = ii[++i];
+                                if (k)
+                                    h += k;
+                            }
+                        }
+                    }
+                }
+
+                html += h + "<br>";
+            });
+        } else {
+            html = "无";
         }
 
-        return '<dt>' + name + '：</dt><dd>' + data + '</dd>';
+        return '<dt>' + name + '：</dt><dd>' + html + '</dd>';
     }
     </script>
 </body>
