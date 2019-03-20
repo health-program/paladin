@@ -73,18 +73,9 @@ public class XKHealthPrescriptionService {
 			Set<String> diseaseSet = new HashSet<>(diseases);
 			diseaseKnowledge = new ArrayList<>();
 			for (String disease : diseaseSet) {
-				String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, disease);
-				if (diseaseName != null && diseaseName.length() > 0) {
-					Map knowledge = getKnowledgeOfDisease(disease);
-					if (knowledge != null) {
-						diseaseKnowledge.add(new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge));
-					}
-				} else {
-					diseaseName = ConstantsContainer.getTypeValue(CONSTANT_INDEX_TYPE, disease);
-					Map knowledge = getKnowledgeOfDisease(disease);
-					if (knowledge != null) {
-						diseaseKnowledge.add(new XKDiseaseKnowledge(disease, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge));
-					}
+				XKDiseaseKnowledge k = getKnowledge(disease);
+				if(k != null) {
+					diseaseKnowledge.add(k);
 				}
 			}
 
@@ -282,9 +273,25 @@ public class XKHealthPrescriptionService {
 		}
 	}
 
-	public Map getKnowledgeOfDisease(String code) {
+	public XKDiseaseKnowledge getKnowledge(String code) {
 		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
-		return knowledgeServlet.getRequest(url, null, Map.class);
+		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
+		if (diseaseName != null && diseaseName.length() > 0) {
+			Map knowledge = knowledgeServlet.getRequest(url, null, Map.class);
+			if (knowledge != null) {
+				return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge);
+			}
+		} else {
+			diseaseName = ConstantsContainer.getTypeValue(CONSTANT_INDEX_TYPE, code);
+			if (diseaseName != null && diseaseName.length() > 0) {
+				Map knowledge = knowledgeServlet.getRequest(url, null, Map.class);
+				if (knowledge != null) {
+					return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge);
+				}
+			}			
+		}
+		
+		return null;
 	}
 
 	public Map getEvaluation(XKEvaluateCondition condition) {

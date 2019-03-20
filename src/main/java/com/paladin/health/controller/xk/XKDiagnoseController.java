@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.common.core.ConstantsContainer;
-import com.paladin.common.core.ConstantsContainer.KeyValue;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
@@ -31,6 +30,7 @@ public class XKDiagnoseController {
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
 
+	// TODO 后期删除
 	@RequestMapping("/evaluate/get/demo")
 	@ResponseBody
 	public Object getEvaluationDemo() {
@@ -72,27 +72,28 @@ public class XKDiagnoseController {
 		return "/health/xk/evaluate_input";
 	}
 
+	@ApiOperation(value = "熙康健康评估接口")
+	@ApiImplicitParam(value = "评估条件", required = true)
 	@RequestMapping("/evaluate")
 	@ResponseBody
 	public Object getEvaluation(XKEvaluateCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getEvaluation(condition));
 	}
 
-	@ApiOperation(value = "疾病百科搜索展示页面")
 	@GetMapping("/symptom/index")
 	public Object index() {
 		return "/health/xk/symptom_index";
 	}
 
-	@ApiOperation(value = "通过code获取疾病详情")
-	@ApiImplicitParam(name = "code", value = "熙康疾病代码", required = true, dataType = "String")
+	@ApiOperation(value = "熙康体检百科接口")
+	@ApiImplicitParam(value = "熙康疾病或指标编码", required = true)
 	@PostMapping("/symptom")
 	@ResponseBody
 	public Object symptom(String code) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledgeOfDisease(code));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledge(code));
 	}
 
-	@ApiOperation(value = "为搜索加载疾病字", response = KeyValue.class, responseContainer = "List")
+	@ApiOperation(value = "疾病和指标数据接口")
 	@GetMapping("/symptom/code")
 	@ResponseBody
 	public Object dict() {
