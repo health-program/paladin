@@ -196,23 +196,33 @@ function search_menu(){
 	        
 }
 
-function showEvaluateResult(data) {
+function showEvaluateResult(result) {
+	console.log(result);
+	var data=result.knowledge;
+	var type=result.type;
 	if (!data) {
         return '';
     }
     var html = "";
+    if(type=='index'){
+    	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
+    		    +'<dt>指标名称：</dt><dd id="dn">'+data.dn+'</dd>'
+    		    +'<dt>所在科室：</dt><dd id="ad">'+data.ad +'</dd>'
+    		    +'<dt>检查目的：</dt><dd id="dm">'+data.dm+'</dd>'
+    		    +'<dt>判定标准：</dt><dd id="dc">'+data.dc+'</dd>'
+    		    +'</dl>'
+    }else{
     html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-    +'<dt>名称：</dt><dd id="dn">'+data.dn+'</dd>'
+    +'<dt>疾病名称：</dt><dd id="dn">'+data.dn+'</dd>'
     +'<dt>所在科室：</dt><dd id="ad">'+data.ad +'</dd>'
-    +'<dt>描述：</dt><dd id="dm">'+data.dm+'</dd>'
+    +'<dt>疾病概述：</dt><dd id="dm">'+data.dm+'</dd>'
+    +'<dt>疾病分类：</dt><dd id="dc">'+data.dc+'</dd>'
     +'</dl>'
-    
-    html += getEvaluateItemHtml('分类/判断标准', data.dc);
-    html += getEvaluateItemHtml('病因', data.dd_c);
+    }
+    html += getEvaluateItemHtml((type=='index'?'可能原因':'病因'), data.dd_c);
     html += getEvaluateItemHtml('症状', data.dd_s);
-    html += getEvaluateItemHtml('风险或并发症', data.dd_r);
+    html += getEvaluateItemHtml((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data.dd_r);
     html += getEvaluateItemHtml('生活方式', data.dd_l);
-    
     html += getEvaluateItemHtml('饮食建议', data.dd_d);
     html += getEvaluateItemHtml('饮食宜吃', data.dd_d_s);
     html += getEvaluateItemHtml('饮食忌吃', data.dd_d_a);
@@ -223,7 +233,6 @@ function showEvaluateResult(data) {
     html += getEvaluateItemHtml('就医复查指南', data.dd_g);
     html += getEvaluateItemHtml('生活常识', data.dd_n);
     html='<div style="padding-top:40px;padding-bottom:40px;padding-right:55px">'+html+'</div>'
-    //$.openPageLayer(html);
     return html;
 }
 
@@ -236,13 +245,12 @@ function getEvaluateItemHtml(name, data) {
 	}
 
     return '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">' +
-        '    <dt>' + name + '</dt><br/>' +
+        '    <dt>' + name + '</dt>' +
         parseContent(data) +
         '</dl>';
 }
 
 function parseContent(content) {
-	console.log(content)
 	 var arr = content.split("@#");
 	 var s = "";
 	 arr.forEach(function(a) {

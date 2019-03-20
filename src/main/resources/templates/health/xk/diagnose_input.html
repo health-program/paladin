@@ -257,11 +257,11 @@
             '    <dt>类型：</dt>' +
             '    <dd><span class="label label-info">' + (data.type == 'index' ? '指标' : '疾病') + '</span></dd>' +
             parseKnowledgeContent("所属科室", knowledge['ad']) +
-            parseKnowledgeContent("描述", knowledge['dm']) +
-            parseKnowledgeContent("分类/判断标准", knowledge['dc']) +
-            parseKnowledgeContent("病因", knowledge['dd_c']) +
+            parseKnowledgeContent((data.type=='index'?'检查目的':'疾病概述'), knowledge['dm']) +
+            parseKnowledgeContent((data.type=='index'?'判定标准':'疾病分类'), knowledge['dc']) +
+            parseKnowledgeContent((data.type=='index'?'可能原因':'病因'), knowledge['dd_c']) +
             parseKnowledgeContent("症状", knowledge['dd_s']) +
-            parseKnowledgeContent("风险或并发症", knowledge['dd_r']) +
+            parseKnowledgeContent((data.type=='index'?'可能存在的风险或疾病':'风险或并发症'), knowledge['dd_r']) +
             parseKnowledgeContent("生活方式", knowledge['dd_l']) +
             parseKnowledgeContent("饮食建议", knowledge['dd_d']) +
             parseKnowledgeContent("饮食宜吃", knowledge['dd_d_s']) +
