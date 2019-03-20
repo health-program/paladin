@@ -1,7 +1,7 @@
 $(function() {
     if ($("#symptomInput").length > 0) {
     	 
-        $.getAjax("/xk/dict", initCatalog);
+        $.getAjax("/xk/symptom/code", initCatalog);
     }
     var symptomKey = $("#symptomKey").val();
     if (symptomKey) {
@@ -17,8 +17,15 @@ var currentZSID;
 var selectedKnowledgeId;
 
 function initCatalog(data) {
-	 
-    catalog = data;
+	data["xk-disease-type"].forEach(function(disease){
+		disease.type="疾病";
+		
+	})
+	data["xk-index-type"].forEach(function(index){
+		index.type="指标";
+		
+	})
+    catalog = data["xk-disease-type"].concat(data["xk-index-type"]);
 	
     var dataList = {
         value: catalog
@@ -27,8 +34,8 @@ function initCatalog(data) {
     $("#symptomInput").bsSuggest({
         idField: "key",
         keyField: "value",
-        effectiveFields: ["value"],
-        effectiveFieldsAlias: { value: "症状名称" },
+        effectiveFields: ["value","type"],
+        effectiveFieldsAlias: { value: "名称",type:"类型" },
         searchFields: ["value", "key"],
         data: dataList,
         clearable: false,
@@ -177,25 +184,75 @@ function initCategoryDetailContent(treedata) {
     });
 }
 
+
 function search_menu(){
 	if (!currentSymptom) {
         return;
     }
 	
 	 $.postAjax("/xk/symptom", { code: currentSymptom }, function(data) {
-		 console.log(data.dn);
-	        $("#dn").html('<p style="text-indent:2em;">' + data.dn + "</p>");
-	        $("#ad").html('<p style="text-indent:2em;">' + data.ad + "</p>");
-	        $("#dm").html('<p style="text-indent:2em;">' + data.dm + "</p>");
-	        $("#dc").html('<p style="text-indent:2em;">' + data.dc + "</p>");
-	        $("#dd_c").html('<p style="text-indent:2em;">' + data.dd_c + "</p>");
-	        $("#dd_s").html('<p style="text-indent:2em;">' + data.dd_s + "</p>");
-	        $("#dd_r").html('<p style="text-indent:2em;">' + data.dd_r + "</p>");
-	        $("#dd_l").html('<p style="text-indent:2em;">' + data.dd_l + "</p>");
-	        $("#dd_d").html('<p style="text-indent:2em;">' + data.dd_d + "</p>");
-	        $("#dd_sa").html('<p style="text-indent:2em;">' + data.dd_sa + "</p>");
-	        $("#dd_m").html('<p style="text-indent:2em;">' + data.dd_m + "</p>");
-	        $("#dd_g").html('<p style="text-indent:2em;">' + data.dd_g + "</p>");
-	        $("#dd_n").html('<p style="text-indent:2em;">' + data.dd_n + "</p>");
+	        $("#content").html(showEvaluateResult(data));
 	        });
+	        
+}
+
+function showEvaluateResult(data) {
+	if (!data) {
+        return '';
+    }
+    var html = "";
+    html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
+    +'<dt>名称：</dt><dd id="dn">'+data.dn+'</dd>'
+    +'<dt>所在科室：</dt><dd id="ad">'+data.ad +'</dd>'
+    +'<dt>描述：</dt><dd id="dm">'+data.dm+'</dd>'
+    +'</dl>'
+    
+    html += getEvaluateItemHtml('分类/判断标准', data.dc);
+    html += getEvaluateItemHtml('病因', data.dd_c);
+    html += getEvaluateItemHtml('症状', data.dd_s);
+    html += getEvaluateItemHtml('风险或并发症', data.dd_r);
+    html += getEvaluateItemHtml('生活方式', data.dd_l);
+    
+    html += getEvaluateItemHtml('饮食建议', data.dd_d);
+    html += getEvaluateItemHtml('饮食宜吃', data.dd_d_s);
+    html += getEvaluateItemHtml('饮食忌吃', data.dd_d_a);
+    html += getEvaluateItemHtml('运动建议', data.dd_sa);
+    html += getEvaluateItemHtml('运动宜做', data.dd_sa_s);
+    html += getEvaluateItemHtml('运动忌做', data.dd_sa_a);
+    html += getEvaluateItemHtml('医疗保健', data.dd_m);
+    html += getEvaluateItemHtml('就医复查指南', data.dd_g);
+    html += getEvaluateItemHtml('生活常识', data.dd_n);
+    html='<div style="padding-top:40px;padding-bottom:40px;padding-right:55px">'+html+'</div>'
+    //$.openPageLayer(html);
+    return html;
+}
+
+
+
+
+function getEvaluateItemHtml(name, data) {
+	if(!data){
+		return '';
+	}
+
+    return '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">' +
+        '    <dt>' + name + '</dt><br/>' +
+        parseContent(data) +
+        '</dl>';
+}
+
+function parseContent(content) {
+	console.log(content)
+	 var arr = content.split("@#");
+	 var s = "";
+	 arr.forEach(function(a) {
+		 var child = a.split("#@");
+		 if(child.length>1){
+         s += "<dd style='color:orange'>" + child[0] + "</dd>"+"<dd>" + child[1] + "</dd>";
+		 }else{
+		 s += "<dd>" + child[0] + "</dd>"
+		 }
+     });
+
+     return s;
 }

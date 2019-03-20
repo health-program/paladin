@@ -93,10 +93,10 @@ public class XKDiagnoseController {
 	}
 
 	@ApiOperation(value = "为搜索加载疾病字", response = KeyValue.class, responseContainer = "List")
-	@GetMapping("/dict")
+	@GetMapping("/symptom/code")
 	@ResponseBody
 	public Object dict() {
-		return CommonResponse.getSuccessResponse(ConstantsContainer.getType(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE));
+		return CommonResponse.getSuccessResponse(ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE,XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
 	}
 	
 	@RequestMapping("/diagnose/input")
