@@ -5,10 +5,35 @@
 		DELETE FROM diagnose_target_factor WHERE target_id =#{targetId}
 	</delete>
 
+
 	<insert id="insertByBatch">
 		INSERT INTO diagnose_target_factor (target_id,factor_code,factor_type,factor_level,create_time) VALUES
 		<foreach collection="coll" item="item" index="index" separator=",">
 			(#{item.targetId}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime})
 		</foreach>
 	</insert>
+
+
+	<select id="searchDiagnoseTargetFactor"
+			resultType="com.paladin.health.service.diagnose.vo.DiagnoseRecordSimpleVO">
+		SELECT
+		dt.id,
+		dt.`name`,
+		dt.sex,
+		dt.birthday,
+		dt.cellphone,
+		GROUP_CONCAT( CONCAT_WS('-',dtf.factor_code,dtf.factor_type,dtf.factor_level)) as factors
+		FROM
+		diagnose_target AS dt
+		LEFT JOIN diagnose_target_factor AS dtf ON dt.id = dtf.target_id
+		where  1 =1
+		<if test="query.startTime != null">
+			AND dt.update_time >= #{query.startTime}
+		</if>
+		<if test="query.endTime != null">
+			AND dt.update_time &lt;= #{query.endTime}
+		</if>
+		GROUP BY dt.id
+		ORDER BY dt.update_time DESC
+	</select>
 </mapper>

@@ -1,23 +1,18 @@
 package com.paladin.health.controller.xk;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiOperation;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
+import com.paladin.health.service.diagnose.DiagnoseRecordService;
+import com.paladin.health.service.diagnose.dto.DiagnoseRecordQueryDTO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 基于熙康知识库
@@ -32,6 +27,9 @@ public class XKDiagnoseController {
 
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
+
+	@Autowired
+	private DiagnoseRecordService diagnoseRecordService;
 
 	// TODO 后期删除
 	@RequestMapping("/evaluate/get/demo")
@@ -107,22 +105,46 @@ public class XKDiagnoseController {
 	public Object diagnoseInput() {
 		return "/health/xk/diagnose_input";
 	}
-	
+
 	@PostMapping("/diagnose")
 	@ResponseBody
 	public Object diagnose(@RequestBody XKPeopleCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
 	}
-	
+
 	@GetMapping("/tips/output")
 	public Object tips() {
 		return "/health/xk/tip_output";
 	}
-	
+
 	@GetMapping("/tips/{typeCode}")
 	@ResponseBody
 	public Object getTips(@PathVariable String typeCode) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getTips(typeCode));
 	}
-	
+
+
+	/**
+	 * 功能描述: <br>
+	 * 〈病人历史诊断记录首页〉
+	 */
+	  @RequestMapping("/diagnose/records/index")
+	  public String diagnoseRecordsIndex() {
+		return "/health/xk/diagnose_records_index";
+	  }
+
+	/**
+	 * 功能描述: <br>
+	 * 〈病人历史诊断记录〉
+	 * @param query
+	 * @return  java.lang.Object
+	 * @author  Huangguochen
+	 * @date  2019/3/22
+	 */
+	  @RequestMapping("/diagnose/records/find/page")
+	  @ResponseBody
+	  public Object diagnoseRecordsFindPage(DiagnoseRecordQueryDTO query) {
+		return CommonResponse.getSuccessResponse(
+			diagnoseRecordService.searchDiagnoseRecordsByQuery(query));
+	  }
 }
