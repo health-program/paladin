@@ -74,7 +74,7 @@ public class XKHealthPrescriptionService {
 			diseaseKnowledge = new ArrayList<>();
 			for (String disease : diseaseSet) {
 				XKDiseaseKnowledge k = getKnowledge(disease);
-				if(k != null) {
+				if (k != null) {
 					diseaseKnowledge.add(k);
 				}
 			}
@@ -273,6 +273,11 @@ public class XKHealthPrescriptionService {
 		}
 	}
 
+	/**
+	 * 获取知识
+	 * @param code
+	 * @return
+	 */
 	public XKDiseaseKnowledge getKnowledge(String code) {
 		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
 		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
@@ -288,21 +293,31 @@ public class XKHealthPrescriptionService {
 				if (knowledge != null) {
 					return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge);
 				}
-			}			
+			}
 		}
-		
+
 		return null;
 	}
 
+	/**
+	 * 获取评估
+	 * @param condition
+	 * @return
+	 */
 	public Map getEvaluation(XKEvaluateCondition condition) {
 		String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
 		return knowledgeServlet.postJsonRequest(url, condition, Map.class);
 	}
-	
-	public Map getDisease(String typeCode) {
-		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/"+ typeCode;
-		
+
+	/**
+	 * 获取TIPS
+	 * @param typeCode
+	 * @return
+	 */
+	public Map getTips(String typeCode) {
+		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" + typeCode;
 		return knowledgeServlet.getRequest(url, null, Map.class);
 	}
 
+	
 }

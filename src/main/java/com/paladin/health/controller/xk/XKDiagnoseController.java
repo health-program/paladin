@@ -114,13 +114,6 @@ public class XKDiagnoseController {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
 	}
 	
-	@GetMapping("/disease/{typeCode}")
-	@ResponseBody
-	//HY.CJJB.TNB
-	public Object disease(@PathVariable String typeCode) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getDisease(typeCode));
-	}
-	
 	@GetMapping("/tips/output")
 	public Object tips() {
 		return "/health/xk/tip_output";
@@ -128,9 +121,8 @@ public class XKDiagnoseController {
 	
 	@GetMapping("/tips/{typeCode}")
 	@ResponseBody
-	//HY.CJJB.TNB
 	public Object getTips(@PathVariable String typeCode) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getDisease(typeCode));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getTips(typeCode));
 	}
 	
 }

@@ -151,6 +151,7 @@
                 model.toView();
             }
         });
+
         baseModel.setData({
             name: "周如",
             sex: 1,
@@ -190,7 +191,7 @@
 
         $.postJsonAjax("/xk/diagnose", request, function(data) {
             console.log(data);
-            var html = createKnowledgeHtml(data.knowledge) + createEvaluateHtml(data.evaluation);
+            var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
 
@@ -256,12 +257,12 @@
             '    <dd>' + data.name + '</dd>' +
             '    <dt>类型：</dt>' +
             '    <dd><span class="label label-info">' + (data.type == 'index' ? '指标' : '疾病') + '</span></dd>' +
-            parseKnowledgeContent("所属科室", knowledge['ad']) +
-            parseKnowledgeContent((data.type=='index'?'检查目的':'疾病概述'), knowledge['dm']) +
-            parseKnowledgeContent((data.type=='index'?'判定标准':'疾病分类'), knowledge['dc']) +
-            parseKnowledgeContent((data.type=='index'?'可能原因':'病因'), knowledge['dd_c']) +
-            parseKnowledgeContent("症状", knowledge['dd_s']) +
-            parseKnowledgeContent((data.type=='index'?'可能存在的风险或疾病':'风险或并发症'), knowledge['dd_r']) +
+            // parseKnowledgeContent("所属科室", knowledge['ad']) +
+            // parseKnowledgeContent((data.type=='index'?'检查目的':'疾病概述'), knowledge['dm']) +
+            // parseKnowledgeContent((data.type=='index'?'判定标准':'疾病分类'), knowledge['dc']) +
+            // parseKnowledgeContent((data.type=='index'?'可能原因':'病因'), knowledge['dd_c']) +
+            // parseKnowledgeContent("症状", knowledge['dd_s']) +
+            // parseKnowledgeContent((data.type=='index'?'可能存在的风险或疾病':'风险或并发症'), knowledge['dd_r']) +
             parseKnowledgeContent("生活方式", knowledge['dd_l']) +
             parseKnowledgeContent("饮食建议", knowledge['dd_d']) +
             parseKnowledgeContent("饮食宜吃", knowledge['dd_d_s']) +
@@ -270,7 +271,7 @@
             parseKnowledgeContent("运动宜做", knowledge['dd_sa_s']) +
             parseKnowledgeContent("运动忌做", knowledge['dd_sa_a']) +
             parseKnowledgeContent("医疗保健", knowledge['dd_m']) +
-            parseKnowledgeContent("就医复查指南", knowledge['dd_g']) +
+            //parseKnowledgeContent("就医复查指南", knowledge['dd_g']) +
             parseKnowledgeContent("生活常识", knowledge['dd_n']) +
             '</dl>';
     }
@@ -293,7 +294,12 @@
                             if (i < ii.length - 1) {
                                 var m = ii[i],
                                     n = ii[++i];
-                                h += "<b>" + m + "：</b>" + n;
+                                if (m == '综述') {
+                                    h += "<b style='color:red'>" + m + "：</b><span style='color:#aaa'>" + n + "</span>";
+                                }
+                                else {
+                                    h += "<b>" + m + "：</b>" + n;
+                                }
                             } else {
                                 var k = ii[++i];
                                 if (k)
@@ -310,6 +316,10 @@
         }
 
         return '<dt>' + name + '：</dt><dd>' + html + '</dd>';
+    }
+
+    function parseOverview(data) {
+
     }
     </script>
 </body>

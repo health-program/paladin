@@ -11,61 +11,56 @@
         </section>
         <section class="content">
             <div class="box-body">
-                  <div class="col-md-12">
-            	<div class="col-md-6">
-                   <!--  aged（老年人类型）、hypertension（高血压类型）、diabetes（糖尿病类型）、festival（手动发送提醒，小短语） -->
-                   <label> 老年人类型</label><input type="radio" class="form-control" name="typeCode" value="aged"/>&nbsp;&nbsp;
-                   <label>高血压类型</label><input type="radio" class="form-control" name="typeCode" value="hypertension"/>&nbsp;
-                   <label>糖尿病类型</label><input type="radio" class="form-control" name="typeCode" value="diabetes"/>&nbsp;&nbsp;
-                   <label>手机提示语</label><input type="radio" class="form-control" name="typeCode" value="festival"/>&nbsp;&nbsp;
-                   <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_tip()"><i class="fa fa-search"></i>
-                   </button>
+                <div class="col-md-12">
+                    <div class="col-md-6">
+                        <!--  aged（老年人类型）、hypertension（高血压类型）、diabetes（糖尿病类型）、festival（手动发送提醒，小短语） -->
+                        <label> 老年人类型</label><input type="radio" class="form-control" name="typeCode" value="aged" />&nbsp;&nbsp;
+                        <label>高血压类型</label><input type="radio" class="form-control" name="typeCode" value="hypertension" />&nbsp;
+                        <label>糖尿病类型</label><input type="radio" class="form-control" name="typeCode" value="diabetes" />&nbsp;&nbsp;
+                        <label>手机提示语</label><input type="radio" class="form-control" name="typeCode" value="festival" />&nbsp;&nbsp;
+                        <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_tip()"><i class="fa fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="content" class="col-md-12">
                 </div>
             </div>
-            <div id="content" class="col-md-12">
-      
-            </div>
-          </div>
         </section>
     </div>
     <div th:include="/health/footer" />
- <script type="text/javascript">
+    <script type="text/javascript">
+    function search_tip() {
+        $.getAjax("/xk/tips/" + $("input[name='typeCode']:checked").val(), function(data) {
+            $("#content").html(showEvaluateResult(data.result));
+        });
+    }
 
-  function search_tip() {
-       $.getAjax("/xk/tips/"+$("input[name='typeCode']:checked").val(), function(data) {
-    	   $("#content").html(showEvaluateResult(data.result));
-       	 
-       });
+    function showEvaluateResult(data) {
+        var html = "";
 
-   }
-
-   function showEvaluateResult(data) {
-       var html = "";
-
-       html += getEvaluateItemHtml('糖尿病风险评估', data);
-       html = "<div style='padding-top:40px;padding-bottom:40px;margin-left:15px'>" + html + "</div>";
-       //$.openPageLayer(html);
-       return html;
-   }
+        html += getEvaluateItemHtml('糖尿病风险评估', data);
+        html = "<div style='padding-top:40px;padding-bottom:40px;margin-left:15px'>" + html + "</div>";
+        //$.openPageLayer(html);
+        return html;
+    }
 
     function getEvaluateItemHtml(name, data) {
-       return 	'<div>' +
-           	parseContent(data) +
-           	'</div>';
-   }
-    
-   function parseContent(content) {
-   	 var arr = content.split(/[@#]/g);
-   	 
-   	 var s = "";
-   	 arr.forEach(function(a) {
+        return '<div>' +
+            parseContent(data) +
+            '</div>';
+    }
+
+    function parseContent(content) {
+        var arr = content.split(/[@#]/g);
+
+        var s = "";
+        arr.forEach(function(a) {
             s += "<p>" + a + "</p>";
         });
 
         return s;
-   }
-    
- </script>
+    }
+    </script>
 </body>
 
 </html>
