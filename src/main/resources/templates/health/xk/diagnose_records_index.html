@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+
+<body>
+<tt:constant enumcode="xk-disease-type,xk-evaluate-type,xk-index-type,sex-type" />
+<section class="content-header">
+    <h1>病人历史诊断记录</h1>
+</section>
+<section class="content">
+    <div class="box box-solid">
+        <div class="box-header with-border">
+            <i class="fa fa-search"></i>
+            <h3 class="box-title">查询</h3>
+        </div>
+        <div class="box-body">
+            <form id="searchbar" class="form-horizontal">
+                <div class="form-group">
+                    <label for="startTime" class="col-md-1 control-label">开始时间</label>
+                    <div class="col-md-2">
+                        <input type="text" name="startTime" placeholder="请输入开始时间" class="form-control tonto-datepicker-datetime" autocomplete="off" th:value="${query?.startTime}" />
+                    </div>
+                    <label for="endTime" class="col-md-1 control-label">结束时间</label>
+                    <div class="col-md-2">
+                        <input type="text" name="endTime" placeholder="请输入结束时间" class="form-control tonto-datepicker-datetime" autocomplete="off" th:value="${query?.endTime}" />
+                    </div>
+                </div>
+                <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                <input type="text" style="display:none">
+            </form>
+            <div class="col-md-12">
+                <div class="pull-right">
+                    <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                </div>
+            </div>
+            <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+            <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+        </div>
+    </div>
+    <div class="box box-solid" style="margin-top:20px">
+        <div class="box-header with-border">
+            <i class="fa fa-list-alt"></i>
+            <h3 class="box-title">结果</h3>
+        </div>
+        <div id="result" class="box-body">
+            <table id="dataGrid"></table>
+            <!--<div id="toolbar">
+                <div class="btn-group">
+                    <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
+                </div>
+            </div>-->
+        </div>
+    </div>
+</section>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    /*<![CDATA[*/
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    {title: "姓名", align: "center", width:"10%",field: "name"},
+                    {title: "身份证号码", align: "center",width:"15%", field: "id"},
+                    {title: "性别", align: "center",width:"5%", field: "sex", enumcode: "sex-type"},
+                    {title: "手机号码", align: "center",width:"10%", field: "cellphone"},
+                    {title: "出生日期", align: "center",width:"10%", field: "birthday", formatter: "date"},
+                    {title: "危险因数", field: "factors",width:"25%", formatter: operateFormatter}
+                ]
+            ],
+            url: '/xk/diagnose/records/find/page',
+            searchbar: '#searchbar',
+            showColumns: true,
+            pageSize: limit|| undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    function operateFormatter(value, row, index) {
+        if (value) {
+            var html ="";
+            let strs = value.split(",");
+            let factorstrs = strs.sort(factorsSort);
+            factorstrs.forEach(function (factorstr,index) {
+                let factors = factorstr.split("-");
+                let factorCode = factors[0];
+                let factorType = factors[1];
+                let factorLevel = factors[2];
+                let factorCodeValue = getFactorCodeValue(factorCode,factorType);
+                let factorLevelColor = getFactorLevelColor(factorLevel,factorType);
+                let factorLevelIcon = getFactorLevelIcon(factorLevel,factorType);
+                html += '<span class="label  '+factorLevelColor+'" style="margin-right:10px"><i class="'+factorLevelIcon+'"></i>&nbsp;'+factorCodeValue+'</span>';
+                if ((index + 1) % 3 === 0) {
+                    html += '<br>'
+                }
+            });
+            return html
+        } else {
+            return '<span class="label label-default"  ><i class="fa fa-info-circle"></i>&nbsp;暂无危险因素</span>'
+        }
+    }
+
+    function getFactorCodeValue(factorCode,factorType) {
+        var factorValue;
+        if (factorType == "1") {
+             factorValue = $.getConstantEnumValue("xk-disease-type",factorCode);
+        }else if (factorType == "2") {
+             factorValue = $.getConstantEnumValue("xk-index-type",factorCode);
+        } else {
+            factorValue = $.getConstantEnumValue("xk-evaluate-type",factorCode);
+        }
+
+        return factorValue;
+    }
+
+    function getFactorLevelIcon(factorLevel,factorType) {
+        var icon = '';
+        if (factorType == "1") {
+            icon = 'fa fa-exclamation-triangle';
+        }else if (factorType == "2") {
+            icon = 'fa fa-exclamation-circle';
+        }else {
+            if (factorLevel == "1" || factorLevel == "2") {
+                icon = 'fa fa-bell-o';
+            }else if (factorLevel == "3" || factorLevel == "4") {
+                icon = 'fa fa-exclamation-circle';
+            } else {
+                icon = 'fa fa-exclamation-triangle';
+            }
+        }
+
+        return icon;
+    }
+
+
+    function getFactorLevelColor(factorLevel,factorType) {
+        var color = '';
+        if (factorType == "1") {
+            color = 'bg-purple';
+        }else if (factorType == "2") {
+            color = 'bg-aqua';
+        }else {
+            if (factorLevel == "1" || factorLevel == "2") {
+                color = 'bg-teal';
+            }else if (factorLevel == "3" || factorLevel == "4") {
+                color = 'label-warning';
+            } else {
+                color = 'label-danger';
+            }
+        }
+
+        return color;
+    }
+
+    function factorsSort(prevFactorStr,nextFactorStr) {
+        let prev = prevFactorStr.split("-");
+        let next = nextFactorStr.split("-");
+        let prevFactorLevel = prev[2].toString();
+        let nextFactorLevel = next[2].toString();
+        let prevFactorType = prev[1].toString();
+        let nextFactorType = next[1].toString();
+        if (nextFactorType == prevFactorType) {
+            return nextFactorLevel -  prevFactorLevel;
+        } else {
+            return  prevFactorType - nextFactorType;
+        }
+
+    }
+
+    /*]]>*/
+</script>
+</body>
+</html>
