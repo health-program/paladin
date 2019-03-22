@@ -3,13 +3,16 @@ package com.paladin.health.controller.xk;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
@@ -109,6 +112,25 @@ public class XKDiagnoseController {
 	@ResponseBody
 	public Object diagnose(@RequestBody XKPeopleCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
+	}
+	
+	@GetMapping("/disease/{typeCode}")
+	@ResponseBody
+	//HY.CJJB.TNB
+	public Object disease(@PathVariable String typeCode) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getDisease(typeCode));
+	}
+	
+	@GetMapping("/tips/output")
+	public Object tips() {
+		return "/health/xk/tip_output";
+	}
+	
+	@GetMapping("/tips/{typeCode}")
+	@ResponseBody
+	//HY.CJJB.TNB
+	public Object getTips(@PathVariable String typeCode) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.getDisease(typeCode));
 	}
 	
 }

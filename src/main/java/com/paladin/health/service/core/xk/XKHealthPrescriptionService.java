@@ -298,5 +298,11 @@ public class XKHealthPrescriptionService {
 		String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
 		return knowledgeServlet.postJsonRequest(url, condition, Map.class);
 	}
+	
+	public Map getDisease(String typeCode) {
+		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/"+ typeCode;
+		
+		return knowledgeServlet.getRequest(url, null, Map.class);
+	}
 
 }
