@@ -197,7 +197,6 @@ function search_menu(){
 }
 
 function showEvaluateResult(result) {
-	console.log(result);
 	var data=result.knowledge;
 	var type=result.type;
 	if (!data) {
