@@ -400,6 +400,10 @@ _Model.prototype.fillViewBody = function() {
         that.filling = false;
         that.checkViewDependency();
     }
+
+    if (typeof that.config.fillViewHandler === 'function') {
+        that.config.fillViewHandler(that, that.data);
+    }
 }
 
 _Model.prototype.fillEditBody = function() {
@@ -412,6 +416,10 @@ _Model.prototype.fillEditBody = function() {
         });
         that.filling = false;
         that.checkEditDependency();
+    }
+
+    if (typeof that.config.fillEditHandler === 'function') {
+        that.config.fillEditHandler(that, that.data);
     }
 }
 

@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
 
 <body>
-    <tt:constant enumcode="publicity-message-type" />
+    <tt:constant enumcode="publicity-message-type,publish-target-type" />
     <section class="content-header">
         <h1>发布信息</h1>
         <ol class="breadcrumb">
@@ -33,7 +33,7 @@
                     <div class="form-group">
                         <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
                         <div class="col-sm-3">
-                            <input name="publishTime" placeholder="请输入发布时间" type="text" class="form-control tonto-datepicker-date" />
+                            <input name="publishTime" placeholder="请输入发布时间" type="text" autocomplete="off" class="form-control tonto-datepicker-date" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -50,7 +50,7 @@
                     <div class="form-group">
                         <label for="thumbnailImage" class="col-sm-3 control-label">标题配图：</label>
                         <div class="col-sm-8">
-                            <input type="file" name="thumbnailImage" multiple class="file" data-language="zh">
+                            <input type="file" name="thumbnailImage">
                         </div>
                     </div>
                     <div class="form-group" id="publishTargetGroup" style="display: none">
@@ -105,12 +105,12 @@
         url: "/health/publicity/message/save",
         columns: [
             { title: "标题", name: "title", inputType: "TEXT" },
-            { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "1", "2"] },
+            { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "2"] },
             { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
-            { title: "标题配图", name: "thumbnail", inputType: "ATTACHMENT", fileName: "thumbnailImage", dependency: ["type", "1", "2"] },
+            { title: "标题配图", name: "thumbnail", inputType: "IMAGE", fileName: "thumbnailImage", dependency: ["type", "2"] },
             { title: "发布时间", name: "publishTime", inputType: "DATE" },
             { title: "内容", name: "content", inputType: "TEXT" },
-            { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
+            { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "2"] },
             { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles", dependency: ["type", "1", "2"] }
         ]
     }
@@ -172,12 +172,12 @@
             return;
         }
 
-        if (type == 1 || type == 2) {
+        if ( type == 2) {
             editor.setShow();
             messageInput.hide();
             messageInput.attr("disabled", true);
             $("#publishTargetGroup").hide();
-        } else if (type == 3) {
+        } else if (type == 1 || type == 3) {
             editor.setHide();
             messageInput.show();
             messageInput.attr("disabled", false);
@@ -188,20 +188,17 @@
     }
 
     function initPublishTarget() {
-        $.getAjax("/health/prescription/factor/list", function(data) {
-            var c = $("#publishTargetDiv");
-            for (var i = 0; i < data.length; i++) {
-                var d = data[i];
-                if (d.type == 1) {
-                    var k = $('<label class="control-label radio-label"><input type="checkbox" name="ptarget" value="' + d.code + '">&nbsp;&nbsp;' + d.name + '&nbsp;&nbsp;</label>');
-                    c.append(k);
-                    k.iCheck({
-                        checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
-                        radioClass: 'iradio_square-blue'
-                    });
-                }
-            }
-        });
+        var data = window._constant_cache['publish-target-type'];
+        var c = $("#publishTargetDiv");
+        for (var i = 0; i < data.length; i++) {
+            var d = data[i];
+            var k = $('<label class="control-label radio-label"><input type="checkbox" name="ptarget" value="' + d.key + '">&nbsp;&nbsp;' + d.value + '&nbsp;&nbsp;</label>');
+            c.append(k);
+            k.iCheck({
+                checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
+                radioClass: 'iradio_square-blue'
+            });
+        }
     }
     </script>
 </body>

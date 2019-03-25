@@ -46,7 +46,7 @@
 		<if test="createUserName !=null and createUserName !='' ">
 			AND c.name LIKE CONCAT('%',#{createUserName},'%')
 		</if>	
-		ORDER BY a.create_time
+		ORDER BY a.create_time DESC
 	</select>
 	
 	<select id="getMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
@@ -93,7 +93,7 @@
 		FROM publicity_message a
 		LEFT JOIN org_user b ON a.examine_user_id = b.id
 		LEFT JOIN org_user c ON a.create_user_id = c.id
-		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type IN  (1,2)
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
 		ORDER BY publish_time DESC
 		LIMIT 8;
     </select>
@@ -118,7 +118,7 @@
 		FROM publicity_message a
 		LEFT JOIN org_user b ON a.examine_user_id = b.id
 		LEFT JOIN org_user c ON a.create_user_id = c.id
-		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type IN  (1,2)
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
 		ORDER BY publish_time DESC
     </select>
 </mapper>

@@ -32,7 +32,6 @@
                             <select name="status" class="form-control tonto-select" th:attr="selectedvalue=${query?.status}">
                                 <option value="1">待审核</option>
                                 <option value="9">审核成功</option>
-                                <option value="2">审核未通过</option>
                             </select>
                         </div>
                     </div>
@@ -83,7 +82,7 @@
                     { title: "发布时间", field: "publishTime", sortable: true, formatter: "date" },
                     { title: "状态", field: "status", sortable: true, enumcode: "publicity-message-status" },
                     { title: "创建人", field: "createUserName", formatter: function(value, row, index) { return value ? value : "管理员" } },
-                    { title: "审核人", field: "examineUserName", formatter: function(value, row, index) { return value ? value : "管理员" } },
+                    { title: "审核人", field: "examineUserName", formatter: function(value, row, index) { return row.status == 9 ? (value || "管理员") : "" } },
                     {
                         title: "操作",
                         align: "center",

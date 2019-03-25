@@ -35,17 +35,6 @@ public class PublicityMessageCenterController extends ControllerSupport {
 
 	@Autowired
 	private VideoPlayPublishService videoPlayPublishService;
-	
-	/**
-	 * app首页列表展示
-	 * 
-	 * @return
-	 */
-	
-	@RequestMapping("/app/index")
-	public String app() {
-		return "/health/open/app/index";
-	}
 
 	/**
 	 * 对外首页展示
@@ -69,29 +58,28 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		return "/health/open/video_top_video_index";
 	}
 
-	
 	/**
 	 * 移动端首页跳转
 	 * 
 	 * @return
 	 */
-	
+
 	@RequestMapping("/app/videoList")
 	@ResponseBody
 	public Object appVideo(VideoQueryDTO queryDTO) {
 		queryDTO.setLimit(8);
 		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
-		Map<String,Object>map=new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("videosAll", videosAll);
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
+
 	/**
 	 * 对外移动端视频图片轮播展示
 	 * 
 	 * @return
 	 */
-	
+
 	@RequestMapping("/app/videoSlip")
 	@ResponseBody
 	public Object videoSlip() {
@@ -99,41 +87,16 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		page.setLimit(5);
 		page.setOffset(0);
 		PageResult<VideoShowVo> pages = videoService.findVideoPage(page);
-		Map<String,Object>map=new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("videos", pages.getData());
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
-	
-	/**
-	 * 对外信息首页展示
-	 * 
-	 * @return
-	 */
-	
-	@RequestMapping("/app/messages")
-	@ResponseBody
-	public Object appMessage() {
-		PublicityMessageQueryDTO queryDTO = new PublicityMessageQueryDTO();
-		queryDTO.setLimit(5);
-		queryDTO.setOffset(0);
-		PageResult<PublicityMessageVO> slipMessages = publicityMessageService.findPublishedMessages(queryDTO);
-		queryDTO.setLimit(8);
-		queryDTO.setOffset(0);
-		PageResult<PublicityMessageVO> messages = publicityMessageService.findPublishedMessages(queryDTO);
-		Map<String,Object>map=new HashMap<String,Object>();
-		map.put("slipMessages", slipMessages.getData());
-		map.put("messages", messages.getData());
-		return CommonResponse.getSuccessResponse(map);
-	}
-	
-	
+
 	/**
 	 * 对外信息首页图片轮播展示
 	 * 
 	 * @return
 	 */
-	
 	@RequestMapping("/app/messageSlip")
 	@ResponseBody
 	public Object messageSlip() {
@@ -141,27 +104,27 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		queryDTO.setLimit(5);
 		queryDTO.setOffset(0);
 		PageResult<PublicityMessageVO> slipMessages = publicityMessageService.findPublishedMessages(queryDTO);
-		Map<String,Object>map=new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("slipMessages", slipMessages.getData());
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
+
 	/**
 	 * 对外信息首页展示
 	 * 
 	 * @return
 	 */
-	
+
 	@RequestMapping("/app/messageList")
 	@ResponseBody
 	public Object messageList(PublicityMessageQueryDTO queryDTO) {
 		queryDTO.setLimit(8);
 		PageResult<PublicityMessageVO> messages = publicityMessageService.findPublishedMessages(queryDTO);
-		Map<String,Object>map=new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("messages", messages);
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
+
 	/**
 	 * 功能描述: <信息详情展示页面>
 	 * 
@@ -178,26 +141,27 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		List<PublicityMessageVO> messageList = publicityMessageService.showDisplayMessage();
 		queryDTO.setLimit(100);
 		PageResult<PublicityMessageVO> messagesResult = publicityMessageService.findPublishedMessages(queryDTO);
-		List<PublicityMessageVO>messages = messagesResult.getData();
+		List<PublicityMessageVO> messages = messagesResult.getData();
 		PublicityMessageVO preMessage = new PublicityMessageVO();
 		PublicityMessageVO nextMessage = new PublicityMessageVO();
 		for (int i = 0; i < messages.size(); i++) {
 			if (messages.get(i).getId().equals(message.getId())) {
 				if (messages.size() > 1) {
-					if(i > 0 && i <  messages.size() - 1){
+					if (i > 0 && i < messages.size() - 1) {
 						preMessage = messages.get(i - 1);
 						nextMessage = messages.get(i + 1);
 					}
 					if (i == 0) {
 						nextMessage = messages.get(i + 1);
-						
-					} 
+
+					}
 					if (i == messages.size() - 1) {
 						preMessage = messages.get(i - 1);
 					}
 				}
 			}
-		};
+		}
+		;
 		model.addAttribute("message", message);
 		model.addAttribute("preMessage", preMessage);
 		model.addAttribute("nextMessage", nextMessage);
@@ -206,8 +170,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	}
 
 	/**
-	 * 功能描述: app对外信息详情
-	 * <信息详情展示页面>
+	 * 功能描述: app对外信息详情 <信息详情展示页面>
 	 * 
 	 * @param id
 	 * @param model
@@ -219,15 +182,13 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	@ResponseBody
 	public Object messageDitail(@RequestParam String id, Model model) {
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
-		Map<String,Object>map=new HashMap<String,Object>();
-		map.put("message",message);
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("message", message);
 		return CommonResponse.getSuccessResponse(map);
 	}
-	
-	
+
 	/**
-	 * 功能描述:
-	 * 〈视频播放页面〉
+	 * 功能描述: 〈视频播放页面〉
 	 * 
 	 * @param id
 	 * @param model
@@ -246,10 +207,9 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		model.addAttribute("videosAll", videosAll.getData());
 		return "/health/open/video_play";
 	}
-	
+
 	/**
-	 * 功能描述:
-	 * 〈视频播放页面〉
+	 * 功能描述: 〈视频播放页面〉
 	 * 
 	 * @param id
 	 * @param model
@@ -261,7 +221,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	@ResponseBody
 	public Object appPlay(@RequestParam String id, Model model) {
 		VideoVO videoVO = beanCopy(videoService.get(id), new VideoVO());
-		Map<String,Object>map=new HashMap<String,Object>();
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("video", videoVO);
 		return CommonResponse.getSuccessResponse(map);
 	}
@@ -277,7 +237,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	public Object findAll(PublicityMessageQueryDTO query) {
 		return CommonResponse.getSuccessResponse(publicityMessageService.findPublishedMessages(query));
 	}
-	
+
 	/**
 	 * 信息展示页面
 	 * 
@@ -287,17 +247,17 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	public String messageIndex() {
 		return "/health/open/message_center";
 	}
-	
+
 	/**
 	 * 视频列表
 	 * 
 	 * @return
 	 */
 	@RequestMapping("/find/page")
-    @ResponseBody
-    public Object findPage(VideoPlayPublishQueryDTO query) {
-        return CommonResponse.getSuccessResponse(videoPlayPublishService.searchPublishedVideo(query));
-    }
+	@ResponseBody
+	public Object findPage(VideoPlayPublishQueryDTO query) {
+		return CommonResponse.getSuccessResponse(videoPlayPublishService.searchPublishedVideo(query));
+	}
 
 	/**
 	 * 视频展示页面
@@ -308,15 +268,14 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	public String videoIndex() {
 		return "/health/open/video_center";
 	}
-	
 
-    @RequestMapping("/updateCount")
+	@RequestMapping("/updateCount")
 	@ResponseBody
-    public Object update(@RequestParam String videoId) {
+	public Object update(@RequestParam String videoId) {
 		if (videoPlayPublishService.updateOrSave(videoId) > 0) {
 			return CommonResponse.getSuccessResponse("");
 		}
 		return CommonResponse.getFailResponse();
 	}
-    
+
 }

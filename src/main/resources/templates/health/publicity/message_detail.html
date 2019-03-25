@@ -6,12 +6,12 @@
 <link rel="stylesheet" href="/static/assets/tagsinput/bootstrap-tagsinput.css" />
 
 <body>
-    <tt:constant enumcode="publicity-message-type" />
+    <tt:constant enumcode="publicity-message-type,publish-target-type" />
     <section class="content-header">
         <h1>信息详情</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/publicity/message/index"><i class="fa fa-list-alt"></i>列表</a></li>
-            <li class="active">详情</li>
+            <li><a href="/health/publicity/message/index"><i class="fa fa-list-alt"></i>信息列表</a></li>
+            <li class="active">信息详情</li>
         </ol>
     </section>
     <section class="content">
@@ -46,15 +46,14 @@
                     <div class="form-group">
                         <label for="label" class="col-sm-3 control-label">标签：</label>
                         <div class="col-sm-3">
-                            <p id="labelP" class="form-control-static description"></p>
+                            <p id="labelP" name="label" class="form-control-static description"></p>
                         </div>
                     </div>
-                     <div class="form-group" id="attachments">
-						<label for="thumbnail" class="col-sm-3 control-label">标题配图：</label>
-						<div name="thumbnail" class="col-sm-8">
-							<ul class="mailbox-thumbnail clearfix"></ul>
-						</div>
-					</div>
+                    <div class="form-group" id="attachments">
+                        <label for="thumbnail" class="col-sm-3 control-label">标题配图：</label>
+                        <div name="thumbnail" class="col-sm-8">
+                        </div>
+                    </div>
                     <div class="form-group" id="publishTargetViewGroup">
                         <label for="publishTarget" class="col-sm-3 control-label">发送对象：<br>
                         </label>
@@ -64,7 +63,7 @@
                     </div>
                     <div class="form-group">
                         <label for="summary" class="col-sm-3 control-label">简介：</label>
-                        <div class="col-sm-3">
+                        <div class="col-sm-8">
                             <p name="summary" class="form-control-static description"></p>
                         </div>
                     </div>
@@ -76,11 +75,10 @@
                         </div>
                     </div>
                     <div class="form-group" id="attachments">
-						<label for="attachments" class="col-sm-3 control-label">附件：</label>
-						<div name="attachments" class="col-sm-8">
-							<ul class="mailbox-attachments clearfix"></ul>
-						</div>
-					</div>
+                        <label for="attachments" class="col-sm-3 control-label">附件：</label>
+                        <div name="attachments" class="col-sm-8">
+                        </div>
+                    </div>
                 </form>
             </div>
             <div id="model_edit" class="box-body" style="display: none">
@@ -108,10 +106,10 @@
                             <input name="label" id="label" type="text" class="form-control" />
                         </div>
                     </div>
-                     <div class="form-group">
+                    <div class="form-group">
                         <label for="thumbnailImage" class="col-sm-3 control-label">标题配图：</label>
                         <div class="col-sm-8">
-                            <input type="file" name="thumbnailImage" multiple class="file" data-language="zh">
+                            <input type="file" name="thumbnailImage">
                         </div>
                     </div>
                     <div class="form-group" id="publishTargetGroup" style="display: none">
@@ -133,7 +131,7 @@
                             <script type="text/plain" id="myEditor" style="width:100%;height:540px;"></script>
                         </div>
                     </div>
-					<div class="form-group">
+                    <div class="form-group">
                         <label for="attachmentFiles" class="col-sm-3 control-label">附件：</label>
                         <div class="col-sm-8">
                             <input type="file" name="attachmentFiles" multiple>
@@ -150,6 +148,9 @@
                 </form>
             </div>
         </div>
+        <div class="col-sm-2 col-sm-offset-5 btn-back">
+            <a href="/health/publicity/message/index" class="btn btn-primary btn-block">返回</a>
+        </div>
     </section>
     <input type="hidden" id="id" th:value="${id}" />
     <div th:include="/health/footer" />
@@ -157,11 +158,11 @@
     <script type="text/javascript" src="/static/assets/ueditor/ueditor.all.min.js"></script>
     <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
     <script type="text/javascript">
-    var targetData, messageData;
+    var messageData;
 
-    function fillViewHandler(data, model) {
+    function fillViewHandler(model, data) {
         $("#contentP").html(data.content);
-        if (data.type != 3) {
+        if (data.type == 2) {
             $("#publishTargetViewGroup").hide();
             $("#contentP").html('<a href="javascript:previewContent()"><i class="glyphicon glyphicon-search"></i>查看富文本</a>');
             var ns = data.label,
@@ -177,13 +178,14 @@
         } else {
             $("#publishTargetViewGroup").show();
             $("#attachments").hide();
-            var ns = data.publishTargetName,
+            var ns = data.publishTarget && data.publishTarget.split(","),
                 c = "";
             if (ns) {
                 ns.forEach(function(n) {
-                    c += '<span class="label label-warning" style="margin-right:10px">' + n.name + '</span>';
-                })
-                c
+                    if (n) {
+                        c += '<span class="label label-warning" style="margin-right:10px">' + $.getConstantEnumValue("publish-target-type",n) + '</span>';
+                    }
+                });
             } else {
                 c = "全部"
             }
@@ -195,13 +197,13 @@
 
     function previewContent() {
         if (messageData) {
-            $.openPageLayer(messageData.content);
+            $.openPageLayer('<div style="padding:40px;padding-right:55px">' + messageData.content + '</div>');
         }
     }
 
-    function fillEditHandler(data, model) {
+    function fillEditHandler(model, data) {
         typeCheckedHandler(data.type);
-        if (data.type == 1 || data.type == 2) {
+        if (data.type == 2) {
             editor.setContent(data.content);
             var ns = data.label,
                 c = "";
@@ -211,7 +213,7 @@
                     $("#label").tagsinput("add", n);
                 })
             }
-        } else if (data.type == 3) {
+        } else if (data.type == 1 || data.type == 3) {
             messageInput.val(data.content);
         }
     }
@@ -223,10 +225,6 @@
     $(function() {
         $("#label").tagsinput();
         initEditor();
-        $.getAjax("/health/prescription/factor/list", function(data) {
-            targetData = data;
-            initPublishTarget();
-        });
         var options = {
             id: "model",
             name: "详情",
@@ -234,12 +232,12 @@
             columns: [
                 { title: "标题", name: "title", inputType: "TEXT" },
                 { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
-                { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "1", "2"] },
-                { title: "标题配图", name: "thumbnail", inputType: "ATTACHMENT", fileName: "thumbnailImage",dependency: ["type", "1", "2"] },
-                { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "1", "2"] },
+                { title: "标题配图", name: "thumbnail", inputType: "IMAGE", fileName: "thumbnailImage", dependency: ["type", "2"] },
+                { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "2"] },
                 { title: "发布时间", name: "publishTime", inputType: "DATE" },
                 { title: "内容", name: "content", inputType: "TEXT" },
-                { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles",dependency: ["type", "1", "2"] }
+                { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "2"] },
+                { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles", dependency: ["type", "1", "2"] }
             ]
         }
 
@@ -249,9 +247,9 @@
                 extraParam: function() {
                     var type = $('input[name="type"]:checked').val();
                     var result = { id: $("#id").val() };
-                    if (type == 1 || type == 2) {
+                    if (type == 2) {
                         result.content = editor.getContent();
-                    } else if (type == 3) {
+                    } else if (type == 1 || type == 3) {
                         var pt = "";
                         $('input[name="ptarget"]:checked').each(function(i, dom) {
                             pt += dom.value + ",";
@@ -289,12 +287,12 @@
             return;
         }
 
-        if (type == 1 || type == 2) {
+        if (type == 2) {
             editor.setShow();
             messageInput.hide();
             messageInput.attr("disabled", true);
             $("#publishTargetGroup").hide();
-        } else if (type == 3) {
+        } else if (type == 1 || type == 3) {
             editor.setHide();
             messageInput.show();
             messageInput.attr("disabled", false);
@@ -305,32 +303,28 @@
     }
 
     function initPublishTarget() {
-        if (messageData && targetData) {
-            var v = messageData.publishTarget;
-            v = v ? v.split(",") : null;
-
-            var c = $("#publishTargetDiv");
-            for (var i = 0; i < targetData.length; i++) {
-                var d = targetData[i];
-                if (d.type == 1) {
-                    var has = false;
-                    if (v) {
-                        for (var j = 0; j < v.length; j++) {
-                            if (v[j] == d.code) {
-                                has = true;
-                                break;
-                            }
-                        }
+        var targetData = window._constant_cache['publish-target-type'];
+        var v = messageData.publishTarget;
+        v = v ? v.split(",") : null;
+        var c = $("#publishTargetDiv");
+        for (var i = 0; i < targetData.length; i++) {
+            var d = targetData[i];
+            var has = false;
+            if (v) {
+                for (var j = 0; j < v.length; j++) {
+                    if (v[j] == d.key) {
+                        has = true;
+                        break;
                     }
-
-                    var k = $('<label class="control-label radio-label"><input type="checkbox"' + (has ? ' checked="checked "' : '') + 'name="ptarget" value="' + d.code + '">&nbsp;&nbsp;' + d.name + '&nbsp;&nbsp;</label>');
-                    c.append(k);
-                    k.iCheck({
-                        checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
-                        radioClass: 'iradio_square-blue'
-                    });
                 }
             }
+
+            var k = $('<label class="control-label radio-label"><input type="checkbox"' + (has ? ' checked="checked "' : '') + 'name="ptarget" value="' + d.key + '">&nbsp;&nbsp;' + d.value + '&nbsp;&nbsp;</label>');
+            c.append(k);
+            k.iCheck({
+                checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
+                radioClass: 'iradio_square-blue'
+            });
         }
     }
     </script>

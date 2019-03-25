@@ -1,13 +1,10 @@
 package com.paladin.health.service.publicity.vo;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import com.paladin.common.core.AttachmentContainer;
 import com.paladin.common.model.syst.SysAttachment;
-import com.paladin.health.core.HealthPrescriptionContainer;
-import com.paladin.health.model.prescription.PrescriptionFactor;
 
 public class PublicityMessageVO {
 
@@ -42,22 +39,6 @@ public class PublicityMessageVO {
 	private String createUserId;
 
 	private String createUserName;
-
-	public List<PrescriptionFactor> getPublishTargetName() {
-		if (publishTarget != null && publishTarget.length() != 0) {
-			String[] targets = publishTarget.split(",");
-			HealthPrescriptionContainer container = HealthPrescriptionContainer.getInstance();
-			List<PrescriptionFactor> factors = new ArrayList<>(targets.length);
-			for (String target : targets) {
-				PrescriptionFactor factor = container.getFactorByCode(target);
-				if (factor != null) {
-					factors.add(factor);
-				}
-			}
-			return factors;
-		}
-		return null;
-	}
 	
 	 // 获取附件文件
     public List<SysAttachment> getAttachmentFiles() {

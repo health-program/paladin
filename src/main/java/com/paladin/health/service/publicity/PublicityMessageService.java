@@ -170,7 +170,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 				query = new PublicityMessageQueryDTO();
 			}
 			query.setCreateUserId(session.getUserId());
-		}
+		} 
 
 		return findMessage(query);
 	}
@@ -182,7 +182,6 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 * @return
 	 */
 	public PageResult<PublicityMessageVO> findPublishedMessages(PublicityMessageQueryDTO query) {
-
 		return findPublishedMessage(query);
 	}
 

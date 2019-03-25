@@ -287,10 +287,13 @@ public class XKKnowledgeServlet {
 	}
 
 	public static void main(String[] args) {
-		String code = "HY.CJJB";
-		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
-
-		System.out.println(new XKKnowledgeServlet().getRequest(url, null, String.class));
+//		String code = "HY.CJJB";
+//		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+//
+//		System.out.println(new XKKnowledgeServlet().getRequest(url, null, String.class));
+		
+		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/aged";
+		System.out.println( new XKKnowledgeServlet().getRequest(url, null, Map.class));
 	}
 
 }
