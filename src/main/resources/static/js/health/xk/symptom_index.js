@@ -204,36 +204,47 @@ function showEvaluateResult(result) {
         return '';
     }
     var html = "";
+   
     if(type=='index'){
     	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-    		    +'<dt>指标名称：</dt><dd id="dn">'+data.dn+'</dd>'
-    		    +'<dt>所在科室：</dt><dd id="ad">'+data.ad +'</dd>'
-    		    +'<dt>检查目的：</dt><dd id="dm">'+data.dm+'</dd>'
-    		    +'<dt>判定标准：</dt><dd id="dc">'+data.dc+'</dd>'
+    		    +'<dt>指标名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
+    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
+    		    +'<dt>检查目的：</dt><dd id="dm">'+data[0].dm+'</dd>'
+    		    +'<dt>判定标准：</dt><dd id="dc">'+data[0].dc+'</dd>'
     		    +'</dl>'
+    		    +'<ul class="nav nav-tabs">'
+    		    +'<li class=""><a href="#tab0" data-toggle="tab" aria-expanded="true">'+data[0].cr+'</a></li>'
+    		    +'<li class=""><a href="#tab1" data-toggle="tab" aria-expanded="false">'+data[1].cr+'</a></li>'
+                +'</ul>'
     }else{
     html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-    +'<dt>疾病名称：</dt><dd id="dn">'+data.dn+'</dd>'
-    +'<dt>所在科室：</dt><dd id="ad">'+data.ad +'</dd>'
-    +'<dt>疾病概述：</dt><dd id="dm">'+data.dm+'</dd>'
-    +'<dt>疾病分类：</dt><dd id="dc">'+data.dc+'</dd>'
-    +'</dl>'
+    +'<dt>疾病名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
+    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
+    +'<dt>疾病概述：</dt><dd id="dm">'+data[0].dm+'</dd>'
+    +'<dt>疾病分类：</dt><dd id="dc">'+data[0].dc+'</dd>'
+    +'</dl>';
+   /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
     }
-    html += getEvaluateItemHtml((type=='index'?'可能原因':'病因'), data.dd_c);
-    html += getEvaluateItemHtml('症状', data.dd_s);
-    html += getEvaluateItemHtml((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data.dd_r);
-    html += getEvaluateItemHtml('生活方式', data.dd_l);
-    html += getEvaluateItemHtml('饮食建议', data.dd_d);
-    html += getEvaluateItemHtml('饮食宜吃', data.dd_d_s);
-    html += getEvaluateItemHtml('饮食忌吃', data.dd_d_a);
-    html += getEvaluateItemHtml('运动建议', data.dd_sa);
-    html += getEvaluateItemHtml('运动宜做', data.dd_sa_s);
-    html += getEvaluateItemHtml('运动忌做', data.dd_sa_a);
-    html += getEvaluateItemHtml('医疗保健', data.dd_m);
-    html += getEvaluateItemHtml('就医复查指南', data.dd_g);
-    html += getEvaluateItemHtml('生活常识', data.dd_n);
-    html='<div style="padding-top:40px;padding-bottom:40px;padding-right:55px">'+html+'</div>'
-    return html;
+    var htmlNode=''; 
+    for(var i in data){
+    	htmlNode += '<div class="tab-pane '+(i==0?'active':'')+'" id="tab'+i+'">';
+    	htmlNode += getEvaluateItemHtml((type=='index'?'可能原因':'病因'), data[i].dd_c);
+    	htmlNode += getEvaluateItemHtml('症状', data[i].dd_s);
+    	htmlNode += getEvaluateItemHtml((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data[i].dd_r);
+    	htmlNode += getEvaluateItemHtml('生活方式', data[i].dd_l);
+    	htmlNode += getEvaluateItemHtml('饮食建议', data[i].dd_d);
+    	htmlNode += getEvaluateItemHtml('饮食宜吃', data[i].dd_d_s);
+    	htmlNode += getEvaluateItemHtml('饮食忌吃', data[i].dd_d_a);
+    	htmlNode += getEvaluateItemHtml('运动建议', data[i].dd_sa);
+    	htmlNode += getEvaluateItemHtml('运动宜做', data[i].dd_sa_s);
+    	htmlNode += getEvaluateItemHtml('运动忌做', data[i].dd_sa_a);
+    	htmlNode += getEvaluateItemHtml('医疗保健', data[i].dd_m);
+    	htmlNode += getEvaluateItemHtml('就医复查指南', data[i].dd_g);
+    	htmlNode += getEvaluateItemHtml('生活常识', data[i].dd_n);
+    	htmlNode+='</div>';
+    	
+    }
+    return html+'<div class="tab-content">'+htmlNode+'</div>';
 }
 
 

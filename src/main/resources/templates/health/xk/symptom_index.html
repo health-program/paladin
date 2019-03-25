@@ -2,10 +2,27 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:include="/health/header" />
 <link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
+<style>
+    .tab-content>.tab-pane, .pill-content>.pill-pane {
+	display: block;
+	height: 0;
+	overflow-y: hidden;
+}
+
+.tab-content>.active, .pill-content>.active {
+	height: auto;
+}
+</style>
 
 <body>
     <section class="content">
         <div class="container">
+         <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-search"></i>
+                <h3 class="box-title">查询</h3>
+            </div>
+            <div class="box-body">
         	<input type="hidden" id="symptomKey" th:value="${symptomKey}"/>
         	<input type="hidden" id="symptomName" th:value="${symptomName}"/>        
             <div class="col-md-12">
@@ -21,10 +38,13 @@
                     </div>
                 </div>
             </div>
-          <div id="content" class="col-md-12">
+            
+            <div id="content" class="col-md-12">
+            
      
-          </div>
+            </div>
         </div>
+       </div>
        </div>
     </section>
     <div th:include="/health/footer" />
