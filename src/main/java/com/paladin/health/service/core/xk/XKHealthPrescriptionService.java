@@ -73,9 +73,9 @@ public class XKHealthPrescriptionService {
 			Set<String> diseaseSet = new HashSet<>(diseases);
 			diseaseKnowledge = new ArrayList<>();
 			for (String disease : diseaseSet) {
-				XKDiseaseKnowledge k = getKnowledge(disease);
-				if (k != null) {
-					diseaseKnowledge.add(k);
+				List<XKDiseaseKnowledge> ks = getKnowledge(disease);
+				if (ks != null) {
+					diseaseKnowledge.addAll(ks);
 				}
 			}
 
@@ -275,23 +275,29 @@ public class XKHealthPrescriptionService {
 
 	/**
 	 * 获取知识
+	 * 
 	 * @param code
 	 * @return
 	 */
-	public XKDiseaseKnowledge getKnowledge(String code) {
+	public List<XKDiseaseKnowledge> getKnowledge(String code) {
 		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
 		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
+		List<XKDiseaseKnowledge> result = new ArrayList<>(2);
 		if (diseaseName != null && diseaseName.length() > 0) {
-			Map knowledge = knowledgeServlet.getRequest(url, null, Map.class);
-			if (knowledge != null) {
-				return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge);
+			List knowledges = knowledgeServlet.getRequest(url, null, List.class);
+			if (knowledges != null) {
+				for (Object knowledge : knowledges) {
+					result.add(new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, (Map) knowledge));
+				}
 			}
 		} else {
 			diseaseName = ConstantsContainer.getTypeValue(CONSTANT_INDEX_TYPE, code);
 			if (diseaseName != null && diseaseName.length() > 0) {
-				Map knowledge = knowledgeServlet.getRequest(url, null, Map.class);
-				if (knowledge != null) {
-					return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_INDE, knowledge);
+				List knowledges = knowledgeServlet.getRequest(url, null, List.class);
+				if (knowledges != null) {
+					for (Object knowledge : knowledges) {
+						result.add(new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_INDE, (Map) knowledge));
+					}
 				}
 			}
 		}
@@ -301,6 +307,7 @@ public class XKHealthPrescriptionService {
 
 	/**
 	 * 获取评估
+	 * 
 	 * @param condition
 	 * @return
 	 */
@@ -311,6 +318,7 @@ public class XKHealthPrescriptionService {
 
 	/**
 	 * 获取TIPS
+	 * 
 	 * @param typeCode
 	 * @return
 	 */
@@ -319,5 +327,4 @@ public class XKHealthPrescriptionService {
 		return knowledgeServlet.getRequest(url, null, Map.class);
 	}
 
-	
 }

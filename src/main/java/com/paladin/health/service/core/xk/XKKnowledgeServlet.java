@@ -288,9 +288,9 @@ public class XKKnowledgeServlet {
 
 	public static void main(String[] args) {
 		String code = "HY.CJJB";
-		String url = "http://dlopen.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
 
-		System.out.println(new XKKnowledgeServlet().getRequest(url, null, Map.class));
+		System.out.println(new XKKnowledgeServlet().getRequest(url, null, String.class));
 	}
 
 }
