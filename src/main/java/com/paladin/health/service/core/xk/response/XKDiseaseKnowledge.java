@@ -1,6 +1,6 @@
 package com.paladin.health.service.core.xk.response;
 
-import java.util.Map;
+import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class XKDiseaseKnowledge {
@@ -14,13 +14,13 @@ public class XKDiseaseKnowledge {
 
 	private String type;
 
-	private Map knowledge;
+	private List knowledge;
 
 	public XKDiseaseKnowledge() {
 
 	}
 
-	public XKDiseaseKnowledge(String code, String name, String type, Map knowledge) {
+	public XKDiseaseKnowledge(String code, String name, String type, List knowledge) {
 		this.code = code;
 		this.name = name;
 		this.type = type;
@@ -43,11 +43,11 @@ public class XKDiseaseKnowledge {
 		this.name = name;
 	}
 
-	public Map getKnowledge() {
+	public List getKnowledge() {
 		return knowledge;
 	}
 
-	public void setKnowledge(Map knowledge) {
+	public void setKnowledge(List knowledge) {
 		this.knowledge = knowledge;
 	}
 

@@ -2,7 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:include="/health/header" />
+<style>
+    .tab-content>.tab-pane, .pill-content>.pill-pane {
+	display: block;
+	height: 0;
+	overflow-y: hidden;
+}
 
+.tab-content>.active, .pill-content>.active {
+	height: auto;
+}
+</style>
 <body>
     <tt:constant enumcode="boolean,sex-type,family-hypertension-type,xk-disease-type,xk-index-type" />
     <div class="container">
@@ -239,42 +249,68 @@
 
         return s;
     }
-
+    
+    
+    var count=0;
     function createKnowledgeHtml(data) {
         var html = "";
 
         data.forEach(function(item) {
             html += createKnowledgeItemHtml(item);
+            count++;
         });
 
         return "<fieldset><legend>体检百科</legend><div>" + html + "</div></fieldset>";
     }
 
-    function createKnowledgeItemHtml(data) {
-        var knowledge = data.knowledge;
-        return '<dl class="dl-horizontal" style="padding-bottom:20px;">' +
-            '    <dt>名称：</dt>' +
-            '    <dd>' + data.name + '</dd>' +
-            '    <dt>类型：</dt>' +
-            '    <dd><span class="label label-info">' + (data.type == 'index' ? '指标' : '疾病') + '</span></dd>' +
-            // parseKnowledgeContent("所属科室", knowledge['ad']) +
-            // parseKnowledgeContent((data.type=='index'?'检查目的':'疾病概述'), knowledge['dm']) +
-            // parseKnowledgeContent((data.type=='index'?'判定标准':'疾病分类'), knowledge['dc']) +
-            // parseKnowledgeContent((data.type=='index'?'可能原因':'病因'), knowledge['dd_c']) +
-            // parseKnowledgeContent("症状", knowledge['dd_s']) +
-            // parseKnowledgeContent((data.type=='index'?'可能存在的风险或疾病':'风险或并发症'), knowledge['dd_r']) +
-            parseKnowledgeContent("生活方式", knowledge['dd_l']) +
-            parseKnowledgeContent("饮食建议", knowledge['dd_d']) +
-            parseKnowledgeContent("饮食宜吃", knowledge['dd_d_s']) +
-            parseKnowledgeContent("饮食忌吃", knowledge['dd_d_a']) +
-            parseKnowledgeContent("运动建议", knowledge['dd_sa']) +
-            parseKnowledgeContent("运动宜做", knowledge['dd_sa_s']) +
-            parseKnowledgeContent("运动忌做", knowledge['dd_sa_a']) +
-            parseKnowledgeContent("医疗保健", knowledge['dd_m']) +
-            //parseKnowledgeContent("就医复查指南", knowledge['dd_g']) +
-            parseKnowledgeContent("生活常识", knowledge['dd_n']) +
-            '</dl>';
-    }
+    function createKnowledgeItemHtml(result) {
+        		var data=result.knowledge;
+        		var type=result.type;
+        		if (!data) {
+        	        return '';
+        	    }
+        	    var html = "";
+        	    if(type=='index'){
+        	    	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
+        	    		    +'<dt>指标名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
+        	    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
+        	    		    +'<dt>检查目的：</dt><dd id="dm">'+data[0].dm+'</dd>'
+        	    		    +'<dt>判定标准：</dt><dd id="dc">'+data[0].dc+'</dd>'
+        	    		    +'</dl>'
+        	    		    +'<ul class="nav nav-tabs">'
+        	    		    +'<li class=""><a href="#tab0'+count+'"data-toggle="tab" aria-expanded="true">'+data[0].cr+'</a></li>'
+        	    		    +'<li class=""><a href="#tab1'+count+'"data-toggle="tab" aria-expanded="false">'+data[1].cr+'</a></li>'
+        	                +'</ul>'
+        	    }else{
+        	    html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
+        	    +'<dt>疾病名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
+        	    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
+        	    +'<dt>疾病概述：</dt><dd id="dm">'+data[0].dm+'</dd>'
+        	    +'<dt>疾病分类：</dt><dd id="dc">'+data[0].dc+'</dd>'
+        	    +'</dl>';
+        	   /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
+        	    }
+        	    var htmlNode=''; 
+        	    for(var i in data){
+        	    	htmlNode += '<div class="tab-pane '+(i==0?'active':'')+'" id="tab'+i+count+'">';
+        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能原因':'病因'), data[i].dd_c);
+        	    	htmlNode += parseKnowledgeContent('症状', data[i].dd_s);
+        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data[i].dd_r);
+        	    	htmlNode += parseKnowledgeContent('生活方式', data[i].dd_l);
+        	    	htmlNode += parseKnowledgeContent('饮食建议', data[i].dd_d);
+        	    	htmlNode += parseKnowledgeContent('饮食宜吃', data[i].dd_d_s);
+        	    	htmlNode += parseKnowledgeContent('饮食忌吃', data[i].dd_d_a);
+        	    	htmlNode += parseKnowledgeContent('运动建议', data[i].dd_sa);
+        	    	htmlNode += parseKnowledgeContent('运动宜做', data[i].dd_sa_s);
+        	    	htmlNode += parseKnowledgeContent('运动忌做', data[i].dd_sa_a);
+        	    	htmlNode += parseKnowledgeContent('医疗保健', data[i].dd_m);
+        	    	htmlNode += parseKnowledgeContent('就医复查指南', data[i].dd_g);
+        	    	htmlNode += parseKnowledgeContent('生活常识', data[i].dd_n);
+        	    	htmlNode+='</div>';
+        	    	
+        	    }
+        	    return html+'<div class="tab-content">'+htmlNode+'</div>';
+        	}
 
     function parseKnowledgeContent(name, data) {
         var html = "";

@@ -17,14 +17,6 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord>{
     private DiagnoseTargetFactorService diagnoseTargetFactorService;
 
     public PageResult<DiagnoseRecordSimpleVO> searchDiagnoseRecordsByQuery(DiagnoseRecordQueryDTO query) {
-      /*  PageResult<DiagnoseTarget> results = diagnoseTargetService.searchPage(query);
-        List<String> ids = new ArrayList<>(5);
-        if (results != null && results.getData() != null && results.getData().size() > 0 ) {
-            List<DiagnoseTarget> targets = results.getData();
-          for (DiagnoseTarget target : targets) {
-            ids.add(target.getId());
-          }
-        }*/
         Page<DiagnoseRecordSimpleVO> page = PageHelper.offsetPage(query.getOffset(),query.getLimit());
         diagnoseTargetFactorService.searchDiagnoseTargetFactor(query);
         return  new PageResult<>(page);

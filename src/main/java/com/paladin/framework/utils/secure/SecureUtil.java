@@ -26,6 +26,6 @@ public class SecureUtil {
 	
 	
 	public static void main(String[] args) {
-		System.out.println(createPassword("1","3ad6c1dd71e0ec26c62ae1b7c81b3e82"));
+		System.out.println(createPassword("123","2a29f954227a613ecb66b08292ab6413"));
 	}
 }

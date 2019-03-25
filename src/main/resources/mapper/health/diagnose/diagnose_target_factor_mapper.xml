@@ -27,11 +27,14 @@
 		diagnose_target AS dt
 		LEFT JOIN diagnose_target_factor AS dtf ON dt.id = dtf.target_id
 		where  1 =1
-		<if test="query.startTime != null">
-			AND dt.update_time >= #{query.startTime}
+	  	<if test="query.name != null and query.name != ''">
+			AND  dt.name LIKE  CONCAT ('%',#{query.name} ,'%')
 		</if>
-		<if test="query.endTime != null">
-			AND dt.update_time &lt;= #{query.endTime}
+		<if test="query.targetId != null">
+			AND dt.id = #{query.targetId}
+		</if>
+		<if test="query.factorType != null and query.factorCode != null">
+			AND IF( #{query.factorType} =1 OR #{query.factorType} = 2 , dtf.factor_code = #{query.factorCode} AND dtf.factor_type = #{query.factorType},dtf.factor_code = #{query.factorCode}  AND dtf.factor_level >= ifnull(#{query.factorLevel},0) AND dtf.factor_type = #{query.factorType} )
 		</if>
 		GROUP BY dt.id
 		ORDER BY dt.update_time DESC
