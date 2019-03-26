@@ -47,9 +47,9 @@ img {
 .van-swipe {
   height: 100%; }
 
-#home .van-tabs__wrap {
+/*#home .van-tabs__wrap {
   position: fixed !important;
-  top: 50% !important; }
+  top: 50% !important; }*/
 #home .van-tabs__line {
   display: none !important; }
 #home .van-tab--active {
