@@ -1,10 +1,5 @@
 package com.paladin.health.service.publicity;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.PageResult;
@@ -13,6 +8,10 @@ import com.paladin.health.mapper.publicity.PublicityMaterialGrantCountMapper;
 import com.paladin.health.model.publicity.PublicityMaterialGrant;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantQueryCountDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialGrantCountVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**   
  * @author 黄伟华
@@ -26,7 +25,7 @@ public class PublicityMaterialGrantCountService extends ServiceSupport<Publicity
     
     public PageResult<PublicityMaterialGrantCountVO> publictyCount(PublicityMaterialGrantQueryCountDTO query){
         Page<PublicityMaterialGrantCountVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
-         publicityMaterialGrantCountMapper.publictyCount(query);
+         publicityMaterialGrantCountMapper.publictyYearCount(query);
          return new PageResult<>(page);
     }
     
