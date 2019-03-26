@@ -25,10 +25,9 @@ public class VideoShowVO {
 
 	private Date publishTime;
 
-	public String getShowImageUrl() {
+	public SysAttachment getShowImageUrl() {
 		if (showImage != null && showImage.length() != 0) {
-			SysAttachment att = AttachmentContainer.getAttachment(showImage);
-			return att != null ? att.getPelativePath() : null;
+			return AttachmentContainer.getAttachment(showImage);
 		}
 		return null;
 	}
