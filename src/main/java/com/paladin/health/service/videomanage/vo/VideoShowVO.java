@@ -1,31 +1,37 @@
-package com.paladin.health.service.videomanage.dto;
+package com.paladin.health.service.videomanage.vo;
 
 import java.util.Date;
 
-public class VideoDTO {
+import com.paladin.common.core.AttachmentContainer;
+import com.paladin.common.model.syst.SysAttachment;
 
-	// 
+public class VideoShowVO {
+
 	private String id;
+
+	private String url;
 
 	// 视频名称
 	private String name;
-
-	// 视频地址
-	private String url;
 
 	// 展示图片(附件ID)
 	private String showImage;
 
 	// 视频简介
 	private String summary;
-	
-	// 状态
-	private Integer status;
 
 	// 标签
 	private String label;
-	
+
 	private Date publishTime;
+
+	public String getShowImageUrl() {
+		if (showImage != null && showImage.length() != 0) {
+			SysAttachment att = AttachmentContainer.getAttachment(showImage);
+			return att != null ? att.getPelativePath() : null;
+		}
+		return null;
+	}
 
 	public String getId() {
 		return id;
@@ -41,14 +47,6 @@ public class VideoDTO {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	public String getShowImage() {
@@ -75,12 +73,12 @@ public class VideoDTO {
 		this.label = label;
 	}
 
-	public Integer getStatus() {
-		return status;
+	public String getUrl() {
+		return url;
 	}
 
-	public void setStatus(Integer status) {
-		this.status = status;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	public Date getPublishTime() {

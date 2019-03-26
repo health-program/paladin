@@ -1781,14 +1781,14 @@ function _initAttachment() {
                     });
                     return result;
                 } else {
-                    return {
+                    return [{
                         id: data.id,
                         name: data.name,
                         filename: data.name + data.suffix,
                         url: "/file/" + data.pelativePath,
                         size: data.size,
                         type: data.type
-                    }
+                    }]
                 }
             }
             return null;

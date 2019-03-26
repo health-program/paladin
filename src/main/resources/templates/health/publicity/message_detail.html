@@ -84,31 +84,31 @@
             <div id="model_edit" class="box-body" style="display: none">
                 <form id="model_form" action="/health/publicity/message/update" method="post" class="form-horizontal edit-body" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="title" class="col-sm-3 control-label">标题：</label>
+                        <label for="title" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>标题：</label>
                         <div class="col-sm-3">
-                            <input name="title" placeholder="请输入标题" type="text" class="form-control" />
+                            <input name="title" placeholder="请输入标题" type="text" class="form-control" required="required"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="publishTime" class="col-sm-3 control-label">发布时间：</label>
+                        <label for="publishTime" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发布时间：</label>
                         <div class="col-sm-3">
-                            <input name="publishTime" placeholder="请输入发布时间" type="text" class="form-control tonto-datepicker-date" />
+                            <input name="publishTime" placeholder="请输入发布时间" type="text" autocomplete="off" class="form-control tonto-datepicker-date" required="required"/>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="type" class="col-sm-3 control-label">类型：</label>
+                        <label for="type" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>类型：</label>
                         <div class="col-sm-3 tonto-radio-constant" name="type" enumcode="publicity-message-type">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="label" class="col-sm-3 control-label">标签：</label>
                         <div class="col-sm-3">
-                            <input name="label" id="label" type="text" class="form-control" />
+                            <input name="label" id="label" type="text" class="form-control" placeholder="输入内容后回车"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="thumbnailImage" class="col-sm-3 control-label">标题配图：</label>
-                        <div class="col-sm-8">
+                        <div class="col-sm-5">
                             <input type="file" name="thumbnailImage">
                         </div>
                     </div>
@@ -126,7 +126,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="content" class="col-sm-3 control-label">内容：</label>
+                        <label for="content" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>内容：</label>
                         <div class="col-sm-8" id="contentDiv">
                             <script type="text/plain" id="myEditor" style="width:100%;height:540px;"></script>
                         </div>
@@ -139,10 +139,14 @@
                     </div>
                     <input type="hidden" id="statusInput" name="status" />
                     <div class="form-group">
-                        <div class="col-sm-4 col-sm-offset-3">
-                            <button type="submit" class="btn btn-primary" onclick="setStatus(0)">暂存</button>
-                            <button type="submit" class="btn btn-success" onclick="setStatus(1)">提交</button>
-                            <button type="button" id="model_form_cancel_btn" class="btn btn-default">取消</button>
+                        <div class="col-sm-1 col-sm-offset-3">
+                            <button type="submit" class="btn btn-primary btn-block" onclick="setStatus(0)">暂存</button>
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="submit" class="btn btn-success btn-block" onclick="setStatus(1)">提交</button>
+                        </div>
+                        <div class="col-sm-1 col-sm-offset-1">
+                            <button type="button" id="model_form_cancel_btn" class="btn btn-default btn-block">取消</button>
                         </div>
                     </div>
                 </form>
@@ -232,7 +236,7 @@
             columns: [
                 { title: "标题", name: "title", inputType: "TEXT" },
                 { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
-                { title: "标题配图", name: "thumbnail", inputType: "IMAGE", fileName: "thumbnailImage", dependency: ["type", "2"] },
+                { title: "标题配图", name: "thumbnail",  inputType: "ATTACHMENT", maxFileCount: 1, fileName: "thumbnailImage", dependency: ["type", "2"] },
                 { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "2"] },
                 { title: "发布时间", name: "publishTime", inputType: "DATE" },
                 { title: "内容", name: "content", inputType: "TEXT" },
@@ -243,7 +247,7 @@
 
         $.getAjax("/health/publicity/message/get?id=" + $("#id").val(), function(data) {
             var model = new tonto.Model("model", options.columns, {
-                pattern: data.status == 0 ? "normal" : "view",
+                pattern: data.status == 0 || data.status == 2 ? "normal" : "view",
                 extraParam: function() {
                     var type = $('input[name="type"]:checked').val();
                     var result = { id: $("#id").val() };
@@ -269,7 +273,7 @@
         });
     });
 
-    var current = 1,
+    var current = -1,
         editor, urlInput, messageInput;
 
     function initEditor() {
@@ -287,12 +291,17 @@
             return;
         }
 
-        if (type == 2) {
+        if ( type == 2) {
             editor.setShow();
             messageInput.hide();
             messageInput.attr("disabled", true);
             $("#publishTargetGroup").hide();
-        } else if (type == 1 || type == 3) {
+        } else if (type == 1 ) {
+            editor.setHide();
+            messageInput.show();
+            messageInput.attr("disabled", false);
+            $("#publishTargetGroup").hide();
+        } else if (type == 3) {
             editor.setHide();
             messageInput.show();
             messageInput.attr("disabled", false);

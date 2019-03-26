@@ -1,14 +1,13 @@
 package com.paladin.health.service.videomanage.vo;
 
 import java.util.Date;
-import java.util.List;
 
 import com.paladin.common.core.AttachmentContainer;
 import com.paladin.common.model.syst.SysAttachment;
 
 public class VideoVO {
 
-	// 
+	//
 	private String id;
 
 	// 视频名称
@@ -32,34 +31,24 @@ public class VideoVO {
 	// 置顶排序号
 	private Integer topOrderNo;
 
-	// 
-	private Date createTime;
-
-	// 
-	private String createUserId;
-
-	// 
-	private Date updateTime;
-
-	// 
-	private String updateUserId;
+	// 状态
+	private Integer status;
 	
+	// 发布时间
+	private Date publishTime;
 	
-	  // 获取附件文件
-    public List<SysAttachment> getAttachmentFiles() {
-        if (showImage != null && showImage.length() != 0) {
-            return AttachmentContainer.getAttachments(showImage.split(","));
-        }
-        return null;
-    }
+	private String createUserName;
+	
+	private String examineUserName;
 
-    public String getShowImageUrl() {
-        if (showImage != null && showImage.length() != 0) {
-            return AttachmentContainer.getAttachments(showImage.split(",")).get(0).getPelativePath();
-        }
-        return null;
-    }
-    
+	// 获取附件文件
+	public SysAttachment getShowImageFile() {
+		if (showImage != null && showImage.length() != 0) {
+			return AttachmentContainer.getAttachment(showImage);
+		}
+		return null;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -124,36 +113,36 @@ public class VideoVO {
 		this.topOrderNo = topOrderNo;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
+	public Integer getStatus() {
+		return status;
 	}
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
-	public String getCreateUserId() {
-		return createUserId;
+	public Date getPublishTime() {
+		return publishTime;
 	}
 
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
+	public void setPublishTime(Date publishTime) {
+		this.publishTime = publishTime;
 	}
 
-	public Date getUpdateTime() {
-		return updateTime;
+	public String getCreateUserName() {
+		return createUserName;
 	}
 
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
+	public void setCreateUserName(String createUserName) {
+		this.createUserName = createUserName;
 	}
 
-	public String getUpdateUserId() {
-		return updateUserId;
+	public String getExamineUserName() {
+		return examineUserName;
 	}
 
-	public void setUpdateUserId(String updateUserId) {
-		this.updateUserId = updateUserId;
+	public void setExamineUserName(String examineUserName) {
+		this.examineUserName = examineUserName;
 	}
 
 }

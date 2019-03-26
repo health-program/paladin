@@ -2,30 +2,22 @@ package com.paladin.health.model.videomanage;
 
 import com.paladin.framework.common.BaseModel;
 
+import java.util.Date;
+
 import javax.persistence.Id;
 
 public class Video extends BaseModel {
 
-    public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
+	public final static String COLUMN_FIELD_TOP_ORDER_NO = "topOrderNo";
 
-    public static final Integer TOP_NUMBER = 7;
-    public static final Integer TOP_NOT_SORT_NUMBER = 6;
+	public static final Integer TOP_NUMBER = 7;
+	public static final Integer TOP_NOT_SORT_NUMBER = 6;
 
-    /**
-     * 待审核
-     */
-    public final static int STATUS_TO_EXAMINE = 1;
-    
-    /**
-     * 驳回
-     */
-    public final static int STATUS_EXAMINE_FAIL = 2;
-    
-    /**
-     * 审核成功
-     */
-    public final static int STATUS_EXAMINE_SUCCESS = 9;
-    
+	public final static int STATUS_TEMP = 0;
+	public final static int STATUS_SUBMIT_EXAMINE = 1;
+	public final static int STATUS_EXAMINE_FAIL = 2;
+	public final static int STATUS_EXAMINE_SUCCESS = 9;
+
 	@Id
 	private String id;
 
@@ -49,11 +41,15 @@ public class Video extends BaseModel {
 
 	// 置顶排序号
 	private Integer topOrderNo;
-	
-	   //状态
-    private Integer status;
-    
-    private String examineUserId;
+
+	// 状态
+	private Integer status;
+
+	// 审核人
+	private String examineUserId;
+
+	// 发布时间
+	private Date publishTime;
 
 	public String getId() {
 		return id;
@@ -119,20 +115,28 @@ public class Video extends BaseModel {
 		this.topOrderNo = topOrderNo;
 	}
 
-    public Integer getStatus() {
-          return status;
-    }
+	public Integer getStatus() {
+		return status;
+	}
 
-    public void setStatus(Integer status) {
-          this.status = status;
-    }
-    
-    public String getExamineUserId() {
-          return examineUserId;
-      }
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
 
-    public void setExamineUserId(String examineUserId) {
-          this.examineUserId = examineUserId;
-      }
+	public String getExamineUserId() {
+		return examineUserId;
+	}
+
+	public void setExamineUserId(String examineUserId) {
+		this.examineUserId = examineUserId;
+	}
+
+	public Date getPublishTime() {
+		return publishTime;
+	}
+
+	public void setPublishTime(Date publishTime) {
+		this.publishTime = publishTime;
+	}
 
 }

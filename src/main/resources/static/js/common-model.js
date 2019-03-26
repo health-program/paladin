@@ -1430,258 +1430,7 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
         var colspan = column.colspan || options.maxColspan;
         var html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
         html += '<div name="' + column.name + '" class="col-sm-' + ((options.maxColspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input type="file" name="' + column.fileName + '" multiple>\n';
-        html += '</div>\n';
-        return {
-            colspan: colspan,
-            html: html
-        };
-    }
-});
-
-// 文件域构建器
-var _imageFieldBuilder = new _FieldBuilder("IMAGE", {
-    setDataHandler: function(column, data, model) {
-        // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
-
-        // 解析的附件
-        if (!data) return;
-
-        var filename = column.fileName,
-            v = data[column.name];
-        data[filename] = $.parseAttachmentData(data[filename]);
-        if (v) {
-            data[column.name] = v.split(column.separator || ",");
-        }
-    },
-    dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
-        }
-        // 不能被依赖
-        console && console.log("附件不应该被依赖");
-    },
-    getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
-
-        // 获取文件数据暂不支持
-        console && console.log("暂不实现文件数据获取");
-    },
-    hideView: function(column, model) {
-        if (column.viewDisplay === "hide") {
-            return;
-        }
-
-        // VIEW页面列隐藏时候调用
-        if (typeof column.hideView === 'function') {
-            column.hideView(column, model);
-            column.viewDisplay = "hide";
-            return;
-        }
-
-        var d = model.viewBody.find("[name='" + column.name + "']");
-        if (!d || d.length == 0) return;
-        var f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-
-        column.viewDisplay = "hide";
-    },
-    showView: function(column, model) {
-        if (column.viewDisplay === "show") {
-            return;
-        }
-
-        // VIEW页面列显示时候调用
-        if (typeof column.showView === 'function') {
-            column.showView(column, model);
-            column.viewDisplay = "show";
-            return;
-        }
-
-        var d = model.viewBody.find("[name='" + column.name + "']");
-        if (!d || d.length == 0) return;
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.viewDisplay = "show";
-    },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var name = column.name,
-            atts = data && data[column.fileName];
-
-        if (atts) {
-            var attDiv = model.viewBody.find('[name="' + name + '"]');
-            var html = '<ul class="mailbox-attachments clearfix">';
-            for (var i = 0; i < atts.length; i++) {
-                var b = atts[i];
-                var k = b.filename.lastIndexOf(".");
-                var suffix = "";
-                if (k >= 0) {
-                    suffix = b.filename.substring(k + 1).toLowerCase();
-                }
-
-                var header = "";
-                if (suffix == "jpeg" || suffix == "jpg" || suffix == "png" || suffix == "gif") {
-                    header = '<span class="mailbox-attachment-icon has-img"><img src="' + b.url + '" alt="Attachment"></span>';
-                } else {
-                    var iconMap = {
-                        txt: "fa-file-text-o",
-                        xls: "fa-file-excel-o",
-                        xlsx: "fa-file-excel-o",
-                        pdf: "fa-file-pdf-o",
-                        doc: "fa-file-word-o",
-                        docx: "fa-file-word-o",
-                        rar: "fa-file-zip-o",
-                        zip: "fa-file-zip-o"
-                    }
-                    var icon = iconMap[suffix] || "fa-file-o";
-                    header = '<span class="mailbox-attachment-icon"><i class="fa ' + icon + '"></i></span>';
-                }
-
-                html +=
-                    '<li>' + header +
-                    '    <div class="mailbox-attachment-info">' +
-                    '        <a target="_blank" href="' + b.url + '" class="mailbox-attachment-name"><i class="fa fa-camera"></i>' + b.filename + '</a>' +
-                    '        <span class="mailbox-attachment-size">' + (Math.floor(b.size / 1024) + "KB") + '<a target="_blank" download="' + b.filename + '" href="' + b.url + '" class="btn btn-default btn-xs pull-right"><i class="fa fa-cloud-download"></i></a></span>' +
-                    '    </div>' +
-                    '</li>';
-            }
-            html += "</ul>";
-            attDiv.html(html);
-        }
-    },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var i = model.editBody.find("[name='" + column.fileName + "']");
-        if (!i || i.length == 0) return;
-        var d = i.parent().parent().parent().parent().parent();
-        var f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-        column.editDisplay = "hide";
-    },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var i = model.editBody.find("[name='" + column.fileName + "']");
-        if (!i || i.length == 0) return;
-        var d = i.parent().parent().parent().parent().parent();
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.editDisplay = "show";
-    },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        var name = column.fileName,
-            atts = data ? data[name] : null,
-            fileInput = model.formBody.find('[name="' + name + '"]');
-
-        var initialPreview = [];
-        var initialPreviewConfig = [];
-        if (atts) {
-            atts.forEach(function(att) {
-                initialPreview.push(att.url);
-                initialPreviewConfig.push({
-                    caption: att.filename,
-                    size: att.size,
-                    key: att.id
-                });
-            });
-        }
-
-        if (column.inputAttachment) {
-            column.inputAttachment.fileinput('destroy');
-        }
-
-        column.inputAttachment = $(fileInput).fileinput({
-            language: 'zh',
-            uploadUrl: '/common/upload/file',
-            showUpload: false,
-            layoutTemplates: {
-                actionUpload: '' //去除上传预览缩略图中的上传图片；
-            },
-            showPreview: false,
-            uploadAsync: false,
-            maxFileCount: 1,
-            allowedFileExtensions: column.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],
-            ajaxDelete: false // 扩展定义配置，不进行后台删除操作
-        });
-    },
-    generateViewFormColspan: function(column, options) {
-        if (typeof column.generateViewFormColspan === 'function') {
-            return column.generateViewFormColspan(column, options);
-        }
-        return column.colspan || options.maxColspan;
-    },
-    generateViewFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateViewFormHtml === 'function') {
-            return column.generateViewFormHtml(column, isFirst, options);
-        }
-        var colspan = column.colspan || options.maxColspan;
-        var html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div name="' + column.name + '" class="col-sm-' + ((options.maxColspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '"></div>\n';
-        return {
-            colspan: colspan,
-            html: html
-        };
-    },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
-    generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
-        var colspan = column.colspan || options.maxColspan;
-        var html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div name="' + column.name + '" class="col-sm-' + ((options.maxColspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input type="file" name="' + column.fileName + '">\n';
+        html += '<input type="file" name="' + column.fileName + '" ' + (column.maxFileCount === 1 ? '' : 'multiple') + '>\n';
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -1905,18 +1654,19 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
     }
 });
 
-// 科室单位域构建器
-var _unitFieldBuilder = new _FieldBuilder("UNIT", {
-    dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
+// 标签域构建器
+var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
+    setDataHandler: function(column, data, model) {
+        // 插入数据时候调用
+        if (typeof column.setDataHandler === 'function') {
+            return column.setDataHandler(column, data, model);
         }
-        column.unitComponment && column.unitComponment.addUnitChangedListener(function() {
-            if (model.filling === false) {
-                model.checkEditDependency();
-            }
-        });
+
+        // 解析的附件
+        var v = data && data[column.name];
+        if (v) {
+            data[column.name] = v.split(column.separator || ",");
+        }
     },
     getEditValue: function(column, model) {
         // 获取域EDIT页面值
@@ -1924,8 +1674,7 @@ var _unitFieldBuilder = new _FieldBuilder("UNIT", {
             return column.getEditValue(column, model);
         }
 
-        var unit = column.unitComponment && column.unitComponment.getCurrent();
-        return unit ? unit.id : null;
+        return model.editBody.find("input[name='" + column.name + "']").tagsinput("items")
     },
     fillView: function(column, data, model) {
         // VIEW页面填充值时候调用
@@ -1935,178 +1684,25 @@ var _unitFieldBuilder = new _FieldBuilder("UNIT", {
 
         var p = model.viewBody.find("[name='" + column.name + "']");
         if (!p || p.length == 0) return;
-        var v = data ? data[column.viewName] : null;
+        var v = data ? data[column.name] : null;
+
 
         if (v) {
-            p.removeClass("text-muted");
-            p.text(v);
-        } else {
-            p.addClass("text-muted");
-            p.text("无");
-        }
-    },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
+            var t = "";
+            v.forEach(function(a) {
+                t += a + ",";
+            });
 
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent(),
-            f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-        column.editDisplay = "hide";
-    },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent();
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.editDisplay = "show";
-    },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        if (!column.unitComponment) {
-            column.unitComponment = model.editBody.find("[name='" + column.name + "']").data("unitComponment");
-        }
-
-        column.unitComponment && column.unitComponment.setCurrent(data ? {
-            id: data[column.name],
-            name: data[column.viewName]
-        } : null);
-    },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
-    generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
-        var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input type="text" class="form-control ' + (column.unitType || 'tonto-select-unit') + '" name="' + column.name + '" placeholder="请选择' + column.title + '"></input>\n';
-        html += '</div>\n';
-        return {
-            colspan: colspan,
-            html: html
-        };
-    }
-});
-
-// 考核周期域构建器
-var _cycleFieldBuilder = new _FieldBuilder("CYCLE", {
-    dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
-        }
-        column.cycleComponment && column.cycleComponment.addUnitChangedListener(function() {
-            if (model.filling === false) {
-                model.checkEditDependency();
+            if (t.length > 0) {
+                t = t.substring(0, t.length - 1);
             }
-        });
-    },
-    getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
 
-        var cycle = column.cycleComponment && column.cycleComponment.getCurrent();
-        return cycle ? cycle.id : null;
-    },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var v = data ? data[column.viewName] : null;
-
-        if (v) {
             p.removeClass("text-muted");
-            p.text(v);
+            p.text(t);
         } else {
             p.addClass("text-muted");
             p.text("无");
         }
-    },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent(),
-            f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-        column.editDisplay = "hide";
-    },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent();
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.editDisplay = "show";
     },
     fillEdit: function(column, data, model) {
         // EDIT页面填充值时候调用
@@ -2114,20 +1710,16 @@ var _cycleFieldBuilder = new _FieldBuilder("CYCLE", {
             return column.fillEdit(column, data, model);
         }
 
-        if (!column.cycleComponment) {
-            column.cycleComponment = model.editBody.find("[name='" + column.name + "']").data("cycleComponment");
-        }
+        var input = model.editBody.find("[name='" + column.name + "']");
+        if (!input && input.length == 0) return;
+        input.tagsinput("removeAll");
+        var v = data ? data[column.name] : null;
 
-        column.cycleComponment && column.cycleComponment.setCurrent(data ? {
-            id: data[column.name],
-            cycleName: data[column.viewName]
-        } : null);
-    },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
+        if (v) {
+            v.forEach(function(a) {
+                input.tagsinput('add', a);
+            });
         }
-        return column.colspan || 1;
     },
     generateEditFormHtml: function(column, isFirst, options) {
         if (typeof column.generateEditFormHtml === 'function') {
@@ -2136,7 +1728,7 @@ var _cycleFieldBuilder = new _FieldBuilder("CYCLE", {
         var colspan = column.colspan || 1,
             html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
         html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input type="text" class="form-control ' + (column.cycleType || 'tonto-select-assess-cycle') + '" name="' + column.name + '" placeholder="请选择' + column.title + '"></input>\n';
+        html += '<input name="' + column.name + '" type="text" class="form-control" data-role="tagsinput" placeholder="输入内容后回车"/>\n';
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -2144,6 +1736,7 @@ var _cycleFieldBuilder = new _FieldBuilder("CYCLE", {
         };
     }
 });
+
 
 if (!window.toton) window.toton = {};
 window.tonto.Model = _Model;

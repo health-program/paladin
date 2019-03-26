@@ -69,6 +69,12 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="createUserName" class="col-sm-3 control-label">创建人：</label>
+                        <div class="col-sm-3">
+                            <p name="createUserName" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
                         <label for="content" class="col-sm-3 control-label">内容：</label>
                         <div class="col-sm-3">
                             <p id="contentP" class="form-control-static description">
@@ -150,7 +156,7 @@
                 { title: "简介", name: "summary", inputType: "TEXT", dependency: ["type", "2"] },
                 { title: "类型", name: "type", inputType: "RADIO", enum: "publicity-message-type" },
                 { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "2"] },
-                { title: "标题配图", name: "thumbnail", inputType: "IMAGE", fileName: "thumbnailImage", dependency: ["type", "2"] },
+                { title: "标题配图", name: "thumbnail",  inputType: "ATTACHMENT", maxFileCount: 1, fileName: "thumbnailImage", dependency: ["type", "2"] },
                 { title: "发布时间", name: "publishTime", inputType: "DATE" },
                 { title: "内容", name: "content", inputType: "TEXT" },
                 { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles", dependency: ["type", "1", "2"] },

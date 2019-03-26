@@ -6,7 +6,7 @@ import com.paladin.framework.common.OffsetPage;
 * @author jisanjie
 * @version 2018年12月28日 下午6:56:06 
 */
-public class VideoExamineQueryVo extends OffsetPage{
+public class VideoExamineQueryVO extends OffsetPage{
 
       private Integer status;
 

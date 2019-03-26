@@ -20,7 +20,7 @@ import com.paladin.health.service.videomanage.VideoPlayPublishService;
 import com.paladin.health.service.videomanage.VideoService;
 import com.paladin.health.service.videomanage.dto.VideoPlayPublishQueryDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
-import com.paladin.health.service.videomanage.vo.VideoShowVo;
+import com.paladin.health.service.videomanage.vo.VideoShowVO;
 import com.paladin.health.service.videomanage.vo.VideoVO;
 
 @Controller
@@ -37,56 +37,46 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	private VideoPlayPublishService videoPlayPublishService;
 
 	/**
-	 * 对外首页展示
-	 * 
-	 * @return
-	 */
-	@RequestMapping("/topVideo")
-	public String topVideo(Model model) {
-		OffsetPage page = new OffsetPage();
-		page.setLimit(5);
-		page.setOffset(0);
-		PageResult<VideoShowVo> pages = videoService.findVideoPage(page);
-		VideoQueryDTO queryDTO = new VideoQueryDTO();
-		queryDTO.setLimit(9);
-		queryDTO.setOffset(0);
-		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
-		List<PublicityMessageVO> messages = publicityMessageService.showDisplayMessage();
-		model.addAttribute("videos", pages.getData());
-		model.addAttribute("videosAll", videosAll.getData());
-		model.addAttribute("messages", messages);
-		return "/health/open/video_top_video_index";
-	}
-
-	/**
 	 * 移动端首页跳转
 	 * 
 	 * @return
 	 */
-
 	@RequestMapping("/app/videoList")
 	@ResponseBody
 	public Object appVideo(VideoQueryDTO queryDTO) {
 		queryDTO.setLimit(8);
-		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
+		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("videosAll", videosAll);
 		return CommonResponse.getSuccessResponse(map);
 	}
 
+	@RequestMapping("/topVideo")
+	public String topVideo(Model model) {
+		OffsetPage queryDTO = new VideoQueryDTO();
+		queryDTO.setLimit(9);
+		queryDTO.setOffset(0);
+		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
+		List<PublicityMessageVO> messages = publicityMessageService.showDisplayMessage();
+		model.addAttribute("videos", videoService.findTopPlayVideo());
+		model.addAttribute("videosAll", videosAll.getData());
+		model.addAttribute("messages", messages);
+		return "/health/open/video_top_video_index";
+	}
+
+	
 	/**
 	 * 对外移动端视频图片轮播展示
 	 * 
 	 * @return
 	 */
-
 	@RequestMapping("/app/videoSlip")
 	@ResponseBody
 	public Object videoSlip() {
 		OffsetPage page = new OffsetPage();
 		page.setLimit(5);
 		page.setOffset(0);
-		PageResult<VideoShowVo> pages = videoService.findVideoPage(page);
+		PageResult<VideoShowVO> pages = videoService.findPlayVideoPage(page);
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("videos", pages.getData());
 		return CommonResponse.getSuccessResponse(map);
@@ -202,7 +192,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		VideoQueryDTO queryDTO = new VideoQueryDTO();
 		queryDTO.setLimit(5);
 		queryDTO.setOffset(0);
-		PageResult<VideoVO> videosAll = videoService.searchPageList(queryDTO);
+		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
 		model.addAttribute("video", videoVO);
 		model.addAttribute("videosAll", videosAll.getData());
 		return "/health/open/video_play";

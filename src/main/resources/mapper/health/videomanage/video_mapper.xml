@@ -1,45 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.videomanage.VideoMapper">
-     <select id="searchPageList" parameterType="com.paladin.health.service.videomanage.dto.VideoQueryDTO" resultType="com.paladin.health.service.videomanage.vo.VideoVO">
+     <select id="findSelfVideo" parameterType="com.paladin.health.service.videomanage.dto.VideoQueryDTO" resultType="com.paladin.health.service.videomanage.vo.VideoVO">
 	    SELECT
 	        id,
 		    show_image AS showImage,
 		    summary,
-		    top,
 		    `name`,
 		    label,
-		    top_order_no AS topOrderNo,
+		    status,
 		    url,
-            create_time AS createTime
+            publish_time AS publishTime
 		FROM 
 		    video
-		WHERE 1=1
+		WHERE create_user_id = #{createUser}
 	    <if test="name != null and name != ''">
 	        AND `name` LIKE CONCAT ('%',#{name},'%') 
 	    </if>
 	    <if test="label != null and label != ''">
 	        AND label LIKE CONCAT ('%',#{label},'%') 
-	    </if>
-	    
-	    ORDER BY top_order_no ASC
+	    </if>    
+	    ORDER BY create_time DESC
      </select>
-    <select id="findVideos" resultType="com.paladin.health.service.videomanage.vo.VideoShowVo">
+     
+    <select id="findPlayVideo" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
          SELECT
 	        id,
 		    show_image AS showImage,
 		    summary,
 		    url,
 		    `name`,
-		    label
+		    label,
+		    publish_time AS publishTime
 		FROM
 		    video
-		WHERE  top = 1
-		 ORDER BY top_order_no ASC
+		WHERE status = 9 AND now() > publish_time
+		ORDER BY publish_time DESC
     </select>
     
-     <select id="findToExamine" parameterType="com.paladin.health.controller.videomanage.VideoExamineQueryVo" 
-        resultType="com.paladin.health.service.videomanage.dto.VideoExamineDTO">
+   
+    <select id="findTopPlayVideo" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
+         SELECT
+	        id,
+		    show_image AS showImage,
+		    summary,
+		    url,
+		    `name`,
+		    label,
+		    publish_time AS publishTime
+		FROM
+		    video
+		WHERE status = 9 AND now() > publish_time 
+		ORDER BY publish_time DESC
+		LIMIT 5	
+    </select>
+    
+     <select id="findExamineVideo" parameterType="com.paladin.health.controller.videomanage.VideoExamineQueryVO"  resultType="com.paladin.health.service.videomanage.vo.VideoVO">
 	      SELECT
 	          id,
 	          show_image AS showImage,
@@ -47,17 +63,37 @@
 	          status,
 	          `name`,
 	          label,
-	          url
+	          url,
+	          publish_time AS publishTime
 	      FROM
 	          video
 	      WHERE
 	          `status` = #{status}
-	      ORDER BY create_time
+	      ORDER BY create_time DESC
    </select>
    
     <update id="updateExamineStatus">
         UPDATE video SET status = #{status}, examine_user_id = #{examinerId} WHERE id = #{id} AND status = 1
     </update>
    
+   	<select id="getVideo" resultType="com.paladin.health.service.videomanage.vo.VideoVO">
+		SELECT 
+			a.id,
+	        a.show_image AS showImage,
+	        a.summary,
+	        a.`name`,
+	        a.label,
+	        a.url,
+			a.examine_user_id AS examineUserId,
+			b.name AS examineUserName,
+			a.create_user_id AS createUserId,
+			c.name AS createUserName,
+			a.status,
+			a.publish_time AS publishTime
+		FROM video a 
+		LEFT JOIN org_user b ON a.examine_user_id = b.id
+		LEFT JOIN org_user c ON a.create_user_id = c.id
+		WHERE a.id=#{id}
+	</select>
     
 </mapper>

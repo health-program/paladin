@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
-    <tt:constant enumcode="boolean" />
+    <tt:constant enumcode="boolean,publicity-video-status" />
     <section class="content-header">
         <h1>视频管理</h1>
     </section>
@@ -22,7 +23,7 @@
                         </div>
                         <label for="label" class="col-md-1 control-label">标签</label>
                         <div class="col-md-2">
-                            <input type="text" class="form-control" name="label" th:value="${query?.label}" placeholder="请输入"/>
+                            <input type="text" class="form-control" name="label" th:value="${query?.label}" placeholder="请输入" />
                         </div>
                     </div>
                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
@@ -49,9 +50,9 @@
                     <div class="btn-group">
                         <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
                     </div>
-                    <div class="btn-group">
+                    <!--                     <div class="btn-group">
                         <a href="javascript:void(0);" onclick="initTable()" class="btn btn-primary">待排序视频&nbsp;&nbsp;<span class="badge" id="sortCount">0</span></a>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -62,27 +63,26 @@
                             <h4 class="modal-title">置顶排序顺序(拖动排序)</h4>
                         </div>
                         <div class="modal-body">
-                            <table class="table  table-bordered"
-                                   id="field_list_table">
+                            <table class="table  table-bordered" id="field_list_table">
                                 <thead id="gridThead">
-                                <tr style="cursor: pointer;">
-                                    <td class="listHeadCell">排序顺序</td>
-                                    <td class="listHeadCell">视频名称</td>
-                                </tr>
+                                    <tr style="cursor: pointer;">
+                                        <td class="listHeadCell">排序顺序</td>
+                                        <td class="listHeadCell">视频名称</td>
+                                    </tr>
                                 </thead>
                                 <tbody id="gridtbody">
-                                <tr>
-                                    <td>
-                                        <span class="badge" >1</span>
-                                    </td>
-                                    <td>名称1</td>
-                                </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="badge" >1</span>
+                                        </td>
+                                        <td>名称1</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="modal-footer">
                             <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
-                            <button class="btn btn-primary" onclick="sort()"  type="button">提交</button>
+                            <button class="btn btn-primary" onclick="sort()" type="button">提交</button>
                         </div>
                     </div><!-- /.modal-content -->
                 </div><!-- /.modal-dialog -->
@@ -107,18 +107,9 @@
             idField: "id",
             columns: [
                 [
-                    { title: "视频简介", align: "center", field: "summary" },
                     { title: "视频名称", align: "center", field: "name" },
                     { title: "标签", align: "center", field: "label" },
-                    { title: "置顶排序号", align: "center", field: "topOrderNo" ,formatter:function (value, row, index) {
-                            if (value === 7){
-                                return '<span class="label label-primary"><i class="fa fa-clock-o"></i>&nbsp;待置顶</span>'
-                            } else if (value === 6) {
-                                return '<span class="label label-success"><i class="fa fa-clock-o"></i>&nbsp;待排序</span>'
-                            } else {
-                                return '<span class="badge">'+value+'</span>';
-                            }
-                        } },
+                    { title: "状态", field: "status", enumcode: "publicity-video-status" },
                     {
                         title: "视频地址",
                         align: "center",
@@ -137,18 +128,26 @@
                             },
                             'click .remove': function(e, value, row, index) {
                                 remove(row);
-                            },
-                            'click .top': function(e, value, row, index) {
-                                addSortNo(row);
-                            },
-                            'click .sort': function(e, value, row, index) {
-                                addSortNo(row);
-                            },
-                            'click .confirm': function(e, value, row, index) {
-                                publish(row);
                             }
                         },
-                        formatter: operateFormatter
+                        formatter: function operateFormatter(value, row, index) {
+                            if (row.status === 0 || row.status === 2) {
+                                return [
+                                    '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
+                                    '<i class="glyphicon glyphicon-edit"></i>详情',
+                                    '</button>',
+                                    '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">',
+                                    '<i class="glyphicon glyphicon-remove"></i>删除',
+                                    '</button>'
+                                ].join('');
+                            } else {
+                                return [
+                                    '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
+                                    '<i class="glyphicon glyphicon-edit"></i>详情',
+                                    '</button>'
+                                ].join('');
+                            }
+                        }
                     }
                 ]
             ],
@@ -164,57 +163,45 @@
         });
     }
 
-    function operateFormatter(value,row,index) {
-        if (row.top === 0 ) {
+    function operateFormatter(value, row, index) {
+        if (row.top === 0) {
             return [
-                '<button class="detail btn btn-xs btn-info" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-edit"></i>详情' ,
+                '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
+                '<i class="glyphicon glyphicon-edit"></i>详情',
                 '</button>',
-                '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-remove"></i>删除' ,
-                '</button>',
-                '<button class="top btn btn-xs btn-primary"  style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-pushpin"></i>置顶' ,
-                '</button>',
-                '<button class="confirm btn btn-xs btn-info">' ,
-                '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
+                '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">',
+                '<i class="glyphicon glyphicon-remove"></i>删除',
                 '</button>'
             ].join('');
-        }else {
+        } else {
             return [
-                '<button class="detail btn btn-xs btn-info" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-edit"></i>详情' ,
+                '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
+                '<i class="glyphicon glyphicon-edit"></i>详情',
                 '</button>',
-                '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-remove"></i>删除' ,
-                '</button>',
-                '<button class="sort btn btn-xs btn-success" style="margin-right:10px">' ,
-                '<i class="glyphicon glyphicon-sort"></i>排序' ,
-                '</button>',
-                '<button class="confirm btn btn-xs btn-info">' ,
-                '<i class="glyphicon glyphicon-eye-open"></i>发布' ,
+                '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">',
+                '<i class="glyphicon glyphicon-remove"></i>删除',
                 '</button>'
             ].join('');
         }
-        
+
     }
     var sortCount = [];
 
     function addSortNo(row) {
-        var obj= {};
-        var  videoId = row.id;
-        var  videoName = row.name;
-        obj.id= videoId;
+        var obj = {};
+        var videoId = row.id;
+        var videoName = row.name;
+        obj.id = videoId;
         obj.name = videoName;
-        var i =sortCount.findIndex(function (video) {
+        var i = sortCount.findIndex(function(video) {
             return video.id === videoId;
         });
-       if ( i >= 0){
-           $.errorMessage("已存在该视频");
-       }else{
-           sortCount.push(obj);
-       }
-       $("#sortCount").text(sortCount.length);
+        if (i >= 0) {
+            $.errorMessage("已存在该视频");
+        } else {
+            sortCount.push(obj);
+        }
+        $("#sortCount").text(sortCount.length);
     };
 
     function initTable() {
@@ -222,17 +209,17 @@
             $.errorMessage("请先添加置顶视频");
             return;
         }
-        if (sortCount.length === 9){
+        if (sortCount.length === 9) {
             $.errorMessage("最多添加8个置顶视频");
             return;
         }
         var html = '';
-        sortCount.forEach(function (video,index) {
-            var i =index +1;
-            html += '<tr id="'+video.id+'">' +
-                '        <td><span class="badge">'+ i +
+        sortCount.forEach(function(video, index) {
+            var i = index + 1;
+            html += '<tr id="' + video.id + '">' +
+                '        <td><span class="badge">' + i +
                 '       </span></td>' +
-                '        <td>' + video.name+
+                '        <td>' + video.name +
                 '         </td>' +
                 '    </tr>';
         });
@@ -241,17 +228,18 @@
     }
 
     var arr = [];
+
     function sort() {
         if ($("#field_list_table tr").length > 1) {
-            $("#gridtbody tr").each(function (i,item) {
-                arr[i]= $(this).attr('id')+":"+$(this).find(".badge").text();
+            $("#gridtbody tr").each(function(i, item) {
+                arr[i] = $(this).attr('id') + ":" + $(this).find(".badge").text();
             })
         }
-        if(arr.length > 5){
-            arr  =  arr.slice(0,5);
+        if (arr.length > 5) {
+            arr = arr.slice(0, 5);
         }
         $.postAjax("/health/video/sort", {
-            ids : arr
+            ids: arr
         }, function() {
             $.successMessage("排序设置成功!");
             $("#myModal").modal('hide');
@@ -288,8 +276,9 @@
             });
         }
     }
-    function publish(row){
-        
+
+    function publish(row) {
+
     }
     </script>
 </body>

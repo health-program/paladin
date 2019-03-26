@@ -9,78 +9,68 @@
     <section class="content-header">
         <h1>视频管理</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
-            <li class="active">新增</li>
+            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>视频列表</a></li>
+            <li class="active">新增视频</li>
         </ol>
     </section>
     <section class="content">
         <div class="box box-solid" id="videoform">
             <div class="box-header with-border">
-                <i class="glyphicon glyphicon-user"></i>
-                <h3 class="box-title">新增</h3>
+                <i class="fa fa-edit"></i>
+                <h3 class="box-title">新增视频</h3>
             </div>
             <div id="model_edit" class="box-body">
                 <form id="model_form" action="/health/video/save" method="post" class="form-horizontal edit-body" enctype="multipart/form-data">
                     <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">视频名称：</label>
+                        <label for="name" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>视频名称：</label>
                         <div class="col-sm-3">
                             <input name="name" id="name" placeholder="请输入视频名称" type="text" class="form-control" required="required" />
                         </div>
-                         <label for="summary" class="col-sm-2 control-label">视频简介：</label>
+                        <label for="summary" class="col-sm-2 control-label">视频简介：</label>
                         <div class="col-sm-3">
-                            <input name="summary" type="text" class="form-control" placeholder="请输入视频简介" required="required" />
+                            <input name="summary" type="text" class="form-control" placeholder="请输入视频简介" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="publishTime" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发布时间：</label>
+                        <div class="col-sm-3">
+                            <input name="publishTime" placeholder="请输入发布时间" type="text" autocomplete="off" class="form-control tonto-datepicker-date" required="required"/>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="label" class="col-sm-3 control-label">标签：</label>
-                        <div class="col-sm-2">
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="tag" name="tag" placeholder="请输入标签" required="required" />
-                                <span class="input-group-btn">
-                              <button type="button" class="btn btn-flat"  id="search-btn">
-                                  <i class="fa fa-search"></i>
-                              </button>
-                              <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                              </ul>
-                          </span>
-                            </div>
-                        </div>
-                        <div class="col-md-7">
-                            <input type="text" class="form-control" id="label" name="label" data-role="tagsinput" required="required"></input>
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="label" name="label" data-role="tagsinput" placeholder="输入内容后回车"></input>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="url" class="col-sm-3 control-label">视频地址：</label>
+                        <label for="url" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>视频地址：</label>
                         <div class="col-sm-3">
                             <input name="url" placeholder="请输入视频地址" type="text" class="form-control" required="required" />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="attachmentFiles" class="col-sm-3 control-label">展示图片：</label>
-                        <div class="col-sm-8">
-                            <input type="file" name="attachmentFiles" multiple>
+                        <label for="showImageFile" class="col-sm-3 control-label">展示图片：</label>
+                        <div class="col-sm-5">
+                            <input type="file" name="showImageFile">
                         </div>
                     </div>
-                    	<input type="hidden" name="status" value="1"></input>
-                    
+                	<input type="hidden" id="statusInput" name="status" />
                     <div class="form-group">
                         <div class="col-sm-2 col-sm-offset-3">
-                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
+                            <button type="submit" class="btn btn-primary btn-block" onclick="setStatus(0)">暂存</button>
+                        </div>
+                        <div class="col-sm-2 col-sm-offset-1">
+                            <button type="submit" class="btn btn-success btn-block" onclick="setStatus(1)">提交</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
+        <div class="col-sm-2 col-sm-offset-5 btn-back">
+            <a href="/health/video/index" class="btn btn-primary btn-block">返回</a>
+        </div>
     </section>
-    <!--     <section class="content-header">
-        <h1>video</h1>
-        <ol class="breadcrumb">
-            <li><a href="/health/video/index"><i class="fa fa-list-alt"></i>列表</a></li>
-            <li class="active">新增</li>
-        </ol>
-    </section>
-    <section class="content" >
-    </section> -->
     <div th:include="/health/footer" />
     <script type="text/javascript" src="/static/assets/tagsinput/bootstrap-tagsinput.min.js"></script>
     <script type="text/javascript" src="/static/js/bootstrap-suggest.js"></script>
@@ -90,9 +80,10 @@
         name: "新增",
         url: "/health/video/save",
         columns: [
-            { title: "展示图片(附件ID)", name: "showImage", inputType: "ATTACHMENT", fileName: "attachmentFiles" },
+            { title: "展示图片(附件ID)", name: "showImage", inputType: "ATTACHMENT", fileName: "showImageFile", maxFileCount: 1 },
             { title: "视频简介", name: "summary", inputType: "TEXT" },
             { title: "视频名称", name: "name", inputType: "TEXT" },
+            { title: "发布时间", name: "publishTime", inputType: "DATE" },
             { title: "标签", name: "label", inputType: "TEXT" },
             { title: "视频地址", name: "url", inputType: "TEXT" }
         ]
@@ -114,31 +105,10 @@
         model.setData(null);
         // $.initComponment(); 
 
-        init([
-            { code: 'tnb', label: '糖尿病' },
-            { code: 'xyg', label: '血压高' },
-            { code: 'tf', label: '痛风' },
-            { code: 'ncz', label: '脑卒中' }
-        ])
     });
-
-    function init(data) {
-        $("#tag").bsSuggest({
-            idField: "code",
-            keyField: "label",
-            effectiveFields: ["label"],
-            searchFields: ["label"],
-            data: {
-                value: data
-            },
-            clearable: false,
-            autoSelect: false,
-            autoDropup: true,
-            ignorecase: true,
-            showHeader: true
-        }).on('onSetSelectValue', function(e, keyword, data) {
-            $("#label").tagsinput('add', data.label);
-        });
+    
+    function setStatus(stat) {
+        $("#statusInput").val(stat);
     }
     </script>
 </body>

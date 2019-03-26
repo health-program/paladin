@@ -8,13 +8,12 @@ import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.exception.BusinessException;
-import com.paladin.health.controller.videomanage.VideoExamineQueryVo;
+import com.paladin.health.controller.videomanage.VideoExamineQueryVO;
 import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.mapper.videomanage.VideoMapper;
 import com.paladin.health.model.videomanage.Video;
-import com.paladin.health.service.videomanage.dto.VideoExamineDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
-import com.paladin.health.service.videomanage.vo.VideoShowVo;
+import com.paladin.health.service.videomanage.vo.VideoShowVO;
 import com.paladin.health.service.videomanage.vo.VideoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,22 +26,59 @@ public class VideoService extends ServiceSupport<Video> {
 	@Autowired
 	private VideoMapper videoMapper;
 
-	public PageResult<VideoVO> searchPageList(VideoQueryDTO query) {
+	public PageResult<VideoVO> findSelfVideoPage(VideoQueryDTO query) {
 		Page<VideoVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
-		videoMapper.searchPageList(query);
+		query.setCreateUser(HealthUserSession.getCurrentUserSession().getUserId());
+		videoMapper.findSelfVideo(query);
 		return new PageResult<>(page);
 	}
 
-	public List<Video> findLabelList() {
-		return videoMapper.findLabelList();
-	}
-
-	public PageResult<VideoShowVo> findVideoPage(OffsetPage pages) {
-		Page<VideoShowVo> page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
-		videoMapper.findVideos(pages);
+	public PageResult<VideoShowVO> findPlayVideoPage(OffsetPage pages) {
+		Page<VideoShowVO> page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
+		videoMapper.findPlayVideo(pages);
 		return new PageResult<>(page);
 	}
+	
+	public List<VideoShowVO> findTopPlayVideo() {		
+		return videoMapper.findTopPlayVideo();
+	}
 
+	public PageResult<VideoVO> findExamineVideoPage(VideoExamineQueryVO query) {
+		Page<VideoVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		videoMapper.findExamineVideo(query);
+		return new PageResult<>(page);
+	}
+	
+
+	public VideoVO getVideo(String id) {
+		return videoMapper.getVideo(id);
+	}
+
+	public boolean examine(String id, boolean success) {
+		Video video = get(id);
+		if (video == null) {
+			throw new BusinessException("找不到需要审核的信息数据");
+		}
+
+		Integer status = video.getStatus();
+
+		if (status != Video.STATUS_SUBMIT_EXAMINE) {
+			throw new BusinessException("当前视频不是待审核状态！");
+		}
+
+		status = success ? Video.STATUS_EXAMINE_SUCCESS : Video.STATUS_EXAMINE_FAIL;
+
+		if (success) {
+			// TODO 成功推送
+		}
+
+		if (videoMapper.updateExamineStatus(id, status, HealthUserSession.getCurrentUserSession().getUserId()) > 0) {
+			return true;
+		} else {
+			throw new BusinessException("审核失败");
+		}
+	}
+	
 	public int updateByOrderNo(String[] ids) {
 		int staus = 0;
 		for (int i = 0; i < ids.length; i++) {
@@ -69,38 +105,7 @@ public class VideoService extends ServiceSupport<Video> {
 		}
 		return staus;
 	}
-
-	public PageResult<VideoExamineDTO> findToExamine(VideoExamineQueryVo vo) {
-		Page<VideoExamineDTO> page = PageHelper.offsetPage(vo.getOffset(), vo.getLimit());
-		videoMapper.findToExamine(vo);
-		return new PageResult<>(page);
-	}
-
-	public boolean examine(String id, boolean success) {
-		Video video = get(id);
-		if (video == null) {
-			throw new BusinessException("找不到需要审核的信息数据");
-		}
-
-		Integer status = video.getStatus();
-
-		if (status != Video.STATUS_TO_EXAMINE) {
-			throw new BusinessException("当前视频不是待审核状态！");
-		}
-
-		status = success ? Video.STATUS_EXAMINE_SUCCESS : Video.STATUS_EXAMINE_FAIL;
-
-		if (success) {
-			// TODO 成功推送
-		}
-
-		if (videoMapper.updateExamineStatus(id, status, HealthUserSession.getCurrentUserSession().getUserId()) > 0) {
-			return true;
-		} else {
-			throw new BusinessException("审核失败");
-		}
-	}
-
+	
 	public int cancelTopById(String id) {
 		Video model = new Video();
 		model.setId(id);
@@ -108,4 +113,5 @@ public class VideoService extends ServiceSupport<Video> {
 		model.setTopOrderNo(Video.TOP_NUMBER);
 		return updateSelective(model);
 	}
+
 }

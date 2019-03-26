@@ -27,33 +27,39 @@
             <div id="model_view" class="box-body">
                 <form class="form-horizontal">
                     <div class="form-group">
-                        <label for="showImage" class="col-sm-3 control-label">展示图片：</label>
+                        <label for="name" class="col-sm-3 control-label">视频名称：</label>
                         <div class="col-sm-3">
-                            <p name="showImage" class="form-control-static description"></p>
+                            <p name="name" class="form-control-static description"></p>
                         </div>
-                        <label for="summary" class="col-sm-3 control-label">视频简介：</label>
+                        <label for="summary" class="col-sm-2 control-label">视频简介：</label>
                         <div class="col-sm-3">
                             <p name="summary" class="form-control-static description"></p>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">视频名称：</label>
-                        <div class="col-sm-3">
-                            <p name="name" class="form-control-static description"></p>
-                        </div>
                         <label for="label" class="col-sm-3 control-label">标签：</label>
                         <div class="col-sm-3">
                             <p name="label" class="form-control-static description"></p>
                         </div>
-                        
                     </div>
                     <div class="form-group">
                         <label for="url" class="col-sm-3 control-label">视频地址：</label>
-                        <div class="col-sm-3">
+                        <div class="col-sm-5">
                             <p name="url" class="form-control-static description"></p>
                         </div>
                     </div>
-                    
+                    <div class="form-group">
+                        <label for="showImage" class="col-sm-3 control-label">展示图片：</label>
+                        <div class="col-sm-3">
+                            <p name="showImage" class="form-control-static description"></p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="createUserName" class="col-sm-3 control-label">创建人：</label>
+                        <div class="col-sm-3">
+                            <p name="createUserName" class="form-control-static description"></p>
+                        </div>
+                    </div>
                     <div class="form-group" id="examineGroup">
                         <div class="col-sm-offset-3 col-sm-1">
                             <button type="button" onclick="examineSuccess()" class="btn btn-success btn-block">审核通过</button>
@@ -75,12 +81,13 @@
             id: "model",
             name: "详情",
             columns: [
-                      { title: "展示图片", name: "showImage", inputType: "TEXT" },
-                      { title: "视频简介", name: "summary", inputType: "TEXT" },
-                      { title: "视频名称", name: "name", inputType: "TEXT" },
-                      { title: "标签", name: "label", inputType: "TEXT" },
-                      { title: "视频地址", name: "url", inputType: "TEXT" }
-                      ]
+                { title: "展示图片", name: "showImage", inputType: "ATTACHMENT", fileName: "showImageFile", maxFileCount: 1 },
+                { title: "视频简介", name: "summary", inputType: "TEXT" },
+                { title: "视频名称", name: "name", inputType: "TEXT" },
+                { title: "标签", name: "label", inputType: "TEXT" },
+                { title: "视频地址", name: "url", inputType: "TEXT" },
+                { title: "创建人", name: "createUserName", inputType: "TEXT" }
+            ]
         }
 
         $.getAjax("/health/video/get?id=" + $("#id").val(), function(data) {
@@ -88,7 +95,7 @@
                 pattern: "view"
             });
             data.createUserName = data.createUserName ? data.createUserName : "管理员";
-            data.examineUserName = data.examineUserName ? data.examineUserName : "管理员";
+            data.examineUserName = data.status == 9 ? (data.examineUserName || "管理员") : "";
             model.setData(data);
         });
     });
