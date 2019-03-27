@@ -239,6 +239,12 @@ public class PublicityMessageController extends ControllerSupport {
 		return "/health/publicity/message_examine";
 	}
 
+	@RequestMapping("/examine/detail")
+	public String examineDetail(@RequestParam String id, Model model) {
+		model.addAttribute("id", id);
+		return "/health/publicity/message_examine_detail";
+	}
+
 	/**
 	 * 审核成功
 	 * 

@@ -29,7 +29,7 @@
                         </div>
                         <label for="status" class="col-md-1 control-label">状态：</label>
                         <div class="col-md-2">
-                            <select name="status" class="form-control tonto-select" th:attr="selectedvalue=${query?.status}">
+                            <select name="status" class="form-control" th:attr="selectedvalue=${query?.status}">
                                 <option value="1">待审核</option>
                                 <option value="9">审核成功</option>
                             </select>
@@ -91,12 +91,17 @@
                             'click .examine': function(e, value, row, index) {
                                 examine(row);
                             },
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            }
 
                         },
                         formatter: function operateFormatter(value, row, index) {
-                            return '<button class="examine btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
-
-                        }
+                            if (row.status === 1) {
+                                return '<button class="examine btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
+                            } else {
+                                return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-eye-open"></i>查看</button>';
+                            }                        }
                     }
                 ]
             ],
@@ -117,14 +122,13 @@
         }
     }
 
-    function getSelectRow(notShowError) {
-        var rows = table.getSelections();
-        var row = rows.length > 0 ? rows[0] : null;
-        if (!notShowError && !row) {
-            $.errorMessage("请选中一条业务数据");
+    function detail(row) {
+        if (row) {
+            window.location = '/health/publicity/message/examine/detail?id=' + row.id;
         }
-        return row;
     }
+
+
     /*]]>*/
     </script>
 </body>

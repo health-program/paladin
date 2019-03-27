@@ -80,12 +80,19 @@
                         align: "center",
                         width: "10%",
                         events: {
-                            'click .detail': function(e, value, row, index) {
+                            'click .check': function(e, value, row, index) {
                                 examine(row);
+                            },
+                            'click .detail': function(e, value, row, index) {
+                                view(row);
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
-                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>'
+                            if (row.status === 1) {
+                                return '<button class="check btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
+                            } else {
+                                return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-eye-open"></i>查看</button>';
+                            }
                         }
                     }
 
@@ -117,6 +124,12 @@
     function examine(row) {
         if (row) {
             window.location = '/health/video/examine?id=' + row.id;
+        }
+    }
+
+    function view(row) {
+        if (row) {
+            window.location = '/health/video/examine/detail?id=' + row.id;
         }
     }
     </script>
