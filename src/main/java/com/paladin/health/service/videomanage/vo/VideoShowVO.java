@@ -27,6 +27,8 @@ public class VideoShowVO {
 
 	public SysAttachment getShowImageUrl() {
 		if (showImage != null && showImage.length() != 0) {
+			SysAttachment attachment=AttachmentContainer.getAttachment(showImage);
+			System.out.println(attachment);
 			return AttachmentContainer.getAttachment(showImage);
 		}
 		return null;

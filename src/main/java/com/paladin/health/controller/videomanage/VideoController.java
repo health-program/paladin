@@ -209,6 +209,12 @@ public class VideoController extends ControllerSupport {
 		return "/health/videomanage/video_examine";
 	}
 
+	@RequestMapping("/examine/detail")
+	public String detail(@RequestParam String id, Model model) {
+		model.addAttribute("id", id);
+		return "/health/videomanage/video_examine_detail";
+	}
+
 	/**
 	 * 审核成功
 	 * 
