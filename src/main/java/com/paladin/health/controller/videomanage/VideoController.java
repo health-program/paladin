@@ -2,17 +2,13 @@ package com.paladin.health.controller.videomanage;
 
 import com.paladin.common.model.syst.SysAttachment;
 import com.paladin.common.service.syst.SysAttachmentService;
-import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.model.videomanage.Video;
-import com.paladin.health.service.publicity.PublicityMessageService;
 import com.paladin.health.service.videomanage.VideoService;
 import com.paladin.health.service.videomanage.dto.VideoDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
-import com.paladin.health.service.videomanage.vo.VideoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,9 +35,6 @@ public class VideoController extends ControllerSupport {
 
 	@Autowired
 	private SysAttachmentService attachmentService;
-
-	@Autowired
-	private PublicityMessageService publicityMessageService;
 
 	@RequestMapping("/index")
 	public String index() {
@@ -109,7 +102,7 @@ public class VideoController extends ControllerSupport {
 			SysAttachment picture = attachmentService.createPictureAndCompress(showImageFile, "视频展示图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
 			videoDTO.setShowImage(picture.getId());
 		}
-		
+
 		Integer status = videoDTO.getStatus();
 		if (status != null && (status == Video.STATUS_TEMP || status == Video.STATUS_SUBMIT_EXAMINE)) {
 			String id = videoDTO.getId();
@@ -127,52 +120,46 @@ public class VideoController extends ControllerSupport {
 		return CommonResponse.getFailResponse();
 	}
 
-	/**
-	 * 视屏播放统计首页
-	 * 
-	 */
-	@RequestMapping("/play/list")
-	@QueryInputMethod(queryClass = VideoQueryDTO.class)
-	public String palyIndex1() {
-		return "/health/videomanage/video_play_list";
-	}
-
 	@RequestMapping("/delete")
 	@ResponseBody
 	public Object delete(@RequestParam String id) {
 		return CommonResponse.getResponse(videoService.removeByPrimaryKey(id));
 	}
 
-	@RequestMapping("/topVideo")
-	public String topVideo(Model model) {
-		OffsetPage query = new OffsetPage();
-		query.setLimit(8);
-		query.setOffset(0);
-		model.addAttribute("videos", videoService.findTopPlayVideo());
-		model.addAttribute("videosAll", videoService.findPlayVideoPage(query).getData());
-		model.addAttribute("messages", publicityMessageService.showDisplayMessage());
-		return "/health/open/video_top_video_index";
-	}
 
-	/**
-	 * 功能描述: <br>
-	 * 〈视频播放页面〉
-	 * 
-	 * @param id
-	 * @param model
-	 * @return java.lang.String
-	 * @author Huangguochen
-	 * @date 2018/12/28
-	 */
-	@RequestMapping("/play")
-	public String play(@RequestParam String id, Model model) {
-		OffsetPage queryDTO = new OffsetPage();
-		queryDTO.setLimit(5);
-		queryDTO.setOffset(0);
-		model.addAttribute("video", beanCopy(videoService.get(id), new VideoVO()));
-		model.addAttribute("videosAll", videoService.findPlayVideoPage(queryDTO).getData());
-		return "/health/open/video_play";
-	}
+
+	// @RequestMapping("/topVideo")
+	// public String topVideo(Model model) {
+	// OffsetPage query = new OffsetPage();
+	// query.setLimit(8);
+	// query.setOffset(0);
+	// model.addAttribute("videos", videoService.findTopPlayVideo());
+	// model.addAttribute("videosAll",
+	// videoService.findPlayVideoPage(query).getData());
+	// model.addAttribute("messages", publicityMessageService.showDisplayMessage());
+	// return "/health/open/video_top_video_index";
+	// }
+
+	// /**
+	// * 功能描述: <br>
+	// * 〈视频播放页面〉
+	// *
+	// * @param id
+	// * @param model
+	// * @return java.lang.String
+	// * @author Huangguochen
+	// * @date 2018/12/28
+	// */
+	// @RequestMapping("/play")
+	// public String play(@RequestParam String id, Model model) {
+	// OffsetPage queryDTO = new OffsetPage();
+	// queryDTO.setLimit(5);
+	// queryDTO.setOffset(0);
+	// model.addAttribute("video", beanCopy(videoService.get(id), new VideoVO()));
+	// model.addAttribute("videosAll",
+	// videoService.findPlayVideoPage(queryDTO).getData());
+	// return "/health/open/video_play";
+	// }
 
 	/**
 	 * 功能描述: <br>

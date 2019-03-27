@@ -6,7 +6,7 @@
 <body>
     <tt:constant enumcode="boolean" />
     <section class="content-header">
-        <h1>视频列表</h1>
+        <h1>视频播放管理</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
@@ -71,10 +71,7 @@
             columns: [
                 [
                     { title: "视频名称", align: "center", field: "name" },
-                    { title: "视频简介", align: "center", field: "summary" },
-                    { title: "是否置顶", align: "center", field: "top", enumcode: "boolean" },
                     { title: "标签", align: "center", field: "label" },
-                    { title: "置顶排序号", align: "center", field: "topOrderNo" },
                     {
                         title: "视频地址",
                         align: "center",
@@ -102,7 +99,7 @@
                     }
                 ]
             ],
-            url: '/health/video/find/page',
+            url: '/health/video/play/list/find',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,

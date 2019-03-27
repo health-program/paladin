@@ -23,7 +23,7 @@
 	    ORDER BY create_time DESC
      </select>
      
-    <select id="findPlayVideo" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
+    <select id="findPlayVideo" parameterType="com.paladin.health.service.videomanage.dto.VideoQueryDTO" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
          SELECT
 	        id,
 		    show_image AS showImage,
@@ -35,6 +35,12 @@
 		FROM
 		    video
 		WHERE status = 9 AND now() > publish_time
+		<if test="name != null and name != ''">
+	        AND `name` LIKE CONCAT ('%',#{name},'%') 
+	    </if>
+	    <if test="label != null and label != ''">
+	        AND label LIKE CONCAT ('%',#{label},'%') 
+	    </if>
 		ORDER BY publish_time DESC
     </select>
     

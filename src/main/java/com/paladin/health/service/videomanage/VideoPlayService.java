@@ -18,7 +18,7 @@ public class VideoPlayService extends ServiceSupport<VideoPlay> {
 	private VideoPlayMapper videoPlayMapper;
 	
 	public List<VideoPlayVO>selectByQuery(VideoPlayQueryDTO videoPlayQueryDTO){
-		return videoPlayMapper.selectByQuery(videoPlayQueryDTO);
+		return videoPlayMapper.findVideoPlayByVideo(videoPlayQueryDTO);
 	}
 	
 	public VideoPlayVO getOne(String id){

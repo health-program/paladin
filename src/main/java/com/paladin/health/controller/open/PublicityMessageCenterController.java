@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
@@ -53,7 +52,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 
 	@RequestMapping("/topVideo")
 	public String topVideo(Model model) {
-		OffsetPage queryDTO = new VideoQueryDTO();
+		VideoQueryDTO queryDTO = new VideoQueryDTO();
 		queryDTO.setLimit(9);
 		queryDTO.setOffset(0);
 		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
@@ -73,7 +72,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	@RequestMapping("/app/videoSlip")
 	@ResponseBody
 	public Object videoSlip() {
-		OffsetPage page = new OffsetPage();
+		VideoQueryDTO page = new VideoQueryDTO();
 		page.setLimit(5);
 		page.setOffset(0);
 		PageResult<VideoShowVO> pages = videoService.findPlayVideoPage(page);

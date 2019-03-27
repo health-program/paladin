@@ -4,13 +4,12 @@
 <head th:include="/health/header" />
 
 <body>
-    <input id = "videoId" name="id" th:value="${id}" type="hidden" >
-    <input id = "videoName" name="name" th:value="${name}" type="hidden">
+    <input id="videoName" name="name" th:value="${name}" type="hidden">
     <section class="content-header">
-        <h1>视频播放记录</h1>
+        <h1>视频播放管理</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/video/play/list"><i class="fa fa-list-alt"></i>视频列表</a></li>
-            <li class="active">视频播放记录列表</li>
+            <li><a href="/health/video/play/list/index"><i class="fa fa-list-alt"></i>视频列表</a></li>
+            <li class="active" th:text="${name}"></li>
         </ol>
     </section>
     <section class="content">
@@ -21,18 +20,14 @@
             </div>
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
-                     <div class="input-group" style="width:100%">
-                        <label for="videoName"  class="col-md-1 control-label">视频名称</label>
+                    <div class="input-group" style="width:100%">
+                        <label for="agencyId" class="col-md-1 control-label">机构名称</label>
                         <div class="col-md-2">
-                            <input type="text" name="videoName" placeholder="请输入视频名称" class="form-control" th:value="${query}?${query.videoName}:${name}" />
+                            <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
+                                <option value="">请选择</option>
+                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
+                            </select>
                         </div>
-                   		<label for="agencyId"  class="col-md-1 control-label">机构名称</label>
-	                    <div class="col-md-2">
-	                       <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
-                              <option value="">请选择</option>
-                              <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
-                           </select>
-	                    </div>
                         <label for="startTime" class="col-md-1 control-label">开始时间</label>
                         <div class="col-md-2">
                             <input type="text" name="startTime" placeholder="请输入开始时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.startTime}" />
@@ -41,9 +36,9 @@
                         <div class="col-md-2">
                             <input type="text" name="endTime" placeholder="请输入结束时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.endTime}" />
                         </div>
-                      </div>
+                    </div>
                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
-                    <input type="text" style="display:none">
+                    <input type="hidden" name="videoId" th:value="${id}">
                 </form>
                 <div class="col-md-12" style="margin-top:10px;">
                     <div class="pull-right">
@@ -87,26 +82,32 @@
             idField: "id",
             columns: [
                 [
-					{ title: "视频名称", align: "center", field: "videoName" },
-					{ title: "播放地点", align: "center", field: "playAddress" },
-					{ title: "负责人", align: "center", field: "principal" },
-					{ title: "观看人数", align: "center", field: "visitorCount" },
-					{ title: "播放开始时间", align: "center", field: "playStartTime" ,formatter: "datetime" },
-					{ title: "播放结束时间", align: "center", field: "playEndTime" ,formatter: "datetime" },
-					{ title: "播放时长", align: "center", field: "playDuration" ,formatter: function getDuration(value, row, index){
-						 //计算播放时长
-						 var minute = 1000 * 60;      //把分，时，天，周，半个月，一个月用毫秒表示
-		                 var hour = minute * 60.00;
-		                 var  resultTime = "";
-						 if(row.playDuration < 0){
-		                     resultTime = "数据异常";
-		                 }else{
-		                     var hour2 = (row.playDuration/hour).toFixed(2);
-			 					 resultTime = hour2+"小时";
-		                 }
-		                 return resultTime;
-					} },
-					{ title: "所属机构", align: "center", field: "agencyName" },
+                    { title: "工作周期", align: "center", field: "workCycle" },
+                    { title: "视频名称", align: "center", field: "videoName" },
+                    { title: "所属机构", align: "center", field: "agencyName" },
+                    { title: "播放地点", align: "center", field: "playAddress" },
+                    { title: "负责人", align: "center", field: "principal" },
+                    { title: "观看人数", align: "center", field: "visitorCount" },
+                    { title: "播放开始时间", align: "center", field: "playStartTime", formatter: "datetime" },
+                    { title: "播放结束时间", align: "center", field: "playEndTime", formatter: "datetime" },
+                    {
+                        title: "播放时长",
+                        align: "center",
+                        field: "playDuration",
+                        formatter: function getDuration(value, row, index) {
+                            //计算播放时长
+                            var minute = 1000 * 60; //把分，时，天，周，半个月，一个月用毫秒表示
+                            var hour = minute * 60.00;
+                            var resultTime = "";
+                            if (row.playDuration < 0) {
+                                resultTime = "数据异常";
+                            } else {
+                                var hour2 = (row.playDuration / hour).toFixed(2);
+                                resultTime = hour2 + "小时";
+                            }
+                            return resultTime;
+                        }
+                    },
                     {
                         title: "操作",
                         align: "center",
@@ -140,12 +141,11 @@
     }
 
     function add() {
-    	$("#videoId").val()
         window.location = '/health/video/play/add?id=' + $("#videoId").val() + "&name=" + $("#videoName").val();
     }
 
     function detail(row) {
-        window.location = '/health/video/play/detail' + (row ? ('?id=' + row.id) : '');
+        window.location = '/health/video/play/detail?id=' + row.id + '&videoId=' + $("#videoId").val() + "&videoName=" + $("#videoName").val();;
     }
 
     function remove(row) {

@@ -1,8 +1,6 @@
 package com.paladin.health.controller.videomanage;
 
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.query.QueryInputMethod;
-import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.model.videomanage.VideoPlayPublish;
@@ -27,14 +25,12 @@ public class VideoPlayPublishController extends ControllerSupport {
     private VideoPlayPublishService videoPlayPublishService;
     
     @RequestMapping("/index")
-    @QueryInputMethod(queryClass = VideoPlayPublishQueryDTO.class)
     public String index(HttpServletRequest request) {
         return "/health/videomanage/video_play_publish_index";
     }	
     
     @RequestMapping("/find/page")
     @ResponseBody
-    @QueryOutputMethod(queryClass = VideoPlayPublishQueryDTO.class, paramIndex = 0)
     public Object findPage(VideoPlayPublishQueryDTO query) {
         return CommonResponse.getSuccessResponse(videoPlayPublishService.searchPublishedVideo(query));
     }

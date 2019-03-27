@@ -8,7 +8,7 @@ public class VideoPlayQueryDTO extends OffsetPage {
 	
 	private String agencyId;
 	
-	private String videoName;
+	private String videoId;
 	
 	private Date startTime;
 	
@@ -19,12 +19,6 @@ public class VideoPlayQueryDTO extends OffsetPage {
 	}
 	public void setAgencyId(String agencyId) {
 		this.agencyId = agencyId;
-	}
-	public String getVideoName() {
-		return videoName;
-	}
-	public void setVideoName(String videoName) {
-		this.videoName = videoName;
 	}
 	public Date getStartTime() {
 		return startTime;
@@ -37,6 +31,12 @@ public class VideoPlayQueryDTO extends OffsetPage {
 	}
 	public void setEndTime(Date endTime) {
 		this.endTime = endTime;
+	}
+	public String getVideoId() {
+		return videoId;
+	}
+	public void setVideoId(String videoId) {
+		this.videoId = videoId;
 	}
 
 }

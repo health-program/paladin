@@ -3,7 +3,6 @@ package com.paladin.health.service.videomanage;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.Condition;
-import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
@@ -33,7 +32,7 @@ public class VideoService extends ServiceSupport<Video> {
 		return new PageResult<>(page);
 	}
 
-	public PageResult<VideoShowVO> findPlayVideoPage(OffsetPage pages) {
+	public PageResult<VideoShowVO> findPlayVideoPage(VideoQueryDTO pages) {
 		Page<VideoShowVO> page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
 		videoMapper.findPlayVideo(pages);
 		return new PageResult<>(page);

@@ -24,7 +24,7 @@ public class DiagnoseTargetFactorService extends ServiceSupport<DiagnoseTargetFa
 		return diagnoseTargetFactorMapper.deleteByTarget(targetId) > 0;
 	}
 
-  public List<DiagnoseRecordSimpleVO> searchDiagnoseTargetFactor(DiagnoseRecordQueryDTO query) {
-    return diagnoseTargetFactorMapper.searchDiagnoseTargetFactor(query);
-  }
+	public List<DiagnoseRecordSimpleVO> searchDiagnoseTargetFactor(DiagnoseRecordQueryDTO query) {
+		return diagnoseTargetFactorMapper.searchDiagnoseTargetFactor(query);
+	}
 }
