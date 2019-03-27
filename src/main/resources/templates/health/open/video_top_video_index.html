@@ -149,7 +149,7 @@
     	<div id="example1" class="slider-pro">
 		<div class="sp-slides" th:each="video,iter: ${videos}">
 			<div class="sp-slide">
-				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl}}"
+				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"
 				th:onclick="play([[${video.id}]])"/>
 				
 				<p class="sp-layer sp-white sp-padding" style="text-align: center" 
@@ -163,7 +163,7 @@
 		<div class="sp-thumbnails">
 			<div class="sp-thumbnail" th:each="video,iter: ${videos}">
 				<div class="sp-thumbnail-description">
-				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl}}"/>
+				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"/>
 				</div>
 			</div>
 		</div>
@@ -182,7 +182,7 @@
                     <ul class="video-list ul-dashed" >
                         <li class="video-li" th:each="video,iter: ${videosAll}">
                              <a th:href="${'/open/health/message/center/play?id='+ video.id}">
-      							<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%">
+      							<img  th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:90%">
      						 </a>
      						 <div class="detail">
      						 <div>
@@ -191,7 +191,7 @@
      						 </strong>
                              </div>
                              <div>
-                             <span>发布时间：</span><span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
+                             <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
                              </div>
                             </div>
                         </li>
@@ -211,7 +211,7 @@
           	   <div>
                     <ul class="notice-list ul-dashed" th:each="message,iter: ${messages}">
                         <li class="notice-li">
-      							<img  th:src="@{'/file/'+${message.thumbnailUrl}}" alt="ATTACHMENT" style="width:20%">
+      							<img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
      						 <div class="notice-box">
      						 <div>
      						 <h4 ><strong th:text="${message.title}"><strong/></h4>
@@ -247,7 +247,8 @@ $( document ).ready(function() {
 		thumbnailsPosition: 'right',
 		arrows: true,
 		buttons: false,
-		imageScaleMode:'cover',
+		centerImage:true,
+		imageScaleMode:'contain',
 		waitForLayers: true,
 		thumbnailWidth: 200,
 		thumbnailHeight: 150,
