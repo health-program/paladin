@@ -56,11 +56,13 @@ public class PublicityMessageVO {
         return null;
     }
     
-    public String getThumbnailUrl() {
-        if (thumbnail != null && thumbnail.length() != 0) {
-            return AttachmentContainer.getAttachments(thumbnail.split(",")).get(0).getPelativePath();
-        }
-        return null;
+    public SysAttachment getThumbnailUrl() {
+    	if (thumbnail != null && thumbnail.length() != 0) {
+			SysAttachment attachment=AttachmentContainer.getAttachment(thumbnail);
+			System.out.println(attachment);
+			return AttachmentContainer.getAttachment(thumbnail);
+		}
+		return null;
     }
     
 	public String getId() {
