@@ -187,7 +187,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 */
 	@RequestMapping("/play")
 	public String play(@RequestParam String id, Model model) {
-		VideoVO videoVO = beanCopy(videoService.get(id), new VideoVO());
+		VideoVO videoVO = videoService.getVideo(id);
 		VideoQueryDTO queryDTO = new VideoQueryDTO();
 		queryDTO.setLimit(5);
 		queryDTO.setOffset(0);

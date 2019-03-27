@@ -1,20 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head th:include="/health/header" />
-<meta charset="utf-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
-  <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
-<style>
+<head>
+    <title>宣教系统</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/ionicons.min.css">
+    <link rel="stylesheet" href="/static/css/iconfont.css">
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen" />
+    <style type="text/css">
     .video-list {
         list-style: none;
-        text-align:center;
+        text-align: center;
     }
- 	.notice-list {
-        list-style: none;
-        text-align:center;
-    }
+
     .right-tool {
         float: right;
     }
@@ -79,206 +83,182 @@
     }
 
     .video-li {
-        margin-bottom:20px;
-        float:left;
-        width:32%;
+        margin-bottom: 20px;
+        float: left;
+        width: 32%;
     }
-    
-     .notice-li {
-        text-height:200px;
-        height:200px;
-    }
-    .notice-box{
-	    display:inline-block;
-	    width:76%;
-	    text-align:left;
-	    text-height:200px;
-	    padding-left:20px;
-	    vertical-align: top;
-    }
-    #noticeContent{
-	    height:70px;
-		overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
-		text-overflow:ellipsis;/* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
-    }
-    .btn-detail{
-    	margin-top:15px;
-    	border: none;
-    	float:right;
-    	color:#3c8dbc
-    }
-</style>
 
-<body class="hold-transition skin-blue layout-top-nav">
-<div class="wrapper">
+    .notice-box {
+        display: inline-block;
+        width: 76%;
+        text-align: left;
+        text-height: 200px;
+        padding-left: 20px;
+        vertical-align: top;
+    }
 
-  <header class="main-header" style="background-color:#43c7a8">
-    <nav class="navbar navbar-static-top">
-      <div class="container">
+    #noticeContent {
+        height: 70px;
+        overflow: hidden;
+        /* 内容超出宽度时隐藏超出部分的内容 */
+        text-overflow: ellipsis;
+        /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+    }
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
-          <ul class="nav navbar-nav">
-           <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">宣传内容<span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#">疾病查询</a></li>
-                <li><a href="#">疾病知识</a></li>
-                <li><a href="#">症状知识</a></li>
-                <li><a href="#">健康处方</a></li>
-              </ul>
-            </li>
-          </ul>
+    .btn-detail {
+        margin-top: 15px;
+        border: none;
+        float: right;
+        color: #3c8dbc
+    }
+
+    .block {
+        padding: 20px;
+        padding-right: 50px;
+        padding-left: 50px;
+    }
+
+    .sli {
+        margin-top: 20px;
+    }
+    </style>
+</head>
+
+<body class="layout-top-nav skin-green-light">
+    <div class="wrapper">
+        <header class="main-header">
+            <nav class="navbar navbar-static-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a href="/open/health/message/center/topVideo" class="navbar-brand"><b>健康</b>宣教</a>
+                    </div>
+                    <!-- Collect the nav links, forms, and other content for toggling -->
+                    <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+                        <ul class="nav navbar-nav">
+                            <li><a href="/open/health/message/center/topVideo">视频</a></li>
+                            <li><a href="#">文章</a></li>
+                            <li><a href="#">百科</a></li>
+                        </ul>
+                        <form class="navbar-form navbar-left" role="search">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="navbar-search-input" placeholder="Search">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </nav>
+        </header>
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container" style="background-color: #fff">
+                <div id="example1" class="slider-pro sli">
+                    <div class="sp-slides" th:each="video,iter: ${videos}">
+                        <div class="sp-slide">
+                            <img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}" th:onclick="play([[${video.id}]])"/>
+                            <p class="sp-layer sp-white sp-padding" style="text-align: center" data-horizontal="17%" data-vertical="5" data-width="50%" data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200" th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
+                            </p>
+                        </div>
+                    </div>
+                    <!--                   <div class="sp-thumbnails">
+                        <div class="sp-thumbnail" th:each="video,iter: ${videos}">
+                            <div class="sp-thumbnail-description"><img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"></img></div>
+                        </div>
+                    </div>  -->
+                </div>
+                <div class="row block">
+                    <h4 align='center'><strong>视频列表</strong></h4>
+                    <div class="pull-right">
+                        <a class="btn" id="model_edit_btn" href="/open/health/message/center/video/index">查看更多></a>
+                    </div>
+                </div>
+                <div class="row block">
+                    <div class="col-sm-3" style="text-align: center;" th:each="video,iter: ${videosAll}">
+                        <span><a th:href="${'/open/health/message/center/play?id='+ video.id}">
+                                        <img  th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT"></a></span>
+                        <div class="detail">
+                            <div>
+                                <strong><a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a></strong>
+                            </div>
+                            <div>
+                                <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row block">
+                    <h4 align='center'><strong>公告列表</strong></h4>
+                    <div class="pull-right">
+                        <a class="btn" id="model_edit_btn" href="/open/health/message/center/message/index">查看更多></a>
+                    </div>
+                </div>
+                <div class="row block">
+                    <div class="post" style="padding-right: 30px;padding-left: 30px" th:each="message,iter: ${messages}">
+                        <img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
+                        <div class="notice-box">
+                            <div>
+                                <h4 ><strong th:text="${message.title}"></strong></h4>
+                            </div>
+                            <div style="font-size:10px; color:#999">
+                                <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
+                                <span th:text="${message.label}"></span>
+                            </div>
+                            <div id="noticeContent" th:utext="${message.content}"></div>
+                            <div class="btnContent">
+                                <a class="btn-detail" th:onclick="detail([[${message.id}]])">查看详情</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <!-- /.container-fluid -->
-    </nav>
-  </header>
-  <!-- Full Width Column -->
-  <div class="content-wrapper">
-    <div class="container">
-      <!-- Content Header (Page header) -->
-      <section class="content-header" style="height:50px;">
-        <img id="logo"/>
-        <ol class="breadcrumb" style="float:left">
-          <li><a href="#"><i class="fa fa-home"></i> 当前所在的位置：主页</a></li>
-          <li><a href="/open/health/message/center/topVideo">宣传教育</a></li>
-        </ol>
-      </section>
-<section class="content">
-    	<div id="example1" class="slider-pro">
-		<div class="sp-slides" th:each="video,iter: ${videos}">
-			<div class="sp-slide">
-				<img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"
-				th:onclick="play([[${video.id}]])"/>
-				
-				<p class="sp-layer sp-white sp-padding" style="text-align: center" 
-					data-horizontal="17%" data-vertical="5" data-width="50%"
-					data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200"
-					th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
-				</p>
-			</div>
-		</div>
-
-		<div class="sp-thumbnails">
-			<div class="sp-thumbnail" th:each="video,iter: ${videos}">
-				<div class="sp-thumbnail-description">
-				<img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"/>
-				</div>
-			</div>
-		</div>
     </div>
-    
-    <div class="box box-solid">
-        <div class="box-header with-border">
-				<h4 align='center'><strong>视频列表<strong/></h4>
-				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="/open/health/message/center/video/index">查看更多></a>
-				</div>
-			</div>
-        <div class="box-body">
-        	<div class="tab-content">
-          	   <div>
-                    <ul class="video-list ul-dashed" >
-                        <li class="video-li" th:each="video,iter: ${videosAll}">
-                             <a th:href="${'/open/health/message/center/play?id='+ video.id}">
-      							<img  th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:90%">
-     						 </a>
-     						 <div class="detail">
-     						 <div>
-     						 <strong>
-     						 <a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a>
-     						 </strong>
-                             </div>
-                             <div>
-                             <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
-                             </div>
-                            </div>
-                        </li>
-                    </ul>
-            	</div>
-            </div>
-        </div>
-        <div class="box box-solid">
-        <div class="box-header with-border">
-				<h4 align='center'><strong>公告列表<strong/></h4>
-				<div class="box-tools pull-right">
-					<a class="btn" id="model_edit_btn" href="/open/health/message/center/message/index">查看更多></a>
-				</div>
-		</div>
-        <div class="box-body">
-        	<div class="tab-content">
-          	   <div>
-                    <ul class="notice-list ul-dashed" th:each="message,iter: ${messages}">
-                        <li class="notice-li">
-      							<img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
-     						 <div class="notice-box">
-     						 <div>
-     						 <h4 ><strong th:text="${message.title}"><strong/></h4>
-                             </div>
-                             <div style="font-size:10px; color:#999">
-                             <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
-                             <span th:text="${message.label}"></span>
-                             </div>
-                             <div id="noticeContent" th:utext="${message.content}"></div>
-                             <div class="btnContent">
-                             <a class="btn-detail" th:onclick="detail([[${message.id}]])">查看详情</a>
-                             </div>
-                            </div>
-                        </li>
-                    </ul>
-            	</div>
-            </div>
-        </div>        
-                
-</section>
-</div>
-</div>
-</div>
+    <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/assets/adminLTE/js/adminlte.min.js"></script>
+    <script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
+    <script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('#example1').sliderPro({
+            width: screen.width,
+            height: 500,
+            thumbnailsPosition: 'right',
+            arrows: true,
+            buttons: false,
+            centerImage: true,
+            imageScaleMode: 'contain',
+            waitForLayers: true,
+            thumbnailWidth: 200,
+            thumbnailHeight: 150,
+            thumbnailPointer: true,
+            autoplay: true,
+            autoScaleLayers: false,
+            breakpoints: {
+                800: {
+                    thumbnailsPosition: 'bottom',
+                    thumbnailWidth: 270,
+                    thumbnailHeight: 100
+                },
+                500: {
+                    orientation: 'vertical',
+                    thumbnailsPosition: 'bottom',
+                    thumbnailWidth: 120,
+                    thumbnailHeight: 50
+                }
 
-<div th:include="/health/footer" />
-<script type="text/javascript" src="/static/js/sliderPro/js/jquery.sliderPro.js"></script>
-<script type="text/javascript" src="/static/js/jwplayer/jwplayer.js"></script>
-<script type="text/javascript">
-$( document ).ready(function() {
-	$( '#example1' ).sliderPro({
-		width: screen.width,
-		height: 900,
-		thumbnailsPosition: 'right',
-		arrows: true,
-		buttons: false,
-		centerImage:true,
-		imageScaleMode:'contain',
-		waitForLayers: true,
-		thumbnailWidth: 200,
-		thumbnailHeight: 150,
-		thumbnailPointer: true,
-		autoplay: true,
-		autoScaleLayers: false,
-		breakpoints: {
-			800: {
-	            thumbnailsPosition: 'bottom',
-	            thumbnailWidth: 270,
-	            thumbnailHeight: 100
-	        },
-	        500: {
-	            orientation: 'vertical',
-	            thumbnailsPosition: 'bottom',
-	            thumbnailWidth: 120,
-	            thumbnailHeight: 50
-	        }
+            }
+        });
+    });
 
-		}
-	});
-});
-        
-   function play(value){
-   		window.location.href="/open/health/message/center/play?id="+value;
-   }
-   function detail(value){
-  		window.location.href="/open/health/message/center/display/index?id="+value;
-  }
-</script>
+    function play(value) {
+        window.location.href = "/open/health/message/center/play?id=" + value;
+    }
+
+    function detail(value) {
+        window.location.href = "/open/health/message/center/display/index?id=" + value;
+    }
+    </script>
 </body>
 
 </html>
