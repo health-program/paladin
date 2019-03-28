@@ -58,8 +58,6 @@ public class PublicityMessageVO {
     
     public SysAttachment getThumbnailUrl() {
     	if (thumbnail != null && thumbnail.length() != 0) {
-			SysAttachment attachment=AttachmentContainer.getAttachment(thumbnail);
-			System.out.println(attachment);
 			return AttachmentContainer.getAttachment(thumbnail);
 		}
 		return null;

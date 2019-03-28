@@ -57,11 +57,11 @@
 <section class="content">
     <input type="hidden" id="url" th:value="${video.url}">
     <input type="hidden" id="id" th:value="${video.id}">
-    <input type="hidden" id="showImageUrl" th:value="${video.showImageUrl}">
+    <input type="hidden" id="showImageUrl" th:value="${video.showImageUrl.pelativePath}">
         <div class="box-body">
         <div class="col-sm-12" style="left:25px">
             <h2 th:text="${video.name}" style="text-align: center;margin-right:60px"></h2>
-            <h5 th:text="|视频发布时间:  ${#dates.format(video.createTime,'yyyy-MM-dd')}|" style="text-align: right;margin-right:60px"></h5>
+            <h5 th:text="|视频发布时间:  ${#dates.format(video.publishTime,'yyyy-MM-dd')}|" style="text-align: right;margin-right:60px"></h5>
             <div id="my-video" class="media-object">Loading the video...</div>
             <p style="color:#3c8dbc;margin-top:20px">视频简介：</p>
             <p th:text="${video.summary}"></p>
@@ -72,7 +72,7 @@
              <ul class="video-list">
                  <li class="video-li"  th:each="video,iter: ${videosAll}">
                       <a th:href="${'/open/health/message/center/play?id='+ video.id}">
-						<img  th:src="@{'/file/'+${video.showImageUrl}}" alt="ATTACHMENT" style="width:90%"/>
+						<img  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}" alt="ATTACHMENT" style="width:90%"/>
 				 </a>
 				 <div class="detail">
 				 <div>
@@ -81,7 +81,7 @@
 				 </strong>
                       </div>
                       <div>
-                      <span>发布时间：</span><span th:text="${#dates.format(video.createTime, 'yyyy-MM-dd')}"></span>
+                      <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
                       </div>
                     </div>
                 </li>
