@@ -27,6 +27,11 @@
     			return false
     		}
     		var data = res.result;
+
+            if (data.length === 0) {
+                showChartInfo(myChart,'暂无数据')
+                return false;
+            }
 		    // 填入数据
 		    var xdata=new Array();
 		    var ydata =new Array();
@@ -34,7 +39,7 @@
 		    	xdata.push(data[i].year);
 		    	ydata.push(data[i].count);
 		    }
-		    
+
 			var year = {
 			    color: ['#3398DB'],
 			    tooltip : {
@@ -52,7 +57,7 @@
 			        containLabel: true
 			    },
 			    xAxis : [
-			        {	
+			        {
 			        	name: '年份',
 			            type : 'category',
 			            data : xdata,
@@ -62,14 +67,14 @@
 			        }
 			    ],
 			    yAxis : [
-			        {	
+			        {
 			        	name: '次数',
 			            type : 'value'
 			        }
 			    ],
 			    series : [
 			        {
-			            name:'播放次数',
+			            name:'播放次数(点击查看该年详细播放记录)',
 			            type:'bar',
 			            barWidth: '60%',
 			            data:ydata
@@ -83,11 +88,16 @@
     		/* 按月统计 */
     		$.get('/health/video/play/publish/getStatistics?videoId=' + $("#id").val() + "&year=" + param.name).done(function (res) {
     		var myChart1 = echarts.init(document.getElementById('month'));
-    		
+
     		if(res.status!=1){
     			return false
     		}
-    		var data = res.result;
+    		var data = res.result
+            if (data.length === 0) {
+                showChartInfo(myChart1,'暂无数据')
+                return false;
+            }
+
 		    // 填入数据
 		    var xdata=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 		    var ydata =[0,0,0,0,0,0,0,0,0,0,0,0];
@@ -95,7 +105,7 @@
 		    	ydata[data[i].month-1] = data[i].count;
 		    }
 		    console.log(xdata);
-		    
+
 			var month = {
 			    color: ['#3368DB'],
 			    tooltip : {
@@ -113,7 +123,7 @@
 			        containLabel: true
 			    },
 			    xAxis : [
-			        {	
+			        {
 			        	name: '月份',
 			            type : 'category',
 			            data : xdata,
@@ -123,7 +133,7 @@
 			        }
 			    ],
 			    yAxis : [
-			        {	
+			        {
 			        	name: '次数',
 			            type : 'value'
 			        }
@@ -141,9 +151,32 @@
     		})
         });
     });
-    
-    
-	
+
+    //无数据展示
+    var showChartInfo = function (chart, infoStr) {
+        var msgOption = {
+            title: {
+                show: true,
+                textStyle:{
+                    color:'grey',
+                    fontSize:20
+                },
+                text: infoStr,
+                left: 'center',
+                top: 'center'
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: {
+                show: false
+            },
+            series: []
+        };
+        chart.clear() ;//initChart(divId): get echarts instance, you can get it by using other method
+        chart.hideLoading();
+        chart.setOption(msgOption)
+    };
     </script>
 </body>
 

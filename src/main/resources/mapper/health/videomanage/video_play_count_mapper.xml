@@ -10,7 +10,7 @@
 			AND org.name LIKE CONCAT('%',#{agencyName},'%')
 		</if>
 		
-		GROUP BY vp.work_cycle
+		GROUP BY vp.agency_id
 	</select>
 	
 <!-- 内部按时间分组播放量统计 -->
@@ -22,11 +22,7 @@
 		<if test="workCycle != null and workCycle!=''">
 			AND vp.work_cycle =#{workCycle}
 		</if>
-		
-		<if test="agencyName != null and agencyName !=''">
-			AND org.name LIKE CONCAT('%',#{agencyName},'%')
-		</if>
-		
-		GROUP BY vp.agency_id ORDER BY vp.work_cycle 
+
+		GROUP BY vp.work_cycle ORDER BY vp.work_cycle
 	</select>
 </mapper>
