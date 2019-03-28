@@ -99,6 +99,8 @@
 
     #noticeContent {
         height: 70px;
+        font-size: 15px;
+        padding-top: 5px;
         overflow: hidden;
         /* 内容超出宽度时隐藏超出部分的内容 */
         text-overflow: ellipsis;
@@ -126,29 +128,7 @@
 
 <body class="layout-top-nav skin-green-light">
     <div class="wrapper">
-        <header class="main-header">
-            <nav class="navbar navbar-static-top">
-                <div class="container">
-                    <div class="navbar-header">
-                        <a href="/open/health/message/center/topVideo" class="navbar-brand"><b>健康</b>宣教</a>
-                    </div>
-                    <!-- Collect the nav links, forms, and other content for toggling -->
-                    <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
-                        <ul class="nav navbar-nav">
-                            <li><a href="/open/health/message/center/topVideo">视频</a></li>
-                            <li><a href="#">文章</a></li>
-                            <li><a href="#">百科</a></li>
-                        </ul>
-                        <form class="navbar-form navbar-left" role="search">
-                            <div class="form-group">
-                                <input type="text" class="form-control" id="navbar-search-input" placeholder="Search">
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!-- /.container-fluid -->
-            </nav>
-        </header>
+        <div th:include="/health/open/open_top" />
         <!-- Full Width Column -->
         <div class="content-wrapper">
             <div class="container" style="background-color: #fff">
@@ -160,11 +140,11 @@
                             </p>
                         </div>
                     </div>
-                    <!--                   <div class="sp-thumbnails">
+                    <!-- <div class="sp-thumbnails">
                         <div class="sp-thumbnail" th:each="video,iter: ${videos}">
                             <div class="sp-thumbnail-description"><img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"></img></div>
                         </div>
-                    </div>  -->
+                    </div> -->
                 </div>
                 <div class="row block">
                     <h4 align='center'><strong>视频列表</strong></h4>
@@ -200,10 +180,10 @@
                                 <h4 ><strong th:text="${message.title}"></strong></h4>
                             </div>
                             <div style="font-size:10px; color:#999">
-                                <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
+                                <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
                                 <span th:text="${message.label}"></span>
                             </div>
-                            <div id="noticeContent" th:utext="${message.content}"></div>
+                            <div id="noticeContent" th:utext="${message.summary}"></div>
                             <div class="btnContent">
                                 <a class="btn-detail" th:onclick="detail([[${message.id}]])">查看详情</a>
                             </div>
@@ -221,11 +201,11 @@
     <script type="text/javascript">
     $(document).ready(function() {
         $('#example1').sliderPro({
-            width: screen.width,
+            width: $("#example1").width() - 100,
             height: 500,
             thumbnailsPosition: 'right',
             arrows: true,
-            buttons: false,
+            //buttons: false,
             centerImage: true,
             imageScaleMode: 'contain',
             waitForLayers: true,

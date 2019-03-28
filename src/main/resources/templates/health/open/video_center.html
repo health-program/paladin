@@ -1,118 +1,201 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:include="/health/header"/>
-<meta charset="utf-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"/>
-<link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen"/>
-<link rel="stylesheet" type="text/css" href="/static/css/message-center.css" media="screen"/>
-  
-<body class="hold-transition skin-blue layout-top-nav">
-	<div class="wrapper">
-		<header class="main-header" style="background-color: #43c7a8">
-			<nav class="navbar navbar-static-top">
-				<div class="container">
 
-					<!-- Collect the nav links, forms, and other content for toggling -->
-					<div class="collapse navbar-collapse pull-left"
-						id="navbar-collapse">
-						<ul class="nav navbar-nav">
-							<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">宣传内容<span class="caret"></span></a>
-								<ul class="dropdown-menu" role="menu">
-									<li><a href="#">疾病查询</a></li>
-									<li><a href="#">疾病知识</a></li>
-									<li><a href="#">症状知识</a></li>
-									<li><a href="#">健康处方</a></li>
-								</ul>
-							</li>
-							<!-- <li><a href="#">link</a></li> -->
-						</ul>
-					</div>
-					<div class="navbar-custom-menu">
-					</div>
-					<!-- /.navbar-custom-menu -->
-				</div>
-				<!-- /.container-fluid -->
-			</nav>
-		</header>
-		<!-- Full Width Column -->
-		<div class="content-wrapper">		
-			<div class="container">
-				<div class="list_container">
-				<section>
-					<div class="list_left">
-						<div class="list_category">
-							<div class="list_c_tit">信息中心</div>
-							<ul class="list_c_show">
-								<li><a href="/open/health/message/center/message/index">公告</a></li>
-								<li><a href="/open/health/message/center/video/index">视频</a></li>
-								<li><a
-									href="/home/list?secondnodeid=9EF9D4C8-4F56-4593-8366-3C30B5CDE9E5">健康活动</a></li>
-								<li><a
-									href="/home/list?secondnodeid=AE359865-B396-4260-9B90-32AD0DBC5284">基层风采</a></li>
-								
-							</ul>
-						</div>
-						<!-- 图片轮播 -->
-						<div class="image_slip">
-							 <div id="myCarousel" class="carousel slide">
-							    <div class="carousel-inner">
-							        <div class="item active">
-							             <img src="/static/img/gif.gif" alt="one slide">
-							        </div>
-							        
-							    </div>
-							  </div>
-						</div>
-					</div>
-				</section>
-					<section>
-					<div class="content-header" style="height: 50px;">
-						<ol class="breadcrumb" style="float: left">
-							<li><a href="#"><i class="fa fa-home"></i> 当前所在位置：主页</a></li>
-							<li><a href="/open/health/message/center/topVideo">宣传宣传教育</a></li>
-							<li class="active">健康宣传教育视频中心</li>
-						</ol>
-					</div>
-						<div class="list_table" style="float: right">
-							<table id="dataGrid"></table>
-						</div>
-					</section>
-				</div>				
-			</div>
-		</div>
-	<div th:include="/health/footer" />
-    <script type="text/javascript">
-    /*<![CDATA[*/
-    var table;
-    $(function() {
-        initDataGrid();
-    });
-
-    function initDataGrid() {
-        var limit = $("#pageLimit").val();
-        var offset = $("#pageOffset").val();
-        var page = (limit && offset) ? offset / limit + 1 : 1;
-
-        table = $.createTable("#dataGrid", {
-            idField: "id",
-            columns: [
-                [
-                    { field: "name",align:"left",width:"88%"},
-                    { field: "updateTime", formatter: "date" }
-                ]
-            ],
-            url: '/open/health/message/center/find/page',
-            pageSize: limit || undefined,
-            pageNumber: page || 1,
-            pagination: true,
-            onClickRow:function (e) {
-            	window.location = '/open/health/message/center/play' + (e ? ('?id=' + e.id) : '');
-            }
-        });
+<head>
+    <title>宣教系统</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/ionicons.min.css">
+    <link rel="stylesheet" href="/static/css/iconfont.css">
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css">
+    <style type="text/css">
+    .video-list {
+        list-style: none;
+        text-align: center;
     }
 
-    /*]]>*/
-    </script>
+    .right-tool {
+        float: right;
+    }
+
+    .list {
+        list-style: none;
+        float: left;
+        text-align: center;
+        width: 23%
+    }
+
+    .right-text {
+        display: inline;
+        float: right;
+    }
+
+    .name-box {
+        display: inline-block;
+        height: 54px;
+        width: 140px;
+    }
+
+    .fa-check-square-o {
+        font-size: 54px;
+    }
+
+    .p1 {
+        color: #666666;
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    .p2 {
+        color: #666666;
+        line-height: 20px;
+        font-size: 22px;
+    }
+
+    .go-todo-btn {
+        padding
+    }
+
+    .name {
+        color: #000;
+    }
+
+    .name:hover,
+    .name:active,
+    .name:focus {
+        color: #000;
+        text-decoration: underline
+    }
+
+    .btn-primary {
+        background-color: #00a65a;
+        border-color: #00a65a
+    }
+
+    .btn-primary:hover {
+        background-color: #1ddc50;
+        border-color: #1ddc50
+    }
+
+    .video-li {
+        margin-bottom: 20px;
+        float: left;
+        width: 32%;
+    }
+
+    .notice-box {
+        display: inline-block;
+        width: 76%;
+        text-align: left;
+        text-height: 200px;
+        padding-left: 20px;
+        vertical-align: top;
+    }
+
+    #noticeContent {
+        height: 70px;
+        overflow: hidden;
+        font-size: 15px;
+        padding-top: 5px;
+        /* 内容超出宽度时隐藏超出部分的内容 */
+        text-overflow: ellipsis;
+        /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+    }
+
+    .btn-detail {
+        margin-top: 15px;
+        border: none;
+        float: right;
+        color: #3c8dbc
+    }
+
+    .block {
+        padding: 20px;
+        padding-right: 50px;
+        padding-left: 50px;
+    }
+
+    .sli {
+        margin-top: 20px;
+    }
+    </style>
+</head>
+
+<body class="layout-top-nav skin-green-light">
+    <div class="wrapper">
+        <div th:include="/health/open/open_top" />
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container">
+                <div class="box box-solid" style="margin-top: 20px">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">视频列表</h3>
+                    </div>
+                    <div id="body" class="box-body">
+                        <div class="post" th:each="video,iter: ${videos}">
+                            <img th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
+                            <div class="notice-box">
+                                <div>
+                                    <h4><a th:href="${'/open/health/message/center/play?id='+ video.id}"><strong th:text="${video.name}"></strong></a></h4>
+                                </div>
+                                <div style="font-size:10px; color:#999">
+                                    <span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
+                                    <span th:text="${video.label}"></span>
+                                </div>
+                                <div id="noticeContent" th:utext="${video.summary}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" id="total" th:value="${total}">
+            <input type="hidden" id="page" th:value="${page}">
+            <input type="hidden" id="limit" th:value="${limit}">
+        </div>
+        <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+        <script type="text/javascript" src="/static/assets/bootstrap3/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/static/assets/adminLTE/js/adminlte.min.js"></script>
+        <script type="text/javascript">
+        /*<![CDATA[*/
+        var table;
+        $(function() {
+            initDataGrid();
+        });
+
+        function initDataGrid() {
+            var limit = $("#limit").val() * 1,
+                total = $("#total").val() * 1,
+                page = $("#page").val() * 1,
+                t = 5;
+
+
+            if (total > limit) {
+                var totalPage = Math.ceil(total / limit);
+                var html = '<div class="text-center"><ul class="pagination">';
+                html += page > 1 ? '<li><a href="/open/health/message/center/video/index?offset=' + ((page - 2) * limit) + '">&laquo;</a></li>' : '<li><a href="javascript:void(0)">&laquo;</a></li>';
+
+                var i = page - Math.floor(t / 2);
+                if (i < 1) i = 1;
+                if (i > totalPage) i = totalPage;
+
+                for (var k = 0; i <= totalPage && k < t; k++) {
+                    html += '<li ' + (i == page ? 'class="active"' : '') + '><a href="/open/health/message/center/video/index?offset=' + ((i - 1) * limit) + '">' + i + '</a></li>';
+                    i++;
+                }
+
+                html += page < totalPage ? '<li><a href="/open/health/message/center/video/index?offset=' + (page * limit) + '">&raquo;</a></li>' : '<li><a href="javascript:void(0)">&raquo;</a></li>';
+                html += '</ul></div>';
+                $("#body").append(html);
+            }
+
+        }
+
+        /*]]>*/
+        </script>
 </body>
+
 </html>

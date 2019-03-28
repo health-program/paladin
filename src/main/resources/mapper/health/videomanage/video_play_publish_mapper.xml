@@ -11,14 +11,14 @@
 	    v.name,
 	    v.summary,
 	    v.label,
-	    v.update_time updateTime,
+	    v.publish_time AS updateTime,
 	    vpp.total as count
 		FROM  video v
 		LEFT JOIN  
 		(select video_id , sum(count) total from video_play_publish group by video_id) vpp 
 		ON 
 		v.id = vpp.video_id
-		WHERE v.status=9
+		WHERE v.status=9 AND now() > v.publish_time 
 	    <if test="name != null and name != ''">
 	        AND v.name LIKE CONCAT ('%',#{name},'%') 
 	    </if>

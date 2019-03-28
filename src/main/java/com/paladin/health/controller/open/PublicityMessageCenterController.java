@@ -128,32 +128,33 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		PublicityMessageQueryDTO queryDTO = new PublicityMessageQueryDTO();
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messageList = publicityMessageService.showDisplayMessage();
-		queryDTO.setLimit(100);
-		PageResult<PublicityMessageVO> messagesResult = publicityMessageService.findPublishedMessages(queryDTO);
-		List<PublicityMessageVO> messages = messagesResult.getData();
-		PublicityMessageVO preMessage = new PublicityMessageVO();
-		PublicityMessageVO nextMessage = new PublicityMessageVO();
-		for (int i = 0; i < messages.size(); i++) {
-			if (messages.get(i).getId().equals(message.getId())) {
-				if (messages.size() > 1) {
-					if (i > 0 && i < messages.size() - 1) {
-						preMessage = messages.get(i - 1);
-						nextMessage = messages.get(i + 1);
-					}
-					if (i == 0) {
-						nextMessage = messages.get(i + 1);
-
-					}
-					if (i == messages.size() - 1) {
-						preMessage = messages.get(i - 1);
-					}
-				}
-			}
-		}
-		;
+//		queryDTO.setLimit(100);
+//		PageResult<PublicityMessageVO> messagesResult = publicityMessageService.findPublishedMessages(queryDTO);
+//		List<PublicityMessageVO> messages = messagesResult.getData();
+//		PublicityMessageVO preMessage = new PublicityMessageVO();
+//		PublicityMessageVO nextMessage = new PublicityMessageVO();
+//		for (int i = 0; i < messages.size(); i++) {
+//			if (messages.get(i).getId().equals(message.getId())) {
+//				if (messages.size() > 1) {
+//					if (i > 0 && i < messages.size() - 1) {
+//						preMessage = messages.get(i - 1);
+//						nextMessage = messages.get(i + 1);
+//					}
+//					if (i == 0) {
+//						nextMessage = messages.get(i + 1);
+//
+//					}
+//					if (i == messages.size() - 1) {
+//						preMessage = messages.get(i - 1);
+//					}
+//				}
+//			}
+//		};
+		
+		
 		model.addAttribute("message", message);
-		model.addAttribute("preMessage", preMessage);
-		model.addAttribute("nextMessage", nextMessage);
+		//model.addAttribute("preMessage", preMessage);
+		//model.addAttribute("nextMessage", nextMessage);
 		model.addAttribute("messageList", messageList);
 		return "/health/open/message_display_index";
 	}
@@ -233,7 +234,21 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 * @return
 	 */
 	@RequestMapping("/message/index")
-	public String messageIndex() {
+	public String messageIndex(@RequestParam(required=false) Integer offset, Model model) {
+		if(offset == null) {
+			offset = 0;
+		}
+		
+		PublicityMessageQueryDTO query = new PublicityMessageQueryDTO();
+		query.setOffset(offset);
+		query.setLimit(10);
+		
+		PageResult<PublicityMessageVO> result = publicityMessageService.findPublishedMessages(query);
+		
+		model.addAttribute("messages", result.getData());
+		model.addAttribute("total", result.getTotal());
+		model.addAttribute("page", result.getPage());	
+		model.addAttribute("limit", result.getLimit());
 		return "/health/open/message_center";
 	}
 
@@ -254,7 +269,22 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 * @return
 	 */
 	@RequestMapping("/video/index")
-	public String videoIndex() {
+	public String videoIndex(@RequestParam(required=false) Integer offset, Model model) {
+		if(offset == null) {
+			offset = 0;
+		}
+		
+		VideoQueryDTO query = new VideoQueryDTO();
+		query.setOffset(offset);
+		query.setLimit(10);
+		
+		PageResult<VideoShowVO> result = videoService.findPlayVideoPage(query);
+		
+		model.addAttribute("videos", result.getData());
+		model.addAttribute("total", result.getTotal());
+		model.addAttribute("page", result.getPage());	
+		model.addAttribute("limit", result.getLimit());
+
 		return "/health/open/video_center";
 	}
 
