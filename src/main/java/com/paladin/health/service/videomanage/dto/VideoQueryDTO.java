@@ -1,6 +1,7 @@
 package com.paladin.health.service.videomanage.dto;
 
 import com.paladin.framework.common.OffsetPage;
+import com.paladin.framework.utils.StringUtil;
 
 public class VideoQueryDTO extends OffsetPage {
 
@@ -15,7 +16,7 @@ public class VideoQueryDTO extends OffsetPage {
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.name = StringUtil.isEmpty(name) ? null : name.trim();
 	}
 
 	public String getLabel() {
