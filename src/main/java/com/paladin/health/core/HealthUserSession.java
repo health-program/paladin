@@ -34,6 +34,8 @@ public class HealthUserSession extends UserSession implements AuthorizationInfo 
 	public HealthUserSession(OrgUser orgUser, Role role) {
 		super(orgUser.getId(),orgUser.getName(),orgUser.getAccount());
 		this.agencyId = orgUser.getAgencyId();
+		this.roleIds = new ArrayList<>();
+		this.roleIds.add(role.getId());
 		this.roleLevel = role.getRoleLevel();
 	}
 
