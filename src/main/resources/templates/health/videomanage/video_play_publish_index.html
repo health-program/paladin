@@ -70,9 +70,9 @@
             columns: [
                 [
                     { title: "视频名称", align: "center", field: "name" },
-                    { title: "视频简介", align: "center", field: "summary" },
-                    { title: "标签", align: "center", field: "label" },
-                    { title: "播放次数", align: "center", field: "count" },
+                    { title: "视频简介", align: "center", field: "summary" , formatter:function (value, row, index) { return value ? value : "无" } },
+                    { title: "标签", align: "center", field: "label" , formatter:function (value, row, index) { return value ? value : "无" }},
+                    { title: "播放次数", align: "center", field: "count", formatter:function (value, row, index) { return value ? value : "无" } },
                     {
                         title: "操作",
                         align: "center",

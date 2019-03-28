@@ -23,8 +23,8 @@
     <section class="content">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab1" data-toggle="tab" aria-expanded="true">按机构统计</a></li>
-                <li class=""><a href="#tab2" data-toggle="tab" aria-expanded="false">按年份统计</a></li>
+                <li class="active"><a href="#tab1" data-toggle="tab" aria-expanded="true">按年份统计</a></li>
+                <li class=""><a href="#tab2" data-toggle="tab" aria-expanded="false">按机构统计</a></li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab1">
@@ -34,11 +34,11 @@
                             <h3 class="box-title">查询</h3>
                         </div>
                         <div class="box-body">
-                            <form id="searchbar1" class="form-horizontal">
+                            <form class="form-horizontal">
                                 <div class="input-group" style="width:100%">
-                                    <label for="agencyName" class="col-md-1 control-label">机构名称</label>
+                                    <label for="workCycle" class="col-md-1 control-label">工作周期</label>
                                     <div class="col-md-2">
-                                        <input type="text" id="agencyName" name="agencyName" class="form-control" placeholder="请输入机构">
+                                        <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
                                     </div>
                                 </div>
                                 <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
@@ -46,8 +46,8 @@
                             </form>
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
-                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar1')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
+                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
                                 </div>
                             </div>
                             <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
@@ -61,7 +61,7 @@
                         </div>
                         <div id="result" class="box-body">
                             <div class="col-sm-12">
-                                <div id="agencyChart" style="height: 400px"></div>
+                                <div id="yearChart" style="height: 400px"></div>
                             </div>
                         </div>
                     </div>
@@ -73,15 +73,11 @@
                             <h3 class="box-title">查询</h3>
                         </div>
                         <div class="box-body">
-                            <form id="searchbar2" class="form-horizontal">
+                            <form id="searchbar" class="form-horizontal">
                                 <div class="input-group" style="width:100%">
                                     <label for="agencyName1" class="col-md-1 control-label">机构名称</label>
                                     <div class="col-md-2">
-                                        <input type="text" id="agencyName1" name="agencyName1" class="form-control" placeholder="请输入机构">
-                                    </div>
-                                    <label for="workCycle" class="col-md-1 control-label">工作周期</label>
-                                    <div class="col-md-2">
-                                        <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
+                                        <input type="text" id="agencyName1" name="agencyName" class="form-control" placeholder="请输入机构">
                                     </div>
                                 </div>
                                 <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
@@ -89,8 +85,8 @@
                             </form>
                             <div class="col-md-12">
                                 <div class="pull-right">
-                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
-                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar2')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
+                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[1].reset()"><i class="fa fa-repeat"></i>重置</button>
                                 </div>
                             </div>
                             <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
@@ -117,7 +113,7 @@
                         </div>
                         <div id="result" class="box-body">
                             <div class="col-sm-12">
-                                <div id="yearChart" style="height: 350px"></div>
+                                <div id="agencyChart" style="height: 350px"></div>
                             </div>
                         </div>
                     </div>
@@ -130,11 +126,42 @@
     var table;
 
     $(function() {
+        initDataGrid();
         agencyCharts(agencyChart);
         yearCharts(yearChart);
-        initDataGrid();
     });
-    //图表自适应大小      
+
+
+    // 机构统计
+
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "机构名称", align: "center", field: "agencyName" },
+                    { title: "观看总人数", align: "center", field: "visitorCount" },
+                    { title: "观看总时长", align: "center", field: "durations", formatter: function getDuration(value, row, index) { return value.toFixed(2) + '小时'; } }
+                ]
+            ],
+            url: '/health/video/play/count/agency',
+            searchbar: '#searchbar',
+            showColumns: true,
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            clickToSelect: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    //图表自适应大小
     window.addEventListener("resize", function() {
         agencyChart.resize();
         yearChart.resize();
@@ -142,24 +169,21 @@
     var yearChart = echarts.init(document.getElementById('yearChart'));
     var agencyChart = echarts.init(document.getElementById('agencyChart'));
 
-    // 机构统计 
+
     function agencyCharts(chart) {
-        var agencyName = $("#agencyName").val();
+        var agencyName = $("#agencyName1").val();
         $.postAjax("/health/video/play/count/agency", { 'agencyName': agencyName }, function(res) {
-            if (!res) {
-                return false
-            }
-            var agencyChart = echarts.init(document.getElementById('agencyChart'));
             var data = res;
-            if (data.length == 0) {
-                chart.dispose();
+            if (data.length === 0) {
+                showChartInfo(chart,'暂无数据');
+                return false;
             }
             // 填入数据
             var xdata = new Array();
             var visitorCounts = new Array();
             var durations = new Array();
             for (var i in data) {
-                xdata.push(data[i].workCycle + '年');
+                xdata.push(data[i].agencyName);
                 visitorCounts.push(data[i].visitorCount);
                 durations.push((data[i].durations).toFixed(2));
             }
@@ -211,7 +235,7 @@
                 },
                 calculable: true,
                 xAxis: [{
-                    name: '年份',
+                    name: '机构名称',
                     type: 'category',
                     axisTick: {
                         show: false
@@ -240,67 +264,38 @@
                     data: durations
                 }]
             };
-            agencyChart.setOption(option, true);
+            chart.setOption(option, true);
 
         })
     }
 
     // 查询 
     function agencyQuery() {
-        agencyCharts();
+        agencyCharts(agencyChart);
+        table.refresh();
     }
 
 
     //年份统计 
 
-
-    function initDataGrid() {
-        var limit = $("#pageLimit").val();
-        var offset = $("#pageOffset").val();
-        var page = (limit && offset) ? offset / limit + 1 : 1;
-
-        table = $.createTable("#dataGrid", {
-            idField: "id",
-            columns: [
-                [
-                    { title: "机构名称", align: "center", field: "agencyName" },
-                    { title: "观看总人数", align: "center", field: "visitorCount" },
-                    { title: "观看总时长", align: "center", field: "durations", formatter: function getDuration(value, row, index) { return value.toFixed(2) + '小时'; } }
-                ]
-            ],
-            url: '/health/video/play/count/year',
-            searchbar: '#searchbar2',
-            showColumns: true,
-            pageSize: limit || undefined,
-            pageNumber: page || 1,
-            pagination: true,
-            clickToSelect: true,
-            toolbar: "#toolbar",
-            showRefresh: true
-        });
-    }
-
-
-    function yearCharts() {
+    function yearCharts(yearChart) {
         var workCycle = $("#workCycle").val();
-        var agencyName = $("#agencyName1").val();
-        $.get('/health/video/play/count/year?workCycle=' + workCycle + '&agencyName=' + agencyName).done(
+        $.get('/health/video/play/count/year?workCycle=' + workCycle).done(
             function(res) {
-                if (res.status != 1) {
-                    return false
+                if (res.status !== 1) {
+                    return false;
                 }
-                var yearChart = echarts.init(document
-                    .getElementById('yearChart'));
                 var data = res.result;
-                if (data.length == 0) {
-                    chart.dispose();
+                if (data.length === 0) {
+                    showChartInfo(yearChart,'暂无数据')
+                    return false;
                 }
                 // 填入数据
                 var xdata = new Array();
                 var visitorCounts = new Array();
                 var durations = new Array();
                 for (var i in data) {
-                    xdata.push(data[i].agencyName);
+                    xdata.push(data[i].workCycle + '年');
                     visitorCounts.push(data[i].visitorCount);
                     durations.push((data[i].durations).toFixed(2));
                 }
@@ -352,7 +347,7 @@
                     },
                     calculable: true,
                     xAxis: [{
-                        name: '机构名称',
+                        name: '年份',
                         type: 'category',
                         axisTick: {
                             show: false
@@ -386,9 +381,34 @@
     }
     //查询
     function yearQuery() {
-        yearCharts();
-        table.refresh();
+        yearCharts(yearChart);
     }
+
+    //无数据展示
+    var showChartInfo = function (chart, infoStr) {
+        var msgOption = {
+            title: {
+                show: true,
+                textStyle:{
+                    color:'grey',
+                    fontSize:20
+                },
+                text: infoStr,
+                left: 'center',
+                top: 'center'
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: {
+                show: false
+            },
+            series: []
+        };
+        chart.clear() ;//initChart(divId): get echarts instance, you can get it by using other method
+        chart.hideLoading();
+        chart.setOption(msgOption)
+    };
     </script>
 </body>
 

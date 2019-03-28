@@ -38,7 +38,7 @@
                 <div class="col-md-12">
                     <div class="pull-right">
                         <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')"><i class="fa fa-repeat"></i>重置</button>
+                        <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
                     </div>
                 </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />

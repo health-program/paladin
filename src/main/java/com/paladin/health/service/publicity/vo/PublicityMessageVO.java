@@ -48,14 +48,6 @@ public class PublicityMessageVO {
         return null;
     }
     
-	 // 获取缩略图
-    public List<SysAttachment> getThumbnailImage() {
-        if (thumbnail != null && thumbnail.length() != 0) {
-            return AttachmentContainer.getAttachments(thumbnail.split(","));
-        }
-        return null;
-    }
-    
     public SysAttachment getThumbnailUrl() {
     	if (thumbnail != null && thumbnail.length() != 0) {
 			return AttachmentContainer.getAttachment(thumbnail);

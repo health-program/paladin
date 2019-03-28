@@ -1,16 +1,20 @@
 package com.paladin.health.service.videomanage;
 
-import java.util.Calendar;
-import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.paladin.framework.common.PageResult;
+import com.paladin.framework.core.ServiceSupport;
 import com.paladin.health.mapper.videomanage.VideoPlayPublishMapper;
 import com.paladin.health.model.videomanage.VideoPlayPublish;
 import com.paladin.health.service.videomanage.dto.VideoPlayPublishDTO;
 import com.paladin.health.service.videomanage.dto.VideoPlayPublishQueryDTO;
 import com.paladin.health.service.videomanage.vo.PublishedVideoVO;
 import com.paladin.health.service.videomanage.vo.VideoPlayPublishVO;
-import com.paladin.framework.core.ServiceSupport;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Calendar;
+import java.util.List;
 
 @Service
 public class VideoPlayPublishService extends ServiceSupport<VideoPlayPublish> {
@@ -18,8 +22,10 @@ public class VideoPlayPublishService extends ServiceSupport<VideoPlayPublish> {
 	@Autowired
 	private VideoPlayPublishMapper videoPlayPublishMapper;
 	
-	public List<PublishedVideoVO> searchPublishedVideo(VideoPlayPublishQueryDTO query) {
-		return videoPlayPublishMapper.searchPublishedVideo(query);
+	public PageResult<PublishedVideoVO> searchPublishedVideo(VideoPlayPublishQueryDTO query) {
+		Page<PublishedVideoVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		videoPlayPublishMapper.searchPublishedVideo(query);
+		return new PageResult<>(page);
 	}
 	
 	public int updateOrSave (String videoId){

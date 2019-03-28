@@ -164,6 +164,10 @@
 		 var agencyName=$("#agencyName2").val();
 		$.postAjax("/health/publicity/material/grant/count/agency",{'agencyName':agencyName} ,function(result) {
 			var list = result;
+            if (list.length === 0) {
+                showChartInfo(agencyCharts,'暂无数据');
+                return false;
+            }
 			var chartValue = [];
 			var chartName = [];
 			list.forEach(function(item) {
@@ -254,6 +258,10 @@
 		var workCycle=$("#workCycle").val();
 		$.postAjax("/health/publicity/material/grant/count/year",{'workCycle':workCycle}, function(result) {
 			var list = result.data;
+            if (list.length === 0) {
+                showChartInfo(yearCharts,'暂无数据');
+                return false;
+            }
 			var chartValue = [];
 			var chartName = [];
 			list.forEach(function(item) {
@@ -350,7 +358,32 @@
     function yearQuery(){
     	chartsYear(yearCharts);
     }
-    
+
+    //无数据展示
+    var showChartInfo = function (chart, infoStr) {
+        var msgOption = {
+            title: {
+                show: true,
+                textStyle:{
+                    color:'grey',
+                    fontSize:20
+                },
+                text: infoStr,
+                left: 'center',
+                top: 'center'
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: {
+                show: false
+            },
+            series: []
+        };
+        chart.clear() ;//initChart(divId): get echarts instance, you can get it by using other method
+        chart.hideLoading();
+        chart.setOption(msgOption)
+    };
     </script>
 </body>
 

@@ -161,14 +161,14 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/save")
 	@ResponseBody
 	public Object save(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,
-			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailImage) {
+			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailUrl) {
 
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
 
-		if (thumbnailImage != null) {
-			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailImage, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
+		if (thumbnailUrl != null) {
+			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailUrl, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
 			publicityMessage.setThumbnail(thumbnail.getId());
 		}
 
@@ -191,13 +191,13 @@ public class PublicityMessageController extends ControllerSupport {
 	@RequestMapping("/update")
 	@ResponseBody
 	public Object update(@Valid PublicityMessageDTO publicityMessage, BindingResult bindingResult,
-			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailImage) {
+			@RequestParam(required = false) MultipartFile[] attachmentFiles, @RequestParam(required = false) MultipartFile thumbnailUrl) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
 
-		if (thumbnailImage != null) {
-			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailImage, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
+		if (thumbnailUrl != null) {
+			SysAttachment thumbnail = attachmentService.createPictureAndCompress(thumbnailUrl, "缩略图", SysAttachment.USE_TYPE_COLUMN_RELATION, 200, 200);
 			publicityMessage.setThumbnail(thumbnail.getId());
 		}
 
