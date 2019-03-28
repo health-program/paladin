@@ -190,14 +190,14 @@
                         'oldPassword': oldPassword,
                         'newPassword': newPassword
                     }, function(response) {
-                        if (response.status == 1) {
-                            layer.alert("修改成功", function() {
+                        if (response.status === 1) {
+                            layer.alert("修改成功",{icon : 6}, function() {
                                 window.location = "/health/logout";
                             });
                         } else {
-                            layer.alert("修改失败", function() {
-
-                            });
+                           layer.alert("修改失败:"+ response.message ? response.message : '未知原因' ,{
+                               icon : 5
+                           })
                         }
 
                     });
