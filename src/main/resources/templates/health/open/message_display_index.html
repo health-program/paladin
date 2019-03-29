@@ -33,14 +33,14 @@
                                         <p th:text="|标签：${message.label != null ? message.label:'暂无'}|" style="color: #999;"></p>
                                     </div>
                                     <div>
-                                        <p th:if="${preMessage.id != null}">
+                                        <p th:if="${preMessage != null}">
                                             <a th:href="${'/open/health/message/center/display/index?id='+ preMessage.id}" th:text="|上一篇：${preMessage.title}|"></a>
                                         </p>
-                                        <p th:if="${preMessage.id == null}" th:text="上一篇：到顶了"></p>
-                                        <p th:if="${nextMessage.id != null}">
+                                        <p th:if="${preMessage == null}" th:text="上一篇：到顶了"></p>
+                                        <p th:if="${nextMessage != null}">
                                             <a  th:href="${'/open/health/message/center/display/index?id='+ nextMessage.id}" th:text="|下一篇：${nextMessage.title}|"></a>
                                         </p>
-                                        <p th:if="${nextMessage.id == null}" th:text="下一篇：到底了"></p>
+                                        <p th:if="${nextMessage == null}" th:text="下一篇：到底了"></p>
                                     </div>
                                 </div>
                             </div>

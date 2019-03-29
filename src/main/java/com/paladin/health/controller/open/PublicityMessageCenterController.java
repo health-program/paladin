@@ -1,14 +1,5 @@
 package com.paladin.health.controller.open;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
@@ -21,6 +12,16 @@ import com.paladin.health.service.videomanage.dto.VideoPlayPublishQueryDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVO;
 import com.paladin.health.service.videomanage.vo.VideoVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/open/health/message/center")
@@ -125,7 +126,6 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	 */
 	@RequestMapping("/display/index")
 	public Object display(@RequestParam String id, Model model) {
-		PublicityMessageQueryDTO queryDTO = new PublicityMessageQueryDTO();
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messageList = publicityMessageService.showDisplayMessage();
 //		queryDTO.setLimit(100);
@@ -150,11 +150,12 @@ public class PublicityMessageCenterController extends ControllerSupport {
 //				}
 //			}
 //		};
-		
-		
+
+		PublicityMessageVO preMessage = publicityMessageService.showPreMessage(null, message.getPublishTime());
+		PublicityMessageVO nextMessage = publicityMessageService.showNextMessage(null, message.getPublishTime());
 		model.addAttribute("message", message);
-		//model.addAttribute("preMessage", preMessage);
-		//model.addAttribute("nextMessage", nextMessage);
+		model.addAttribute("preMessage", preMessage);
+		model.addAttribute("nextMessage", nextMessage);
 		model.addAttribute("messageList", messageList);
 		return "/health/open/message_display_index";
 	}

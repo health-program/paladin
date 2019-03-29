@@ -119,4 +119,50 @@
 		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
 		ORDER BY publish_time DESC
     </select>
+	<select id="findPreMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
+		SELECT
+			a.id,
+			a.title,
+			a.thumbnail,
+			a.subtitle,
+			a.summary,
+			a.label,
+			a.attachments,
+			a.publish_time AS publishTime
+		FROM publicity_message a
+		LEFT JOIN org_user b ON a.examine_user_id = b.id
+		LEFT JOIN org_user c ON a.create_user_id = c.id
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
+		<if test="publishTime != null">
+			AND  a.publish_time <![CDATA[>]]> #{publishTime}
+		</if>
+		<if test="id != null">
+			AND a.id = #{id}
+		</if>
+		ORDER BY publish_time ASC
+		LIMIT 1
+	</select>
+	<select id="findNextMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
+		SELECT
+		a.id,
+		a.title,
+		a.thumbnail,
+		a.subtitle,
+		a.summary,
+		a.label,
+		a.attachments,
+		a.publish_time AS publishTime
+		FROM publicity_message a
+		LEFT JOIN org_user b ON a.examine_user_id = b.id
+		LEFT JOIN org_user c ON a.create_user_id = c.id
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
+		<if test="publishTime != null">
+			AND  a.publish_time <![CDATA[<]]> #{publishTime}
+		</if>
+		<if test="id != null">
+			AND a.id = #{id}
+		</if>
+		ORDER BY publish_time desc
+		LIMIT 1
+	</select>
 </mapper>

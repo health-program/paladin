@@ -1,24 +1,23 @@
 package com.paladin.health.service.publicity;
 
-import java.util.Date;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.mapper.publicity.PublicityMessageMapper;
-import com.paladin.health.model.publicity.PublicityMessage;
-import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
-import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
-import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.copy.SimpleBeanCopier.SimpleBeanCopyUtil;
 import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.health.core.HealthUserSession;
+import com.paladin.health.mapper.publicity.PublicityMessageMapper;
+import com.paladin.health.model.publicity.PublicityMessage;
+import com.paladin.health.service.publicity.dto.PublicityMessageDTO;
+import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
@@ -226,5 +225,13 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 
 	public List<PublicityMessageVO> showDisplayMessage() {
 		return publicityMessageMapper.findDisplay();
+	}
+
+  public PublicityMessageVO showPreMessage(String id, Date publishTime) {
+		return  publicityMessageMapper.findPreMessage(id,publishTime);
+  }
+
+	public PublicityMessageVO showNextMessage(String id, Date publishTime) {
+		return  publicityMessageMapper.findNextMessage(id,publishTime);
 	}
 }
