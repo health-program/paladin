@@ -1,28 +1,35 @@
 package com.paladin.health.service.publicity.dto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class PublicityMaterialGrantDTO {
 	private String id;
 	//年度
+	@NotNull(message = "工作周期不能为空！")
 	private Integer workCycle;
 	//名称
 	private String materialId;
 	//类型
 	private Integer materialType;
 	//数量
+	@NotNull(message = "数量不能为空！")
 	private Integer count;
 	//发放对象
 	private Integer grantTargetType;
 	//发放对象
 	private String grantTarget;
 	//发放人
+	@NotEmpty(message = "发放人不能为空！")
 	private String grantor;
 	//发放机构的Id
 	private String grantorAgency;
 	//发放日期
+	@NotNull(message = "发放日期不能为空！")
 	private Date grantDate;
 	//接收人
+	@NotEmpty(message = "接收人不能为空！")
 	private String receiver;
 	//备注
 	private String remarks;

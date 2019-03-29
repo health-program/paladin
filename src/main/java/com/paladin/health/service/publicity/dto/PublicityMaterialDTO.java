@@ -1,5 +1,7 @@
 package com.paladin.health.service.publicity.dto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 public class PublicityMaterialDTO {
@@ -8,24 +10,29 @@ public class PublicityMaterialDTO {
 	private String id;
 
 	// 工作周期
+	@NotNull(message = "工作周期不能为空！")
 	private Integer workCycle;
 
 	// 所属机构
 	private String agencyId;
 
 	// 健康教育宣传资料名称
+	@NotEmpty(message = "资料名称不能为空！")
 	private String name;
 
 	// 健康教育宣传资料类型
 	private Integer type;
 
 	// 编发单位
+	@NotEmpty(message = "编发单位不能为空！")
 	private String compileIssueUnit;
 
 	// 数量
+	@NotNull(message = "数量不能为空！")
 	private Integer count;
 
 	// 日期
+	@NotNull(message = "日期不能为空！")
 	private Date date;
 
 	// 备注
