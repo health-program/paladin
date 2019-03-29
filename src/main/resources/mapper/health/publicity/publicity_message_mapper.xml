@@ -92,7 +92,7 @@
 		FROM publicity_message a
 		LEFT JOIN org_user b ON a.examine_user_id = b.id
 		LEFT JOIN org_user c ON a.create_user_id = c.id
-		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2 AND now() > a.publish_time
 		ORDER BY publish_time DESC
 		LIMIT 8;
     </select>
@@ -116,7 +116,7 @@
 		FROM publicity_message a
 		LEFT JOIN org_user b ON a.examine_user_id = b.id
 		LEFT JOIN org_user c ON a.create_user_id = c.id
-		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2 AND now() > a.publish_time
 		ORDER BY publish_time DESC
     </select>
 	<select id="findPreMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
@@ -134,12 +134,12 @@
 		LEFT JOIN org_user c ON a.create_user_id = c.id
 		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
 		<if test="publishTime != null">
-			AND  a.publish_time <![CDATA[>]]> #{publishTime}
+			AND  a.publish_time <![CDATA[>=]]> #{publishTime}
 		</if>
 		<if test="id != null">
-			AND a.id = #{id}
+			AND a.id != #{id}
 		</if>
-		ORDER BY publish_time ASC
+		ORDER BY publish_time ASC,id ASC
 		LIMIT 1
 	</select>
 	<select id="findNextMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
@@ -157,12 +157,22 @@
 		LEFT JOIN org_user c ON a.create_user_id = c.id
 		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2
 		<if test="publishTime != null">
-			AND  a.publish_time <![CDATA[<]]> #{publishTime}
+			AND  a.publish_time <![CDATA[<=]]> #{publishTime}
 		</if>
 		<if test="id != null">
-			AND a.id = #{id}
+			AND a.id != #{id}
 		</if>
-		ORDER BY publish_time desc
+		ORDER BY publish_time DESC,id DESC
 		LIMIT 1
 	</select>
+	
+	<select id="findSendMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
+		SELECT id, content,publish_target AS publishTarget FROM publicity_message 
+		WHERE `status` = 9 AND is_delete = 0 AND type = 3 AND now() > publish_time AND is_send = 0
+	</select>
+	
+	<update id="updateToSended">
+		UPDATE publicity_message SET is_send = 1 WHERE id = #{id}
+	</update>
+	
 </mapper>

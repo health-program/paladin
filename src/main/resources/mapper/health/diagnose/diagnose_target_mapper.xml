@@ -1,5 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.diagnose.DiagnoseTargetMapper">
-
+	
+	<select id="findTargetForMessage" parameterType="com.paladin.health.service.diagnose.dto.MessageTargetQuery"
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, a.cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != '' AND
+		<trim prefix="(" suffix=")" prefixOverrides="AND |OR ">
+		<if test="birthday != null">
+			OR #{birthday} > a.birthday 
+		</if>
+		<if test="gxy != null">
+			OR ((factor_code = 'hypertension' AND factor_level >3) OR factor_code= 'HY.CJJB.GXY')
+		</if>
+		
+		<if test="tnb != null">
+			OR ((factor_code = 'diabetes' AND factor_level >3) OR factor_code= 'HY.CJJB.TNB')
+		</if>
+		
+		<if test="gxb != null">
+			OR ((factor_code = 'chd' AND factor_level >3) OR factor_code= 'HY.CJJB.GXB')
+		</if>
+		
+		<if test="gxb != null">
+			OR (factor_code = 'af' AND factor_level >3)
+		</if>
+		</trim>
+	</select>
+	
+	<select id="findAllTargetForMessage"
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT id, `name`, cellphone FROM diagnose_target  
+		WHERE cellphone IS NOT NULL AND cellphone != ''
+	</select>
+	
+	<select id="findOldTarget"  
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != '' AND #{birthday} > a.birthday 
+	</select>
+	
+	<select id="findHypertensionTarget" 
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != ''
+		AND ((factor_code = 'hypertension' AND factor_level >3) OR factor_code= 'HY.CJJB.GXY')
+	</select>
+	
+	<select id="findDiabetesTarget" 
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != ''
+		AND ((factor_code = 'diabetes' AND factor_level >3) OR factor_code= 'HY.CJJB.TNB')
+	</select>
+	
+	<select id="findCHDTarget" 
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != ''
+		AND ((factor_code = 'chd' AND factor_level >3) OR factor_code= 'HY.CJJB.GXB')
+	</select>
+	
+	<select id="findAFTarget" 
+		resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
+		SELECT DISTINCT(a.id), a.`name`, cellphone FROM diagnose_target a, diagnose_target_factor b 
+		WHERE a.id = b.target_id AND a.cellphone IS NOT NULL AND a.cellphone != ''
+		AND factor_code = 'af' AND factor_level >3
+	</select>
+	
 </mapper>

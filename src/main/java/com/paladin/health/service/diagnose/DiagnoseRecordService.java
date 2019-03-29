@@ -1,24 +1,23 @@
 package com.paladin.health.service.diagnose;
 
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ServiceSupport;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
-import com.paladin.health.service.diagnose.dto.DiagnoseRecordQueryDTO;
-import com.paladin.health.service.diagnose.vo.DiagnoseRecordSimpleVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.paladin.health.service.diagnose.dto.DiagnoseRecordQuery;
+
 import org.springframework.stereotype.Service;
 
 @Service
-public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord>{
+public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 
-    @Autowired
-    private DiagnoseTargetFactorService diagnoseTargetFactorService;
+	public PageResult<DiagnoseRecord> findRecordByTarget(DiagnoseRecordQuery query) {
+		String targetId = query.getTargetId();
+		if(targetId == null || targetId.length() == 0) {
+			throw new BusinessException("必须传入查询目标ID");
+		}
+		
+		return searchPage(query);
+	}
 
-    public PageResult<DiagnoseRecordSimpleVO> searchDiagnoseRecordsByQuery(DiagnoseRecordQueryDTO query) {
-        Page<DiagnoseRecordSimpleVO> page = PageHelper.offsetPage(query.getOffset(),query.getLimit());
-        diagnoseTargetFactorService.searchDiagnoseTargetFactor(query);
-        return  new PageResult<>(page);
-    }
 }

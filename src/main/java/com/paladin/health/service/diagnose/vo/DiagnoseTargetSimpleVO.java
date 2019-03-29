@@ -8,7 +8,7 @@ import java.util.Date;
  * @author Huangguochen
  * @create 2019/3/20 11:17
  */
-public class DiagnoseRecordSimpleVO {
+public class DiagnoseTargetSimpleVO {
 
     private String id;
 

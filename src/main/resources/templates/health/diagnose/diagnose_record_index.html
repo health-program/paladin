@@ -4,46 +4,22 @@
 <head th:include="/health/header" />
 
 <body>
-    <tt:constant enumcode="xk-disease-type,xk-evaluate-type,xk-index-type,sex-type" />
     <section class="content-header">
         <h1>健康处方历史</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/diagnose/target/index"><i class="fa fa-list-alt"></i>病人列表</a></li>
+            <li class="active" th:text="${targetName}"></li>
+        </ol>
     </section>
+    <input type="hidden" id="targetId" th:value="${targetId}" />
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
-                <i class="fa fa-search"></i>
-                <h3 class="box-title">查询</h3>
-            </div>
-            <div class="box-body">
-                <form id="searchbar" class="form-horizontal">
-                    <div class="form-group">
-                        <div class="col-md-3">
-                            <input type="text" name="name" placeholder="请输入姓名" class="form-control" th:value="${query?.name}" />
-                        </div>
-                        <div class="col-md-9">
-                            <div class="pull-right">
-                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-                <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
-                <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
-            </div>
-        </div>
-        <div class="box box-solid" style="margin-top:20px">
-            <div class="box-header with-border">
                 <i class="fa fa-list-alt"></i>
-                <h3 class="box-title">结果</h3>
+                <h3 class="box-title">历史记录</h3>
             </div>
             <div id="result" class="box-body">
                 <table id="dataGrid"></table>
-                <!--<div id="toolbar">
-                <div class="btn-group">
-                    <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
-                </div>
-            </div>-->
             </div>
         </div>
     </section>
@@ -56,19 +32,11 @@
     });
 
     function initDataGrid() {
-        var limit = $("#pageLimit").val();
-        var offset = $("#pageOffset").val();
-        var page = (limit && offset) ? offset / limit + 1 : 1;
         table = $.createTable("#dataGrid", {
             idField: "id",
             columns: [
                 [
-                    { title: "姓名", align: "center", width: "10%", field: "name" },
-                    { title: "身份证号码", align: "center", width: "15%", field: "id" },
-                    { title: "性别", align: "center", width: "5%", field: "sex", enumcode: "sex-type" },
-                    { title: "手机号码", align: "center", width: "10%", field: "cellphone" },
-                    { title: "出生日期", align: "center", width: "10%", field: "birthday", formatter: "date" },
-                    { title: "危险因数", field: "factors", width: "40%", formatter: operateFormatter },
+                    { title: "时间", field: "createTime", formatter: "datetime" },
                     {
                         title: "操作",
                         align: "center",
@@ -83,16 +51,14 @@
                                 '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
                                 '<i class="glyphicon glyphicon-edit"></i>详情',
                                 '</button>'
-                            ].join('');                            
+                            ].join('');
                         }
                     }
                 ]
             ],
-            url: '/health/diagnose/target/search',
+            url: '/health/diagnose/record/search?targetId=' + $("#targetId").val(),
             searchbar: '#searchbar',
             showColumns: true,
-            pageSize: limit || undefined,
-            pageNumber: page || 1,
             pagination: true,
             toolbar: "#toolbar",
             showRefresh: true
@@ -100,8 +66,18 @@
     }
 
     function detail(row) {
-		window.location = '/health/diagnose/record/index?targetId=' + row.id + '&targetName=' + row.name;
+        $.getAjax("/health/diagnose/record/get?id=" + row.id, showDetail);
     }
+
+
+    function showDetail(data) {
+
+        var html = "<div style='margin:40px;margin-right:55px'><pre><code>" + data.targetCondition + "</code></pre>" +
+            "<pre><code>" + data.prescription + "</code></pre></div>";
+
+        $.openPageLayer(html);
+    }
+
 
     function operateFormatter(value, row, index) {
         if (value) {

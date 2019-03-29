@@ -8,7 +8,7 @@ import com.paladin.framework.common.OffsetPage;
  * @author Huangguochen
  * @create 2019/3/20 14:46
  */
-public class DiagnoseRecordQueryDTO  extends OffsetPage {
+public class DiagnoseTargetQuery  extends OffsetPage {
 
     private String name;
 

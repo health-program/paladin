@@ -30,7 +30,7 @@ public class ShortMessageSender {
 				ary[i] = new org.apache.axis.types.URI("tel:" + cellphones[i]);
 			}
 			reqeuest.setDestinationAddresses(ary);
-			stub.sendSms(reqeuest);
+			stub.sendSms(reqeuest);		
 		} catch (Exception e) {
 			return false;
 		}

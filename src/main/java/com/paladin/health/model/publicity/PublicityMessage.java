@@ -22,7 +22,8 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	public final static int TYPE_SHORT_MESSAGE = 3;
 	
 	public final static String COLUMN_FIELD_STATUS = "status";
-
+	public final static String COLUMN_FIELD_IS_SEND = "isSend";
+	public final static String COLUMN_FIELD_TYPE = "type";
 	@Id
 	@GeneratedValue(generator = "UUID")
 	private String id;
@@ -51,6 +52,8 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	private Date publishTime;
 
 	private String publishTarget;
+	
+	private Integer isSend;
 		
 	public String getId() {
 		return id;
@@ -154,6 +157,14 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
+	}
+
+	public Integer getIsSend() {
+		return isSend;
+	}
+
+	public void setIsSend(Integer isSend) {
+		this.isSend = isSend;
 	}
 
 }

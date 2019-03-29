@@ -15,7 +15,7 @@
 
 
 	<select id="searchDiagnoseTargetFactor"
-			resultType="com.paladin.health.service.diagnose.vo.DiagnoseRecordSimpleVO">
+			resultType="com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO">
 		SELECT
 		dt.id,
 		dt.`name`,

@@ -8,6 +8,7 @@ import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 public class DiagnoseRecord {
 
 	public final static String TYPE_XK = "XK";
+	public final static String COLUMN_FIELD_TARGET_ID= "targetId";
 	
 	@Id
 	private String id;

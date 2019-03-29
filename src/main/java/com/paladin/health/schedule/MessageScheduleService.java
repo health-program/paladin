@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.common.Condition;
-import com.paladin.framework.common.QueryType;
-import com.paladin.health.model.publicity.PublicityMessage;
-import com.paladin.health.model.publicity.PublicityMessagePush;
-import com.paladin.health.service.publicity.PublicityMessagePushService;
+import com.paladin.framework.common.PageResult;
+import com.paladin.health.service.diagnose.DiagnoseTargetService;
+import com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO;
 import com.paladin.health.service.publicity.PublicityMessageService;
+import com.paladin.health.service.publicity.vo.PublicityMessageVO;
+import com.paladin.health.service.sms.ShortMessageSender;
 
 @Component
 public class MessageScheduleService {
@@ -24,23 +24,10 @@ public class MessageScheduleService {
 	private PublicityMessageService publicityMessageService;
 
 	@Autowired
-	private PublicityMessagePushService publicityMessagePushService;
+	private DiagnoseTargetService diagnoseTargetService;
 
-	// 0 0 1 * * ? 每天凌晨1点执行
-	/**
-	 * 每天凌晨1点执行，检查需要推送的消息
-	 */
-	@Scheduled(cron = "0 0 1 * * ?")
-	public void checkMessage() {
-
-		List<PublicityMessage> messages = publicityMessageService
-				.searchAll(new Condition(PublicityMessage.COLUMN_FIELD_STATUS, QueryType.EQUAL, PublicityMessage.STATUS_EXAMINE_SUCCESS));
-
-		for (PublicityMessage message : messages) {
-			String id = message.getId();
-			publicityMessagePushService.pushMessage(id, message.getType(), message.getPublishTime());
-		}
-	}
+	@Autowired
+	private ShortMessageSender shortMessageSender;
 
 	// 0 0 2 * * ? 每天凌晨2点执行
 	/**
@@ -49,47 +36,43 @@ public class MessageScheduleService {
 	@Scheduled(cron = "0 0 2 * * ?")
 	public void sendMessage() {
 
-		List<PublicityMessagePush> messagePushs = publicityMessagePushService.findSendMessage();
+		List<PublicityMessageVO> messages = publicityMessageService.findSendMessage();
 
-		PublicityMessage message = null;
-		String messageId = null;
+		for (PublicityMessageVO message : messages) {
 
-		for (PublicityMessagePush messagePush : messagePushs) {
-			String id = messagePush.getMessageId();
-			if (!id.equals(messageId) || message == null) {
-				messageId = id;
-				message = publicityMessageService.get(messageId);
-			}
+			String id = message.getId();
+			String publishTarget = message.getPublishTarget();
+			String content = "【健康促进中心】" + message.getContent();
 
-			int result = 0;
+			int limit = 100;
+			int offset = 0;
 
-			int channel = messagePush.getChannel();
+			PageResult<DiagnoseTargetSimpleVO> result = null;
+
+			do {
+				try {
+					result = diagnoseTargetService.findTarget2SendMessage(publishTarget, offset, limit);
+				} catch (Exception e) {
+					logger.error("发送短信失败，查找短信发送目标异常：" + publishTarget, e);
+					break;
+				}
+
+				for (DiagnoseTargetSimpleVO target : result.getData()) {
+					try {
+						shortMessageSender.sendMessage(content, target.getCellphone());
+						
+						// TODO 记录发送成功或失败到数据库
+					} catch (Exception e) {
+						logger.error("发送短信[ID:" + id + "]失败，发送目标[" + target.getName() + ":" + target.getCellphone() + "]", e);
+					}						
+				}
+
+				offset += limit;
+			} while (offset < result.getTotal());
 			
-			// TODO 发送信息
-//			if (channel == PublicityMessagePush.CHANNEL_APP) {
-//				logger.info("发送消息给APP[" + id + "]");
-//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-//			} else if (channel == PublicityMessagePush.CHANNEL_CELLPHONE) {
-//				logger.info("发送消息给短信[" + id + "]");
-//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-//			} else if (channel == PublicityMessagePush.CHANNEL_WEIXIN) {
-//				logger.info("发送消息给微信[" + id + "]");
-//				result = PublicityMessagePush.STATUS_SEND_SUCCESS;
-//			} else {
-//				result = 99;
-//			}
-			
-			//TODO 发送信息
-
-			Integer times = messagePush.getTryTimes();
-			if (times == null)
-				times = 0;
-
-			messagePush.setTryTimes(times + 1);
-			messagePush.setStatus(result);
-
-			publicityMessagePushService.update(messagePush);
+			publicityMessageService.updateToSended(id);
 		}
+
 	}
 
 }

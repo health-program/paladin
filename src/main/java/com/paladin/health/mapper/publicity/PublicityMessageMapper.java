@@ -17,12 +17,15 @@ public interface PublicityMessageMapper extends CustomMapper<PublicityMessage> {
 
 	public PublicityMessageVO getMessage(@Param("id") String id);
 
-    List<PublicityMessageVO> findDisplay();
+	public List<PublicityMessageVO> findDisplay();
     
-    List<PublicityMessageVO> findPublishedMessage(PublicityMessageQueryDTO query);
+	public List<PublicityMessageVO> findPublishedMessage(PublicityMessageQueryDTO query);
 
-	PublicityMessageVO findPreMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
+	public PublicityMessageVO findPreMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
 
+	public PublicityMessageVO findNextMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
 
-	PublicityMessageVO findNextMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
+	public List<PublicityMessageVO> findSendMessage();
+	
+	public int updateToSended(@Param("id")String id);
 }

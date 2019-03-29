@@ -128,31 +128,9 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	public Object display(@RequestParam String id, Model model) {
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messageList = publicityMessageService.showDisplayMessage();
-//		queryDTO.setLimit(100);
-//		PageResult<PublicityMessageVO> messagesResult = publicityMessageService.findPublishedMessages(queryDTO);
-//		List<PublicityMessageVO> messages = messagesResult.getData();
-//		PublicityMessageVO preMessage = new PublicityMessageVO();
-//		PublicityMessageVO nextMessage = new PublicityMessageVO();
-//		for (int i = 0; i < messages.size(); i++) {
-//			if (messages.get(i).getId().equals(message.getId())) {
-//				if (messages.size() > 1) {
-//					if (i > 0 && i < messages.size() - 1) {
-//						preMessage = messages.get(i - 1);
-//						nextMessage = messages.get(i + 1);
-//					}
-//					if (i == 0) {
-//						nextMessage = messages.get(i + 1);
-//
-//					}
-//					if (i == messages.size() - 1) {
-//						preMessage = messages.get(i - 1);
-//					}
-//				}
-//			}
-//		};
 
-		PublicityMessageVO preMessage = publicityMessageService.showPreMessage(null, message.getPublishTime());
-		PublicityMessageVO nextMessage = publicityMessageService.showNextMessage(null, message.getPublishTime());
+		PublicityMessageVO preMessage = publicityMessageService.showPreMessage(id, message.getPublishTime());
+		PublicityMessageVO nextMessage = publicityMessageService.showNextMessage(id, message.getPublishTime());
 		model.addAttribute("message", message);
 		model.addAttribute("preMessage", preMessage);
 		model.addAttribute("nextMessage", nextMessage);

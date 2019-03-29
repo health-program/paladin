@@ -6,15 +6,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.service.diagnose.DiagnoseRecordService;
-import com.paladin.health.service.diagnose.dto.DiagnoseRecordQueryDTO;
+import com.paladin.health.service.diagnose.DiagnoseTargetFactorService;
+import com.paladin.health.service.diagnose.dto.DiagnoseTargetQuery;
 
 @Controller
 @RequestMapping("/health/diagnose/target")
 public class DiagnoseTargetController {
 
 	@Autowired
-	private DiagnoseRecordService diagnoseRecordService;
+	private DiagnoseTargetFactorService diagnoseTargetFactorService;
 
 	/**
 	 * 功能描述: <br>
@@ -31,8 +31,11 @@ public class DiagnoseTargetController {
 	 */
 	@RequestMapping("/search")
 	@ResponseBody
-	public Object diagnoseRecordsFindPage(DiagnoseRecordQueryDTO query) {
-		return CommonResponse.getSuccessResponse(diagnoseRecordService.searchDiagnoseRecordsByQuery(query));
+	public Object diagnoseRecordsFindPage(DiagnoseTargetQuery query) {
+		return CommonResponse.getSuccessResponse(diagnoseTargetFactorService.searchDiagnoseTargetByQuery(query));
 	}
+	
+	
+	
 
 }

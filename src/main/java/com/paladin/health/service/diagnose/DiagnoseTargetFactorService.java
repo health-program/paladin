@@ -1,10 +1,13 @@
 package com.paladin.health.service.diagnose;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.health.mapper.diagnose.DiagnoseTargetFactorMapper;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
-import com.paladin.health.service.diagnose.dto.DiagnoseRecordQueryDTO;
-import com.paladin.health.service.diagnose.vo.DiagnoseRecordSimpleVO;
+import com.paladin.health.service.diagnose.dto.DiagnoseTargetQuery;
+import com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +26,10 @@ public class DiagnoseTargetFactorService extends ServiceSupport<DiagnoseTargetFa
 	public boolean removeByTarget(String targetId) {
 		return diagnoseTargetFactorMapper.deleteByTarget(targetId) > 0;
 	}
-
-	public List<DiagnoseRecordSimpleVO> searchDiagnoseTargetFactor(DiagnoseRecordQueryDTO query) {
-		return diagnoseTargetFactorMapper.searchDiagnoseTargetFactor(query);
-	}
+	
+    public PageResult<DiagnoseTargetSimpleVO> searchDiagnoseTargetByQuery(DiagnoseTargetQuery query) {
+        Page<DiagnoseTargetSimpleVO> page = PageHelper.offsetPage(query.getOffset(),query.getLimit());
+        diagnoseTargetFactorMapper.searchDiagnoseTargetFactor(query);
+        return  new PageResult<>(page);
+    }
 }

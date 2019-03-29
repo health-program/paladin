@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class XKDiagnoseController {
 
 	@Autowired
-	private XKHealthPrescriptionService healthPrescriptionService;
-
+	private XKHealthPrescriptionService healthPrescriptionService;	
 
 	@RequestMapping("/evaluate/input")
 	public Object input() {

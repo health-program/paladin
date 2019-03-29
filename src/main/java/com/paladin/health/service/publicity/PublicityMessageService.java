@@ -169,7 +169,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 				query = new PublicityMessageQueryDTO();
 			}
 			query.setCreateUserId(session.getUserId());
-		} 
+		}
 
 		return findMessage(query);
 	}
@@ -227,11 +227,19 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return publicityMessageMapper.findDisplay();
 	}
 
-  public PublicityMessageVO showPreMessage(String id, Date publishTime) {
-		return  publicityMessageMapper.findPreMessage(id,publishTime);
-  }
+	public PublicityMessageVO showPreMessage(String id, Date publishTime) {
+		return publicityMessageMapper.findPreMessage(id, publishTime);
+	}
 
 	public PublicityMessageVO showNextMessage(String id, Date publishTime) {
-		return  publicityMessageMapper.findNextMessage(id,publishTime);
+		return publicityMessageMapper.findNextMessage(id, publishTime);
+	}
+
+	public List<PublicityMessageVO> findSendMessage() {
+		return publicityMessageMapper.findSendMessage();
+	}
+
+	public boolean updateToSended(String id) {
+		return publicityMessageMapper.updateToSended(id) > 0;
 	}
 }
