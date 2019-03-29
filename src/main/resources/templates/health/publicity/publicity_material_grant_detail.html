@@ -90,9 +90,9 @@
 						action="/health/publicity/material/grant/update" method="post"
 						class="form-horizontal edit-body">
 						<div class="form-group">
-							<label for="workCycle" class="col-sm-3 control-label">工作周期：</label>
+							<label for="workCycle" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>工作周期：</label>
 							<div class="col-sm-3">
-								<input name="workCycle" type="text" placeholder="请输入工作周期"
+								<input name="workCycle" required="required" type="text" placeholder="请输入工作周期"
 									class="form-control tonto-datepicker-year" autocomplete="off" />
 							</div>
 							<label for="materialName" class="col-sm-2 control-label">资料名称：</label>
@@ -105,65 +105,61 @@
 							<label for="materialType" class="col-sm-3 control-label">资料类型：</label>
 							<div class="col-sm-3">
 								<select name="materialType" class="form-control tonto-select-constant" enumcode="publicity-material-type" readonly="readonly">
-									<option value="">请选择</option>
 								</select>
 							</div>
-							<label for="count" class="col-sm-2 control-label">数量：</label>
+							<label for="count" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>数量：</label>
 							<div class="col-sm-3">
-								<input name="count" placeholder="请输入数量" type="number" onchange="checkCount(this.value);"
-									class="form-control">
+								<input name="count" required="required" placeholder="请输入数量" type="number" onchange="checkCount(this.value);"
+									class="form-control" autocomplete="off">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="grantDate" class="col-sm-3 control-label">发放日期：</label>
+							<label for="grantDate" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放日期：</label>
 							<div class="col-sm-3">
-								<input name="grantDate" placeholder="请输入发放日期" type="text"
+								<input name="grantDate" required="required" placeholder="请输入发放日期" type="text"
 									class="form-control tonto-datepicker-date" autocomplete="off">
 							</div>
-							<label for="grantTargetType" class="col-sm-2 control-label">发放对象类型：</label>
+							<label for="grantTargetType" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放对象类型：</label>
 							<div class="col-sm-3">
-								<select name="grantTargetType" class="form-control tonto-select-constant" enumcode="grant-target-type">
-									<option value="">请选择</option>
+								<select name="grantTargetType" required="required" class="form-control tonto-select-constant" enumcode="grant-target-type">
 								</select>
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="grantTarget" class="col-sm-3 control-label">发放对象：</label>
+							<label for="grantTarget" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放对象：</label>
 							<div class="col-sm-3">
 								<select name="grantTarget" class="form-control">
-                                   <option value="">请选择</option>
-                                   <option th:each="agency : ${agencyList}" th:value="${agency.Id}" 
+                                   <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
                                    th:selected="${grantTarget == agency.Id}"
                                    th:text="${agency.name}"></option>
                                </select>
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="grantor" class="col-sm-3 control-label">发放人：</label>
+							<label for="grantor" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放人：</label>
 							<div class="col-sm-3">
-								<input name="grantor" placeholder="请输入发放人" type="text"
-									class="form-control">
+								<input name="grantor" required="required" placeholder="请输入发放人" type="text"
+									class="form-control" autocomplete="off">
 							</div>
-							<label for="grantorAgency" class="col-sm-2 control-label">发放机构：</label>
+							<label for="grantorAgency" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放机构：</label>
 							<div class="col-sm-3">
 							    <select name="grantorAgency" class="form-control">
-                                   <option value="">请选择</option>
-                                   <option th:each="agency : ${agencyList}" th:value="${agency.Id}" 
+                                   <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
                                    th:selected="${grantorAgency == agency.Id}"
                                    th:text="${agency.name}"></option>
                                </select>
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="receiver" class="col-sm-3 control-label">接收人：</label>
+							<label for="receiver" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>接收人：</label>
 							<div class="col-sm-3">
-								<input name="receiver" placeholder="请输入接收人" type="text"
-									class="form-control">
+								<input name="receiver" required="required" placeholder="请输入接收人" type="text"
+									class="form-control" autocomplete="off">
 							</div>
 							<label for="remarks" class="col-sm-2 control-label">备注：</label>
 							<div class="col-sm-3">
 								<input name="remarks" placeholder="请输入备注" type="text"
-									class="form-control">
+									class="form-control" autocomplete="off">
 							</div>
 						</div>
 						<div class="form-group">
