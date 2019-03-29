@@ -1,54 +1,48 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:include="/health/header" />
-<link rel="stylesheet" href="/static/assets/bootstrap-treeview/bootstrap-treeview.min.css" />
-<style>
-    .tab-content>.tab-pane, .pill-content>.pill-pane {
-	display: block;
-	height: 0;
-	overflow-y: hidden;
-}
+<head>
+    <title>宣教系统</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/static/css/ionicons.min.css" />
+    <link rel="stylesheet" href="/static/css/iconfont.css" />
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css" />
+</head>
 
-.tab-content>.active, .pill-content>.active {
-	height: auto;
-}
-</style>
-
-<body>
-    <section class="content">
-        <div class="container">
-         <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-search"></i>
-                <h3 class="box-title">查询</h3>
-            </div>
-            <div class="box-body">
-        	<input type="hidden" id="symptomKey" th:value="${symptomKey}"/>
-        	<input type="hidden" id="symptomName" th:value="${symptomName}"/>        
-            <div class="col-md-12">
-            	<div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="symptomInput" placeholder="请输入症状名称或拼音" /> 
-                        <span class="input-group-btn">
-			                <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_menu()"><i class="fa fa-search"></i>
-			                </button>
-			                <ul class="dropdown-menu dropdown-menu-right" role="menu">
-                            </ul>
-			             </span>                                          
+<body class="layout-top-nav skin-green-light">
+    <div class="wrapper">
+        <div th:include="/health/open/open_top" />
+        <!-- Full Width Column -->
+        <div class="content-wrapper">
+            <div class="container">
+                <div class="box box-solid" style="margin-top: 20px">
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="symptomInput" placeholder="请输入疾病或指标名称" />
+                                    <div class="input-group-btn">
+                                        <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div id="content" class="col-md-12">
-            
-     
+                <div id="summary">
+                </div>
+                <div id="detail" class="nav-tabs-custom">
+                </div>
             </div>
         </div>
-       </div>
-       </div>
-    </section>
-    <div th:include="/health/footer" />
-    <script type="text/javascript" src="/static/assets/bootstrap-treeview/bootstrap-treeview.min.js"></script>
+    </div>
+    </div>
+    <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/assets/adminLTE/js/adminlte.min.js"></script>
     <script type="text/javascript" src="/static/js/health/xk/symptom_index.js"></script>
     <script type="text/javascript" src="/static/assets/bootstrap-suggest/bootstrap-suggest.js"></script>
 </body>

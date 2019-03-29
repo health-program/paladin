@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
     <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/css/ionicons.min.css">
-    <link rel="stylesheet" href="/static/css/iconfont.css">
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css">
-    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/static/css/ionicons.min.css"/>
+    <link rel="stylesheet" href="/static/css/iconfont.css"/>
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css"/>
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css"/>
     <link rel="stylesheet" type="text/css" href="/static/js/sliderPro/css/slider-pro.css" media="screen" />
     <style type="text/css">
     .video-list {
@@ -131,61 +131,62 @@
         <div th:include="/health/open/open_top" />
         <!-- Full Width Column -->
         <div class="content-wrapper">
-            <div class="container" style="background-color: #fff">
-                <div id="example1" class="slider-pro sli">
-                    <div class="sp-slides" th:each="video,iter: ${videos}">
-                        <div class="sp-slide">
-                            <img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}" th:onclick="play([[${video.id}]])"/>
-                            <p class="sp-layer sp-white sp-padding" style="text-align: center" data-horizontal="17%" data-vertical="5" data-width="50%" data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200" th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
-                            </p>
-                        </div>
-                    </div>
-                    <!-- <div class="sp-thumbnails">
+            <div class="container">
+                <div class="box box-solid" style="margin-top: 20px">
+                    <div class="box-body">
+                        <div id="example1" class="slider-pro sli">
+                            <div class="sp-slides" th:each="video,iter: ${videos}">
+                                <div class="sp-slide">
+                                    <img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}" th:onclick="play([[${video.id}]])"/>
+                                    <p class="sp-layer sp-white sp-padding" style="text-align: center" data-horizontal="17%" data-vertical="5" data-width="50%" data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200" th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- <div class="sp-thumbnails">
                         <div class="sp-thumbnail" th:each="video,iter: ${videos}">
                             <div class="sp-thumbnail-description"><img  style="width:200px" th:src="@{'/file/'+${video.showImageUrl.pelativePath}}"></img></div>
                         </div>
                     </div> -->
-                </div>
-                <div class="row block">
-                    <h4 align='center'><strong>视频列表</strong></h4>
-                    <div class="pull-right">
-                        <a class="btn" id="model_edit_btn" href="/open/health/message/center/video/index">查看更多></a>
-                    </div>
-                </div>
-                <div class="row block">
-                    <div class="col-sm-3" style="text-align: center;" th:each="video,iter: ${videosAll}">
-                        <span><a th:href="${'/open/health/message/center/play?id='+ video.id}">
-                                        <img  th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT"></a></span>
-                        <div class="detail">
-                            <div>
-                                <strong><a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a></strong>
-                            </div>
-                            <div>
-                                <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
+                        </div>
+                        <div class="row block">
+                            <h4 align='center'><strong>视频列表</strong></h4>
+                            <div class="pull-right">
+                                <a class="btn" id="model_edit_btn" href="/open/health/message/center/video/index">查看更多></a>
                             </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row block">
-                    <h4 align='center'><strong>公告列表</strong></h4>
-                    <div class="pull-right">
-                        <a class="btn" id="model_edit_btn" href="/open/health/message/center/message/index">查看更多></a>
-                    </div>
-                </div>
-                <div class="row block">
-                    <div class="post" style="padding-right: 30px;padding-left: 30px" th:each="message,iter: ${messages}">
-                        <img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
-                        <div class="notice-box">
-                            <div>
-                                <h4 ><strong th:text="${message.title}"></strong></h4>
+                        <div class="row block">
+                            <div class="col-sm-3" style="text-align: center;" th:each="video,iter: ${videosAll}">
+                                <span><a th:href="${'/open/health/message/center/play?id='+ video.id}">
+                                        <img  th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" alt="ATTACHMENT"></a></span>
+                                <div class="detail">
+                                    <div>
+                                        <strong><a class="name" th:href="${'/open/health/message/center/play?id='+ video.id}" th:text="${video.name}"></a></strong>
+                                    </div>
+                                    <div>
+                                        <span>发布时间：</span><span th:text="${#dates.format(video.publishTime, 'yyyy-MM-dd')}"></span>
+                                    </div>
+                                </div>
                             </div>
-                            <div style="font-size:10px; color:#999">
-                                <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
-                                <span th:text="${message.label}"></span>
+                        </div>
+                        <div class="row block">
+                            <h4 align='center'><strong>公告列表</strong></h4>
+                            <div class="pull-right">
+                                <a class="btn" id="model_edit_btn" href="/open/health/message/center/message/index">查看更多></a>
                             </div>
-                            <div id="noticeContent" th:utext="${message.summary}"></div>
-                            <div class="btnContent">
-                                <a class="btn-detail" th:onclick="detail([[${message.id}]])">查看详情</a>
+                        </div>
+                        <div class="row block">
+                            <div class="post" style="padding-right: 30px;padding-left: 30px" th:each="message,iter: ${messages}">
+                                <img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
+                                <div class="notice-box">
+                                    <div>
+                                        <h4 ><a th:href="${'/open/health/message/center/display/index?id='+ message.id}"><strong th:text="${message.title}"></strong></a></h4>
+                                    </div>
+                                    <div style="font-size:10px; color:#999">
+                                        <span th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>
+                                        <span th:text="${message.label}"></span>
+                                    </div>
+                                    <div id="noticeContent" th:utext="${message.summary}"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -235,9 +236,6 @@
         window.location.href = "/open/health/message/center/play?id=" + value;
     }
 
-    function detail(value) {
-        window.location.href = "/open/health/message/center/display/index?id=" + value;
-    }
     </script>
 </body>
 
