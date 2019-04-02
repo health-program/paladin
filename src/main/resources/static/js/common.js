@@ -1048,7 +1048,9 @@ function _initTable() {
 
         if (!options.classes) {
             if (window.screen.height <= 900 || window.screen.width <= 1600) {
-                options.classes = "table table-hover table-condensed";
+                options.classes = "table table-hover table-border table-striped table-condensed";
+            } else {
+                options.classes = "table table-hover table-border table-striped";
             }
         }
 
