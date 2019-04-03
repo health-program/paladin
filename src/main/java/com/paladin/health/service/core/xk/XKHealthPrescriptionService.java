@@ -1,20 +1,5 @@
 package com.paladin.health.service.core.xk;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.ConstantsContainer.KeyValue;
 import com.paladin.framework.common.BaseModel;
@@ -30,6 +15,14 @@ import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 import com.paladin.health.service.diagnose.DiagnoseTargetFactorService;
 import com.paladin.health.service.diagnose.DiagnoseTargetService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.util.*;
 
 @Service
 @SuppressWarnings("rawtypes")
@@ -242,12 +235,12 @@ public class XKHealthPrescriptionService {
 			record.setId(diagnoseId);
 			record.setTargetId(identificationId);
 			record.setTargetCondition(JsonUtil.getJson(condition));
+			result.setId(diagnoseId);
 			record.setPrescription(JsonUtil.getJson(result));
 			record.setType(DiagnoseRecord.TYPE_XK);
 			record.setCreateTime(now);
 
 			diagnoseRecordService.save(record);
-			result.setId(diagnoseId);
 		}
 
 		return result;

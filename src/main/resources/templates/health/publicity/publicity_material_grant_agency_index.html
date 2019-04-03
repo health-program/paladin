@@ -65,12 +65,17 @@
               <div class="box box-solid">
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
-                <div class="input-group" style="width:100%">
-                     <label for="agencyName"  class="col-md-1 control-label">机构名称</label>
-	                    <div class="col-md-2">
-	                       <input type="text" id="agencyName2" name="agencyName" class="form-control" placeholder="请输入机构" >
-	                    </div>
-                   </div>
+                    <div class="input-group" style="width:100%">
+                        <label for="agencyName" class="col-md-1 control-label">机构名称</label>
+                        <div class="col-md-2">
+                            <input type="text" id="agencyName2" name="agencyName" class="form-control"
+                                   placeholder="请输入机构">
+                        </div>
+                        <label for="workCycle"  class="col-md-1 control-label">工作周期</label>
+                        <div class="col-md-2">
+                            <input type="text" id="workCycle1" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间" >
+                        </div>
+                    </div>
                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
                     <input type="text" style="display:none">
                 </form>
@@ -120,8 +125,6 @@
     <script type="text/javascript">
     var table;
     $(function() {
-    	
-    	
         initDataGrid();
         chartsYear(yearCharts);
     	chartsAgency(agencyCharts);
@@ -161,10 +164,13 @@
     var yearCharts = echarts.init(document.getElementById('yearCharts'));
     var agencyCharts = echarts.init(document.getElementById('agencyCharts'));
     function chartsAgency(agencyCharts) {
-		 var agencyName=$("#agencyName2").val();
-		$.postAjax("/health/publicity/material/grant/count/agency",{'agencyName':agencyName} ,function(result) {
+		 var agencyNameVal=$("#agencyName2").val();
+		 var workCycleVal=$("#workCycle1").val();
+		 var agencyName = agencyNameVal.length > 0 ? agencyNameVal : null;
+		 var workCycle = workCycleVal.length > 0 ? workCycleVal : null;
+		$.postAjax("/health/publicity/material/grant/count/agency",{'agencyName':agencyName,'workCycle':workCycle} ,function(result) {
 			var list = result;
-            if (list.length === 0) {
+            if (list.length === 1 && list[0].total === 0) {
                 showChartInfo(agencyCharts,'暂无数据');
                 return false;
             }
