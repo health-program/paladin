@@ -51,10 +51,9 @@
     }
 
     function parseContent(content) {
-        var arr = content.split(/[@#]/g);
 
         var s = "";
-        arr.forEach(function(a) {
+        content.forEach(function(a) {
             s += "<p>" + a + "</p>";
         });
 
