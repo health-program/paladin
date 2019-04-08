@@ -13,7 +13,7 @@
 	height: auto;
 }
 </style>
-<body>
+<body class="container">
     <input type="hidden" id="recordId" th:value="${recordId}"/>
     <input type="hidden" id="targetName" th:value="${targetName}"/>
     <input type="hidden" id="targetId" th:value="${targetId}"/>
@@ -35,13 +35,6 @@
             </ul>
             <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
-                        <!--<section class="content-header" style="padding-top: 25px">
-                            <h1></h1>
-                            <ol class="breadcrumb">
-                                <li><a  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${#strings.substring(targetName,0,2)})}"  href="/health/diagnose/record/index"><i class="fa fa-list-alt"></i>诊断列表</a></li>
-                                <li class="active" th:text="${targetName}"></li>
-                            </ol>
-                        </section>-->
                         <section class="content">
                             <div id="base"></div>
                             <div id="disease"></div>
