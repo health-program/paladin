@@ -43,7 +43,7 @@ public class VideoPlayPublishService extends ServiceSupport<VideoPlayPublish> {
 		}
 		videoPlayPublish.setCount(1);
 		videoPlayPublish.setYear(calendar.get(Calendar.YEAR));
-		videoPlayPublish.setMonth(calendar.get(Calendar.MONTH));
+		videoPlayPublish.setMonth(calendar.get(Calendar.MONTH) + 1 );
 		videoPlayPublish.setDay(calendar.get(Calendar.DAY_OF_MONTH));
 		return save(videoPlayPublish);
 	}
