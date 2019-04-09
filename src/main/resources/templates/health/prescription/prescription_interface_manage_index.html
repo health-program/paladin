@@ -17,9 +17,9 @@
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
                     <div class="form-group">
-                        <label for="name" class="col-md-2 control-label" >第三方名称：</label>
+                        <label for="name" class="col-md-1 control-label"  style="padding-right: 0px">第三方名称：</label>
                         <div class="col-md-2">
-                            <input name="name" class="form-control" placeholder="请输入第三方名称" />
+                            <input name="name" class="form-control" placeholder="请输入第三方名称"  th:value="${query?.name}"/>
                         </div>
                     </div>
 

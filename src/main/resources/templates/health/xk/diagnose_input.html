@@ -20,11 +20,38 @@
             <h1>健康处方获取DEMO</h1>
         </section>
         <section class="content">
-            <div id="base"></div>
-            <div id="disease"></div>
-            <div id="evaluate"></div>
-            <div class="col-sm-2 col-sm-offset-5 btn-back">
-                <a href="javascript:diagnose()" id="diagnoseBtn" class="btn btn-primary btn-block">提交</a>
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#tab_1" data-toggle="tab" aria-expanded="true">健康百科</a>
+                    </li>
+                    <li>
+                        <a href="#tab_2" data-toggle="tab" aria-expanded="true">风险评估</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1">
+                        <section class="content">
+                            <div id="disease"></div>
+                        </section>
+                        <section class="content-end">
+                            <div class="col-sm-2 col-sm-offset-5 btn-back">
+                                <a href="javascript:diagnoseDisease()" id="diagnoseBtn" class="btn btn-primary btn-block">提交</a>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="tab-pane" id="tab_2">
+                        <section class="content">
+                            <div id="base"></div>
+                            <div id="evaluate"></div>
+                        </section>
+                        <section class="content-end">
+                            <div class="col-sm-2 col-sm-offset-5 btn-back">
+                                <a href="javascript:diagnoseEvaluation()" id="diagnoseBtn1" class="btn btn-primary btn-block">提交</a>
+                            </div>
+                        </section>
+                    </div>
+                </div>
             </div>
         </section>
     </div>
@@ -191,7 +218,7 @@
         $.initComponment($(".content"));
     });
 
-    function diagnose() {
+  /*  function diagnose() {
         var request = jQuery.extend({}, baseModel.data);
         request.condition = evaluateModel.data;
         var d = diseaseModel.data;
@@ -206,7 +233,35 @@
             $.openPageLayer(html);
 
         }, $("#diagnoseBtn"))
+    }*/
+
+    function diagnoseDisease() {
+        let d = diseaseModel.data;
+        let ds = d && d.disease || [];
+        let is = d && d.index || [];
+        if ( ds.length === 0 && is.length === 0  ) {
+            $.errorMessage("请勾选疾病或指标");
+            return false
+        }
+        let codes = ds.concat(is);
+        $.postAjax("/xk/diagnose/disease",{"code":codes},function (data) {
+            var html = createKnowledgeHtml(data);
+            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
+            $.openPageLayer(html);
+        }, $("#diagnoseBtn"))
     }
+
+
+    function diagnoseEvaluation() {
+        let request = jQuery.extend({}, baseModel.data);
+        request.condition = evaluateModel.data;
+        $.postJsonAjax("/xk/diagnose/evaluation", request, function(data) {
+            let html = createEvaluateHtml(data);
+            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
+            $.openPageLayer(html);
+        }, $("#diagnoseBtn1"))
+    }
+
 
     function createEvaluateHtml(data) {
         var html = "";

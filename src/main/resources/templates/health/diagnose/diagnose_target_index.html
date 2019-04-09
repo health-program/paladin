@@ -17,14 +17,15 @@
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal">
                     <div class="form-group">
-                        <div class="col-md-3">
-                            <input type="text" name="name" placeholder="请输入姓名" class="form-control" th:value="${query?.name}" />
+                        <label for="name" class="col-md-1 control-label">姓名：</label>
+                        <div class="col-md-2">
+                            <input name="name" class="form-control" placeholder="请输入姓名" th:value="${query?.name}" />
                         </div>
-                        <div class="col-md-9">
-                            <div class="pull-right">
-                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
-                            </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="pull-right">
+                            <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                            <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
                         </div>
                     </div>
                 </form>
