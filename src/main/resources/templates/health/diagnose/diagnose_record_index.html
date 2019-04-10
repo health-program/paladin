@@ -12,6 +12,7 @@
         </ol>
     </section>
     <input type="hidden" id="targetId" th:value="${targetId}" />
+    <input type="hidden" id="targetName" th:value="${targetName}" />
     <section class="content">
         <div class="box box-solid">
             <div class="box-header with-border">
@@ -36,7 +37,7 @@
             idField: "id",
             columns: [
                 [
-                    { title: "时间", field: "createTime", formatter: "datetime" },
+                    { title: "时间", field: "createTime", formatter: "datetime" ,sortable:true},
                     {
                         title: "操作",
                         align: "center",
@@ -66,7 +67,10 @@
     }
 
     function detail(row) {
-        $.getAjax("/health/diagnose/record/get?id=" + row.id, showDetail);
+        let nameStr = $("#targetName").val();
+        let datetimeStr = datetimeFormat(row.createTime);
+        let targetName = nameStr + "(诊断时间:" + datetimeStr +")";
+        window.location = '/health/diagnose/record/detail?recordId='+ row.id+'&targetName='+targetName+"&targetId="+$("#targetId").val();
     }
 
 
@@ -77,154 +81,6 @@
 
         $.openPageLayer(html);
     }
-
-
-    function operateFormatter(value, row, index) {
-        if (value) {
-            var html = "";
-            let strs = value.split(",");
-            let factorstrs = strs.sort(factorsSort);
-            var disease = [],
-                risk5 = [],
-                risk4 = [],
-                risk3 = [];
-
-            factorstrs.forEach(function(factorstr, index) {
-                let factors = factorstr.split("-");
-                let factorCode = factors[0];
-                let factorType = factors[1];
-                let factorLevel = factors[2] * 1;
-
-                if (factorType == '1' || factorType == '2') {
-                    disease.push(getFactorCodeValue(factorCode, factorType));
-                } else {
-                    if (factorLevel == 3) {
-                        risk3.push(getFactorCodeValue(factorCode, factorType));
-                    } else if (factorLevel == 4) {
-                        risk4.push(getFactorCodeValue(factorCode, factorType));
-                    } else if (factorLevel == 5) {
-                        risk5.push(getFactorCodeValue(factorCode, factorType));
-                    }
-                }
-
-                // let factorCodeValue = getFactorCodeValue(factorCode,factorType);
-                // let factorLevelColor = getFactorLevelColor(factorLevel,factorType);
-                // let factorLevelIcon = getFactorLevelIcon(factorLevel,factorType);
-                // html += '<span class="label  '+factorLevelColor+'" style="margin-right:10px"><i class="'+factorLevelIcon+'"></i>&nbsp;'+factorCodeValue+'</span>';
-                // if ((index + 1) % 3 === 0) {
-                //     html += '<br>'
-                // }
-            });
-
-            html += '<dl class="dl-horizontal">';
-            var has = false;
-            if (disease.length > 0) {
-                html += parseHtml(disease, "疾病·症状", 'label-danger');
-                has = true;
-            }
-
-            if (risk5.length > 0) {
-                html += parseHtml(risk5, "极高风险", 'label-danger');
-                has = true;
-            }
-
-            if (risk4.length > 0) {
-                html += parseHtml(risk4, "高风险", 'label-danger');
-                has = true;
-            }
-
-            if (risk3.length > 0) {
-                html += parseHtml(risk3, "中风险", 'label-warning');
-                has = true;
-            }
-
-            html += '</dl>';
-
-            if (!has) {
-                return '<span class="label label-default"  ><i class="fa fa-info-circle"></i>&nbsp;暂无危险因素</span>';
-            }
-            return html
-        } else {
-            return '<span class="label label-default"  ><i class="fa fa-info-circle"></i>&nbsp;暂无危险因素</span>';
-        }
-    }
-
-    function parseHtml(arr, name, style) {
-        var html = "";
-        arr.forEach(function(a) {
-            html += (a.endsWith('风险评估') ? a.substring(0, a.length - 4) : a) + ' | '; //'<span class="label ' + style + '">' + a + '</span>';
-        });
-        return '<dt>' + name + '：</dt><dd style="text-align:left">' + html + '</dd>';
-    }
-
-
-    function getFactorCodeValue(factorCode, factorType) {
-        var factorValue;
-        if (factorType == "1") {
-            factorValue = $.getConstantEnumValue("xk-disease-type", factorCode);
-        } else if (factorType == "2") {
-            factorValue = $.getConstantEnumValue("xk-index-type", factorCode);
-        } else {
-            factorValue = $.getConstantEnumValue("xk-evaluate-type", factorCode);
-        }
-
-        return factorValue;
-    }
-
-    function getFactorLevelIcon(factorLevel, factorType) {
-        var icon = '';
-        if (factorType == "1") {
-            icon = 'fa fa-exclamation-triangle';
-        } else if (factorType == "2") {
-            icon = 'fa fa-exclamation-circle';
-        } else {
-            if (factorLevel == "1" || factorLevel == "2") {
-                icon = 'fa fa-bell-o';
-            } else if (factorLevel == "3" || factorLevel == "4") {
-                icon = 'fa fa-exclamation-circle';
-            } else {
-                icon = 'fa fa-exclamation-triangle';
-            }
-        }
-
-        return icon;
-    }
-
-
-    function getFactorLevelColor(factorLevel, factorType) {
-        var color = '';
-        if (factorType == "1") {
-            color = 'bg-purple';
-        } else if (factorType == "2") {
-            color = 'bg-aqua';
-        } else {
-            if (factorLevel == "1" || factorLevel == "2") {
-                color = 'bg-teal';
-            } else if (factorLevel == "3" || factorLevel == "4") {
-                color = 'label-warning';
-            } else {
-                color = 'label-danger';
-            }
-        }
-
-        return color;
-    }
-
-    function factorsSort(prevFactorStr, nextFactorStr) {
-        let prev = prevFactorStr.split("-");
-        let next = nextFactorStr.split("-");
-        let prevFactorLevel = prev[2].toString();
-        let nextFactorLevel = next[2].toString();
-        let prevFactorType = prev[1].toString();
-        let nextFactorType = next[1].toString();
-        if (nextFactorType == prevFactorType) {
-            return nextFactorLevel - prevFactorLevel;
-        } else {
-            return prevFactorType - nextFactorType;
-        }
-
-    }
-
     /*]]>*/
     </script>
 </body>

@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+
 /**
  * 基于熙康知识库
  * 
@@ -64,10 +66,28 @@ public class XKDiagnoseController {
 		return "/health/xk/diagnose_input";
 	}
 
-	@PostMapping("/diagnose")
+	/*@PostMapping("/diagnose")
 	@ResponseBody
 	public Object diagnose(@RequestBody XKPeopleCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
+	}*/
+
+	@PostMapping("/diagnose/disease")
+	@ResponseBody
+	public Object diagnoseDisease(@RequestParam("code[]") String[] codes) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseDiseases(Arrays.asList(codes)));
+	}
+
+	@PostMapping("/diagnose/index")
+	@ResponseBody
+	public Object diagnoseIndex(@RequestParam("code[]") String[] codes) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseDiseases(Arrays.asList(codes)));
+	}
+
+	@PostMapping("/diagnose/evaluation")
+	@ResponseBody
+	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition) {
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition));
 	}
 
 	@GetMapping("/tips/output")

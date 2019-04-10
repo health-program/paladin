@@ -13,54 +13,47 @@
 	height: auto;
 }
 </style>
-<body>
+<body class="container">
+    <input type="hidden" id="recordId" th:value="${recordId}"/>
+    <input type="hidden" id="targetName" th:value="${targetName}"/>
+    <input type="hidden" id="targetId" th:value="${targetId}"/>
     <tt:constant enumcode="boolean,sex-type,family-hypertension-type,xk-disease-type,xk-index-type" />
-    <div class="container">
-        <section class="content-header">
-            <h1>健康处方获取DEMO</h1>
-        </section>
-        <section class="content">
-            <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a href="#tab_1" data-toggle="tab" aria-expanded="true">健康百科</a>
-                    </li>
-                    <li>
-                        <a href="#tab_2" data-toggle="tab" aria-expanded="true">风险评估</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a href="#tab_1" data-toggle="tab" aria-expanded="true">诊断信息</a>
+                </li>
+                <li>
+                    <a href="#tab_2" data-toggle="tab" aria-expanded="true">处方结果</a>
+                </li>
+                <li class="pull-right">
+                    <ol class="breadcrumb no-margin">
+                        <li><a class="text-muted"  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${#strings.substring(targetName,0,2)})}"  href="/health/diagnose/record/index"><i class="fa fa-list-alt"></i>&nbsp;诊断列表</a></li>
+                        <li class="active" th:text="${targetName}"></li>
+                    </ol>
+                </li>
+            </ul>
+            <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
                         <section class="content">
-                            <div id="disease"></div>
+                            <div id="base"></div>
+                            <!--<div id="disease"></div>-->
+                            <div id="evaluate"></div>
                         </section>
-                        <section class="content-end">
-                            <div class="col-sm-2 col-sm-offset-5 btn-back">
-                                <a href="javascript:diagnoseDisease()" id="diagnoseBtn" class="btn btn-primary btn-block">提交</a>
-                            </div>
-                        </section>
+
                     </div>
                     <div class="tab-pane" id="tab_2">
                         <section class="content">
-                            <div id="base"></div>
-                            <div id="evaluate"></div>
-                        </section>
-                        <section class="content-end">
-                            <div class="col-sm-2 col-sm-offset-5 btn-back">
-                                <a href="javascript:diagnoseEvaluation()" id="diagnoseBtn1" class="btn btn-primary btn-block">提交</a>
-                            </div>
+                            <div id="info"></div>
                         </section>
                     </div>
-                </div>
             </div>
-        </section>
-    </div>
+        </div>
     <div th:include="/health/footer" />
     <script type="text/javascript">
     var base_options = {
         id: "base",
         name: "基本信息",
-        server: false,
         columns: [
             { name: "name", title: "姓名", inputType: "TEXT" },
             { name: "identificationId", title: "身份证号码", inputType: "TEXT" },
@@ -75,7 +68,6 @@
     var disease_options = {
         id: "disease",
         name: "疾病指标信息",
-        server: false,
         columns: [
             { name: "disease", title: "疾病", inputType: "CHECKBOX", enum: "xk-disease-type", colspan: 2 },
             { name: "index", title: "指标", inputType: "CHECKBOX", enum: "xk-index-type", colspan: 2 }
@@ -85,7 +77,6 @@
     var evaluate_options = {
         id: "evaluate",
         name: "评估信息",
-        server: false,
         columns: [
             { name: "age", title: "年龄", inputType: "NUMBER", unit: "岁" },
             { name: "sex", title: "性别", inputType: "RADIO", enum: "sex-type", colspan: 2 },
@@ -120,103 +111,70 @@
     }
 
     var submitData, evaluateModel, baseModel, diseaseModel;
-
+    var baseData = {},evaluateData,diseaseData={};
     $(function() {
-        $("#evaluate").html(generateHtml(evaluate_options));
-        evaluateModel = new tonto.Model("evaluate", evaluate_options.columns, {
-            submitClick: function(model) {
-                var jsonData = model.formBody.serializeArray();
-                var d = {};
-                jsonData.forEach(function(item) {
-                    if (d[item.name]) {
-                        d[item.name] = d[item.name] + "," + item.value;
-                    } else {
-                        d[item.name] = item.value;
+        $.getAjax('/health/diagnose/record/get?id='+ $("#recordId").val(),function (data) {
+            let conditionDataStr = data.targetCondition;
+            let prescriptionDataStr = data.prescription;
+            let  conditionData =  JSON.parse(conditionDataStr);
+            let  prescriptionData =  JSON.parse(prescriptionDataStr);
+            $.each(conditionData, function (col, value) {
+                if (col === "diseases") {
+                    if (value && value.length > 0) {
+                        $.each(value, function (index, item) {
+                            let constantKey = getConstantKey(item);
+                            if (diseaseData.hasOwnProperty(constantKey)) {
+                                let diseaseDatum = diseaseData[constantKey];
+                                diseaseData[constantKey] = diseaseDatum + "," + item;
+                            } else {
+                                diseaseData[constantKey] = item;
+                            }
+                        })
                     }
-                });
-                model.setData(d);
-                model.toView();
-            }
+                } else if (col === "condition") {
+                    evaluateData = value;
+                } else {
+                    baseData[col] = value;
+                }
+            });
+            $("#base").html(generateViewHtml(base_options));
+            baseModel = new tonto.Model("base", base_options.columns,{
+                pattern: "view"
+            });
+            baseModel.setData(baseData);
+            $("#disease").html(generateViewHtml(disease_options));
+            diseaseModel = new tonto.Model("disease", disease_options.columns,{
+                pattern: "view"
+            });
+            diseaseModel.setData(diseaseData);
+            $("#evaluate").html(generateViewHtml(evaluate_options));
+            evaluateModel = new tonto.Model("evaluate", evaluate_options.columns,{
+                pattern: "view"
+            });
+            evaluateModel.setData(evaluateData);
+            $.initComponment($(".content"));
+            var html = createEvaluateHtml(prescriptionData) ;
+            html = "<div class='no-pad-top' style='padding-right: 50px'>" + html + "</div>";
+            $("#info").html(html)
         });
-        evaluateModel.setData({
-            age: "47",
-            dbp: "90",
-            diabetes: "1",
-            diarrhea: "1",
-            drinking: "1",
-            dyazide: "1",
-            family_cvd: "1",
-            family_diabetes: "1",
-            family_hypertension: "0",
-            family_osteoporosis: "1",
-            fbc: "10.8",
-            hdl: "4.5",
-            height: "178",
-            hormone: "1",
-            hyperglycemia: "1",
-            idl: "4.12",
-            menopause: "1",
-            pbg: "16.1",
-            rarelyBask: "1",
-            rarelysports: "1",
-            sbp: "156",
-            sex: "1",
-            smoke: "1",
-            sports: "1",
-            strokeOrTia: "1",
-            tc_mmol: "7.8",
-            vegOrFruits: "1",
-            waistline: "100",
-            weight: "95"
-        });
-
-        html = generateHtml(base_options);
-        $("#base").html(generateHtml(base_options));
-
-        baseModel = new tonto.Model("base", base_options.columns, {
-            submitClick: function(model) {
-                var jsonData = model.formBody.serializeArray();
-                var d = {};
-                jsonData.forEach(function(item) {
-                    if (d[item.name]) {
-                        d[item.name] = d[item.name] + "," + item.value;
-                    } else {
-                        d[item.name] = item.value;
-                    }
-                });
-                model.setData(d);
-                model.toView();
-            }
-        });
-
-        baseModel.setData({
-            name: "周如",
-            sex: 1,
-            identificationId: "320583198806119617",
-            cellphone: "13584950680"
-        });
-
-        $("#disease").html(generateHtml(disease_options));
-        diseaseModel = new tonto.Model("disease", disease_options.columns, {
-            submitClick: function(model) {
-                var jsonData = model.formBody.serializeArray();
-                var d = {};
-                jsonData.forEach(function(item) {
-                    if (d[item.name]) {
-                        d[item.name] = d[item.name] + "," + item.value;
-                    } else {
-                        d[item.name] = item.value;
-                    }
-                });
-                model.setData(d);
-                model.toView();
-            }
-        });
-        diseaseModel.setData({
-            index: "HR51.03.057,CM.0134"
-        });
-        $.initComponment($(".content"));
     });
+
+    function getConstantKey(code) {
+        let enumcodes = ["xk-index-type", "xk-disease-type"];
+        let result = false;
+        let key = "";
+        enumcodes.some(function (enumcode) {
+            let constantEnum = $.getConstantEnum(enumcode);
+            if ($.isArray(constantEnum)) {
+                result = constantEnum.some(function (item) {
+                    return item.key === code;
+                })
+            }
+            if (result) key = enumcode.substring(enumcode.indexOf("-") + 1, enumcode.lastIndexOf("-"));
+            return key.length > 0;
+        });
+        return key;
+    }
 
   /*  function diagnose() {
         var request = jQuery.extend({}, baseModel.data);
@@ -234,34 +192,6 @@
 
         }, $("#diagnoseBtn"))
     }*/
-
-    function diagnoseDisease() {
-        let d = diseaseModel.data;
-        let ds = d && d.disease || [];
-        let is = d && d.index || [];
-        if ( ds.length === 0 && is.length === 0  ) {
-            $.errorMessage("请勾选疾病或指标");
-            return false
-        }
-        let codes = ds.concat(is);
-        $.postAjax("/xk/diagnose/disease",{"code":codes},function (data) {
-            var html = createKnowledgeHtml(data);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
-        }, $("#diagnoseBtn"))
-    }
-
-
-    function diagnoseEvaluation() {
-        let request = jQuery.extend({}, baseModel.data);
-        request.condition = evaluateModel.data;
-        $.postJsonAjax("/xk/diagnose/evaluation", request, function(data) {
-            let html = createEvaluateHtml(data);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
-        }, $("#diagnoseBtn1"))
-    }
-
 
     function createEvaluateHtml(data) {
         var html = "";
@@ -328,7 +258,7 @@
         	    if(type=='index'){
         	    	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
         	    		    +'<dt>指标名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
-        	    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
+        	    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad+'</dd>'
         	    		    +'<dt>检查目的：</dt><dd id="dm">'+data[0].dm+'</dd>'
         	    		    +'<dt>判定标准：</dt><dd id="dc">'+data[0].dc+'</dd>'
         	    		    +'</dl>'

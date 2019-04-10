@@ -2,14 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.publicity.PublicityMaterialGrantCountMapper">
 
-	<select id="publictyAgencyCount" parameterType="String" resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantCountVO">
-		SELECT p.id,org.name,SUM(p.count) as total from publicity_material_grant as p 
-		LEFT JOIN org_agency as org on org.id = p.grantor_agency where 1=1
-		<if test="agencyName != null and agencyName !=''">
-			AND org.`name` LIKE CONCAT('%',#{agencyName},'%')
-		</if>
-		GROUP BY p.grantor_agency
-		
+	<select id="publictyAgencyCount"  resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantCountVO">
+	SELECT
+	COALESCE ( t1.`name`, #{agencyName} ,"无" ) AS name,
+	COALESCE ( t1.total, 0 ) AS total
+	FROM
+		(
+	SELECT
+		org.`name`,
+		SUM( p.count ) AS total
+	FROM
+		publicity_material_grant AS p
+		LEFT JOIN org_agency AS org ON org.id = p.grantor_agency
+	WHERE
+		1 = 1
+	<if test="agencyName != null and agencyName != ''">
+		AND org.`name` LIKE CONCAT('%',#{agencyName},'%')
+	</if>
+	 <if test="workCycle != null and workCycle != ''">
+		 AND p.work_cycle =#{workCycle}
+	 </if>
+	  GROUP BY p.grantor_agency
+		) t1
+	  RIGHT JOIN ( SELECT 0 ) t2 ON 1 = 1
 	</select>
 	
 	<select id="publictyYearCount" resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantCountVO">
@@ -17,7 +32,7 @@
 		SELECT p.id,p.work_cycle as workCycle,SUM(p.count) as total from publicity_material_grant as p 
 		LEFT JOIN org_agency as org on org.id = p.grantor_agency where 1=1
 		<if test="workCycle != null and workCycle!=''">
-			and p.work_cycle =#{workCycle}
+			AND p.work_cycle =#{workCycle}
 		</if>
 		GROUP BY p.work_cycle ORDER BY P.work_cycle 
 	</select>

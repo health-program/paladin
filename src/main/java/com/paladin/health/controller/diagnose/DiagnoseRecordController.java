@@ -39,9 +39,10 @@ public class DiagnoseRecordController {
 	}
 	
 	@RequestMapping("/detail")
-	public String detail(String targetId, String targetName, Model model) {
-		model.addAttribute("targetId", targetId);
+	public String detail(String recordId, String targetId, String targetName, Model model) {
+		model.addAttribute("recordId", recordId);
 		model.addAttribute("targetName", targetName);
+		model.addAttribute("targetId", targetId);
 		return "/health/diagnose/diagnose_record_detail";
 	}
 	
