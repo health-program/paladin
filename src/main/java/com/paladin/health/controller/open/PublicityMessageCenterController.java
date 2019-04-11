@@ -192,6 +192,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		VideoVO videoVO = beanCopy(videoService.get(id), new VideoVO());
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("video", videoVO);
+		videoPlayPublishService.updateOrSave(id);
 		return CommonResponse.getSuccessResponse(map);
 	}
 

@@ -1,18 +1,16 @@
 package com.paladin.common.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.paladin.common.model.syst.SysConstant;
 import com.paladin.common.service.syst.SysConstantService;
 import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.core.VersionContainerManager;
+import com.paladin.health.model.diagnose.DiagnoseCodeComparison;
+import com.paladin.health.service.diagnose.DiagnoseCodeComparisonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class ConstantsContainer implements VersionContainer {
@@ -20,6 +18,10 @@ public class ConstantsContainer implements VersionContainer {
 	@Autowired
 	private SysConstantService constantService;
 
+	@Autowired
+	private DiagnoseCodeComparisonService diagnoseCodeComparisonService;
+
+	private static Map<String, List<DiagnoseCodeComparison>> diagnoseMap = new HashMap<>();
 	private static Map<String, List<KeyValue>> constantMap = new HashMap<>();
 	private static Map<String, Map<String, String>> constantValueMap = new HashMap<>();
 	private static Map<String, Map<String, String>> constantKeyMap = new HashMap<>();
@@ -56,8 +58,19 @@ public class ConstantsContainer implements VersionContainer {
 
 			keyMap.put(code, name);
 		}
-
 		constantMap = enumConstantMap;
+
+		List<DiagnoseCodeComparison> lists = diagnoseCodeComparisonService.findAll();
+		for (DiagnoseCodeComparison list : lists) {
+			String icd10Code = list.getIcd10Code();
+			if (icd10Code != null) {
+        	List<DiagnoseCodeComparison> diagnoseCodeComparisons =
+				lists.stream()
+					.filter(codeComparison -> codeComparison.getIcd10Code() != null && icd10Code.equals(codeComparison.getIcd10Code()) )
+					.collect(Collectors.toList());
+				diagnoseMap.put(icd10Code,diagnoseCodeComparisons);
+			}
+		}
 		return true;
 	}
 
@@ -162,5 +175,10 @@ public class ConstantsContainer implements VersionContainer {
 		}
 	}
 
-
+	/**
+	 * 功能描述: <通过ICD10编码查找熙康编码>
+	 * @param code
+	 * @return  java.util.List<com.paladin.health.model.diagnose.DiagnoseCodeComparison>
+	 */
+  public static List<DiagnoseCodeComparison> getDiagnoseCodesByIcd10Code(String code) { return diagnoseMap.get(code); }
 }
