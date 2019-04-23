@@ -24,19 +24,26 @@ public class XKDiagnoseController {
 
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
-	
+
 	@ApiOperation(value = "熙康健康评估接口")
 	@PostMapping("/evaluate/simple")
 	@ResponseBody
-	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition));
+	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition, @RequestParam(required = false, name = "appkey") String accessKey) {
+		if (accessKey == null || accessKey.length() == 0) {
+			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
+		}
+
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition, accessKey));
 	}
 
 	@ApiOperation(value = "熙康体检百科接口")
 	@ApiImplicitParam(value = "熙康疾病或指标编码", required = true)
 	@GetMapping("/knowledge")
 	@ResponseBody
-	public Object knowledge(String code) {
+	public Object knowledge(@RequestParam String code, @RequestParam(required = false, name = "appkey") String accessKey) {
+		if (accessKey == null || accessKey.length() == 0) {
+			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
+		}
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledge(code));
 	}
 

@@ -27,6 +27,8 @@ public class DiagnoseRecord {
 	private String type;
 
 	private Date createTime;
+	
+	private String createBy;
 
 	public String getId() {
 		return id;
@@ -90,6 +92,14 @@ public class DiagnoseRecord {
 
 	public void setFactors(String factors) {
 		this.factors = factors;
+	}
+
+	public String getCreateBy() {
+		return createBy;
+	}
+
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
 	}
 
 }

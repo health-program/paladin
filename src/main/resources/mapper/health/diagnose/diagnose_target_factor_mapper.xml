@@ -7,9 +7,9 @@
 
 
 	<insert id="insertByBatch">
-		INSERT INTO diagnose_target_factor (target_id,factor_code,factor_type,factor_level,create_time) VALUES
+		INSERT INTO diagnose_target_factor (target_id,factor_code,factor_type,factor_level,create_time,create_by) VALUES
 		<foreach collection="coll" item="item" index="index" separator=",">
-			(#{item.targetId}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime})
+			(#{item.targetId}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime}, #{item.createBy})
 		</foreach>
 	</insert>
 

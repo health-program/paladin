@@ -19,17 +19,19 @@ public class DiagnoseTargetFactor {
 	private Integer factorType;
 	private Integer factorLevel;
 	private Date createTime;
+	private String createBy;
 
 	public DiagnoseTargetFactor() {
 
 	}
 
-	public DiagnoseTargetFactor(String targetId, String code, Integer type, Integer level, Date createTime) {
+	public DiagnoseTargetFactor(String targetId, String code, Integer type, Integer level, Date createTime, String createBy) {
 		this.targetId = targetId;
 		this.factorCode = code;
 		this.factorType = type;
 		this.factorLevel = level;
 		this.createTime = createTime;
+		this.createBy = createBy;
 	}
 
 	public String getTargetId() {
@@ -70,6 +72,14 @@ public class DiagnoseTargetFactor {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public String getCreateBy() {
+		return createBy;
+	}
+
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
 	}
 
 }

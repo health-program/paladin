@@ -80,8 +80,8 @@ public class XKHealthPrescriptionService {
 	 * @date 2019/4/8
 	 */
 	@Transactional
-	public XKHealthPrescription diagnoseEvaluation(XKPeopleCondition condition) {
-		
+	public XKHealthPrescription diagnoseEvaluation(XKPeopleCondition condition, String accessKey) {
+
 		List<XKEvaluation> evaluationResultList = null;
 		XKEvaluateCondition evaluateCondition = condition.getCondition();
 
@@ -194,6 +194,7 @@ public class XKHealthPrescriptionService {
 				target.setSex(sex);
 				target.setCreateTime(now);
 				target.setUpdateTime(now);
+				target.setUpdateBy(accessKey);
 				diagnoseTargetService.save(target);
 			} else {
 				target.setId(identificationId);
@@ -207,6 +208,7 @@ public class XKHealthPrescriptionService {
 				if (sex != null)
 					target.setSex(sex);
 				target.setUpdateTime(now);
+				target.setUpdateBy(accessKey);
 				diagnoseTargetService.update(target);
 			}
 			// 替换目标病人存在的危险因素（疾病，风险）
@@ -215,7 +217,7 @@ public class XKHealthPrescriptionService {
 			if (evaluationResultList != null && evaluationResultList.size() > 0) {
 				for (XKEvaluation evaluation : evaluationResultList) {
 					targetFactors.add(new DiagnoseTargetFactor(identificationId, evaluation.getCode(), DiagnoseTargetFactor.FACTOR_TYPE_RISK,
-							evaluation.getRiskLevel(), now));
+							evaluation.getRiskLevel(), now, accessKey));
 				}
 			}
 
@@ -233,20 +235,19 @@ public class XKHealthPrescriptionService {
 			record.setPrescription(JsonUtil.getJson(evaluationResultList));
 			record.setType(DiagnoseRecord.TYPE_XK);
 			record.setCreateTime(now);
+			record.setCreateBy(accessKey);
 
 			diagnoseRecordService.save(record);
-			
+
 			XKHealthPrescription result = new XKHealthPrescription();
 			result.setId(diagnoseId);
 			result.setEvaluation(evaluationResultList);
-			
+
 			return result;
 		}
-		
+
 		return null;
 	}
-
-	
 
 	/**
 	 * 获取知识

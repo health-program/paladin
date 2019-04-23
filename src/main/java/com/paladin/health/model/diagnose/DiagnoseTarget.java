@@ -27,6 +27,8 @@ public class DiagnoseTarget {
 	private Date createTime;
 	
 	private Date updateTime;
+	
+	private String updateBy;
 
 	public String getId() {
 		return id;
@@ -95,6 +97,14 @@ public class DiagnoseTarget {
 
 	public void setFactors(String factors) {
 		this.factors = factors;
+	}
+
+	public String getUpdateBy() {
+		return updateBy;
+	}
+
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
 	}
 
 	

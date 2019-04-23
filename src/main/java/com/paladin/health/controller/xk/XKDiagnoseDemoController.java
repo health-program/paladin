@@ -29,7 +29,7 @@ import java.util.Arrays;
 public class XKDiagnoseDemoController {
 
 	@Autowired
-	private XKHealthPrescriptionService healthPrescriptionService;	
+	private XKHealthPrescriptionService healthPrescriptionService;
 
 	@RequestMapping("/evaluate/input")
 	public Object input() {
@@ -61,19 +61,23 @@ public class XKDiagnoseDemoController {
 	@GetMapping("/symptom/code")
 	@ResponseBody
 	public Object dict() {
-		return CommonResponse.getSuccessResponse(ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE,XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
+		return CommonResponse.getSuccessResponse(
+				ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE, XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
 	}
-	
+
 	@RequestMapping("/diagnose/input")
 	public Object diagnoseInput() {
 		return "/health/xk/diagnose_input";
 	}
 
-	/*@PostMapping("/diagnose")
-	@ResponseBody
-	public Object diagnose(@RequestBody XKPeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(condition));
-	}*/
+	/*
+	 * @PostMapping("/diagnose")
+	 * 
+	 * @ResponseBody public Object diagnose(@RequestBody XKPeopleCondition
+	 * condition) { return
+	 * CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(
+	 * condition)); }
+	 */
 
 	@PostMapping("/diagnose/disease")
 	@ResponseBody
@@ -90,7 +94,7 @@ public class XKDiagnoseDemoController {
 	@PostMapping("/diagnose/evaluation")
 	@ResponseBody
 	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition, "demo"));
 	}
 
 	@GetMapping("/tips/output")
@@ -103,7 +107,5 @@ public class XKDiagnoseDemoController {
 	public Object getTips(@PathVariable String typeCode) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getTips(typeCode));
 	}
-
-
 
 }
