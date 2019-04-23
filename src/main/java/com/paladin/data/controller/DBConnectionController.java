@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,11 +39,13 @@ import com.paladin.data.service.dto.DBConnectionQueryDTO;
 import com.paladin.data.service.vo.DBConnectionVO;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.framework.spring.DevCondition;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
 
 @Controller
 @RequestMapping("/data/connection")
+@Conditional(DevCondition.class)
 public class DBConnectionController extends ControllerSupport {
 
 	@Autowired
