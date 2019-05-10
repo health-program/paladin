@@ -10,47 +10,36 @@
     </section>
     <section class="content">
         <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-search"></i>
-                <h3 class="box-title">查询</h3>
-            </div>
             <div class="box-body">
-                <form id="searchbar" class="form-horizontal">
+                <form id="searchbar" class="form-horizontal form-search">
                     <div class="form-group">
-                        <label for="title" class="col-md-1 control-label">标题：</label>
                         <div class="col-md-2">
-                            <input name="title" class="form-control" th:value="${query?.title}" />
+                            <input name="title" class="form-control" th:value="${query?.title}" placeholder="请输入标题" />
                         </div>
-                        <label for="type" class="col-md-1 control-label">类型：</label>
                         <div class="col-md-2">
                             <select name="type" class="form-control tonto-select-constant" th:attr="selectedvalue=${query?.type}" enumcode="publicity-message-type">
-                                <option value="">请选择</option>
+                                <option value="">请选择类型</option>
                             </select>
                         </div>
-                        <label for="status" class="col-md-1 control-label">状态：</label>
                         <div class="col-md-2">
                             <select name="status" class="form-control" th:attr="selectedvalue=${query?.status}">
                                 <option value="1">待审核</option>
                                 <option value="9">审核成功</option>
                             </select>
                         </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                            </div>
+                        </div>
                     </div>
                 </form>
-                <div class="col-md-12">
-                    <div class="pull-right">
-                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$.reset('#searchbar')"><i class="fa fa-repeat"></i>重置</button>
-                    </div>
-                </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
                 <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
             </div>
         </div>
         <div class="box box-solid" style="margin-top:20px">
-            <div class="box-header with-border">
-                <i class="fa fa-list-alt"></i>
-                <h3 class="box-title">结果</h3>
-            </div>
             <div id="result" class="box-body">
                 <table id="dataGrid"></table>
                 <div id="toolbar">
@@ -101,7 +90,8 @@
                                 return '<button class="examine btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
                             } else {
                                 return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-eye-open"></i>查看</button>';
-                            }                        }
+                            }
+                        }
                     }
                 ]
             ],
