@@ -1,165 +1,173 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
     <section class="content-header">
         <h1>播放详情</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/video/play/publish/index"><i class="fa fa-list-alt"></i>视频播放统计</a></li>
-            <li class="active">详情</li>
+            <li><a href="/health/video/play/publish/index"><i class="fa fa-list-alt"></i>视频列表</a></li>
+            <li class="active">视频播放量统计</li>
         </ol>
     </section>
     <section class="content">
-    	<div id="year" style="width: 600px;height:400px; display:inline-block;"></div>
-    	<div id="month" style="width: 800px;height:400px;display:inline-block;"></div>
-    </section> 
-    <input type="hidden" id="id" th:value="${id}"/>
-    <input type="hidden" id="name" th:value="${name}"/>
+        <div class="box box-solid">
+            <div class="box-header no-border">
+                <h3 class="box-title">按年播放统计</h3>
+            </div>
+            <div class="box-body">
+                <div id="year" style="width: 100%;height:400px; display:inline-block;"></div>
+            </div>
+        </div>
+        <div class="box box-solid">
+            <div class="box-header no-border">
+                <h3 class="box-title" id="monthTitle"></h3>
+            </div>
+            <div class="box-body">
+                <div id="month" style="width: 100%;height:400px;display:inline-block;"></div>
+            </div>
+        </div>
+        <div class="col-sm-2 col-sm-offset-5 btn-back">
+            <a href="/health/video/play/publish/index" class="btn btn-primary btn-block">返回</a>
+        </div>
+    </section>
+    <input type="hidden" id="id" th:value="${id}" />
+    <input type="hidden" id="name" th:value="${name}" />
     <div th:include="/health/footer" />
     <script type="text/javascript">
-
     $(function() {
-    	/* 按年统计 */
-    	var myChart = echarts.init(document.getElementById('year'));
-    	$.get('/health/video/play/publish/getStatistics?videoId=' + $("#id").val()).done(function (res) {
-    		if(res.status!=1){
-    			return false
-    		}
-    		var data = res.result;
+        /* 按年统计 */
+        var myChart = echarts.init(document.getElementById('year'));
+        $.get('/health/video/play/publish/getStatistics?videoId=' + $("#id").val()).done(function(res) {
+            if (res.status != 1) {
+                return false
+            }
+            var data = res.result;
 
             if (data.length === 0) {
-                showChartInfo(myChart,'暂无数据')
+                showChartInfo(myChart, '暂无数据')
                 return false;
             }
-		    // 填入数据
-		    var xdata=new Array();
-		    var ydata =new Array();
-		    for(var i in data){
-		    	xdata.push(data[i].year);
-		    	ydata.push(data[i].count);
-		    }
-
-			var year = {
-			    color: ['#3398DB'],
-			    tooltip : {
-			        trigger: 'axis',
-			        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-			            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-			        }
-			    },
-			    legend: {
-					data: ['年播放量']
-				},
-			    grid: {
-			        left: '3%',
-			        bottom: '3%',
-			        containLabel: true
-			    },
-			    xAxis : [
-			        {
-			        	name: '年份',
-			            type : 'category',
-			            data : xdata,
-			            axisTick: {
-			                alignWithLabel: true
-			            }
-			        }
-			    ],
-			    yAxis : [
-			        {
-			        	name: '次数',
-			            type : 'value'
-			        }
-			    ],
-			    series : [
-			        {
-			            name:'播放次数(点击查看该年详细播放记录)',
-			            type:'bar',
-			            barWidth: '60%',
-			            data:ydata
-			        }
-			    ]
-			};
-			myChart.setOption(year);
-		});
-    	myChart.on('click', function (param) {
-
-    		/* 按月统计 */
-    		$.get('/health/video/play/publish/getStatistics?videoId=' + $("#id").val() + "&year=" + param.name).done(function (res) {
-    		var myChart1 = echarts.init(document.getElementById('month'));
-
-    		if(res.status!=1){
-    			return false
-    		}
-    		var data = res.result
-            if (data.length === 0) {
-                showChartInfo(myChart1,'暂无数据')
-                return false;
+            // 填入数据
+            var xdata = new Array();
+            var ydata = new Array();
+            for (var i in data) {
+                xdata.push(data[i].year);
+                ydata.push(data[i].count);
             }
 
-		    // 填入数据
-		    var xdata=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
-		    var ydata =[0,0,0,0,0,0,0,0,0,0,0,0];
-		    for(var i in data){
-		    	ydata[data[i].month-1] = data[i].count;
-		    }
-		    console.log(xdata);
+            var year = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    }
+                },
+                legend: {
+                    data: ['年播放量']
+                },
+                grid: {
+                    left: '3%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [{
+                    name: '年份',
+                    type: 'category',
+                    data: xdata,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }],
+                yAxis: [{
+                    name: '次数',
+                    type: 'value'
+                }],
+                series: [{
+                    name: '播放次数(点击查看该年详细播放记录)',
+                    type: 'bar',
+                    barWidth: '60%',
+                    data: ydata
+                }]
+            };
+            myChart.setOption(year);
+        });
+        myChart.on('click', function(param) {
 
-			var month = {
-			    color: ['#3368DB'],
-			    tooltip : {
-			        trigger: 'axis',
-			        axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-			            type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-			        }
-			    },
-			    legend: {
-					data: ['年播放量']
-				},
-			    grid: {
-			        left: '3%',
-			        bottom: '3%',
-			        containLabel: true
-			    },
-			    xAxis : [
-			        {
-			        	name: '月份',
-			            type : 'category',
-			            data : xdata,
-			            axisTick: {
-			                alignWithLabel: true
-			            }
-			        }
-			    ],
-			    yAxis : [
-			        {
-			        	name: '次数',
-			            type : 'value'
-			        }
-			    ],
-			    series : [
-			        {
-			            name:'播放次数',
-			            type:'bar',
-			            barWidth: '60%',
-			            data:ydata
-			        }
-			    ]
-			};
-			myChart1.setOption(month);
-    		})
+            /* 按月统计 */
+            $.get('/health/video/play/publish/getStatistics?videoId=' + $("#id").val() + "&year=" + param.name).done(function(res) {
+                var myChart1 = echarts.init(document.getElementById('month'));
+
+                if (res.status != 1) {
+                    return false
+                }
+
+                $("#monthTitle").html(param.name + "年月播放量");
+
+                var data = res.result
+                if (data.length === 0) {
+                    showChartInfo(myChart1, '暂无数据')
+                    return false;
+                }
+
+                // 填入数据
+                var xdata = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+                var ydata = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                for (var i in data) {
+                    ydata[data[i].month - 1] = data[i].count;
+                }
+                //console.log(xdata);
+
+                var month = {
+                    color: ['#3368DB'],
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    legend: {
+                        data: ['年播放量']
+                    },
+                    grid: {
+                        left: '3%',
+                        bottom: '3%',
+                        containLabel: true
+                    },
+                    xAxis: [{
+                        name: '月份',
+                        type: 'category',
+                        data: xdata,
+                        axisTick: {
+                            alignWithLabel: true
+                        }
+                    }],
+                    yAxis: [{
+                        name: '次数',
+                        type: 'value'
+                    }],
+                    series: [{
+                        name: '播放次数',
+                        type: 'bar',
+                        barWidth: '60%',
+                        data: ydata
+                    }]
+                };
+                myChart1.setOption(month);
+            })
         });
     });
 
     //无数据展示
-    var showChartInfo = function (chart, infoStr) {
+    var showChartInfo = function(chart, infoStr) {
         var msgOption = {
             title: {
                 show: true,
-                textStyle:{
-                    color:'grey',
-                    fontSize:20
+                textStyle: {
+                    color: 'grey',
+                    fontSize: 20
                 },
                 text: infoStr,
                 left: 'center',
@@ -173,7 +181,7 @@
             },
             series: []
         };
-        chart.clear() ;//initChart(divId): get echarts instance, you can get it by using other method
+        chart.clear(); //initChart(divId): get echarts instance, you can get it by using other method
         chart.hideLoading();
         chart.setOption(msgOption)
     };

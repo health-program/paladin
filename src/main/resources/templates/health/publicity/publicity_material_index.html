@@ -4,75 +4,61 @@
 <head th:include="/health/header" />
 
 <body>
-    <tt:constant enumcode="publicity-material-type"/>
-    <input type="hidden" name="year"/>
+    <tt:constant enumcode="publicity-material-type" />
+    <input type="hidden" name="year" />
     <section class="content-header">
         <h1>健康教育宣传资料登记表</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-search"></i>
-                <h3 class="box-title">查询</h3>
-            </div>
             <div class="box-body">
-                <form id="searchbar" class="form-horizontal">
-                <div class="input-group" style="width:100%">
-                    <label for="agencyId"  class="col-md-1 control-label">机构名称</label>
-		                    <div class="col-md-2">
-		                       <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
-                                    <option value="">请选择</option>
-                                    <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
-                                </select>
-		                    </div>
-		                    <label for="workCycle"  class="col-md-1 control-label">工作周期</label>
-		                    <div class="col-md-2">
-		                          <input type="text" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请输入工作周期" th:value="${query}? ${query.workCycle} : ${year}">
-		                    </div>
-                            <label for="type"  class="col-md-1 control-label">宣传资料类型</label>
-                            <div class="col-md-2">
-                                <select name="type" class="form-control tonto-select-constant" enumcode="publicity-material-type">
-                                    <option value="">请选择</option>
-                                </select>
+                <form id="searchbar" class="form-horizontal form-search">
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
+                                <option value="">请选择机构</option>
+                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请输入工作周期" th:value="${query}? ${query.workCycle} : ${year}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="type" class="form-control tonto-select-constant" enumcode="publicity-material-type">
+                                <option value="">请选择资料类型</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <input type="text" name="name" placeholder="请输入宣传资料名称" class="form-control" th:value="${query?.name}" />
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" name="startTime" placeholder="请输入开始时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.startTime}" />
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" name="endTime" placeholder="请输入结束时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.endTime}" />
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
                             </div>
-                            </div>
-                            <div class="input-group" style="width:100%;margin-top:20px">
-                             <label for="name" class="col-md-1 control-label">宣传资料名称</label>
-                            <div class="col-md-2">
-                                <input type="text" name="name" placeholder="请输入宣传资料名称" class="form-control" th:value="${query?.name}" />
-                            </div>
-                            <label for="startTime" class="col-md-1 control-label">开始时间</label>
-                            <div class="col-md-2">
-                                <input type="text" name="startTime" placeholder="请输入开始时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.startTime}" />
-                            </div>
-                            <label for="endTime" class="col-md-1 control-label">结束时间</label>
-                            <div class="col-md-2">
-                                <input type="text" name="endTime" placeholder="请输入结束时间" class="form-control tonto-datepicker-date" autocomplete="off" th:value="${query?.endTime}" />
-                            </div>
-                            </div>
+                        </div>
+                    </div>
                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
                     <input type="text" style="display:none">
                 </form>
-                <div class="col-md-12">
-                    <div class="pull-right">
-                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
-                    </div>
-                </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
                 <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
             </div>
         </div>
         <div class="box box-solid" style="margin-top:20px">
-            <div class="box-header with-border">
-                <i class="fa fa-list-alt"></i>
-                <h3 class="box-title">结果</h3>
-            </div>
             <div id="result" class="box-body">
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                        <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增</a>
+                        <a onclick="add()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>添加宣传资料</a>
                     </div>
                 </div>
             </div>
@@ -94,15 +80,15 @@
             idField: "id",
             columns: [
                 [
-                    { title: "序号", align: "center",formatter: function (value, row, index) {return index+1;}},
+                    { title: "序号", align: "center", formatter: function(value, row, index) { return index + 1; } },
                     { title: "工作周期", align: "center", field: "workCycle" },
-					{ title: "日期", align: "center", field: "date" ,formatter: "date" },
-					{ title: "所属机构", align: "center", field: "agencyName" },
-					{ title: "宣传资料名称", align: "center", field: "name" },
-					{ title: "宣传资料类型", align: "center", field: "type" ,enumcode: "publicity-material-type" },
-					{ title: "编发单位", align: "center", field: "compileIssueUnit" },
-					{ title: "数量", align: "center", field: "count" },
-					{ title: "备注", align: "center", field: "remarks" ,visible: false},
+                    { title: "日期", align: "center", field: "date", formatter: "date" },
+                    { title: "所属机构", align: "center", field: "agencyName" },
+                    { title: "宣传资料名称", align: "center", field: "name" },
+                    { title: "宣传资料类型", align: "center", field: "type", enumcode: "publicity-material-type" },
+                    { title: "编发单位", align: "center", field: "compileIssueUnit" },
+                    { title: "数量", align: "center", field: "count" },
+                    { title: "备注", align: "center", field: "remarks", visible: false },
                     {
                         title: "操作",
                         align: "center",
@@ -112,7 +98,7 @@
                                 detail(row);
                             },
                             'click .share': function(e, value, row, index) {
-                            	distribute(row);
+                                distribute(row);
                             },
                             'click .remove': function(e, value, row, index) {
                                 remove(row);
@@ -120,8 +106,8 @@
                         },
                         formatter: function operateFormatter(value, row, index) {
                             return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
-                                   '<button class="share btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-share"></i>发放</button>' +
-                                   '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+                                '<button class="share btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-share"></i>发放</button>' +
+                                '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
                         }
                     }
                 ]
@@ -147,9 +133,9 @@
     }
 
     function distribute(row) {
-        window.location = '/health/publicity/material/grant/add' + (row ? ('?name=' + row.name +'&type=' + row.type +'&id=' + row.id) : '');
+        window.location = '/health/publicity/material/grant/add' + (row ? ('?name=' + row.name + '&type=' + row.type + '&id=' + row.id) : '');
     }
-    
+
     function remove(row) {
         if (row) {
             layer.confirm('确定删除吗?', function() {

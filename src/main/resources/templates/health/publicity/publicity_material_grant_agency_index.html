@@ -77,8 +77,6 @@
                                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
                                     <input type="text" style="display:none">
                                 </form>
-                                <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
-                                <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
                             </li>
                             <li class="item">
                                 <table id="dataGrid"></table>
@@ -109,10 +107,7 @@
 
     });
 
-    function initDataGrid() {
-        var limit = $("#pageLimit").val();
-        var offset = $("#pageOffset").val();
-        var page = (limit && offset) ? offset / limit + 1 : 1;
+    function initDataGrid() {     
 
         table = $.createTable("#dataGrid", {
             idField: "id",
@@ -125,8 +120,6 @@
             url: '/health/publicity/material/grant/count/agency',
             searchbar: '#searchbar',
             showColumns: true,
-            pageSize: limit || undefined,
-            pageNumber: page || 1,
             pagination: true,
             clickToSelect: true,
             toolbar: "#toolbar",

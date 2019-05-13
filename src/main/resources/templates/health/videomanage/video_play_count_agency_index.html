@@ -4,13 +4,13 @@
 <head th:include="/health/header" />
 <style>
     .tab-content>.tab-pane, .pill-content>.pill-pane {
-	display: block;
-	height: 0;
-	overflow-y: hidden;
+    display: block;
+    height: 0;
+    overflow-y: hidden;
 }
 
 .tab-content>.active, .pill-content>.active {
-	height: auto;
+    height: auto;
 }
 </style>
 
@@ -18,7 +18,7 @@
     <tt:constant enumcode="publicity-material-type,grant-target-type" />
     <input type="hidden" name="year" />
     <section class="content-header">
-        <h1>视频播放记录机构历年统计</h1>
+        <h1>视频播放记录统计</h1>
     </section>
     <section class="content">
         <div class="nav-tabs-custom">
@@ -28,98 +28,67 @@
             </ul>
             <div class="tab-content">
                 <div class="tab-pane active" id="tab1">
-                    <div class="box box-solid">
-                        <div class="box-header with-border">
-                            <i class="fa fa-search"></i>
-                            <h3 class="box-title">查询</h3>
-                        </div>
-                        <div class="box-body">
-                            <form class="form-horizontal">
-                                <div class="input-group" style="width:100%">
-                                    <label for="workCycle" class="col-md-1 control-label">工作周期</label>
-                                    <div class="col-md-2">
-                                        <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
+                    <div class="box-body">
+                        <ul class="products-list product-list-in-box">
+                            <li class="item">
+                                <form id="searchbar1" class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-2">
+                                            <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="pull-right">
+                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
+                                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar1')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                            </div>
+                                        </div>
                                     </div>
+                                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                                    <input type="text" style="display:none">
+                                </form>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <div id="yearChart" style="height: 400px"></div>
                                 </div>
-                                <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
-                                <input type="text" style="display:none">
-                            </form>
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
-                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
-                                </div>
-                            </div>
-                            <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
-                            <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
-                        </div>
-                    </div>
-                    <div class="box box-solid" style="margin-top:20px">
-                        <div class="box-header with-border">
-                            <i class="fa fa-bar-chart"></i>
-                            <h3 class="box-title">图表</h3>
-                        </div>
-                        <div id="result" class="box-body">
-                            <div class="col-sm-12">
-                                <div id="yearChart" style="height: 400px"></div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
                 <div class="tab-pane" id="tab2">
-                    <div class="box box-solid">
-                        <div class="box-header with-border">
-                            <i class="fa fa-search"></i>
-                            <h3 class="box-title">查询</h3>
-                        </div>
-                        <div class="box-body">
-                            <form id="searchbar" class="form-horizontal">
-                                <div class="input-group" style="width:100%">
-                                    <label for="agencyName1" class="col-md-1 control-label">机构名称</label>
-                                    <div class="col-md-2">
-                                        <input type="text" id="agencyName1" name="agencyName" class="form-control" placeholder="请输入机构">
+                    <div class="box-body">
+                        <ul class="products-list product-list-in-box">
+                            <li class="item">
+                                <form id="searchbar2" class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-2">
+                                            <input type="text" id="agencyName1" name="agencyName" class="form-control" placeholder="请输入机构名称">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" id="workCycle1" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择工作周期">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="pull-right">
+                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
+                                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar2')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <label for="workCycle" class="col-md-1 control-label">工作周期</label>
-                                    <div class="col-md-2">
-                                        <input type="text" id="workCycle1" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
-                                    </div>
+                                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                                    <input type="text" style="display:none">
+                                </form>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <table id="dataGrid"></table>
                                 </div>
-                                <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
-                                <input type="text" style="display:none">
-                            </form>
-                            <div class="col-md-12">
-                                <div class="pull-right">
-                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
-                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[1].reset()"><i class="fa fa-repeat"></i>重置</button>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <div id="agencyChart" style="height: 350px"></div>
                                 </div>
-                            </div>
-                            <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
-                            <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
-                        </div>
-                    </div>
-                    <div class="box box-solid" style="margin-top:20px">
-                        <div class="box-header with-border">
-                            <i class="fa fa-list-alt"></i>
-                            <h3 class="box-title">结果</h3>
-                        </div>
-                        <div id="result" class="box-body">
-                            <table id="dataGrid"></table>
-                            <div id="toolbar">
-                                <div class="btn-group">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="box box-solid" style="margin-top:20px">
-                        <div class="box-header with-border">
-                            <i class="fa fa-bar-chart"></i>
-                            <h3 class="box-title">图表</h3>
-                        </div>
-                        <div id="result" class="box-body">
-                            <div class="col-sm-12">
-                                <div id="agencyChart" style="height: 350px"></div>
-                            </div>
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -140,10 +109,6 @@
 
 
     function initDataGrid() {
-        var limit = $("#pageLimit").val();
-        var offset = $("#pageOffset").val();
-        var page = (limit && offset) ? offset / limit + 1 : 1;
-
         table = $.createTable("#dataGrid", {
             idField: "id",
             columns: [
@@ -156,8 +121,6 @@
             url: '/health/video/play/count/agency',
             searchbar: '#searchbar',
             showColumns: true,
-            pageSize: limit || undefined,
-            pageNumber: page || 1,
             pagination: true,
             clickToSelect: true,
             toolbar: "#toolbar",
@@ -176,13 +139,13 @@
 
     function agencyCharts(chart) {
         var agencyNameVal = $("#agencyName1").val();
-        var workCycleVal=$("#workCycle1").val();
+        var workCycleVal = $("#workCycle1").val();
         var agencyName = agencyNameVal.length > 0 ? agencyNameVal : null;
         var workCycle = workCycleVal.length > 0 ? workCycleVal : null;
-        $.postAjax("/health/video/play/count/agency", { 'agencyName': agencyName,'workCycle':workCycle }, function(res) {
+        $.postAjax("/health/video/play/count/agency", { 'agencyName': agencyName, 'workCycle': workCycle }, function(res) {
             var data = res;
             if (data.length === 1 && data[0].visitorCount === 0) {
-                showChartInfo(chart,'暂无数据');
+                showChartInfo(chart, '暂无数据');
                 return false;
             }
             // 填入数据
@@ -202,7 +165,7 @@
                     align: 'center',
                     verticalAlign: 'top',
                     rotate: 0,
-                    formatter: '{name|{a}}	 {c}',
+                    formatter: '{name|{a}}   {c}',
                     fontSize: 12,
                     rich: {
                         name: {
@@ -294,7 +257,7 @@
                 }
                 var data = res.result;
                 if (data.length === 0) {
-                    showChartInfo(yearChart,'暂无数据')
+                    showChartInfo(yearChart, '暂无数据')
                     return false;
                 }
                 // 填入数据
@@ -314,7 +277,7 @@
                         align: 'center',
                         verticalAlign: 'top',
                         rotate: 0,
-                        formatter: '{name|{a}}	 {c}',
+                        formatter: '{name|{a}}   {c}',
                         fontSize: 12,
                         rich: {
                             name: {
@@ -392,13 +355,13 @@
     }
 
     //无数据展示
-    var showChartInfo = function (chart, infoStr) {
+    var showChartInfo = function(chart, infoStr) {
         var msgOption = {
             title: {
                 show: true,
-                textStyle:{
-                    color:'grey',
-                    fontSize:20
+                textStyle: {
+                    color: 'grey',
+                    fontSize: 20
                 },
                 text: infoStr,
                 left: 'center',
@@ -412,7 +375,7 @@
             },
             series: []
         };
-        chart.clear() ;//initChart(divId): get echarts instance, you can get it by using other method
+        chart.clear(); //initChart(divId): get echarts instance, you can get it by using other method
         chart.hideLoading();
         chart.setOption(msgOption)
     };

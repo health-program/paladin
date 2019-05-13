@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:include="/health/header" />
 
 <body>
@@ -9,45 +10,34 @@
     </section>
     <section class="content">
         <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-search"></i>
-                <h3 class="box-title">查询</h3>
-            </div>
             <div class="box-body">
-                <form id="searchbar" class="form-horizontal">
+                <form id="searchbar" class="form-horizontal form-search">
                     <div class="form-group">
-                        <label for="name" class="col-md-1 control-label">视频名称</label>
                         <div class="col-md-2">
-                            <input type="text" class="form-control" name="name" th:value="${query?.name}" placeholder="请输入" />
+                            <input type="text" class="form-control" name="name" th:value="${query?.name}" placeholder="请输入视频名称" />
                         </div>
-                        <label for="label" class="col-md-1 control-label">标签</label>
                         <div class="col-md-2">
-                            <input type="text" class="form-control" name="label" th:value="${query?.label}" placeholder="请输入"/>
+                            <input type="text" class="form-control" name="label" th:value="${query?.label}" placeholder="请输入标签" />
+                        </div>
+                        <div class="col-md-8">
+                            <div class="pull-right">
+                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                            </div>
                         </div>
                     </div>
                     <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
                     <input type="text" style="display:none">
                 </form>
-                <div class="col-md-12">
-                    <div class="pull-right">
-                        <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
-                        <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
-                    </div>
-                </div>
                 <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
                 <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
             </div>
         </div>
         <div class="box box-solid" style="margin-top:20px">
-            <div class="box-header with-border">
-                <i class="fa fa-list-alt"></i>
-                <h3 class="box-title">结果</h3>
-            </div>
             <div id="result" class="box-body">
                 <table id="dataGrid"></table>
                 <div id="toolbar">
                     <div class="btn-group">
-                       
                     </div>
                 </div>
             </div>
@@ -70,9 +60,9 @@
             columns: [
                 [
                     { title: "视频名称", align: "center", field: "name" },
-                    { title: "视频简介", align: "center", field: "summary" , formatter:function (value, row, index) { return value ? value : "无" } },
-                    { title: "标签", align: "center", field: "label" , formatter:function (value, row, index) { return value ? value : "无" }},
-                    { title: "播放次数", align: "center", field: "count", formatter:function (value, row, index) { return value ? value : "无" } },
+                    { title: "视频简介", align: "center", field: "summary", formatter: function(value, row, index) { return value ? value : "无" } },
+                    { title: "标签", align: "center", field: "label", formatter: function(value, row, index) { return value ? value : "无" } },
+                    { title: "播放次数", align: "center", field: "count", formatter: function(value, row, index) { return value ? value : "无" } },
                     {
                         title: "操作",
                         align: "center",
@@ -83,7 +73,7 @@
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
-                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-stats"></i>播放详情</button>';
+                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-stats"></i>播放统计</button>';
 
                         }
                     }
@@ -102,7 +92,7 @@
     }
 
     function detail(row) {
-        window.location = '/health/video/play/publish/detail' + (row ? ('?id=' + row.id +"&name=" + row.name) : '') ;
+        window.location = '/health/video/play/publish/detail' + (row ? ('?id=' + row.id + "&name=" + row.name) : '');
     }
 
     function getSelectRow(notShowError) {
