@@ -18,12 +18,11 @@ import java.util.List;
 @Service
 public class OrgRoleService extends ServiceSupport<OrgRole> {
 
-	public List<OrgRole> getOwnGrantRoles(int roleLevel, boolean defaultabled) {
+	public List<OrgRole> getOwnGrantRoles(int roleLevel) {
 		/**
 		 * 只能获取数据等级小于等于自己的角色
 		 */
 		return searchAll(
-				new Condition(OrgRole.COLUMN_FIELD_IS_DEFAULT, QueryType.EQUAL, defaultabled ? 1 : 0),
 				new Condition(OrgRole.COLUMN_FIELD_ROLE_LEVEL, QueryType.LESS_EQUAL, roleLevel),
 				new Condition(OrgRole.COLUMN_FIELD_ENABLE,QueryType.EQUAL,1));
 	}

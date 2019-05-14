@@ -56,27 +56,58 @@
     var submitData, evaluateDiv;
 
     $(function() {
+        var data = {
+            age:47,
+            sex:1,
+            height:178,
+            weight:95,
+            dbp: 90,
+            sbp:156,
+            pbg:16.1,
+            fbc:10.8,
+            smoke:1,
+            drinking:1,
+            waistline:100,
+            tc_mmol:7.8,
+            idl:4.12,
+            hdl:4.5,
+            hypertension:1,
+            diabetes:1,
+            family_diabetes:1,
+            strokeOrTia:1,
+            family_cvd:1,
+            sports:1,
+            vegOrFruits:1,
+            dyazide:1,
+            hormone:1,
+            menopause:1,
+            diarrhea:1,
+            rarelyBask:1,
+            rarelysports:1,
+            family_osteoporosis:1,
+            family_hypertension:0
+        };
 
-        $.getAjax("/xk/evaluate/get/demo", function(data) {
-            var html = generateHtml(options);
-            $("#evaluate").html(html);
-            var model = new tonto.Model("model", options.columns, {
-                beforeSubmit: function(formdata) {
-                    submitData = {};
-                    formdata.forEach(function(item) {
-                        submitData[item.name] = item.value;
-                    });
-                },
-                successCallback: function(result) {
-                    model.setData(submitData);
-                    model.toView();
-                    showEvaluateResult(result);
-                }
-            });
+        var html = generateHtml(options);
+        $("#evaluate").html(html);
+        $.initComponment($("#evaluate"));
 
-            model.setData(data);
-            $.initComponment($("#evaluate"));
+        var model = new tonto.Model("model", options.columns, {
+            beforeSubmit: function(formdata) {
+                submitData = {};
+                formdata.forEach(function(item) {
+                    submitData[item.name] = item.value;
+                });
+            },
+            successCallback: function(result) {
+                model.setData(submitData);
+                model.toView();
+                showEvaluateResult(result);
+            }
         });
+
+        model.setData(data);
+        
     });
 
     function showEvaluateResult(data) {
@@ -121,17 +152,18 @@
             parseContent1(data.suggest) +
             '</dl>';
     }
-    function parseContent1(content) {
-    	 var arr = content.split(/[@#]/g);
-    	 
-    	 var s = "";
-    	 arr.forEach(function(a) {
-             s += "<dd>" + a + "</dd>";
-         });
 
-         return s;
+    function parseContent1(content) {
+        var arr = content.split(/[@#]/g);
+
+        var s = "";
+        arr.forEach(function(a) {
+            s += "<dd>" + a + "</dd>";
+        });
+
+        return s;
     }
-    
+
     function parseContent(content) {
         var s = content.replace(/(\d+[\.\)])/g, "\n$1");
         var arr = s.split(/[\n,]/g);

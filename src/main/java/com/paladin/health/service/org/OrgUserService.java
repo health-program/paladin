@@ -114,13 +114,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 	public List<OrgRole> searchOwnedRoles() {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
 		int roleLevel = session.getRoleLevel();
-		if (session.isAdminRoleLevel()) {
-			return orgRoleService.getOwnGrantRoles(HealthUserSession.ROLE_LEVEL_ADMIN,false);
-		} else if (roleLevel == HealthUserSession.ROLE_LEVEL_AGENCY) {
-			return orgRoleService.getOwnGrantRoles(HealthUserSession.ROLE_LEVEL_AGENCY,false);
-		}else {
-			return orgRoleService.getOwnGrantRoles(HealthUserSession.ROLE_LEVEL_DEFAULT,true);
-		}
+		return orgRoleService.getOwnGrantRoles(roleLevel);
 	}
 
 
