@@ -1,20 +1,14 @@
 package com.paladin.health.controller.xk;
 
 import com.paladin.common.core.ConstantsContainer;
-import com.paladin.framework.spring.DevCondition;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
-import com.paladin.health.service.core.xk.XKPeopleCondition;
-import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
 
 /**
  * 基于熙康知识库
@@ -25,13 +19,12 @@ import java.util.Arrays;
 @Api("熙康疾病百科")
 @Controller
 @RequestMapping("/xk/")
-@Conditional(DevCondition.class)
 public class XKDiagnoseDemoController {
 
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;
 
-	@RequestMapping("/evaluate/input")
+/*	@RequestMapping("/evaluate/input")
 	public Object input() {
 		return "/health/xk/evaluate_input";
 	}
@@ -42,7 +35,7 @@ public class XKDiagnoseDemoController {
 	@ResponseBody
 	public Object getEvaluation(XKEvaluateCondition condition) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getEvaluation(condition));
-	}
+	}*/
 
 	@GetMapping("/symptom/index")
 	public Object index() {
@@ -65,19 +58,10 @@ public class XKDiagnoseDemoController {
 				ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE, XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
 	}
 
-	@RequestMapping("/diagnose/input")
+/*	@RequestMapping("/diagnose/input")
 	public Object diagnoseInput() {
 		return "/health/xk/diagnose_input";
 	}
-
-	/*
-	 * @PostMapping("/diagnose")
-	 * 
-	 * @ResponseBody public Object diagnose(@RequestBody XKPeopleCondition
-	 * condition) { return
-	 * CommonResponse.getSuccessResponse(healthPrescriptionService.diagnose(
-	 * condition)); }
-	 */
 
 	@PostMapping("/diagnose/disease")
 	@ResponseBody
@@ -106,6 +90,6 @@ public class XKDiagnoseDemoController {
 	@ResponseBody
 	public Object getTips(@PathVariable String typeCode) {
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.getTips(typeCode));
-	}
+	}*/
 
 }
