@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @Api("熙康疾病百科")
 @Controller
 @RequestMapping("/xk/")
-public class XKDiagnoseDemoController {
+public class XKKnowledgeController {
 
 	@Autowired
 	private XKHealthPrescriptionService healthPrescriptionService;

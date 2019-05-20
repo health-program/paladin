@@ -244,7 +244,7 @@
             return false
         }
         let codes = ds.concat(is);
-        $.postAjax("/xk/diagnose/disease",{"code":codes},function (data) {
+        $.postAjax("/xk/demo/diagnose/disease",{"code":codes},function (data) {
             var html = createKnowledgeHtml(data);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
@@ -255,7 +255,7 @@
     function diagnoseEvaluation() {
         let request = jQuery.extend({}, baseModel.data);
         request.condition = evaluateModel.data;
-        $.postJsonAjax("/xk/diagnose/evaluation", request, function(data) {
+        $.postJsonAjax("/xk/demo/diagnose/evaluation", request, function(data) {
             let html = createEvaluateHtml(data);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);

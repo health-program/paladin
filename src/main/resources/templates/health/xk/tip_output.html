@@ -10,28 +10,27 @@
             <h1>健康小贴士</h1>
         </section>
         <section class="content">
-            <div class="box-body">
-                <div class="col-md-12">
-                    <div class="col-md-6">
-                        <!--  aged（老年人类型）、hypertension（高血压类型）、diabetes（糖尿病类型）、festival（手动发送提醒，小短语） -->
-                        <label> 老年人类型</label><input type="radio" class="form-control" name="typeCode" value="aged" />&nbsp;&nbsp;
-                        <label>高血压类型</label><input type="radio" class="form-control" name="typeCode" value="hypertension" />&nbsp;
-                        <label>糖尿病类型</label><input type="radio" class="form-control" name="typeCode" value="diabetes" />&nbsp;&nbsp;
-                        <label>手机提示语</label><input type="radio" class="form-control" name="typeCode" value="festival" />&nbsp;&nbsp;
-                        <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_tip()"><i class="fa fa-search"></i>
-                        </button>
-                    </div>
+            <div class="box box-widget">
+                <div class="box-body">
+                    <label> 老年人类型</label><input type="radio" class="form-control" name="typeCode" value="aged" />&nbsp;&nbsp;
+                    <label>高血压类型</label><input type="radio" class="form-control" name="typeCode" value="hypertension" />&nbsp;
+                    <label>糖尿病类型</label><input type="radio" class="form-control" name="typeCode" value="diabetes" />&nbsp;&nbsp;
+                    <label>手机提示语</label><input type="radio" class="form-control" name="typeCode" value="festival" />&nbsp;&nbsp;
+                    <button type="button" name="search" id="search-btn" class="btn btn-flat" onclick="search_tip()"><i class="fa fa-search"></i>查找
+                    </button>
                 </div>
-                <div id="content" class="col-md-12">
+            </div> 
+            <div class="box box-widget">
+                <div class="box-body" id="tips">
                 </div>
-            </div>
+            </div>          
         </section>
     </div>
     <div th:include="/health/footer" />
     <script type="text/javascript">
     function search_tip() {
-        $.getAjax("/xk/tips/" + $("input[name='typeCode']:checked").val(), function(data) {
-            $("#content").html(showEvaluateResult(data.result));
+        $.getAjax("/xk/demo/tips/" + $("input[name='typeCode']:checked").val(), function(data) {
+            $("#tips").html(showEvaluateResult(data.result));
         });
     }
 

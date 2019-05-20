@@ -7,6 +7,8 @@ public class XKHealthPrescription {
 	private String id;
 			
 	private List<XKEvaluation> evaluation;
+	
+	private List<String> message;
 
 	public String getId() {
 		return id;
@@ -23,5 +25,14 @@ public class XKHealthPrescription {
 	public void setEvaluation(List<XKEvaluation> evaluation) {
 		this.evaluation = evaluation;
 	}
-	
+
+	public List<String> getMessage() {
+		return message;
+	}
+
+	public void setMessage(List<String> message) {
+		this.message = message;
+	}
+
+
 }

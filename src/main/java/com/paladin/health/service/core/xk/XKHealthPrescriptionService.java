@@ -2,6 +2,7 @@ package com.paladin.health.service.core.xk;
 
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.utils.JsonUtil;
+import com.paladin.framework.utils.time.DateTimeUtil;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
@@ -41,13 +42,13 @@ public class XKHealthPrescriptionService {
 
 	@Value("${xk.knowledge.url}")
 	private String knowledgeUrl;
-	
+
 	@Value("${xk.evaluation.url}")
 	private String evaluationUrl;
-	
+
 	@Value("${xk.tips.url}")
 	private String tipsUrl;
-		
+
 	/** 熙康疾病类型 */
 	public static String CONSTANT_DISEASE_TYPE = "xk-disease-type";
 	/** 熙康指标类型 */
@@ -252,11 +253,47 @@ public class XKHealthPrescriptionService {
 			XKHealthPrescription result = new XKHealthPrescription();
 			result.setId(diagnoseId);
 			result.setEvaluation(evaluationResultList);
+			result.setMessage(getMessage(target, evaluationResultList));
 
 			return result;
 		}
 
 		return null;
+	}
+
+	/**
+	 * 根据居民情况获取短信
+	 * 
+	 * @param target
+	 * @param evaluationResultList
+	 * @return
+	 */
+	private List<String> getMessage(DiagnoseTarget target, List<XKEvaluation> evaluationResultList) {
+		if (evaluationResultList != null) {
+			for (XKEvaluation eval : evaluationResultList) {
+				String code = eval.getCode();
+				int level = eval.getRiskLevel();
+
+				if (level > XKEvaluation.LEVEL_MIDDLE) {
+					if (XKEvaluation.CODE_DIABETES.equals(code)) {
+						return getTips("diabetes");
+					} else if (XKEvaluation.CODE_HYPERTENSION.equals(code)) {
+						return getTips("hypertension");
+					}
+				}
+			}
+		}
+
+		if (target != null) {
+			Date birthday = target.getBirthday();
+			if (birthday != null) {
+				if (DateTimeUtil.getAge(birthday) > 60) {
+					return getTips("aged");
+				}
+			}
+		}
+
+		return getTips("festival");
 	}
 
 	/**
@@ -266,7 +303,8 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public XKDiseaseKnowledge getKnowledge(String code) {
-		//String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+		// String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" +
+		// code;
 		String url = knowledgeUrl + code;
 		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
 		if (diseaseName != null && diseaseName.length() > 0) {
@@ -304,10 +342,19 @@ public class XKHealthPrescriptionService {
 	 * @param typeCode
 	 * @return
 	 */
-	public Map getTips(String typeCode) {
-		// String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" + typeCode;
+	@SuppressWarnings("unchecked")
+	public List<String> getTips(String typeCode) {
+		// String url =
+		// "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" +
+		// typeCode;
 		String url = tipsUrl + typeCode;
-		return knowledgeServlet.getRequest(url, null, Map.class);
+		Map result = knowledgeServlet.getRequest(url, null, Map.class);
+
+		String status = (String) result.get("status");
+		if (!"0000".equals(status)) {
+			return null;
+		}
+		return (List<String>) result.get("result");
 	}
 
 }
