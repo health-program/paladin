@@ -1,6 +1,9 @@
 package com.paladin.health.service.core.xk;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.SocketAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -9,8 +12,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,12 +36,25 @@ public class XKKnowledgeServlet {
 
 	private static Logger logger = LoggerFactory.getLogger(XKKnowledgeServlet.class);
 
+	@Value("${proxy.enabled}")
+	private boolean proxyEnabled;
+
+	@Value("${proxy.host}")
+	private String proxyHost;
+
+	@Value("${proxy.port}")
+	private int proxyPort;
+
 	// 熙康环境auth访问地址
-	private String authUrl = "http://passport.xikang.com/oauth/token";
+	@Value("${xk.auth.url}")
+	private String authUrl;
+	// private String authUrl = "http://passport.xikang.com/oauth/token";
 	// 熙康环境clientId名称
-	private String clientId = "xk_kunshan";
+	@Value("${xk.auth.key}")
+	private String clientId;
 	// 熙康环境clientSecret名称
-	private String clientSecret = "njneid(BH!kjdoue";
+	@Value("${xk.auth.secret}")
+	private String clientSecret;
 
 	// token 获取参数
 	private MultiValueMap<String, Object> tokenRequestParamMap;
@@ -45,12 +64,24 @@ public class XKKnowledgeServlet {
 	// TODO 超时时间，用于辅助判断token是否超时，需要看熙康是否能返回
 	private long expiresTime;
 
-	public XKKnowledgeServlet() {
+	@PostConstruct
+	public void init() {
 		SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
 		factory.setReadTimeout(15000);// 单位为ms
 		factory.setConnectTimeout(15000);// 单位为ms
+
+		if (proxyEnabled) {
+			SocketAddress address = new InetSocketAddress(proxyHost, proxyPort);
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
+			factory.setProxy(proxy);
+		}
+
 		restTemplate = new RestTemplate(factory);
 	}
+	
+	
+
+	
 
 	/**
 	 * 获取熙康assess token
@@ -287,13 +318,15 @@ public class XKKnowledgeServlet {
 	}
 
 	public static void main(String[] args) {
-//		String code = "HY.CJJB";
-//		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
-//
-//		System.out.println(new XKKnowledgeServlet().getRequest(url, null, String.class));
-		
+		// String code = "HY.CJJB";
+		// String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" +
+		// code;
+		//
+		// System.out.println(new XKKnowledgeServlet().getRequest(url, null,
+		// String.class));
+
 		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/aged";
-		System.out.println( new XKKnowledgeServlet().getRequest(url, null, Map.class));
+		System.out.println(new XKKnowledgeServlet().getRequest(url, null, Map.class));
 	}
 
 }

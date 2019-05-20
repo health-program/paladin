@@ -16,6 +16,7 @@ import com.paladin.health.service.diagnose.DiagnoseTargetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,15 @@ public class XKHealthPrescriptionService {
 	@Autowired
 	private XKKnowledgeServlet knowledgeServlet;
 
+	@Value("${xk.knowledge.url}")
+	private String knowledgeUrl;
+	
+	@Value("${xk.evaluation.url}")
+	private String evaluationUrl;
+	
+	@Value("${xk.tips.url}")
+	private String tipsUrl;
+		
 	/** 熙康疾病类型 */
 	public static String CONSTANT_DISEASE_TYPE = "xk-disease-type";
 	/** 熙康指标类型 */
@@ -256,7 +266,8 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public XKDiseaseKnowledge getKnowledge(String code) {
-		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+		//String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" + code;
+		String url = knowledgeUrl + code;
 		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
 		if (diseaseName != null && diseaseName.length() > 0) {
 			List knowledge = knowledgeServlet.getRequest(url, null, List.class);
@@ -283,8 +294,8 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public Map getEvaluation(XKEvaluateCondition condition) {
-		String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
-		return knowledgeServlet.postJsonRequest(url, condition, Map.class);
+		// String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
+		return knowledgeServlet.postJsonRequest(evaluationUrl, condition, Map.class);
 	}
 
 	/**
@@ -294,7 +305,8 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public Map getTips(String typeCode) {
-		String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" + typeCode;
+		// String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" + typeCode;
+		String url = tipsUrl + typeCode;
 		return knowledgeServlet.getRequest(url, null, Map.class);
 	}
 
