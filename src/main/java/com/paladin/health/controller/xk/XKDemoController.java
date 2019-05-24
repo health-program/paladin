@@ -63,7 +63,7 @@ public class XKDemoController {
 	@PostMapping("/diagnose/evaluation")
 	@ResponseBody
 	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseEvaluation(condition, "demo"));
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.doSimpleEvaluation(condition, "demo"));
 	}
 
 	@GetMapping("/tips/output")

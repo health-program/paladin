@@ -11,15 +11,15 @@ public class XKPeopleCondition {
 	
 	private String identificationId;
 	
+	private String searchId;
+	
 	private String cellphone;
 	
 	private Integer sex;
 
 	private Date birthday;
-		
-	private Integer sendMessage;
-	
-	private String senderName;
+			
+	private String doctorName;
 	
 	private List<String> diseases;
 	
@@ -64,23 +64,7 @@ public class XKPeopleCondition {
 	public void setCondition(XKEvaluateCondition condition) {
 		this.condition = condition;
 	}
-
-	public Integer getSendMessage() {
-		return sendMessage;
-	}
-
-	public void setSendMessage(Integer sendMessage) {
-		this.sendMessage = sendMessage;
-	}
-
-	public String getSenderName() {
-		return senderName;
-	}
-
-	public void setSenderName(String senderName) {
-		this.senderName = senderName;
-	}
-
+	
 	public Integer getSex() {
 		return sex;
 	}
@@ -95,6 +79,22 @@ public class XKPeopleCondition {
 
 	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
+	}
+
+	public String getSearchId() {
+		return searchId;
+	}
+
+	public void setSearchId(String searchId) {
+		this.searchId = searchId;
+	}
+
+	public String getDoctorName() {
+		return doctorName;
+	}
+
+	public void setDoctorName(String doctorName) {
+		this.doctorName = doctorName;
 	}
 
 	

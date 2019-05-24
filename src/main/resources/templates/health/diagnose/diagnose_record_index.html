@@ -37,7 +37,7 @@
             idField: "id",
             columns: [
                 [
-                    { title: "时间", field: "createTime", formatter: "datetime" ,sortable:true},
+                    { title: "时间", field: "createTime", formatter: "datetime", sortable: true },
                     {
                         title: "操作",
                         align: "center",
@@ -67,10 +67,9 @@
     }
 
     function detail(row) {
-        let nameStr = $("#targetName").val();
+        let targetName = $("#targetName").val();
         let datetimeStr = datetimeFormat(row.createTime);
-        let targetName = nameStr + "(诊断时间:" + datetimeStr +")";
-        window.location = '/health/diagnose/record/detail?recordId='+ row.id+'&targetName='+targetName+"&targetId="+$("#targetId").val();
+        window.location = '/health/diagnose/record/detail?recordId=' + row.id + '&targetName=' + targetName + "&targetId=" + $("#targetId").val() + "&time=" + datetimeStr;
     }
 
 

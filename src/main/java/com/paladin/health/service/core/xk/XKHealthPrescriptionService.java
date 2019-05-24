@@ -1,12 +1,14 @@
 package com.paladin.health.service.core.xk;
 
 import com.paladin.common.core.ConstantsContainer;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.utils.time.DateTimeUtil;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
+import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKEvaluation;
@@ -56,15 +58,6 @@ public class XKHealthPrescriptionService {
 	/** 熙康评估类型 */
 	public static String CONSTANT_EVALUATE_TYPE = "xk-evaluate-type";
 
-	/**
-	 * 功能描述: <br>
-	 * 〈体检百科知识获取〉
-	 * 
-	 * @param codes
-	 * @return java.util.List<com.paladin.health.service.core.xk.response.XKDiseaseKnowledge>
-	 * @author Huangguochen
-	 * @date 2019/4/8
-	 */
 	@Transactional
 	public List<XKDiseaseKnowledge> diagnoseDiseases(List<String> codes) {
 		List<XKDiseaseKnowledge> diseaseKnowledge = null;
@@ -82,16 +75,14 @@ public class XKHealthPrescriptionService {
 	}
 
 	/**
-	 * 功能描述: <br>
-	 * 〈风险评估知识获取〉
+	 * 简单评估
 	 * 
 	 * @param condition
-	 * @return java.util.List<com.paladin.health.service.core.xk.response.XKEvaluation>
-	 * @author Huangguochen
-	 * @date 2019/4/8
+	 * @param accessKey
+	 * @return
 	 */
 	@Transactional
-	public XKHealthPrescription diagnoseEvaluation(XKPeopleCondition condition, String accessKey) {
+	public XKHealthPrescription doSimpleEvaluation(XKPeopleCondition condition, String accessKey) {
 
 		List<XKEvaluation> evaluationResultList = null;
 		XKEvaluateCondition evaluateCondition = condition.getCondition();
@@ -134,20 +125,10 @@ public class XKHealthPrescriptionService {
 					}
 
 					String riskLevelName = (String) riskResult.get("riskLevel");
-					int riskLevel = 0;
 
 					// 熙康返回的是中文危险等级名称，这里对其归纳总结给出等级
-					if ("极低风险".equals(riskLevelName)) {
-						riskLevel = XKEvaluation.LEVEL_VERY_LOW;
-					} else if ("低风险".equals(riskLevelName)) {
-						riskLevel = XKEvaluation.LEVEL_LOW;
-					} else if ("中风险".equals(riskLevelName) || "中等风险".equals(riskLevelName)) {
-						riskLevel = XKEvaluation.LEVEL_MIDDLE;
-					} else if ("高风险".equals(riskLevelName)) {
-						riskLevel = XKEvaluation.LEVEL_HIGH;
-					} else if ("极高风险".equals(riskLevelName)) {
-						riskLevel = XKEvaluation.LEVEL_VERY_HIGH;
-					} else {
+					Integer riskLevel = XKEvaluation.nameLevelMap.get(riskLevelName);
+					if (riskLevel == null) {
 						logger.error("评估[" + name + "]时出现未知风险等级：" + riskLevelName);
 						continue;
 					}
@@ -222,20 +203,12 @@ public class XKHealthPrescriptionService {
 				target.setUpdateBy(accessKey);
 				diagnoseTargetService.update(target);
 			}
-			// 替换目标病人存在的危险因素（疾病，风险）
-			List<DiagnoseTargetFactor> targetFactors = new ArrayList<>();
 
-			if (evaluationResultList != null && evaluationResultList.size() > 0) {
-				for (XKEvaluation evaluation : evaluationResultList) {
-					targetFactors.add(new DiagnoseTargetFactor(identificationId, evaluation.getCode(), DiagnoseTargetFactor.FACTOR_TYPE_RISK,
-							evaluation.getRiskLevel(), now, accessKey));
-				}
-			}
+			// 更新评估得到的因素
+			updateEvaluationFactor(evaluationResultList, identificationId, accessKey);
 
-			diagnoseRecordFactorService.removeByTarget(identificationId);
-			if (targetFactors.size() > 0) {
-				diagnoseRecordFactorService.batchSave(targetFactors);
-			}
+			String searchId = condition.getSearchId();
+			List<String> messages = getMessage(target, evaluationResultList);
 
 			// 保存目标病人本次请求和返回数据
 			DiagnoseRecord record = new DiagnoseRecord();
@@ -247,13 +220,15 @@ public class XKHealthPrescriptionService {
 			record.setType(DiagnoseRecord.TYPE_XK);
 			record.setCreateTime(now);
 			record.setCreateBy(accessKey);
+			record.setSearchId(searchId);
+			record.setMessage(JsonUtil.getJson(messages));
 
 			diagnoseRecordService.save(record);
 
 			XKHealthPrescription result = new XKHealthPrescription();
 			result.setId(diagnoseId);
 			result.setEvaluation(evaluationResultList);
-			result.setMessage(getMessage(target, evaluationResultList));
+			result.setMessage(messages);
 
 			return result;
 		}
@@ -261,6 +236,75 @@ public class XKHealthPrescriptionService {
 		return null;
 	}
 
+	/**
+	 * 替换目标病人存在的危险因素（疾病，风险）
+	 * 
+	 * @param evaluationResultList
+	 * @param identificationId
+	 * @param accessKey
+	 */
+	private void updateEvaluationFactor(List<XKEvaluation> evaluationResultList, String identificationId, String accessKey) {
+		Date now = new Date();
+		List<DiagnoseTargetFactor> targetFactors = new ArrayList<>();
+
+		if (evaluationResultList != null && evaluationResultList.size() > 0) {
+			for (XKEvaluation evaluation : evaluationResultList) {
+				targetFactors.add(new DiagnoseTargetFactor(identificationId, evaluation.getCode(), DiagnoseTargetFactor.FACTOR_TYPE_RISK,
+						evaluation.getRiskLevel(), now, accessKey));
+			}
+		}
+
+		diagnoseRecordFactorService.removeByTarget(identificationId);
+		if (targetFactors.size() > 0) {
+			diagnoseRecordFactorService.batchSave(targetFactors);
+		}
+
+	}
+
+	/**
+	 * 确认评估，并更新确认后评估内容
+	 * 
+	 * @param confirmEvaluations
+	 * @param searchId
+	 * @param accessKey
+	 */
+	public void confirmSimpleEvaluation(List<ConfirmEvaluationDTO> confirmEvaluations, String searchId, String accessKey) {
+		DiagnoseRecord record = diagnoseRecordService.getRecordBySearchId(searchId, accessKey);
+		String id = record.getId();
+		String identificationId = record.getTargetId();
+
+		List<XKEvaluation> evaluationResultList = null;
+		if (confirmEvaluations != null && confirmEvaluations.size() > 0) {
+			evaluationResultList = new ArrayList<>(confirmEvaluations.size());
+			for (ConfirmEvaluationDTO confirmEvaluation : confirmEvaluations) {
+				String code = confirmEvaluation.getCode();
+				String name = XKEvaluation.codeNameMap.get(code);
+				if (name == null) {
+					throw new BusinessException("评估数据错误！");
+				}
+
+				Integer level = confirmEvaluation.getRiskLevel();
+				String levelName = XKEvaluation.levelNameMap.get(level);
+				if (levelName == null) {
+					throw new BusinessException("评估数据错误！");
+				}
+
+				String suggest = confirmEvaluation.getSuggest();
+				evaluationResultList.add(new XKEvaluation(code, name, level, levelName, suggest));
+			}
+		}
+
+		updateEvaluationFactor(evaluationResultList, identificationId, accessKey);
+
+		String correctPrescription = "";
+		if (evaluationResultList != null) {
+			correctPrescription = JsonUtil.getJson(evaluationResultList);
+		}
+
+		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription);
+	}
+	
+	
 	/**
 	 * 根据居民情况获取短信
 	 * 
@@ -303,8 +347,6 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public XKDiseaseKnowledge getKnowledge(String code) {
-		// String url = "http://open.xikang.com/openapi/evaluate/diseaseEncyclopedia/" +
-		// code;
 		String url = knowledgeUrl + code;
 		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
 		if (diseaseName != null && diseaseName.length() > 0) {
@@ -332,7 +374,6 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public Map getEvaluation(XKEvaluateCondition condition) {
-		// String url = "http://open.xikang.com/openapi/evaluate/diseasePrediction";
 		return knowledgeServlet.postJsonRequest(evaluationUrl, condition, Map.class);
 	}
 
@@ -344,9 +385,6 @@ public class XKHealthPrescriptionService {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<String> getTips(String typeCode) {
-		// String url =
-		// "http://open.xikang.com/openapi/evaluate/diseaseEncyclopediaByType/" +
-		// typeCode;
 		String url = tipsUrl + typeCode;
 		Map result = knowledgeServlet.getRequest(url, null, Map.class);
 

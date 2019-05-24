@@ -9,6 +9,8 @@ public class DiagnoseRecord {
 
 	public final static String TYPE_XK = "XK";
 	public final static String COLUMN_FIELD_TARGET_ID= "targetId";
+	public final static String COLUMN_FIELD_SEARCH_ID= "searchId";
+	public final static String COLUMN_FIELD_CREATE_BY= "createBy";
 	
 	@Id
 	private String id;
@@ -28,7 +30,15 @@ public class DiagnoseRecord {
 
 	private Date createTime;
 	
+	private Date updateTime;
+	
 	private String createBy;
+	
+	private String searchId;
+	
+	private String message;
+	
+	private String sendMessage;
 
 	public String getId() {
 		return id;
@@ -100,6 +110,38 @@ public class DiagnoseRecord {
 
 	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
+	}
+
+	public String getSearchId() {
+		return searchId;
+	}
+
+	public void setSearchId(String searchId) {
+		this.searchId = searchId;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getSendMessage() {
+		return sendMessage;
+	}
+
+	public void setSendMessage(String sendMessage) {
+		this.sendMessage = sendMessage;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 }

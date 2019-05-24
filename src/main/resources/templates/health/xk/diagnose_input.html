@@ -218,22 +218,22 @@
         $.initComponment($(".content"));
     });
 
-  /*  function diagnose() {
-        var request = jQuery.extend({}, baseModel.data);
-        request.condition = evaluateModel.data;
-        var d = diseaseModel.data;
-        var ds = d && d.disease || [];
-        var is = d && d.index || [];
-        request.diseases = ds.concat(is);
+    // function diagnose() {
+    //     var request = jQuery.extend({}, baseModel.data);
+    //     request.condition = evaluateModel.data;
+    //     var d = diseaseModel.data;
+    //     var ds = d && d.disease || [];
+    //     var is = d && d.index || [];
+    //     request.diseases = ds.concat(is);
 
-        $.postJsonAjax("/xk/diagnose", request, function(data) {
-            console.log(data);
-            var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
+    //     $.postJsonAjax("/xk/diagnose", request, function(data) {
+    //         console.log(data);
+    //         var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
+    //         html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
+    //         $.openPageLayer(html);
 
-        }, $("#diagnoseBtn"))
-    }*/
+    //     }, $("#diagnoseBtn"))
+    // }
 
     function diagnoseDisease() {
         let d = diseaseModel.data;
@@ -245,7 +245,7 @@
         }
         let codes = ds.concat(is);
         $.postAjax("/xk/demo/diagnose/disease",{"code":codes},function (data) {
-            var html = createKnowledgeHtml(data);
+            var html = createKnowledgeHtml(data.evaluation);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
         }, $("#diagnoseBtn"))
@@ -256,7 +256,7 @@
         let request = jQuery.extend({}, baseModel.data);
         request.condition = evaluateModel.data;
         $.postJsonAjax("/xk/demo/diagnose/evaluation", request, function(data) {
-            let html = createEvaluateHtml(data);
+            let html = createEvaluateHtml(data.evaluation);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
         }, $("#diagnoseBtn1"))

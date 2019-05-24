@@ -4,51 +4,63 @@
 <head th:include="/health/header" />
 <style>
     .tab-content>.tab-pane, .pill-content>.pill-pane {
-	display: block;
-	height: 0;
-	overflow-y: hidden;
+    display: block;
+    height: 0;
+    overflow-y: hidden;
 }
 
 .tab-content>.active, .pill-content>.active {
-	height: auto;
+    height: auto;
 }
 </style>
+
 <body class="container">
-    <input type="hidden" id="recordId" th:value="${recordId}"/>
-    <input type="hidden" id="targetName" th:value="${targetName}"/>
-    <input type="hidden" id="targetId" th:value="${targetId}"/>
+    <input type="hidden" id="recordId" th:value="${recordId}" />
+    <input type="hidden" id="targetName" th:value="${targetName}" />
+    <input type="hidden" id="targetId" th:value="${targetId}" />
     <tt:constant enumcode="boolean,sex-type,family-hypertension-type,xk-disease-type,xk-index-type" />
+    <section class="content-header">
+        <h1>健康处方历史</h1>
+        <ol class="breadcrumb no-margin">
+            <li><a href="/health/diagnose/target/index"><i class="fa fa-list-alt"></i>病人列表</a></li>
+            <li><a class="text-muted"  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${#strings.substring(targetName,0,2)})}"  th:text="${targetName}"></a></li>
+            <li class="active" th:text="${time}"></li>
+        </ol>
+    </section>
+    <section class="content">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
                 <li class="active">
                     <a href="#tab_1" data-toggle="tab" aria-expanded="true">诊断信息</a>
                 </li>
                 <li>
-                    <a href="#tab_2" data-toggle="tab" aria-expanded="true">处方结果</a>
+                    <a href="#tab_2" data-toggle="tab" aria-expanded="true">原始处方</a>
                 </li>
-                <li class="pull-right">
-                    <ol class="breadcrumb no-margin">
-                        <li><a class="text-muted"  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${#strings.substring(targetName,0,2)})}"  href="/health/diagnose/record/index"><i class="fa fa-list-alt"></i>&nbsp;诊断列表</a></li>
-                        <li class="active" th:text="${targetName}"></li>
-                    </ol>
+                <li>
+                    <a href="#tab_3" data-toggle="tab" aria-expanded="true">确认处方</a>
                 </li>
             </ul>
             <div class="tab-content">
-                    <div class="tab-pane active" id="tab_1">
-                        <section class="content">
-                            <div id="base"></div>
-                            <!--<div id="disease"></div>-->
-                            <div id="evaluate"></div>
-                        </section>
-
-                    </div>
-                    <div class="tab-pane" id="tab_2">
-                        <section class="content">
-                            <div id="info"></div>
-                        </section>
-                    </div>
+                <div class="tab-pane active" id="tab_1">
+                    <section class="content">
+                        <div id="base"></div>
+                        <!--<div id="disease"></div>-->
+                        <div id="evaluate"></div>
+                    </section>
+                </div>
+                <div class="tab-pane" id="tab_2">
+                    <section class="content">
+                        <div id="info"></div>
+                    </section>
+                </div>
+                <div class="tab-pane" id="tab_3">
+                    <section class="content">
+                        <div id="info2"></div>
+                    </section>
+                </div>
             </div>
         </div>
+    </section>
     <div th:include="/health/footer" />
     <script type="text/javascript">
     var base_options = {
@@ -111,17 +123,21 @@
     }
 
     var submitData, evaluateModel, baseModel, diseaseModel;
-    var baseData = {},evaluateData,diseaseData={};
+    var baseData = {},
+        evaluateData, diseaseData = {};
     $(function() {
-        $.getAjax('/health/diagnose/record/get?id='+ $("#recordId").val(),function (data) {
+        $.getAjax('/health/diagnose/record/get?id=' + $("#recordId").val(), function(data) {
             let conditionDataStr = data.targetCondition;
             let prescriptionDataStr = data.prescription;
-            let  conditionData =  JSON.parse(conditionDataStr);
-            let  prescriptionData =  JSON.parse(prescriptionDataStr);
-            $.each(conditionData, function (col, value) {
+            let correctPrescriptionStr = data.correctPrescription
+            let conditionData = JSON.parse(conditionDataStr);
+            let prescriptionData = JSON.parse(prescriptionDataStr);
+            let correctPrescription = correctPrescriptionStr ? JSON.parse(correctPrescriptionStr) : null;
+
+            $.each(conditionData, function(col, value) {
                 if (col === "diseases") {
                     if (value && value.length > 0) {
-                        $.each(value, function (index, item) {
+                        $.each(value, function(index, item) {
                             let constantKey = getConstantKey(item);
                             if (diseaseData.hasOwnProperty(constantKey)) {
                                 let diseaseDatum = diseaseData[constantKey];
@@ -138,24 +154,26 @@
                 }
             });
             $("#base").html(generateViewHtml(base_options));
-            baseModel = new tonto.Model("base", base_options.columns,{
+            baseModel = new tonto.Model("base", base_options.columns, {
                 pattern: "view"
             });
             baseModel.setData(baseData);
             $("#disease").html(generateViewHtml(disease_options));
-            diseaseModel = new tonto.Model("disease", disease_options.columns,{
+            diseaseModel = new tonto.Model("disease", disease_options.columns, {
                 pattern: "view"
             });
             diseaseModel.setData(diseaseData);
             $("#evaluate").html(generateViewHtml(evaluate_options));
-            evaluateModel = new tonto.Model("evaluate", evaluate_options.columns,{
+            evaluateModel = new tonto.Model("evaluate", evaluate_options.columns, {
                 pattern: "view"
             });
             evaluateModel.setData(evaluateData);
             $.initComponment($(".content"));
-            var html = createEvaluateHtml(prescriptionData) ;
-            html = "<div class='no-pad-top' style='padding-right: 50px'>" + html + "</div>";
-            $("#info").html(html)
+
+            var html = createEvaluateHtml(prescriptionData);
+            var html2 = correctPrescription ? createEvaluateHtml(correctPrescription) : '';
+            $("#info").html(html);
+            $("#info2").html(html2);
         });
     });
 
@@ -163,10 +181,10 @@
         let enumcodes = ["xk-index-type", "xk-disease-type"];
         let result = false;
         let key = "";
-        enumcodes.some(function (enumcode) {
+        enumcodes.some(function(enumcode) {
             let constantEnum = $.getConstantEnum(enumcode);
             if ($.isArray(constantEnum)) {
-                result = constantEnum.some(function (item) {
+                result = constantEnum.some(function(item) {
                     return item.key === code;
                 })
             }
@@ -176,23 +194,6 @@
         return key;
     }
 
-  /*  function diagnose() {
-        var request = jQuery.extend({}, baseModel.data);
-        request.condition = evaluateModel.data;
-        var d = diseaseModel.data;
-        var ds = d && d.disease || [];
-        var is = d && d.index || [];
-        request.diseases = ds.concat(is);
-
-        $.postJsonAjax("/xk/diagnose", request, function(data) {
-            console.log(data);
-            var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
-
-        }, $("#diagnoseBtn"))
-    }*/
-
     function createEvaluateHtml(data) {
         var html = "";
 
@@ -200,7 +201,7 @@
             html += createEvaluateItemHtml(item);
         });
 
-        return "<fieldset><legend>风险评估</legend><div>" + html + "</div></fieldset>";
+        return "<div>" + html + "</div>";
     }
 
     function createEvaluateItemHtml(data) {
@@ -220,127 +221,35 @@
             '    <dt>风险等级：</dt>' +
             '    <dd><span class="label label-' + color + '">' + data.riskLevelName + '</span></dd>' +
             '    <dt>分析建议：</dt>' +
-            parseEvaluateContent(data.suggest) +
+            parseEvaluateContent(data) +
             '</dl>';
     }
 
-    function parseEvaluateContent(content) {
-        var arr = content.split('@#');
+    function parseEvaluateContent(data) {
+        var content = data.suggest;
+        if(!content) return ''; 
 
-        var s = "";
-        arr.forEach(function(a) {
-            s += "<dd>&nbsp;&nbsp;" + a + "</dd>";
-        });
-
-        return s;
-    }
-    
-    
-    var count=0;
-    function createKnowledgeHtml(data) {
-        var html = "";
-
-        data.forEach(function(item) {
-            html += createKnowledgeItemHtml(item);
-            count++;
-        });
-
-        return "<fieldset><legend>体检百科</legend><div>" + html + "</div></fieldset>";
-    }
-
-    function createKnowledgeItemHtml(result) {
-        		var data=result.knowledge;
-        		var type=result.type;
-        		if (!data) {
-        	        return '';
-        	    }
-        	    var html = "";
-        	    if(type=='index'){
-        	    	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-        	    		    +'<dt>指标名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
-        	    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad+'</dd>'
-        	    		    +'<dt>检查目的：</dt><dd id="dm">'+data[0].dm+'</dd>'
-        	    		    +'<dt>判定标准：</dt><dd id="dc">'+data[0].dc+'</dd>'
-        	    		    +'</dl>'
-        	    		    +'<ul class="nav nav-tabs">'
-        	    		    +'<li class=""><a href="#tab0'+count+'"data-toggle="tab" aria-expanded="true">'+data[0].cr+'</a></li>'
-        	    		    +'<li class=""><a href="#tab1'+count+'"data-toggle="tab" aria-expanded="false">'+data[1].cr+'</a></li>'
-        	                +'</ul>'
-        	    }else{
-        	    html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-        	    +'<dt>疾病名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
-        	    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
-        	    +'<dt>疾病概述：</dt><dd id="dm">'+data[0].dm+'</dd>'
-        	    +'<dt>疾病分类：</dt><dd id="dc">'+data[0].dc+'</dd>'
-        	    +'</dl>';
-        	   /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
-        	    }
-        	    var htmlNode=''; 
-        	    for(var i in data){
-        	    	htmlNode += '<div class="tab-pane '+(i==0?'active':'')+'" id="tab'+i+count+'">';
-        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能原因':'病因'), data[i].dd_c);
-        	    	htmlNode += parseKnowledgeContent('症状', data[i].dd_s);
-        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data[i].dd_r);
-        	    	htmlNode += parseKnowledgeContent('生活方式', data[i].dd_l);
-        	    	htmlNode += parseKnowledgeContent('饮食建议', data[i].dd_d);
-        	    	htmlNode += parseKnowledgeContent('饮食宜吃', data[i].dd_d_s);
-        	    	htmlNode += parseKnowledgeContent('饮食忌吃', data[i].dd_d_a);
-        	    	htmlNode += parseKnowledgeContent('运动建议', data[i].dd_sa);
-        	    	htmlNode += parseKnowledgeContent('运动宜做', data[i].dd_sa_s);
-        	    	htmlNode += parseKnowledgeContent('运动忌做', data[i].dd_sa_a);
-        	    	htmlNode += parseKnowledgeContent('医疗保健', data[i].dd_m);
-        	    	htmlNode += parseKnowledgeContent('就医复查指南', data[i].dd_g);
-        	    	htmlNode += parseKnowledgeContent('生活常识', data[i].dd_n);
-        	    	htmlNode+='</div>';
-        	    	
-        	    }
-        	    return html+'<div class="tab-content">'+htmlNode+'</div>';
-        	}
-
-    function parseKnowledgeContent(name, data) {
-        var html = "";
-
-        if (data) {
-            data = data.split("@#");
-            data.forEach(function(it) {
-
-                var ii = it.split("#@"),
-                    h = "";
-                if (ii.length == 1) {
-                    h = ii[0];
-                } else {
-                    var b = true;
-                    for (var i = 0; i < ii.length;) {
-                        if (b) {
-                            if (i < ii.length - 1) {
-                                var m = ii[i],
-                                    n = ii[++i];
-                                if (m == '综述') {
-                                    h += "<b style='color:red'>" + m + "：</b><span style='color:#aaa'>" + n + "</span>";
-                                }
-                                else {
-                                    h += "<b>" + m + "：</b>" + n;
-                                }
-                            } else {
-                                var k = ii[++i];
-                                if (k)
-                                    h += k;
-                            }
-                        }
-                    }
-                }
-
-                html += h + "<br>";
-            });
-        } else {
-            html = "无";
+        if (data.code == 'hypertension' || data.code == 'osteoporosis') {
+            content = content.replace(/(2\. *运动：|3\. *吸烟：|4\. *饮酒：|5\. *心理：)/g, "@#$1");
         }
 
-        return '<dt>' + name + '：</dt><dd>' + html + '</dd>';
-    }
+        var arr = content.split('@#');
+        var ps = [];
 
-    function parseOverview(data) {
+        for (var i = 0; i < arr.length; i++) {
+            var a = arr[i];
+            a = $.trim(a);
+            if (a && a.length > 0 && a !== '3.吸烟：') {
+                ps.push(a);
+            }
+        }
 
+        var s = "<pre style='margin:0px;margin-top:13px;'>";
+        for (var i = 0; i < ps.length; i++) {
+            s += "\t" + ps[i] + "\n";
+        }
+        s += "</pre>";
+        return s;
     }
     </script>
 </body>
