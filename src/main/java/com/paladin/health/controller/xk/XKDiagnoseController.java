@@ -46,6 +46,7 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
+
 		return CommonResponse.getSuccessResponse(healthPrescriptionService.doSimpleEvaluation(condition, accessKey));
 	}
 
@@ -56,6 +57,7 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
+		
 		healthPrescriptionService.doSimpleEvaluation(condition, accessKey);
 		return CommonResponse.getSuccessResponse();
 	}
@@ -122,9 +124,9 @@ public class XKDiagnoseController {
 		return CommonResponse.getSuccessResponse(
 				ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE, XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
 	}
-	
+
 	private boolean validAccessKey(String accessKey) {
 		return authKeyContainer.hasAccessKey(accessKey);
 	}
-	
+
 }

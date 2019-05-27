@@ -1,8 +1,6 @@
 package com.paladin.health.service.diagnose;
 
-import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.PageResult;
-import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.health.mapper.diagnose.DiagnoseRecordMapper;
@@ -27,9 +25,8 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 		return searchPage(query);
 	}
 
-	public DiagnoseRecord getRecordBySearchId(String searchId, String accessKey) {
-		DiagnoseRecord record = searchOne(new Condition(DiagnoseRecord.COLUMN_FIELD_SEARCH_ID, QueryType.EQUAL, searchId),
-				new Condition(DiagnoseRecord.COLUMN_FIELD_CREATE_BY, QueryType.EQUAL, accessKey));
+	public DiagnoseRecord getRecordBySearchId(String searchId, String accessKey) {	
+		DiagnoseRecord record = diagnoseRecordMapper.findRecordBySearchId(searchId,accessKey);		
 		if (record == null) {
 			throw new BusinessException("找不到对应健康处方记录");
 		}

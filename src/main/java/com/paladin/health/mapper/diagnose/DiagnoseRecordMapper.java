@@ -9,4 +9,6 @@ public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
 	int updateCorrectPrescription(@Param("id") String id, @Param("correctPrescription") String correctPrescription);
 
+	DiagnoseRecord findRecordBySearchId(@Param("searchId") String searchId, @Param("accessKey") String accessKey);
+
 }
