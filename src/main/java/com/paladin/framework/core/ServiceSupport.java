@@ -24,6 +24,7 @@ import com.paladin.framework.common.QueryOrderBy;
 import com.paladin.framework.common.QueryType;
 import com.paladin.framework.common.UnDelete;
 import com.paladin.framework.core.configuration.mybatis.CustomMapper;
+import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.exception.SystemException;
 import com.paladin.framework.core.session.UserSession;
 import com.paladin.framework.utils.ParseUtil;
@@ -466,6 +467,92 @@ public abstract class ServiceSupport<Model> {
 			return new PageResult<Model>(page);
 		} finally {
 			PageHelper.clearPage();
+		}
+	}
+
+	/**
+	 * 查找唯一数据
+	 * @param conditions
+	 * @return
+	 */
+	public Model searchOne(Condition... conditions) {
+		return searchOne(conditions, false);
+	}
+
+	/**
+	 * 查找唯一数据
+	 * @param searchParam
+	 * @return
+	 */
+	public Model searchOne(Object searchParam) {
+		return searchOne(searchParam, false);
+	}
+
+	/**
+	 * 查找唯一数据
+	 * @param searchParam
+	 * @param simple
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Model searchOne(Object searchParam, boolean simple) {
+		Example example = null;
+
+		if (searchParam instanceof Example) {
+
+			example = (Example) searchParam;
+
+		} else if (searchParam instanceof Condition) {
+
+			Condition condition = (Condition) searchParam;
+			example = GeneralCriteriaBuilder.buildAnd(modelType, condition);
+
+		} else {
+
+			Class<?> clazz = searchParam.getClass();
+
+			if (List.class.isAssignableFrom(clazz)) {
+				List<Condition> list = (List<Condition>) searchParam;
+				/*
+				 * 对于list，array暂时只处理Condition情况，对于其他多条件传入日后补充
+				 */
+				example = GeneralCriteriaBuilder.buildAnd(modelType, list);
+			} else if (clazz.isArray()) {
+				Condition[] array = (Condition[]) searchParam;
+				example = GeneralCriteriaBuilder.buildAnd(modelType, Arrays.asList(array));
+			} else {
+				example = GeneralCriteriaBuilder.buildQuery(modelType, searchParam);
+			}
+		}
+
+		// 如果是简单模式，则不考虑通用条件和动态条件
+		if (!simple) {
+
+			if (hasCommonCondition) {
+
+				if (example != null) {
+					example = GeneralCriteriaBuilder.buildAnd(example, commonConditions);
+				}
+
+				if (hasDynamicCondition) {
+					example = buildDynamicCondition(example);
+				} else {
+					if (example == null) {
+						throw new BusinessException("无法查到唯一数据");
+					}
+				}
+			} else if (hasDynamicCondition) {
+				example = buildDynamicCondition(example);
+			}
+
+		}
+
+		example = buildOrderBy(example);
+
+		if (example == null) {
+			throw new BusinessException("无法查到唯一数据");
+		} else {
+			return getSqlMapper().selectOneByExample(example);
 		}
 	}
 

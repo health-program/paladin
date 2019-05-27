@@ -10,6 +10,7 @@ import tk.mybatis.mapper.common.base.update.UpdateByPrimaryKeySelectiveMapper;
 import tk.mybatis.mapper.common.example.DeleteByExampleMapper;
 import tk.mybatis.mapper.common.example.SelectByExampleMapper;
 import tk.mybatis.mapper.common.example.SelectCountByExampleMapper;
+import tk.mybatis.mapper.common.example.SelectOneByExampleMapper;
 import tk.mybatis.mapper.common.example.UpdateByExampleMapper;
 import tk.mybatis.mapper.common.example.UpdateByExampleSelectiveMapper;
 
@@ -24,6 +25,7 @@ public interface CustomMapper<T> extends
 				UpdateByPrimaryKeySelectiveMapper<T>,
 				DeleteByPrimaryKeyMapper<T>,
 				DeleteByExampleMapper<T>,
+				SelectOneByExampleMapper<T>,
 				SelectByExampleMapper<T>,
 				SelectCountByExampleMapper<T>,
 				UpdateByExampleMapper<T>,

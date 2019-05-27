@@ -154,6 +154,20 @@ public class ExampleProvider extends MapperTemplate {
      * @return
      */
     public String selectOneByExample(MappedStatement ms) {
-        return selectByExample(ms);
+    	Class<?> entityClass = getEntityClass(ms);
+        //将返回值修改为实体类型
+        setResultType(ms, entityClass);
+        StringBuilder sql = new StringBuilder("SELECT ");
+        if (isCheckExampleEntityClass()) {
+            sql.append(SqlHelper.exampleCheck(entityClass));
+        }
+        sql.append("<if test=\"distinct\">distinct</if>");
+        //支持查询指定列
+        sql.append(SqlHelper.exampleSelectOneColumns(entityClass));
+        sql.append(SqlHelper.fromTable(entityClass, tableName(entityClass)));
+        sql.append(SqlHelper.exampleWhereClause());
+        sql.append(SqlHelper.exampleOrderBy(entityClass));
+        sql.append(SqlHelper.exampleForUpdate());
+        return sql.toString();
     }
 }

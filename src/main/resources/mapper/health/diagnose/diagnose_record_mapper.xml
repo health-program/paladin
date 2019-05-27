@@ -3,7 +3,7 @@
 <mapper namespace="com.paladin.health.mapper.diagnose.DiagnoseRecordMapper">
 
 	<update id="updateCorrectPrescription">
-		UPDATE diagnose_record SET correct_prescription=#{correctPrescription}  WHERE id=#{id} AND update_time=now()
+		UPDATE diagnose_record SET correct_prescription=#{correctPrescription},update_time=now() WHERE id=#{id} 
 	</update>
 
 </mapper>

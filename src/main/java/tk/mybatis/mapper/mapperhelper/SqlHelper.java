@@ -656,6 +656,29 @@ public class SqlHelper {
 	 *
 	 * @return
 	 */
+	public static String exampleSelectOneColumns(Class<?> entityClass) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("<choose>");
+		sql.append("<when test=\"@tk.mybatis.mapper.util.OGNL@hasSelectColumns(_parameter)\">");
+		sql.append("<foreach collection=\"_parameter.selectColumns\" item=\"selectColumn\" separator=\",\">");
+		sql.append("${selectColumn}");
+		sql.append("</foreach>");
+		sql.append("</when>");
+		// 不支持指定列的时候查询全部列
+		sql.append("<otherwise>");
+		// edited By TontoZhou
+		sql.append(getAllColumns(entityClass));
+		sql.append("</otherwise>");
+		sql.append("</choose>");
+		return sql.toString();
+	}
+	
+	
+	/**
+	 * example支持查询指定列时
+	 *
+	 * @return
+	 */
 	public static String exampleCountColumn(Class<?> entityClass) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("<choose>");
