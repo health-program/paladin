@@ -3,6 +3,7 @@ package com.paladin.health.controller.xk;
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.web.response.CommonResponse;
+import com.paladin.health.core.AuthKeyContainer;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
@@ -35,6 +36,8 @@ public class XKDiagnoseController {
 	private XKHealthPrescriptionService healthPrescriptionService;
 	@Autowired
 	private DiagnoseRecordService diagnoseRecordService;
+	@Autowired
+	private AuthKeyContainer authKeyContainer;
 
 	@ApiOperation(value = "熙康健康评估接口")
 	@PostMapping("/evaluate/simple/data")
@@ -121,7 +124,7 @@ public class XKDiagnoseController {
 	}
 	
 	private boolean validAccessKey(String accessKey) {
-		return true;
+		return authKeyContainer.hasAccessKey(accessKey);
 	}
 	
 }
