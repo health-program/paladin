@@ -94,6 +94,7 @@ public class DefaultWriteRow extends WriteRow {
 				defaultColumn.setDefaultEmptyValue(writeProp.defaultValue());
 				defaultColumn.setFormat(writeProp.format());
 				defaultColumn.setWrapText(writeProp.wrapText());
+				defaultColumn.setDateFormat(writeProp.dateFormat());
 
 				CellFormat cellFormat = field.getAnnotation(CellFormat.class);
 				if (cellFormat != null) {

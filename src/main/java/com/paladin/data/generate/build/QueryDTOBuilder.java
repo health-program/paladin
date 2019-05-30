@@ -35,8 +35,7 @@ public class QueryDTOBuilder extends SpringBootClassBuilder {
 				sb.append("import ").append(className).append(";\n");
 		}
 
-		sb.append("\npublic class ").append(getClassName(tableOption)).append(" extends ").append(OffsetPage.class.getSimpleName());
-		sb.append(" {\n\n");
+		sb.append("\npublic class ").append(getClassName(tableOption)).append(" extends ").append(OffsetPage.class.getSimpleName()).append(" {\n\n");
 		sb.append("}");
 
 		return sb.toString();
@@ -54,7 +53,7 @@ public class QueryDTOBuilder extends SpringBootClassBuilder {
 
 	@Override
 	public String getClassName(GenerateTableOption tableOption) {
-		return tableOption.getModelName() + "QueryDTO";
+		return tableOption.getModelName() + "Query";
 	}
 
 }

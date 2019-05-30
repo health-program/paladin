@@ -4,85 +4,159 @@
 //
 // -----------------------------------------
 
-function generateHtml(options) {
+function generateTagAttribute(obj) {
+    if (!obj) return '';
+    var s = [];
+    for (var o in obj) {
+        var v = obj[o];
+        if (v !== undefined && v !== null) {
+            s.push(o + '="' + v + '"');
+        }
+    }
+    return s.length > 0 ? s.join(' ') : '';
+}
+
+function generateTag(tag, obj, text) {
+    var s = [];
+    if (obj) {
+        for (var o in obj) {
+            var v = obj[o];
+            if (v !== undefined && v !== null) {
+                s.push(o + '="' + v + '"');
+            }
+        }
+    }
+    s = s.length > 0 ? s.join(" ") : "";
+    return "<" + tag + " " + s + ">" + (text ? text : '') + "</" + tag + ">";
+}
+
+function generateToolBar(toolBtn) {
+    var html = "";
+    if (toolBtn) {
+        if (!$.isArray(toolBtn)) {
+            toolBtn = [toolBtn];
+        }
+
+        toolBtn.sort(function(a, b) {
+            return (a.order > b.order) ? 1 : -1;
+        });
+
+        toolBtn.forEach(function(b) {
+            var a = b.showIn == 'view' ? ' tonto-model-tool-view-btn' : (b.showIn == 'edit' ? ' tonto-model-tool-edit-btn' : '');
+            if (b.name) {
+                html += '<a class="btn' + a + '" id="' + b.id + '" href="javascript:void(0)">' + (b.icon ? '<i class="' + b.icon + '"></i>' : '') + b.name + '</a>\n';
+            } else {
+                html += '<button id="' + b.id + '" type="button" class="btn btn-box-tool' + a + '"><i class="' + b.icon + '"></i></button>'
+            }
+        });
+    }
+    return html
+}
+
+function generateBox(options, content) {
     var id = options.id,
         name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'fa fa-list';
+        icon = options.icon,
+        editable = options.editable !== false,
+        borderClass = options.boxHeaderClass || 'box-header no-border',
+        boxStyle = options.boxStyle,
+        boxHeaderStyle = options.boxHeaderStyle,
+        boxClass = options.boxClass || 'box box-widget',
+        toolBtn = options.toolBtn || [];
 
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '        <a class="btn" id="' + id + '_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>\n' +
-        '    </div>\n' +
-        '</div>\n';
+    var html = '<div id="' + id + '_container" class="' + boxClass + '" ' + (boxStyle ? 'style="' + boxStyle + '"' : '') + '>\n';
 
-    html += generateViewFormHtml(options);
-    html += generateEditFormHtml(options, true);
+    if (options.hearderBox !== false) {
 
+        if (editable) {
+            if (toolBtn.length > 0 && !toolBtn[0].name) {
+                toolBtn.push({
+                    id: id + '_edit_btn',
+                    icon: 'fa fa-edit',
+                    showIn: 'view',
+                    order: -1
+                });
+            } else {
+                toolBtn.push({
+                    id: id + '_edit_btn',
+                    icon: 'fa fa-edit',
+                    showIn: 'view',
+                    name: '编辑',
+                    order: -1
+                });
+            }
+        }
+
+        html += '<div class="' + borderClass + '" ' + (boxHeaderStyle ? 'style="' + boxHeaderStyle + '"' : '') + '>\n' +
+            (icon ? '<i class="' + icon + '"></i>\n' : '') +
+            (name ? '<h3 class="box-title">' + name + '</h3>\n' : '<h3 class="box-title"> </h3>') +
+            '    <div class="box-tools pull-right">\n';
+        html += generateToolBar(toolBtn);
+        html += '    </div>\n' +
+            '</div>\n';
+    }
+
+    html += content;
     html += '</div>\n';
 
     return html;
 }
 
+function generateHtml(options) {
+    var html = generateBox(options, generateViewFormHtml(options) + generateEditFormHtml(options, true));
+    return html;
+}
+
 function generateEditHtml(options) {
-    var id = options.id,
-        name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'fa fa-list';
-
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '    </div>\n' +
-        '</div>\n';
-
-    html += generateEditFormHtml(options);
-    html += '</div>';
+    var html = generateBox(options, generateEditFormHtml(options));
     return html;
 }
 
 function generateEditFormHtml(options, hide) {
-
-    var id = options.id,
-        columns = options.columns;
-
-    var html =
-        '<div id="' + id + '_edit" class="box-body" ' + (hide == true ? 'style="display: none"' : '') + '>\n' +
-        '   <form id="' + id + '_form" action="' + options.url + '" method="post" class="form-horizontal edit-body">\n';
-
     var defaultConfig = {
             maxColspan: 2,
-            firstLabelSize: 3,
             inputSize: 3,
             labelSize: 2,
-            server: true
+            server: true, //是否服务器支持新增更新，false时提交数据不会到服务端，而是保存在前端
+            columns: [],
+            editBodyClass: 'box-body', //body样式
+            editFormClass: null, //form样式
+            url: '', //form action
+            formPaddingLeft: 100
         },
         currentColspan = 0;
 
     options = $.extend(defaultConfig, options);
 
+    var id = options.id,
+        columns = options.columns;
+
+    var html =
+        '<div id="' + id + '_edit" class="' + options.editBodyClass + '" ' + (hide == true ? 'style="display: none"' : '') + '>\n' +
+        '   <form id="' + id + '_form" action="' + options.url + '" method="post" class="form-horizontal ' + options.editFormClass + '" style="padding-left:' + options.formPaddingLeft + 'px">\n';
+
     for (var i = 0; i < columns.length;) {
         var column = columns[i++],
-            fieldBuilder = _FieldBuilderContainer[column.inputType],
-            colspan = fieldBuilder.generateEditFormColspan(column, options);
+            colspan, result,
+            fieldBuilder = _FieldBuilderContainer[column.inputType];
 
-        // 附件独占一行
+        if (column.editable === false) {
+            result = fieldBuilder.generateViewFormHtml(column, currentColspan == 0 ? true : false, options);
+        } else {
+            result = fieldBuilder.generateEditFormHtml(column, currentColspan == 0 ? true : false, options);
+        }
+
+        colspan = result.colspan;
+
+        // 独占一行
         if (currentColspan + colspan <= options.maxColspan) {
             if (currentColspan == 0) {
                 html += '<div class="form-group">\n';
             }
 
-            result = fieldBuilder.generateEditFormHtml(column, currentColspan == 0 ? true : false, options);
             html += result.html;
 
-            if (result.colspan == 0) {
+            if (colspan == 0) {
                 continue;
             } else if (result.back === true) {
                 i--;
@@ -111,67 +185,85 @@ function generateEditFormHtml(options, hide) {
         currentColspan = 0;
     }
 
-    html +=
-        '   <div class="form-group">\n' +
-        '       <div class="col-sm-2 col-sm-offset-3">\n' +
-        '           <button type="' + (options.server === false ? 'button' : 'submit') + '" id="' + id + '_form_submit_btn" class="btn btn-primary btn-block">保存</button>\n' +
-        '       </div>\n';
+    options.formButtonBar = options.formButtonBar || [];
+    if (options.submitBtn !== false) {
+        options.formButtonBar.push({
+            id: id + '_form_submit_btn',
+            type: options.server === false ? 'button' : 'submit',
+            name: options.submitBtnName || '保存',
+            class: options.submitBtnClass || 'btn btn-primary btn-block',
+            order: -1
+        });
+    }
 
-    if (hide == true) {
-        html +=
-            '       <div class="col-sm-2 col-sm-offset-1">\n' +
-            '       <button type="button" id="' + id + '_form_cancel_btn" class="btn btn-default btn-block">取消</button>\n' +
-            '       </div>\n';
+    if (options.cancelBtn !== false) {
+        options.formButtonBar.push({
+            id: id + '_form_cancel_btn',
+            type: 'button',
+            name: options.cancelBtnName || '取消',
+            class: options.cancelBtnClass || 'btn btn-default btn-block',
+            order: 9999
+        });
+    }
+
+    options.formButtonBar.sort(function(a, b) {
+        return (a.order > b.order) ? 1 : -1;
+    });
+
+    if (options.formButtonBar.length > 0) {
+        var formButtonBarClass = options.formButtonBarClass === false ? null : (options.formButtonBarClass || 'form-button-bar');
+        html += '<div class="form-group' + (formButtonBarClass ? ' ' + formButtonBarClass : '') + '">\n';
+        var firstBtn = true,
+            btnWidth = options.formButtonBar.length > 2 ? 'col-sm-1' : 'col-sm-2';
+        options.formButtonBar.forEach(function(a) {
+            html += firstBtn ? '<div class="' + btnWidth + ' col-sm-offset-3">\n' : '<div class="' + btnWidth + ' col-sm-offset-1">\n';
+            html += '<button type="' + a.type + '" id="' + a.id + '" class="' + a.class + '">' + a.name + '</button>\n';
+            html += '</div>\n';
+
+            firstBtn = false;
+        });
+
+        html += '</div>\n';
     }
 
     html +=
-        '   </div>\n' +
         '</form>\n' +
         '</div>\n';
     return html;
 }
 
 function generateViewHtml(options) {
-    var id = options.id,
-        name = options.name,
-        columns = options.columns,
-        icon = options.icon || 'fa fa-list';
-
-    var html =
-        '<div class="box box-solid">\n' +
-        '<div class="box-header with-border">\n' +
-        '    <i class="' + icon + '"></i>\n' +
-        '    <h3 class="box-title">' + name + '</h3>\n' +
-        '    <div class="box-tools pull-right">\n' +
-        '    </div>\n' +
-        '</div>\n';
-
-    html += generateViewFormHtml(options);
-    html += '</div>';
+    options.editable = false;
+    var html = generateBox(options, generateViewFormHtml(options));
     return html;
 }
 
 function generateViewFormHtml(options) {
-    var id = options.id,
-        columns = options.columns;
-    var html =
-        '<div id="' + id + '_view" class="box-body">\n' +
-        '    <form class="form-horizontal">\n';
-
     var defaultConfig = {
             maxColspan: 2,
-            firstLabelSize: 3,
             inputSize: 3,
-            labelSize: 2
+            labelSize: 2,
+            viewBodyClass: 'box-body',
+            formPaddingLeft: 100
         },
         currentColspan = 0;
 
     options = $.extend(defaultConfig, options);
 
+    var id = options.id,
+        columns = options.columns;
+
+    var html =
+        '<div id="' + id + '_view" class="' + options.viewBodyClass + '">\n' +
+        '    <form class="form-horizontal" style="padding-left:' + options.formPaddingLeft + 'px">\n';
+
+
     for (var i = 0; i < columns.length;) {
         var column = columns[i++],
-            fieldBuilder = _FieldBuilderContainer[column.inputType],
-            colspan = fieldBuilder.generateViewFormColspan(column, options);
+            fieldBuilder = _FieldBuilderContainer[column.inputType];
+
+        var result = fieldBuilder.generateViewFormHtml(column, currentColspan == 0 ? true : false, options);
+        var colspan = result.colspan;
 
         // 附件独占一行
         if (currentColspan + colspan <= options.maxColspan) {
@@ -179,16 +271,15 @@ function generateViewFormHtml(options) {
                 html += '<div class="form-group">\n';
             }
 
-            result = fieldBuilder.generateViewFormHtml(column, currentColspan == 0 ? true : false, options);
             html += result.html;
 
-            if (result.colspan == 0) {
+            if (colspan == 0) {
                 continue;
             } else if (result.back === true) {
                 i--;
                 currentColspan = currentColspan > 0 ? maxColspan : 0;
             } else {
-                currentColspan += result.colspan;
+                currentColspan += colspan;
             }
         } else {
             i--;
@@ -217,13 +308,20 @@ function generateViewFormHtml(options) {
     return html;
 }
 
-
+// Model实体类对象
 var _Model = function(name, column, options) {
     var that = this;
     that.name = name;
-    that.editBtn = $("#" + name + "_edit_btn");
-    that.addBtn = $("#" + name + "_add_btn");
     that.status = "view";
+
+    options = options || {};
+    that.container = options.container || $("#" + name + "_container");
+
+    if (that.container.length == 0) {
+        that.container = $("body");
+    }
+
+    that.editBtn = $("#" + name + "_edit_btn");
     that.viewBody = $("#" + name + "_view");
     that.editBody = $("#" + name + "_edit");
     that.formSubmitBtn = $("#" + name + "_form_submit_btn");
@@ -232,14 +330,6 @@ var _Model = function(name, column, options) {
 
     that.editBtn.click(function() {
         that.toEdit();
-    });
-
-    that.addBtn.click(function() {
-        that.toAdd();
-    });
-
-    that.formCancelBtn.click(function() {
-        that.toView();
     });
 
     that.columns = column;
@@ -259,25 +349,51 @@ var _Model = function(name, column, options) {
 
     that.config = $.extend({
         pattern: "normal", // edit:只能编辑,view:只能查看
-        successCallback: function(data) {
+        extraParam: null, // 可以为方法或对象，用于扩展表单外提交的字段
+        beforeSubmit: null, // 提交表单前调取的方法，如果返回false则不提交
+        successCallback: function(data) { //成功提交表单后回调
             $.successMessage("保存成功");
             that.setData(data)
             that.toView();
-        }
+        },
+        fillViewHandler: null, //填充显示后调用
+        fillEditHandler: null //填充编辑后调用
     }, options);
 
 
-    // 如果非服务端
+    // 编辑提交按钮点击事件
     if (typeof that.config.submitClick === 'function') {
         that.formSubmitBtn.click(function() {
             that.config.submitClick(that);
+        });
+    } else if (options.server === false) {
+        // 非服务端时，不提交后台，直接前端保存
+        that.formSubmitBtn.click(function() {
+            if (that.formBody.valid()) {
+                var d = that.getFormData();
+                that.setData(d);
+                that.toView();
+            }
+        });
+    }
+
+    // 编辑取消按钮点击事件
+    if (typeof that.config.formCancelEventHandler === 'function') {
+        that.formCancelBtn.click(function() {
+            that.config.formCancelEventHandler(that);
+        });
+    } else {
+        that.formCancelBtn.click(function() {
+            that.toView(false);
         });
     }
 
     // 创建表单提交
     if (that.formBody) {
         that.formBody.createForm({
+            // 在表单提交前调用
             beforeCallback: function(formData) {
+                // 扩展参数
                 var extraParam = that.config.extraParam;
                 if (extraParam) {
                     if (typeof extraParam === 'function') {
@@ -294,12 +410,15 @@ var _Model = function(name, column, options) {
                     }
                 }
 
-                that.columns.forEach(function(column) {
-                    if (column.fieldBuilder.formDataHandler(column, formData, that) === false) {
+                // 每列对提交表单数据处理
+                for (var k = 0; k < that.columns.length; k++) {
+                    if (that.columns[k].editable === false) continue;
+                    if (that.columns[k].fieldBuilder.formDataHandler(that.columns[k], formData, that) === false) {
                         return false;
                     }
-                });
+                }
 
+                // 提交前调取
                 var beforeSubmit = that.config.beforeSubmit;
                 if (beforeSubmit && typeof beforeSubmit === 'function') {
                     return beforeSubmit(formData);
@@ -312,6 +431,8 @@ var _Model = function(name, column, options) {
     // 初始化依赖关系
     that.dependency = {};
     if (that.columns) {
+
+        // 建立依赖关系
         that.columns.forEach(function(column) {
             if (column.dependency) {
                 that.dependency[column.name] = [{
@@ -344,12 +465,22 @@ var _Model = function(name, column, options) {
             cache[depend.dependColumn] = 1;
         }
 
+        // 初始化接口
+        that.columns.forEach(function(column) {
+            var fun = column.fieldBuilder.initHandler;
+            if (typeof fun === 'function') {
+                column.fieldBuilder.initHandler(column, that);
+            }
+        });
+
         if (that.config.pattern == 'view') {
             that.editBtn.hide();
+        } else if (that.config.pattern == 'edit') {
+            that.toEdit(false);
         }
     }
 }
-
+// 获取列
 _Model.prototype.getColumn = function(columnName) {
     for (var i = 0; i < this.columns.length; i++) {
         if (this.columns[i].name == columnName) {
@@ -358,7 +489,7 @@ _Model.prototype.getColumn = function(columnName) {
     }
     return null;
 }
-
+// 设置数据，
 _Model.prototype.setData = function(data) {
     var that = this;
     that.data = data;
@@ -381,13 +512,13 @@ _Model.prototype.setData = function(data) {
         });
     }
 
-    if (that.config.pattern == 'edit') {
-        that.toEdit();
+    if (that.status === "edit") {
+        that.fillEditBody();
     } else {
         that.fillViewBody();
     }
 }
-
+// 填充视图
 _Model.prototype.fillViewBody = function() {
     var that = this,
         data = that.data;
@@ -405,14 +536,18 @@ _Model.prototype.fillViewBody = function() {
         that.config.fillViewHandler(that, that.data);
     }
 }
-
+// 填充编辑
 _Model.prototype.fillEditBody = function() {
     var that = this,
         data = that.data;
     if (that.columns) {
         that.filling = true;
         that.columns.forEach(function(column) {
-            column.fieldBuilder.fillEdit(column, data, that);
+            if (column.editable === false) {
+                column.fieldBuilder.fillView(column, data, that, column.fieldBuilder.getEditTarget(column, that));
+            } else {
+                column.fieldBuilder.fillEdit(column, data, that);
+            }
         });
         that.filling = false;
         that.checkEditDependency();
@@ -422,43 +557,46 @@ _Model.prototype.fillEditBody = function() {
         that.config.fillEditHandler(that, that.data);
     }
 }
-
-_Model.prototype.toAdd = function() {
+// 切编辑
+_Model.prototype.toEdit = function(refill) {
     var that = this;
-    that.data = null;
-    that.addBtn.hide();
+    that.container.find(".tonto-model-tool-view-btn").hide();
+    that.container.find(".tonto-model-tool-edit-btn").show();
     that.viewBody.hide();
     that.editBody.show();
-    that.fillEditBody();
+    refill !== false && that.fillEditBody();
+    that.status = 'edit';
 }
-
-_Model.prototype.toEdit = function() {
+// 切视图
+_Model.prototype.toView = function(refill) {
     var that = this;
-    that.editBtn.hide();
-    that.viewBody.hide();
-    that.editBody.show();
-    that.fillEditBody();
-}
-
-_Model.prototype.toView = function() {
-    var that = this;
-    that.editBtn.show();
-    that.addBtn.show();
+    that.container.find(".tonto-model-tool-view-btn").show();
+    that.container.find(".tonto-model-tool-edit-btn").hide();
     that.viewBody.show();
     that.editBody.hide();
+    refill !== false && that.fillViewBody();
+    that.status = 'view';
 }
-
+// 是否在依赖值中
 _Model.prototype.isInDependencyValues = function(val, vals) {
     // 是否在依赖值内
     if (val != null && val != undefined && val !== "") {
         if ($.isArray(val)) {
-            for (var i = 0; i < val.length; i++) {
-                var v = val[i];
-                for (var j = 0; j < vals.length; j++) {
-                    if (v == vals[s]) {
-                        return true;
+            if (val.length > 0) {
+                for (var i = 0; i < val.length; i++) {
+                    var v = val[i],
+                        has = false;
+                    for (var j = 0; j < vals.length; j++) {
+                        if (v == vals[s]) {
+                            has = true;
+                            break;
+                        }
+                    }
+                    if (!has) {
+                        return false;
                     }
                 }
+                return true;
             }
         } else {
             for (var i = 0; i < vals.length; i++) {
@@ -470,7 +608,7 @@ _Model.prototype.isInDependencyValues = function(val, vals) {
     }
     return false;
 }
-
+// 是否满足依赖
 _Model.prototype.isDependencySatisfy = function(dependencies, data) {
     // 是否满足依赖
     for (var i = 0; i < dependencies.length; i++) {
@@ -481,7 +619,7 @@ _Model.prototype.isDependencySatisfy = function(dependencies, data) {
     }
     return true;
 }
-
+// 检查视图状态下依赖
 _Model.prototype.checkViewDependency = function() {
     // 检查VIEW页面依赖
     var that = this,
@@ -490,13 +628,17 @@ _Model.prototype.checkViewDependency = function() {
         var depends = that.dependency[o],
             targetColumn = that.getColumn(depends[0].target);
         if (!that.isDependencySatisfy(depends, data)) {
+            if (targetColumn.viewDisplay == "hide") continue;
             targetColumn.fieldBuilder.hideView(targetColumn, that);
+            targetColumn.viewDisplay = "hide";
         } else {
+            if (targetColumn.viewDisplay == "show") continue;
             targetColumn.fieldBuilder.showView(targetColumn, that);
+            targetColumn.viewDisplay = "show";
         }
     }
 }
-
+// 检查编辑状态下依赖
 _Model.prototype.checkEditDependency = function() {
     // 检查EDIT页面依赖
     var that = this;
@@ -506,8 +648,8 @@ _Model.prototype.checkEditDependency = function() {
 
         for (var i = 0; i < dependencies.length; i++) {
             var depend = dependencies[i],
-                dependCol = that.getColumn(depend.dependColumn),
-                val = dependCol.fieldBuilder.getEditValue(dependCol, that);
+                dependCol = that.getColumn(depend.dependColumn);
+            var val = dependCol.editable === false ? (that.data ? that.data[depend.dependColumn] : null) : dependCol.fieldBuilder.getEditValue(dependCol, that);
 
             if (!that.isInDependencyValues(val, depend.dependValue)) {
                 isOk = false;
@@ -517,42 +659,90 @@ _Model.prototype.checkEditDependency = function() {
 
         var targetCol = that.getColumn(dependencies[0].target);
         if (isOk) {
-            targetCol.fieldBuilder.showEdit(targetCol, that);
+            if (targetCol.editDisplay == "show") continue;
+            if (targetCol.editable === false) {
+                targetCol.fieldBuilder.showView(targetCol, that, targetCol.fieldBuilder.getEditTarget(targetCol, that));
+            } else {
+                targetCol.fieldBuilder.showEdit(targetCol, that);
+            }
+            targetCol.editDisplay = "show";
         } else {
-            targetCol.fieldBuilder.hideEdit(targetCol, that);
+            if (targetCol.editDisplay == "hide") continue;
+            if (targetCol.editable === false) {
+                targetCol.fieldBuilder.hideView(targetCol, that, targetCol.fieldBuilder.getEditTarget(targetCol, that));
+            } else {
+                targetCol.fieldBuilder.hideEdit(targetCol, that);
+            }
+            targetCol.editDisplay = "hide";
         }
     }
 }
+// 获取编辑中数据对象
+_Model.prototype.getFormData = function() {
+    // TODO 附件等处理
+    var jsonData = this.formBody.serializeArray();
+    var d = {},
+        that = this;
+    jsonData.forEach(function(item) {
+        if (d[item.name]) {
+            d[item.name] = d[item.name] + "," + item.value;
+        } else {
+            d[item.name] = item.value;
+        }
+    });
+
+    that.columns.forEach(function(column) {
+        column.fieldBuilder.getFormData(column, d, that);
+    });
+
+    return d;
+}
 
 var _FieldBuilderContainer = {};
+// 在域构建器每个方法前插入，如果列中已经声明方法，则优先列中声明方法
+var _insertBefore = function(name, face, caller) {
+    return function() {
+        var column = arguments[0];
+        if (column && typeof column[name] === 'function') {
+            return column[name].call(caller, arguments);
+        } else {
+            return face.apply(caller, arguments);
+        }
+    }
+}
 var _FieldBuilder = function(name, interfaces) {
     var that = this;
     that.name = name;
+    that.originInterfaces = interfaces;
     var defaultInterfaces = {
+        initHandler: function(column, model) {},
         setDataHandler: function(column, data, model) {
             // 插入数据时候调用
-            if (typeof column.setDataHandler === 'function') {
-                return column.setDataHandler(column, data, model);
-            }
-
             if (data && column.separator) {
+                // 如果有分隔符，则初始化分割字符串
                 var v = data[column.name];
-                if (v) {
-                    data[column.name] = v.split(column.separator);
+                if (typeof v === 'string') {
+                    var arr = v.split(column.separator);
+                    if (arr.length > 1 && arr[arr.length - 1] === '') {
+                        arr.splice(arr.length - 1, 1);
+                    }
+                    data[column.name] = arr;
                 }
             }
         },
         formDataHandler: function(column, formData, model) {
             // 提交表单数据调用
-            if (typeof column.formDataHandler === 'function') {
-                return column.formDataHandler(column, formData, model);
+            return;
+        },
+        getFormData: function(column, data, model) {
+            // 获取表单列编辑数据
+            delete data[column.name];
+            if (column.editDisplay !== "hide") {
+                return data[column.name] = this.getEditValue(column, model);
             }
         },
         dependTrigger: function(column, model) {
             // 依赖域变化注册，监听依赖域变更
-            if (typeof column.dependTrigger === 'function') {
-                return column.dependTrigger(column, model);
-            }
             model.editBody.find("[name='" + column.name + "']").change(function() {
                 if (model.filling === false) {
                     model.checkEditDependency();
@@ -561,63 +751,39 @@ var _FieldBuilder = function(name, interfaces) {
         },
         getEditValue: function(column, model) {
             // 获取域EDIT页面值
-            if (typeof column.getEditValue === 'function') {
-                return column.getEditValue(column, model);
-            }
             return model.editBody.find("[name='" + column.name + "']").val();
         },
-        hideView: function(column, model) {
-            if (column.viewDisplay === "hide") {
-                return;
-            }
-
-            // VIEW页面列隐藏时候调用
-            if (typeof column.hideView === 'function') {
-                column.hideView(column, model);
-                column.viewDisplay = "hide";
-                return;
-            }
-
-            var p = model.viewBody.find("[name='" + column.name + "']");
-            if (!p || p.length == 0) return;
-            var d = p.parent(),
-                f = d.parent();
+        getEditTarget: function(column, model) {
+            // 获取编辑目标
+            return model.editBody.find("[name='" + column.name + "']");
+        },
+        getViewTarget: function(column, model) {
+            // 获取视图目标
+            return model.viewBody.find("[name='" + column.name + "']");
+        },
+        hideView: function(column, model, target) {
+            // 默认class:form-control的div下有label和一个div，div下包含了具体控件
+            var p = target || this.getViewTarget(column, model);
+            if (p.length == 0) return;
+            var d = p.is("div") ? p : p.parent();
+            var f = d.parent();
             d.hide();
             d.prev().hide();
             if (f.children(":visible").length == 0) {
                 f.hide();
             }
-
-            column.viewDisplay = "hide";
         },
-        showView: function(column, model) {
-            if (column.viewDisplay === "show") {
-                return;
-            }
-
-            // VIEW页面列显示时候调用
-            if (typeof column.showView === 'function') {
-                column.showView(column, model);
-                column.viewDisplay = "show";
-                return;
-            }
-
-            var p = model.viewBody.find("[name='" + column.name + "']");
-            if (!p || p.length == 0) return;
-            var d = p.parent();
+        showView: function(column, model, target) {
+            // 显示视图域
+            var p = target || this.getViewTarget(column, model);
+            var d = p.is("div") ? p : p.parent();
             d.show();
             d.prev().show();
             d.parent().show();
-
-            column.viewDisplay = "show";
         },
-        fillView: function(column, data, model) {
+        fillView: function(column, data, model, target) {
             // VIEW页面填充值时候调用
-            if (typeof column.fillView === 'function') {
-                return column.fillView(column, data, model);
-            }
-
-            var p = model.viewBody.find("[name='" + column.name + "']");
+            var p = target || this.getViewTarget(column, model);
             if (!p || p.length == 0) return;
             var v = data ? data[column.name] : null;
 
@@ -629,70 +795,45 @@ var _FieldBuilder = function(name, interfaces) {
                 p.text("无");
             }
         },
-        hideEdit: function(column, model) {
-            if (column.editDisplay === "hide") {
-                return;
-            }
-
-            // EDIT页面列隐藏时候调用
-            if (typeof column.hideEdit === 'function') {
-                column.hideEdit(column, model);
-                column.editDisplay = "hide";
-                return;
-            }
-
-            var p = model.editBody.find("[name='" + column.name + "']");
+        hideEdit: function(column, model, target) {
+            // 隐藏编辑域
+            var p = target || this.getEditTarget(column, model);
             if (!p || p.length == 0) return;
-            var d = p.parent(),
-                f = d.parent();
+            var d = p.is("div") ? p : p.parent();
+            var f = d.parent();
             d.hide();
             d.prev().hide();
             if (f.children(":visible").length == 0) {
                 f.hide();
             }
-            column.editDisplay = "hide";
         },
         showEdit: function(column, model) {
-            if (column.editDisplay === "show") {
-                return;
-            }
-
-            // EDIT页面列隐藏时候调用
-            if (typeof column.showEdit === 'function') {
-                column.showEdit(column, model);
-                column.editDisplay = "show";
-                return;
-            }
-
+            // 显示编辑域
             var p = model.editBody.find("[name='" + column.name + "']");
             if (!p || p.length == 0) return;
-            var d = p.parent();
+            var d = p.is("div") ? p : p.parent();
             d.show();
             d.prev().show();
             d.parent().show();
-            column.editDisplay = "show";
         },
-        fillEdit: function(column, data, model) {
-            // EDIT页面填充值时候调用
-            if (typeof column.fillEdit === 'function') {
-                return column.fillEdit(column, data, model);
-            }
+        fillEdit: function(column, data, model, target) {
+            // EDIT页面填充值时候调用        
 
-            var input = model.editBody.find("[name='" + column.name + "']");
+            var input = target || this.getEditTarget(column, model);
             if (!input && input.length == 0) return;
 
             var v = data ? data[column.name] : null,
                 isP = input.is("p");
 
             if (v || v === 0) {
-                if (isP) {
+                if (isP || column.editable === false) {
                     input.removeClass("text-muted");
                     input.text(v);
                 } else {
                     input.val(v);
                 }
             } else {
-                if (isP) {
+                if (isP || column.editable === false) {
                     input.addClass("text-muted");
                     input.text("无");
                 } else {
@@ -700,19 +841,19 @@ var _FieldBuilder = function(name, interfaces) {
                 }
             }
         },
-        generateViewFormColspan: function(column, options) {
-            if (typeof column.generateViewFormColspan === 'function') {
-                return column.generateViewFormColspan(column, options);
-            }
-            return column.colspan || 1;
+        getRequiredIcon: function(column, options) {
+            return column.required === 'required' ? '<i class="required-label fa fa-asterisk"></i>' : '';
+        },
+        getViewColSize: function(column, colspan, options) {
+            return column.colCount ? column.colCount : ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize);
+        },
+        getEditColSize: function(column, colspan, options) {
+            return column.colCount ? column.colCount : ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize);
         },
         generateViewFormHtml: function(column, isFirst, options) {
-            if (typeof column.generateViewFormHtml === 'function') {
-                return column.generateViewFormHtml(column, isFirst, options);
-            }
-            var colspan = column.colspan || 1,
-                html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-            html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+            var colspan = column.colspan || 1;
+            var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + column.title + '：</label>\n';
+            html += '<div class="col-sm-' + this.getViewColSize(column, colspan, options) + '">\n';
             html += '<p name="' + column.name + '" class="form-control-static description"></p>\n';
             html += '</div>\n';
             return {
@@ -720,20 +861,27 @@ var _FieldBuilder = function(name, interfaces) {
                 html: html
             };
         },
-        generateEditFormColspan: function(column, options) {
-            if (typeof column.generateEditFormColspan === 'function') {
-                return column.generateEditFormColspan(column, options);
-            }
-            return column.colspan || 1;
-        },
         generateEditFormHtml: function(column, isFirst, options) {
-            if (typeof column.generateEditFormHtml === 'function') {
-                return column.generateEditFormHtml(column, isFirst, options);
-            }
             var colspan = column.colspan || 1,
-                html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-            html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-            html += '<input name="' + column.name + '" placeholder="请输入' + column.title + '" type="text" class="form-control"/>\n';
+                required = column.required === 'required',
+                requiredIcon = required ? '<i class="required-label fa fa-asterisk"></i>' : '';
+
+            var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+            html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+
+            var inputAttr = {
+                name: column.name,
+                placeholder: "请输入" + column.title,
+                type: "text",
+                class: "form-control",
+                required: required ? "required" : null
+            }
+
+            if (column.attr) {
+                inputAttr = $.extend(inputAttr, column.attr);
+            }
+
+            html += generateTag("input", inputAttr);
             html += '</div>\n';
             return {
                 colspan: colspan,
@@ -749,7 +897,10 @@ var _FieldBuilder = function(name, interfaces) {
     }
 
     for (var o in interfaces) {
-        that[o] = interfaces[o];
+        var face = interfaces[o];
+        if (typeof face === 'function') {
+            that[o] = _insertBefore(o, face, that);
+        }
     }
 
     _FieldBuilderContainer[name] = that;
@@ -760,13 +911,8 @@ var _textFieldBuilder = new _FieldBuilder("TEXT", {});
 
 // 数字域构建器
 var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
+    fillView: function(column, data, model, target) {
+        var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
 
@@ -782,19 +928,8 @@ var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
             p.text("无");
         }
     },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
+    hideEdit: function(column, model, target) {
+        var p = target || this.getEditTarget(column, model);
         if (!p || p.length == 0) return;
 
         if (column.unit || column.unitIcon) {
@@ -814,19 +949,25 @@ var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
                 f.hide();
             }
         }
-
-        column.editDisplay = "hide";
     },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+            required = column.required === 'required';
+
+        var attr = {
+            placeholder: "请输入" + column.title
+        }
+
+        if (column.attr) {
+            attr = $.extend(attr, column.attr);
+        }
+
+
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
         if (column.unit || column.unitIcon) {
             html += '<div class="input-group">';
-            html += '<input name="' + column.name + '" class="form-control" type="number"></input>\n';
+            html += '<input name="' + column.name + '" class="form-control" ' + (required ? 'required="required"' : '') + ' type="number" ' + generateTagAttribute(attr) + '></input>\n';
             if (column.unitIcon) {
                 html += '<div class="input-group-addon">';
                 html += '       <i class="' + column.unitIcon + '"></i>';
@@ -836,7 +977,7 @@ var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
             }
             html += '</div>';
         } else {
-            html += '<input name="' + column.name + '" type="number"></input>\n';
+            html += '<input name="' + column.name + '" class="form-control" ' + (required ? 'required="required"' : '') + ' type="number" ' + generateTagAttribute(attr) + '></input>\n';
         }
 
         html += '</div>\n';
@@ -849,19 +990,10 @@ var _numberFieldBuilder = new _FieldBuilder("NUMBER", {
 
 // 大文本域构建器
 var _textAreaFieldBuilder = new _FieldBuilder("TEXTAREA", {
-    generateViewFormColspan: function(column, options) {
-        if (typeof column.generateViewFormColspan === 'function') {
-            return column.generateViewFormColspan(column, options);
-        }
-        return column.colspan || options.maxColspan;
-    },
     generateViewFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateViewFormHtml === 'function') {
-            return column.generateViewFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || options.maxColspan;
-        html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getViewColSize(column, colspan, options) + '">\n';
         html += '<pre name="' + column.name + '" style="min-height:150px" class="form-control-static description"></pre>\n';
         html += '</div>\n';
         return {
@@ -869,20 +1001,27 @@ var _textAreaFieldBuilder = new _FieldBuilder("TEXTAREA", {
             html: html
         };
     },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || options.maxColspan;
-    },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
+        var colspan = column.colspan || options.maxColspan,
+            required = column.required === 'required';
+
+        html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+
+        var inputAttr = {
+            name: column.name,
+            placeholder: "请输入" + column.title,
+            rows: column.rows || 5,
+            type: "text",
+            class: "form-control",
+            required: required ? "required" : null
         }
-        var colspan = column.colspan || options.maxColspan;
-        html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<textarea name="' + column.name + '" rows="' + (column.rows || 5) + '" placeholder="请输入' + column.title + '" class="form-control"></textarea>\n';
+
+        if (column.attr) {
+            inputAttr = $.extend(inputAttr, column.attr);
+        }
+
+        html += generateTag("textarea", inputAttr);
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -895,28 +1034,13 @@ var _textAreaFieldBuilder = new _FieldBuilder("TEXTAREA", {
 var _dateFieldBuilder = new _FieldBuilder("DATE", {
     setDataHandler: function(column, data, model) {
         // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
-
         var v = data && data[column.name];
         if (typeof v === 'number') {
             data[column.name] = dateFormat(v);
         }
     },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
+    hideEdit: function(column, model, target) {
+        var p = target || this.getEditTarget(column, model);
         if (!p || p.length == 0) return;
         var d = p.parent().parent(),
             f = d.parent();
@@ -925,42 +1049,35 @@ var _dateFieldBuilder = new _FieldBuilder("DATE", {
         if (f.children(":visible").length == 0) {
             f.hide();
         }
-        column.editDisplay = "hide";
     },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
+    showEdit: function(column, model, target) {
+        var p = target || this.getEditTarget(column, model);
         if (!p || p.length == 0) return;
         var d = p.parent().parent();
         d.show();
         d.prev().show();
         d.parent().show();
-        column.editDisplay = "show";
-    },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
     },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input name="' + column.name + '" autocomplete="off" placeholder="请输入' + column.title + '" type="text" class="form-control tonto-datepicker-date"/>\n';
+            required = column.required === 'required';
+
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+        var inputAttr = {
+            name: column.name,
+            placeholder: "请输入" + column.title,
+            autocomplete: "off",
+            type: "text",
+            class: "form-control tonto-datepicker-date",
+            required: required ? "required" : null
+        }
+
+        if (column.attr) {
+            inputAttr = $.extend(inputAttr, column.attr);
+        }
+
+        html += generateTag("input", inputAttr);
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -970,98 +1087,67 @@ var _dateFieldBuilder = new _FieldBuilder("DATE", {
 });
 
 // 时间域构建器
-var _timeFieldBuilder = new _FieldBuilder("TIME", {
-    setDataHandler: function(column, data, model) {
-        // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
+var _timeFieldBuilder = new _FieldBuilder("TIME",
+    $.extend(_dateFieldBuilder.originInterfaces, {
+        generateEditFormHtml: function(column, isFirst, options) {
+            var colspan = column.colspan || 1,
+                required = column.required === 'required';
 
-        var v = data && data[column.name];
-        if (typeof v === 'number') {
-            data[column.name] = datetimeFormat(v);
-        }
-    },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
+            var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+            html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+            var inputAttr = {
+                name: column.name,
+                placeholder: "请输入" + column.title,
+                autocomplete: "off",
+                type: "text",
+                class: "form-control tonto-datepicker-datetime",
+                required: required ? "required" : null
+            }
 
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
+            if (column.attr) {
+                inputAttr = $.extend(inputAttr, column.attr);
+            }
 
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent(),
-            f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
+            html += generateTag("input", inputAttr);
+            html += '</div>\n';
+            return {
+                colspan: colspan,
+                html: html
+            };
         }
-        column.editDisplay = "hide";
-    },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var p = model.editBody.find("[name='" + column.name + "']");
-        if (!p || p.length == 0) return;
-        var d = p.parent().parent();
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.editDisplay = "show";
-    },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
-    generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
-        var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input name="' + column.name + '" autocomplete="off" placeholder="请输入' + column.title + '" type="text" class="form-control tonto-datepicker-datetime"/>\n';
-        html += '</div>\n';
-        return {
-            colspan: colspan,
-            html: html
-        };
-    }
-});
+    })
+);
 
 // 下拉框域构建器
 var _selectFieldBuilder = new _FieldBuilder("SELECT", {
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
+    initHandler: function(column, model) {
+        if (column.multiple === true) {
+            column.separator = column.separator || ',';
         }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
+    },
+    getDataName: function(column, v) {
+        if (column.multiple === true) {
+            if (v) {
+                if (!$.isArray(v)) return v;
+                var vs = [];
+                v.forEach(function(vi) {
+                    var a = $.getConstantEnumValue(column.enum, vi);
+                    a && vs.push(a);
+                });
+                v = vs.join("，");
+            }
+        } else {
+            if (v || v === 0) {
+                v = $.getConstantEnumValue(column.enum, v);
+            }
+        }
+        return v;
+    },
+    fillView: function(column, data, model, target) {
+        var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
-        if (column.enum && (v || v === 0)) {
-            v = $.getConstantEnumValue(column.enum, v);
-        }
-
+        v = this.getDataName(column, v);
         if (v || v === 0) {
             p.removeClass("text-muted");
             p.text(v);
@@ -1070,20 +1156,17 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
             p.text("无");
         }
     },
-    fillEdit: function(column, data, model) {
+    fillEdit: function(column, data, model, target) {
         // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        var input = model.editBody.find("[name='" + column.name + "']");
+        var input = target || this.getEditTarget(column, model);
         if (!input && input.length == 0) return;
 
         var ov = data ? data[column.name] : null,
-            isP = input.is("p"),
-            v = column.enum && (ov || ov === 0) ? $.getConstantEnumValue(column.enum, ov) : null;
+            isP = input.is("p") || column.editable === false;
 
         if (isP) {
+            var v = this.getDataName(column, ov);
+
             if (v || v === 0) {
                 input.removeClass("text-muted");
                 input.text(v);
@@ -1093,27 +1176,43 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
             }
         } else {
             if (ov || ov === 0) {
-                input.val(ov);
+                if (column.multiple === true) {
+                    input.val(ov).trigger('change');
+                } else {
+                    input.val(ov);
+                }
             } else {
-                input.find("option:first").prop("selected", 'selected');
+                if (column.multiple === true) {
+
+                } else {
+                    input.find("option:first").prop("selected", 'selected');
+                }
             }
         }
     },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<select name="' + column.name + '" class="form-control tonto-select-constant" enumcode="' + column.enum + '">\n';
-        if (column.nullable !== false) {
+            required = column.required === 'required',
+            multiple = column.multiple === true;
+
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+
+        var inputAttr = {
+            name: column.name,
+            placeholder: column.placeholder || null,
+            class: "form-control tonto-select-constant" + (multiple ? ' tonto-multiple-select' : ''),
+            required: required ? "required" : null,
+            multiple: multiple ? 'multiple' : null,
+            enumcode: column.enum
+        }
+
+        if (column.attr) {
+            inputAttr = $.extend(inputAttr, column.attr);
+        }
+
+        html += '<select ' + generateTagAttribute(inputAttr) + '>\n';
+        if (column.nullable !== false && !required && !multiple) {
             html += '<option value="">请选择</option>\n';
         }
         html += '</select>\n';
@@ -1122,18 +1221,166 @@ var _selectFieldBuilder = new _FieldBuilder("SELECT", {
             colspan: colspan,
             html: html
         };
+    }
+});
 
+// 下拉框域构建器
+var _selectServerFieldBuilder = new _FieldBuilder("SELECT-SERVER", {
+    initHandler: function(column, model) {
+        if (column.multiple === true) {
+            column.separator = column.separator || ',';
+        }
+        this.getDataFromServer(column, model);
+    },
+    getDataFromServer: function(column, model) {
+        var that = this;
+        $.getAjax(column.url, function(data) {
+            column.serverData = data;
+            column.serverDataGot = true;
+            that.fillDataFromServer(column, model);
+        });
+    },
+    fillDataFromServer: function(column, model) {
+        var input = this.getEditTarget(column, model);
+        if (column.serverData && input.length > 0) {
+            var k = column.idField || 'id',
+                n = column.nameField || 'name';
+            column.serverData.forEach(function(d) {
+                input.append('<option value="' + d[k] + '">' + d[n] + '</option>');
+            });
+
+            input.select2({
+                placeholder: input.attr("placeholder") || "请选择", //未选择时显示文本
+                maximumSelectionSize: column.maxSelectionSize || null, //显示最大选项数目
+                multiple: column.multiple !== false,
+                width: '100%',
+                allowClear: true
+            });
+        };
+
+        if (model.status == 'view') {
+            this.fillView(column, model.data, model);
+        }
+
+        if (model.status == 'edit') {
+            this.fillEdit(column, model.data, model, column.editable === false ? this.getViewTarget(column, model) : null);
+        }
+    },
+    getDataName: function(column, v) {
+        if (column.serverData) {
+            var k = column.idField || 'id',
+                n = column.nameField || 'name';
+            if (column.multiple === true) {
+                if (v) {
+                    if ($.isArray(v)) {
+                        var vs = [];
+                        v.forEach(function(vi) {
+                            for (var i = 0; i < column.serverData.length; i++) {
+                                var a = column.serverData[i];
+                                if (a[k] == vi) {
+                                    vs.push(a[n]);
+                                }
+                            }
+                        });
+                        v = vs.length > 0 ? vs.join("，") : null;
+                    }
+                }
+            } else {
+                if (v || v === 0) {
+                    for (var i = 0; i < column.serverData.length; i++) {
+                        var a = column.serverData[i];
+                        if (a[k] == v) {
+                            v = a[n];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return v;
+    },
+    fillView: function(column, data, model, target) {
+        if (column.serverDataGot === true) {
+            var p = target || this.getViewTarget(column, model);
+            if (!p || p.length == 0) return;
+            var v = data ? data[column.name] : null;
+            v = this.getDataName(column, v);
+
+            if (v || v === 0) {
+                p.removeClass("text-muted");
+                p.text(v);
+            } else {
+                p.addClass("text-muted");
+                p.text("无");
+            }
+        }
+    },
+    fillEdit: function(column, data, model, target) {
+        if (column.serverDataGot === true) {
+            var input = target || this.getEditTarget(column, model);
+            if (!input && input.length == 0) return;
+
+            var ov = data ? data[column.name] : null,
+                isP = input.is("p") || column.editable === false;
+
+            if (isP) {
+                var v = this.getDataName(column, ov);
+                if (v || v === 0) {
+                    input.removeClass("text-muted");
+                    input.text(v);
+                } else {
+                    input.addClass("text-muted");
+                    input.text("无");
+                }
+            } else {
+                if (ov || ov === 0) {
+                    input.val(ov).trigger('change');
+                } else {
+                    if (column.multiple === true) {
+
+                    } else {
+                        input.find("option:first").prop("selected", 'selected');
+                    }
+                }
+            }
+        }
+    },
+    generateEditFormHtml: function(column, isFirst, options) {
+        var colspan = column.colspan || 1,
+            required = column.required === 'required',
+            multiple = column.multiple === true;
+
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+
+        var inputAttr = {
+            name: column.name,
+            placeholder: column.placeholder || null,
+            class: "form-control",
+            required: required ? "required" : null,
+            multiple: multiple ? 'multiple' : null
+        }
+
+        if (column.attr) {
+            inputAttr = $.extend(inputAttr, column.attr);
+        }
+
+        html += '<select ' + generateTagAttribute(inputAttr) + '>\n';
+        if (column.nullable !== false && !required && !multiple) {
+            html += '<option value="">请选择</option>\n';
+        }
+        html += '</select>\n';
+        html += '</div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
     }
 });
 
 // 附件域构建器
 var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
     setDataHandler: function(column, data, model) {
-        // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
-
         // 解析的附件
         if (!data) return;
 
@@ -1144,12 +1391,34 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
             data[column.name] = v.split(column.separator || ",");
         }
     },
-    formDataHandler: function(column, formData, model) {
-        // 提交表单数据调用
-        if (typeof column.formDataHandler === 'function') {
-            return column.formDataHandler(column, formData, model);
-        }
+    getFormData: function(column, data, model) {
+        delete data[column.name];
+        delete data[column.fileName];
+        if (column.editDisplay !== "hide") {
+            // 有附件时，需要替换某些参数
+            var previews = column.inputAttachment.fileinput('getPreview');
+            var attachments = "";
+            if (previews && previews.config && previews.config.length > 0) {
+                previews.config.forEach(function(p) {
+                    attachments += p.key + ",";
+                });
+            }
 
+            data[column.name] = attachments;
+
+            // 动态加入未上传的文件数据
+            var files = column.inputAttachment.fileinput('getFileStack');
+            if (files) {
+                var fileArr = [];
+
+                files.forEach(function(file) {
+                    fileArr.push(file);
+                });
+                data[column.fileName] = fileArr;
+            }
+        }
+    },
+    formDataHandler: function(column, formData, model) {
         var maxFileCount = column.maxFileCount || 5,
             fileName = column.fileName,
             fileCount = 0,
@@ -1203,75 +1472,21 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
         }
     },
     dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
-        }
         // 不能被依赖
         console && console.log("附件不应该被依赖");
     },
     getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
-
         // 获取文件数据暂不支持
         console && console.log("暂不实现文件数据获取");
     },
-    hideView: function(column, model) {
-        if (column.viewDisplay === "hide") {
-            return;
-        }
-
-        // VIEW页面列隐藏时候调用
-        if (typeof column.hideView === 'function') {
-            column.hideView(column, model);
-            column.viewDisplay = "hide";
-            return;
-        }
-
-        var d = model.viewBody.find("[name='" + column.name + "']");
-        if (!d || d.length == 0) return;
-        var f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-
-        column.viewDisplay = "hide";
-    },
-    showView: function(column, model) {
-        if (column.viewDisplay === "show") {
-            return;
-        }
-
-        // VIEW页面列显示时候调用
-        if (typeof column.showView === 'function') {
-            column.showView(column, model);
-            column.viewDisplay = "show";
-            return;
-        }
-
-        var d = model.viewBody.find("[name='" + column.name + "']");
-        if (!d || d.length == 0) return;
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.viewDisplay = "show";
-    },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
+    fillView: function(column, data, model, target) {
         var name = column.name,
             atts = data && data[column.fileName];
 
         if (atts) {
-            var attDiv = model.viewBody.find('[name="' + name + '"]');
+            var attDiv = target || this.getViewTarget(column, model);
+            if (attDiv.length == 0) return;
+
             var html = '<ul class="mailbox-attachments clearfix">';
             for (var i = 0; i < atts.length; i++) {
                 var b = atts[i];
@@ -1311,58 +1526,12 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
             attDiv.html(html);
         }
     },
-    hideEdit: function(column, model) {
-        if (column.editDisplay === "hide") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.hideEdit === 'function') {
-            column.hideEdit(column, model);
-            column.editDisplay = "hide";
-            return;
-        }
-
-        var i = model.editBody.find("[name='" + column.fileName + "']");
-        if (!i || i.length == 0) return;
-        var d = i.parent().parent().parent().parent().parent();
-        var f = d.parent();
-        d.hide();
-        d.prev().hide();
-        if (f.children(":visible").length == 0) {
-            f.hide();
-        }
-        column.editDisplay = "hide";
-    },
-    showEdit: function(column, model) {
-        if (column.editDisplay === "show") {
-            return;
-        }
-
-        // EDIT页面列隐藏时候调用
-        if (typeof column.showEdit === 'function') {
-            column.showEdit(column, model);
-            column.editDisplay = "show";
-            return;
-        }
-
-        var i = model.editBody.find("[name='" + column.fileName + "']");
-        if (!i || i.length == 0) return;
-        var d = i.parent().parent().parent().parent().parent();
-        d.show();
-        d.prev().show();
-        d.parent().show();
-        column.editDisplay = "show";
-    },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
+    fillEdit: function(column, data, model, target) {
         var name = column.fileName,
             atts = data ? data[name] : null,
-            fileInput = model.formBody.find('[name="' + name + '"]');
+            fileInput = target || model.editBody.find("[name='" + column.fileName + "']");
+
+        if (fileInput.length == 0) return;
 
         var initialPreview = [];
         var initialPreviewConfig = [];
@@ -1389,9 +1558,10 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
                 actionUpload: '' //去除上传预览缩略图中的上传图片；
             },
             uploadAsync: false,
-            maxFileCount: column.maxFileCount || 4,
+            maxFileCount: column.maxFileCount || 5,
             allowedFileExtensions: column.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],
             overwriteInitial: false,
+            dropZoneEnabled: false, // 禁止拖拽
             ajaxDelete: false, // 扩展定义配置，不进行后台删除操作
             initialPreview: initialPreview,
             initialPreviewAsData: true, // allows you to set a raw markup
@@ -1399,37 +1569,21 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
             initialPreviewConfig: initialPreviewConfig
         });
     },
-    generateViewFormColspan: function(column, options) {
-        if (typeof column.generateViewFormColspan === 'function') {
-            return column.generateViewFormColspan(column, options);
-        }
-        return column.colspan || options.maxColspan;
-    },
     generateViewFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateViewFormHtml === 'function') {
-            return column.generateViewFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || options.maxColspan;
-        var html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div name="' + column.name + '" class="col-sm-' + ((options.maxColspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '"></div>\n';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + column.title + '：</label>\n';
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getViewColSize(column, colspan, options) + '"></div>\n';
         return {
             colspan: colspan,
             html: html
         };
     },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || options.maxColspan;
-    },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
-        var colspan = column.colspan || options.maxColspan;
-        var html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div name="' + column.name + '" class="col-sm-' + ((options.maxColspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
+        var colspan = column.colspan || options.maxColspan,
+            required = column.required === 'required';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getEditColSize(column, colspan, options) + '" ' + attrHtml + '>\n';
         html += '<input type="file" name="' + column.fileName + '" ' + (column.maxFileCount === 1 ? '' : 'multiple') + '>\n';
         html += '</div>\n';
         return {
@@ -1442,18 +1596,9 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
 // 单选构建器
 var _radioFieldBuilder = new _FieldBuilder("RADIO", {
     getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
-
         return model.editBody.find("input[name='" + column.name + "']:checked").val();
     },
     dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
-        }
         // 这里使用icheck 所以调用ifChecked事件
         model.editBody.find("input[name='" + column.name + "']").on('ifChecked', function() {
             if (model.filling === false) {
@@ -1461,13 +1606,8 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
             }
         });
     },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
+    fillView: function(column, data, model, target) {
+        var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
         if (column.enum && (v || v === 0)) {
@@ -1482,13 +1622,8 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
             p.text("无");
         }
     },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        var input = model.editBody.find("[name='" + column.name + "']");
+    fillEdit: function(column, data, model, target) {
+        var input = target || this.getEditTarget(column, model);
         if (!input && input.length == 0) return;
 
         var ov = data ? data[column.name] : null,
@@ -1512,20 +1647,13 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
             });
         }
     },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<div name="' + column.name + '" class="tonto-radio-constant" enumcode="' + column.enum + '"></div>\n';
+            required = column.required === 'required';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+        var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
+        html += '<div name="' + column.name + '" class="tonto-radio-constant" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -1537,11 +1665,6 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
 // 多选选构建器
 var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
     setDataHandler: function(column, data, model) {
-        // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
-
         // 解析的附件
         var v = data && data[column.name];
         if (v) {
@@ -1549,18 +1672,13 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
         }
     },
     getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
-
-        return model.editBody.find("input[name='" + column.name + "']:checked").val();
+        var vals = [];
+        model.editBody.find("input[name='" + column.name + "']:checked").each(function() {
+            vals.push($(this).val());
+        });
+        return vals.join();
     },
     dependTrigger: function(column, model) {
-        // 依赖域变化注册，监听依赖域变更
-        if (typeof column.dependTrigger === 'function') {
-            return column.dependTrigger(column, model);
-        }
         // 这里使用icheck 所以调用ifChecked事件
         model.editBody.find("input[name='" + column.name + "']").on('ifChecked', function() {
             if (model.filling === false) {
@@ -1568,27 +1686,18 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
             }
         });
     },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
+    fillView: function(column, data, model, target) {
+        var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
 
-
         if (v) {
-            var t = "";
+            var t = [];
             v.forEach(function(a) {
-                t += column.enum ? $.getConstantEnumValue(column.enum, a) : a;
-                t += ",";
+                t.push(column.enum ? $.getConstantEnumValue(column.enum, a) : a);
             });
 
-            if (t.length > 0) {
-                t = t.substring(0, t.length - 1);
-            }
+            t = t.length > 0 ? t.join("，") : "无";
 
             p.removeClass("text-muted");
             p.text(t);
@@ -1597,30 +1706,21 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
             p.text("无");
         }
     },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        var input = model.editBody.find("[name='" + column.name + "']");
+    fillEdit: function(column, data, model, target) {
+        var input = target || this.getEditTarget(column, model);
         if (!input && input.length == 0) return;
 
-        if (input.is("p")) {
+        if (input.is("p") || column.editable === false) {
             var ov = data ? data[column.name] : null,
                 v = column.enum && ov ? $.getConstantEnumValue(column.enum, ov) : null,
-                t = "";
+                t = [];
             if (v) {
                 v.forEach(function(a) {
-                    t += column.enum ? $.getConstantEnumValue(column.enum, a) : a;
-                    t += ",";
+                    t.push(column.enum ? $.getConstantEnumValue(column.enum, a) : a);
                 });
             }
 
-            if (t.length > 0) {
-                t = t.substring(0, t.length - 1);
-            }
-
+            t = t.length > 0 ? t.join("，") : "无"
             input.removeClass("text-muted");
             input.text(t);
         } else {
@@ -1632,20 +1732,13 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
             }
         }
     },
-    generateEditFormColspan: function(column, options) {
-        if (typeof column.generateEditFormColspan === 'function') {
-            return column.generateEditFormColspan(column, options);
-        }
-        return column.colspan || 1;
-    },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<div name="' + column.name + '" class="tonto-checkbox-constant" enumcode="' + column.enum + '"></div>\n';
+            required = column.required === 'required';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+        var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
+        html += '<div name="' + column.name + '" class="tonto-checkbox-constant" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -1657,11 +1750,6 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
 // 标签域构建器
 var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
     setDataHandler: function(column, data, model) {
-        // 插入数据时候调用
-        if (typeof column.setDataHandler === 'function') {
-            return column.setDataHandler(column, data, model);
-        }
-
         // 解析的附件
         var v = data && data[column.name];
         if (v) {
@@ -1669,34 +1757,15 @@ var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
         }
     },
     getEditValue: function(column, model) {
-        // 获取域EDIT页面值
-        if (typeof column.getEditValue === 'function') {
-            return column.getEditValue(column, model);
-        }
-
-        return model.editBody.find("input[name='" + column.name + "']").tagsinput("items")
+        return model.editBody.find("input[name='" + column.name + "']").tagsinput("items");
     },
-    fillView: function(column, data, model) {
-        // VIEW页面填充值时候调用
-        if (typeof column.fillView === 'function') {
-            return column.fillView(column, data, model);
-        }
-
-        var p = model.viewBody.find("[name='" + column.name + "']");
+    fillView: function(column, data, model, target) {
+        var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
         var v = data ? data[column.name] : null;
 
-
         if (v) {
-            var t = "";
-            v.forEach(function(a) {
-                t += a + ",";
-            });
-
-            if (t.length > 0) {
-                t = t.substring(0, t.length - 1);
-            }
-
+            var t = $.isArray(v) ? v.join("，") : v;
             p.removeClass("text-muted");
             p.text(t);
         } else {
@@ -1704,13 +1773,8 @@ var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
             p.text("无");
         }
     },
-    fillEdit: function(column, data, model) {
-        // EDIT页面填充值时候调用
-        if (typeof column.fillEdit === 'function') {
-            return column.fillEdit(column, data, model);
-        }
-
-        var input = model.editBody.find("[name='" + column.name + "']");
+    fillEdit: function(column, data, model, target) {
+        var input = target || this.getEditTarget(column, model);;
         if (!input && input.length == 0) return;
         input.tagsinput("removeAll");
         var v = data ? data[column.name] : null;
@@ -1722,13 +1786,13 @@ var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
         }
     },
     generateEditFormHtml: function(column, isFirst, options) {
-        if (typeof column.generateEditFormHtml === 'function') {
-            return column.generateEditFormHtml(column, isFirst, options);
-        }
         var colspan = column.colspan || 1,
-            html = '<label for="' + column.name + '" class="col-sm-' + (isFirst ? options.firstLabelSize : options.labelSize) + ' control-label">' + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + ((colspan - 1) * (options.inputSize + options.labelSize) + options.inputSize) + '">\n';
-        html += '<input name="' + column.name + '" type="text" class="form-control" data-role="tagsinput" placeholder="输入内容后回车"/>\n';
+            required = column.required === 'required';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
+        var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
+        html += '<input name="' + column.name + '" type="text" class="form-control" data-role="tagsinput" placeholder="输入内容后回车" ' +
+            (required ? 'required="required"' : '') + ' ' + attrHtml + '/>\n';
         html += '</div>\n';
         return {
             colspan: colspan,
@@ -1737,6 +1801,295 @@ var _tagsinputFieldBuilder = new _FieldBuilder("TAGSINPUT", {
     }
 });
 
+// 子模块域构建器
+var _subModelFieldBuilder = new _FieldBuilder("SUB-MODEL", {
+    getEditValue: function(column, model) {
+        if (column.contentMap) {
+            var datas = [];
+            for (var o in column.contentMap) {
+                datas.push(column.contentMap[o].data);
+            }
+            return datas;
+        }
+        return null;
+    },
+    getFormData: function(column, data) {
+        var datas = [];
+        if (column.contentMap) {
+            for (var o in column.contentMap) {
+                datas.push(column.contentMap[o].data);
+            }
+        }
+        data[column.name] = datas;
+    },
+    fillView: function(column, data, model, target) {
+        var that = this,
+            div = target || this.getViewTarget(column, model),
+            ul = $('<ul class="products-list product-list-in-box"></ul>');
+        if (div.length == 0) return;
+        div.empty();
+        div.append(ul);
+        var subData = data ? data[column.name] : null;
+        if (subData) {
+            subData.forEach(function(d) {
+                that.fillSubView(column, d, model, ul);
+            });
+        }
+    },
+    fillSubView: function(column, data, model, contentContainer) {
+        var itemHtml, that = this;
+        if (typeof column.createSubDataHtml === 'function') {
+            itemHtml = column.createSubDataHtml();
+        } else {
+            itemHtml = '';
+            var subTitleViewHtmml;
+            if (typeof column.subTitleViewHtmml === 'function') {
+                subTitleViewHtmml = column.subTitleViewHtmml(data);
+            } else {
+                subTitleViewHtmml += "<h3 style='display: inline-block;font-size: 18px;margin: 0;line-height: 1;'>" + data[column.subViewField] + "</h3>";
+            }
+
+            itemHtml += subTitleViewHtmml;
+        }
+
+        contentContainer.append(itemHtml);
+    },
+    fillSubEdit: function(column, data, model, id) {
+        var contentContainer = column.contentContainer,
+            itemHtml, that = this;
+        if (typeof column.createSubDataHtml === 'function') {
+            itemHtml = column.createSubDataHtml();
+
+        } else {
+            itemHtml = '<div class="pull-right">' +
+                '<a class="btn" id="' + column.name + '_sub_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>\n' +
+                '<a class="btn" id="' + column.name + '_sub_remove_btn" href="javascript:void(0)"><i class="fa fa-remove"></i>删除</a>\n' +
+                '</div>';
+            var subTitleViewHtmml;
+            if (typeof column.subTitleViewHtmml === 'function') {
+                subTitleViewHtmml = column.subTitleViewHtmml(data);
+            } else {
+                subTitleViewHtmml += "<h3 style='display: inline-block;font-size: 18px;margin: 0;line-height: 1;'>" + data[column.subViewField] + "</h3>";
+            }
+
+            itemHtml += subTitleViewHtmml;
+        }
+
+        var div, com;
+        if (!id) {
+            id = column.name + "_content_" + new Date().getTime();
+            div = $('<li class="item" style="background: none;"></li>');
+            com = {
+                id: id,
+                div: div,
+                data: data
+            };
+            column.contentMap[id] = com;
+            contentContainer.append(div);
+            div.html(itemHtml);
+        } else {
+            com = column.contentMap[id];
+            div = com.div;
+            com.data = data;
+            div.html(itemHtml);
+        }
+
+        div.find('#' + column.name + '_sub_edit_btn').click(function() {
+            that.openSubEditor(column, com, model);
+        });
+
+        div.find('#' + column.name + '_sub_remove_btn').click(function() {
+            layer.confirm('确定删除吗?', function(layerIndex) {
+                delete column.contentMap[id];
+                div.remove();
+                layer.close(layerIndex);
+            });
+        });
+    },
+    fillEdit: function(column, data, model, target) {
+        var that = this,
+            div = target || this.getEditTarget(column, model);
+
+        if (div.length == 0) return;
+
+        if (!column.hasEdited) {
+            var contentContainer = $('<ul class="products-list product-list-in-box"></ul>'),
+                addSubModelBtn = column.addSubModelBtn ? column.addSubModelBtn :
+                $('<div class="dotted-line-btn"><a href="javascript:void(0)" ><i class="glyphicon glyphicon-plus"></i>' + (column.addSubModelBtnTitle ? column.addSubModelBtnTitle : '添加选项') + '</a></div>');
+            div.append(contentContainer);
+            div.append(addSubModelBtn);
+            column.contentContainer = contentContainer;
+            column.contentMap = {};
+
+            var subData = data ? data[column.name] : null;
+            if (subData) {
+                subData.forEach(function(d) {
+                    that.fillSubEdit(column, d, model, null);
+                });
+            }
+
+            addSubModelBtn.click(function() {
+                that.openSubEditor(column, null, model);
+            });
+
+            column.hasEdited = true;
+        }
+    },
+    openSubEditor: function(column, com, model) {
+        var that = this;
+        var subOp = column.subModelOptions;
+        subOp.id = subOp.id || column.name + "_" + new Date().getTime();
+
+        var defaultSubOp = {
+            cancelBtn: false,
+            server: false,
+            editFormClass: false,
+            maxColspan: 1,
+            firstLabelSize: 3,
+            inputSize: 8,
+            labelSize: 3,
+            formButtonBar: [{
+                id: subOp.id + '_edit_cancel_btn',
+                type: 'button',
+                name: '取消',
+                class: 'btn btn-default btn-block',
+                order: 999
+            }]
+        }
+
+        var subOp = $.extend(defaultSubOp, subOp);
+        var html = generateEditFormHtml(subOp, false);
+        html = "<div style='padding:50px'>" + html + "</div>";
+        var layerOption = subOp.layerOption || {};
+        layerOption = $.extend({
+                success: function(layero, index) {
+                    $.initComponment($(layero));
+                    $("#" + subOp.id + '_edit_cancel_btn').click(function() {
+                        layer.close(index);
+                    });
+
+                    var subModel = new tonto.Model(subOp.id, subOp.columns, {
+                        server: false,
+                        pattern: "edit",
+                        submitClick: function() {
+                            if (subModel.formBody.valid()) {
+                                var d = subModel.getFormData();
+                                if (typeof column.beforeAddHandler === 'function') {
+                                    if (column.beforeAddHandler(d, subModel, index) === false) {
+                                        return;
+                                    }
+                                }
+
+                                that.fillSubEdit(column, d, model, com ? com.id : null);
+                                layer.close(index);
+                            }
+                        }
+                    });
+
+                    if (com) {
+                        subModel.setData(com.data);
+                    }
+                }
+            },
+            layerOption);
+        var index = $.openPageLayer(html, layerOption);
+    },
+    generateViewFormHtml: function(column, isFirst, options) {
+        var colspan = column.colspan || options.maxColspan;
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + column.title + '：</label>\n';
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getViewColSize(column, colspan, options) + '"></div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
+    },
+    generateEditFormHtml: function(column, isFirst, options) {
+        var colspan = column.colspan || options.maxColspan,
+            required = column.required === 'required';
+
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getEditColSize(column, colspan, options) + '"></div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
+    }
+});
+
+// 子模块域构建器
+var _editorFieldBuilder = new _FieldBuilder("EDITOR", {
+    initHandler: function(column, model) {
+        if (model.config.pattern != 'view') {
+            var that = this;
+            column.editor = UE.getEditor(model.name + '_' + column.name + '_editor');
+            column.editor.ready(function() {
+                that.fillEdit(column, model.data, model);
+                column.editorReady = true;
+            })
+        }
+
+        if (model.config.pattern != 'edit') {
+            $("#" + model.name + '_' + column.name + '_editor_show_btn').click(function() {
+                var content = model.data ? model.data[column.name] : '';
+                $.openPageLayer('<div style="padding:40px;padding-right:55px">' + content + '</div>');
+            });
+        }
+    },
+    getEditValue: function(column, model) {
+        return column.editor.getContent();
+    },
+    getFormData: function(column, data) {
+        data[column.name] = column.editor.getContent();
+    },
+    formDataHandler: function(column, formData, model) {
+        var content = column.editor.getContent();
+
+        if (!content && column.required === 'required') {
+            $.errorMessage(column.title + "不能为空");
+            return false;
+        }
+
+        formData.push({
+            name: column.name,
+            value: content,
+            type: "text",
+            required: false
+        });
+    },
+    fillView: function(column, data, model) {
+
+    },
+    fillEdit: function(column, data, model) {
+        if (column.editorReady === true) {
+            var content = data ? data[column.name] : '';
+            column.editor.setContent(content);
+        }
+    },
+    generateViewFormHtml: function(column, isFirst, options) {
+        var colspan = column.colspan || options.maxColspan;
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + column.title + '：</label>\n';
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getViewColSize(column, colspan, options) + '"><label class="control-label">' +
+            '<a href="javascript:void(0)" id="' + options.id + '_' + column.name + '_editor_show_btn">查看富文本</a>' +
+            '</label></div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
+    },
+    generateEditFormHtml: function(column, isFirst, options) {
+        var colspan = column.colspan || options.maxColspan,
+            required = column.required === 'required';
+        var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
+        var height = column.height || "500px";
+        html += '<div name="' + column.name + '" class="col-sm-' + this.getEditColSize(column, colspan, options) + '">' +
+            '<script type="text/plain" id="' + options.id + '_' + column.name + '_editor" style="width:100%;height:' + height + ';"></script>' +
+            '</div>\n';
+        return {
+            colspan: colspan,
+            html: html
+        };
+    }
+});
 
 if (!window.toton) window.toton = {};
 window.tonto.Model = _Model;

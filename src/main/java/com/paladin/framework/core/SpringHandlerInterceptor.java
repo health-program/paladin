@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.paladin.framework.core.query.QueryInputMethod;
+import com.paladin.framework.utils.JsonUtil;
 
 public class SpringHandlerInterceptor implements HandlerInterceptor {
 
@@ -39,6 +40,9 @@ public class SpringHandlerInterceptor implements HandlerInterceptor {
 				QueryInputMethod queryMethod = shell.queryMethod;
 				Object object = SecurityUtils.getSubject().getSession().getAttribute(queryMethod.queryClass().getName());
 				if (object != null) {
+					if(object instanceof String) {
+						object = JsonUtil.parseJson((String)object, queryMethod.queryClass());
+					}
 					modelAndView.addObject(queryMethod.viewName(), object);
 				}
 			}

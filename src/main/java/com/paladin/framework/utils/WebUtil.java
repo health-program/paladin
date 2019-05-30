@@ -30,4 +30,22 @@ public class WebUtil {
 
 	}
 
+	public static void sendJsonByCors(HttpServletResponse response, Object obj, String allowOrigin) {
+
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Cache-Control", "no-cache");
+		response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+
+		try {
+			JsonUtil.writeJson(response.getWriter(), obj);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public static void sendJsonByCors(HttpServletResponse response, Object obj) {
+		sendJsonByCors(response, obj, "*");
+	}
 }

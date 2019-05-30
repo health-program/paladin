@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.paladin.framework.core.copy.SimpleBeanCopier.SimpleBeanCopyUtil;
 import com.paladin.framework.web.response.CommonResponse;
@@ -50,5 +51,8 @@ public class ControllerSupport {
 	public <T> List<T> beanCopyList(List<?> sourceList, List<T> targeList) {
 		return SimpleBeanCopyUtil.simpleCopyList(sourceList, targeList);
 	}
-
+	
+	public ModelAndView returnErrorView(String errorMessage) {
+		return new ModelAndView("/common/error/error", "errorMessage", errorMessage);
+	}
 }

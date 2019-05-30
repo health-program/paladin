@@ -33,6 +33,6 @@ public class MapperXMLBuilder extends SpringBootResourceBuilder {
 
 	@Override
 	public String getFileName(GenerateTableOption tableOption) {
-		return tableOption.getTable().getName() + "_mapper.xml";
+		return tableOption.getModelName() + "Mapper.xml";
 	}
 }

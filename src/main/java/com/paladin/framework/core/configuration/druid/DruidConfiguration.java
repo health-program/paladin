@@ -17,7 +17,7 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.support.http.StatViewServlet;
 import com.alibaba.druid.support.http.WebStatFilter;
 
-@ConditionalOnProperty(name = "paladin.configuration.auto.druid", havingValue = "true", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "paladin", value = "druid-enabled", havingValue = "true", matchIfMissing = false)
 @Configuration
 public class DruidConfiguration {
 

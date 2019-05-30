@@ -1,6 +1,7 @@
 package com.paladin.framework.core.configuration.mybatis;
 
 import com.github.pagehelper.PageInterceptor;
+import com.paladin.framework.core.GlobalProperties;
 
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -9,7 +10,6 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -27,8 +27,7 @@ import java.util.Properties;
  * MyBatis基础配置
  */
 @Configuration
-@ConditionalOnProperty(name = "paladin.configuration.auto.mybatis", havingValue = "true", matchIfMissing = true)
-@EnableConfigurationProperties(MyBatisProperties.class)
+@ConditionalOnProperty(prefix = "paladin", value = "mybatis-enabled", havingValue = "true", matchIfMissing = true)
 @Import(MyBatisMapperScannerConfig.class)
 public class MyBatisConfiguration implements TransactionManagementConfigurer {
 
@@ -38,13 +37,15 @@ public class MyBatisConfiguration implements TransactionManagementConfigurer {
 	public DataSource dataSource;
 
 	@Bean(name = "sqlSessionFactory")
-	public SqlSessionFactory sqlSessionFactoryBean(MyBatisProperties myBatisProperties) {
+	public SqlSessionFactory sqlSessionFactoryBean() {
 
 		logger.info("初始化MyBatis插件");
 
+		String typeAliasesPackage = "com.paladin.common.model,com.paladin.data.model,com.paladin." + GlobalProperties.project + ".model";
+
 		SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
 		bean.setDataSource(dataSource);
-		bean.setTypeAliasesPackage(myBatisProperties.getTypeAliasesPackage());
+		bean.setTypeAliasesPackage(typeAliasesPackage);
 
 		// 分页插件
 		PageInterceptor pageHelper = new PageInterceptor();
@@ -65,7 +66,7 @@ public class MyBatisConfiguration implements TransactionManagementConfigurer {
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
 		try {
-			bean.setMapperLocations(resolver.getResources(myBatisProperties.getMapperLocations()));
+			bean.setMapperLocations(resolver.getResources("classpath:mapper/**/*.xml"));
 			return bean.getObject();
 		} catch (Exception e) {
 			e.printStackTrace();

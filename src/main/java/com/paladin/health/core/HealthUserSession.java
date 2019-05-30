@@ -172,4 +172,9 @@ public class HealthUserSession extends UserSession implements AuthorizationInfo 
 		return map;
 	}
 
+	@Override
+	public boolean isSystemAdmin() {
+		return isSystemAdmin;
+	}
+
 }

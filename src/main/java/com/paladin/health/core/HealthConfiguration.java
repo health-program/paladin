@@ -1,6 +1,7 @@
 package com.paladin.health.core;
 
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerExceptionResolver;
@@ -8,8 +9,9 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import com.paladin.common.core.CommonHandlerExceptionResolver;
 import com.paladin.common.core.TontoDialect;
 
+import io.buji.pac4j.realm.Pac4jRealm;
+
 @Configuration
-@EnableConfigurationProperties(HealthProperties.class)
 public class HealthConfiguration {
 
 	@Bean
@@ -22,4 +24,14 @@ public class HealthConfiguration {
 		return new CommonHandlerExceptionResolver();
 	}
 	
+	@Bean("casRealm")
+	@ConditionalOnProperty(prefix = "paladin", value = "cas-enabled", havingValue = "true", matchIfMissing = false)
+	public Pac4jRealm getCasRealm() {
+		return new HealthCasUserRealm();
+	}
+
+	@Bean("localRealm")
+	public AuthorizingRealm getLocalRealm() {
+		return new HealthUserRealm();
+	}
 }

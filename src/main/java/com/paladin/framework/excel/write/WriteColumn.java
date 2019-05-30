@@ -1,6 +1,7 @@
 package com.paladin.framework.excel.write;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -11,6 +12,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+
+import com.paladin.framework.utils.time.DateFormatUtil;
 
 /**
  * 
@@ -53,15 +56,21 @@ public abstract class WriteColumn implements WriteComponent {
 
 	// 枚举类型
 	private String enumType;
+	// 是否多个
+	private boolean multiple;
+
+	// 日期时间格式化字符串
+	private String dateFormat;
+	private SimpleDateFormat dateFormatter;
 
 	// cell样式
 	private CellStyle style;
 
 	@Override
 	public int write(Object data, Sheet sheet, Workbook workbook, int rowNum, int span, CellStyle commonCellStyle) {
-		
+
 		int cellIndex = getCellIndex();
-		
+
 		Row row = sheet.getRow(rowNum);
 		if (row == null)
 			row = sheet.createRow(rowNum);
@@ -120,7 +129,14 @@ public abstract class WriteColumn implements WriteComponent {
 			} else if (value instanceof Float) {
 				cell.setCellValue((Float) value);
 			} else if (value instanceof Date) {
-				cell.setCellValue((Date) value);
+				if (dateFormat != null && dateFormat.length() > 0) {
+					if (dateFormatter == null) {
+						dateFormatter = DateFormatUtil.getThreadSafeFormat(dateFormat);
+					}
+					cell.setCellValue(dateFormatter.format((Date) value));
+				} else {
+					cell.setCellValue((Date) value);
+				}
 			} else if (value instanceof Calendar) {
 				cell.setCellValue((Calendar) value);
 			} else {
@@ -153,7 +169,7 @@ public abstract class WriteColumn implements WriteComponent {
 			style = createCellStyle(workbook, commonCellStyle);
 		return style;
 	}
-	
+
 	public CellStyle resetCellStyle() {
 		return style = null;
 	}
@@ -280,12 +296,24 @@ public abstract class WriteColumn implements WriteComponent {
 		this.valueFormator = valueFormator;
 	}
 
+	/** 常量·字典类型 */
 	public String getEnumType() {
 		return enumType;
 	}
 
+	/** 常量·字典类型 */
 	public void setEnumType(String enumType) {
 		this.enumType = enumType;
+	}
+
+	/** 日期时间格式化字符串 */
+	public String getDateFormat() {
+		return dateFormat;
+	}
+
+	/** 日期时间格式化字符串 */
+	public void setDateFormat(String dateFormat) {
+		this.dateFormat = dateFormat;
 	}
 
 	public String toString() {
@@ -293,6 +321,14 @@ public abstract class WriteColumn implements WriteComponent {
 		StringBuilder sb = new StringBuilder();
 		sb.append("\nID：").append(id).append("\n列名：").append(name).append("\n列序号：").append(cellIndex);
 		return sb.toString();
+	}
+
+	public boolean isMultiple() {
+		return multiple;
+	}
+
+	public void setMultiple(boolean multiple) {
+		this.multiple = multiple;
 	}
 
 }

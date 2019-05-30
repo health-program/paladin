@@ -18,8 +18,15 @@ public class JsonUtil {
 		objectMapper.writeValue(out, value);
 	}
 
+	public static <T> T parseJson(String json, Class<T> valueType) {
+		try {
+			return objectMapper.readValue(json, valueType);
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
 	public static String getJson(Object value) {
-		if(value == null) return null;
 		try {
 			return objectMapper.writeValueAsString(value);
 		} catch (JsonProcessingException e) {
@@ -28,13 +35,10 @@ public class JsonUtil {
 		}
 	}
 
-	public static <T> T parseJson(String json, Class<T> valueType) throws IOException {
-		return objectMapper.readValue(json, valueType);	
-	}
-
 	public static void writeJson(Writer writer, Object value) throws IOException {
 		objectMapper.writeValue(writer, value);
 	}
+
 	
 	public static <T> List<T> parseJsonList(String json, Class<T> valueType) throws IOException {
 		return objectMapper.readValue(json, new TypeReference<List<T>>() { });	

@@ -14,13 +14,11 @@ import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.paladin.common.model.syst.SysUser;
 import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.session.UserSession;
 
-@Component
 public class HealthUserRealm extends AuthorizingRealm {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());

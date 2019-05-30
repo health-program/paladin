@@ -1,4 +1,4 @@
-package com.paladin.framework.core.configuration.shiro;
+package com.paladin.framework.core.configuration.shiro.cache;
 
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;

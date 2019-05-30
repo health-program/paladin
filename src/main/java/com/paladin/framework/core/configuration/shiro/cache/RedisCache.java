@@ -1,4 +1,4 @@
-package com.paladin.framework.core.configuration.shiro;
+package com.paladin.framework.core.configuration.shiro.cache;
 
 import java.util.Collection;
 import java.util.Set;

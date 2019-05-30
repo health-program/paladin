@@ -53,10 +53,9 @@ public class DBConnectionController extends ControllerSupport {
 
 	@Autowired
 	private GenerateService generateService;
-	
+
 	@Autowired
 	private DbBuildTableService buildTableService;
-	
 
 	@GetMapping(value = "/index")
 	public String index(HttpServletRequest request) {
@@ -161,15 +160,15 @@ public class DBConnectionController extends ControllerSupport {
 
 		model.addAttribute("dbName", dbName);
 		model.addAttribute("tableName", tableName);
-		
+
 		DbBuildTable buildTable = buildTableService.getDbBuildColumn(dbName, tableName);
-		
+
 		String title = tableName;
-		if(buildTable != null) {
+		if (buildTable != null) {
 			title = buildTable.getTableTitle();
 		}
-		
-		model.addAttribute("tableTitle", title);		
+
+		model.addAttribute("tableTitle", title);
 		model.addAttribute("projectPath", visitCacheService.getCache(request, CACHE_PROJECT_PATH));
 
 		return "/data/connection/build";
@@ -220,6 +219,7 @@ public class DBConnectionController extends ControllerSupport {
 		generateService.buildProjectFile(tableOption, BuilderType.MODEL_VO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.MODEL_DTO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.QUERY_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.EXPORT_QUERY_DTO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.MAPPER, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.SERVICE, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.CONTROLLER, projectPath);
@@ -233,7 +233,7 @@ public class DBConnectionController extends ControllerSupport {
 		visitCacheService.putCache(request, CACHE_PROJECT_PATH, projectPath);
 
 		generateService.saveBuildOption(tableOption, dbName);
-		
+
 		return CommonResponse.getSuccessResponse();
 	}
 
@@ -277,6 +277,7 @@ public class DBConnectionController extends ControllerSupport {
 		generateService.buildProjectFile(tableOption, BuilderType.MODEL_VO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.MODEL_DTO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.QUERY_DTO, projectPath);
+		generateService.buildProjectFile(tableOption, BuilderType.EXPORT_QUERY_DTO, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.MAPPER, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.SERVICE, projectPath);
 		generateService.buildProjectFile(tableOption, BuilderType.CONTROLLER, projectPath);
@@ -288,7 +289,7 @@ public class DBConnectionController extends ControllerSupport {
 		generateService.buildProjectFile(tableOption, BuilderType.PAGE_DETAIL, projectPath);
 
 		generateService.saveBuildOption(tableOption, dbName);
-		
+
 		return CommonResponse.getSuccessResponse();
 	}
 

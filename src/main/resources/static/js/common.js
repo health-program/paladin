@@ -1,3 +1,6 @@
+// 需要修改
+var $global_project = "health";
+
 (function($) {
 
     // --------------------------------------
@@ -236,12 +239,34 @@
     // --------------------------------------
 
     $.extend({
+        validErrorHandler: function(response) {
+            // $.errorMessage(data.message || "数据验证异常");
+            var errorHtml, error = response.result;
+            if (!response.message && $.isArray(error)) {
+                var errorHtml = "<ul>数据验证失败："
+                error.forEach(function(item) {
+                    var el = item[1];
+                    var errorMsg = item[2];
+
+                    // 存在可能对不上input输入框，加上存在前端验证保证大部分情况正确，所以这里才有用户体验稍差的方式
+                    // form.find("#" + el + ",[name='" + el + "']").each(function() {
+                    //     layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
+                    // });
+
+                    errorHtml += "<li>" + errorMsg + "</li>";
+                });
+                errorHtml += "</ul>"
+            } else {
+                errorHtml = response.message || error || "数据验证异常";
+            }
+
+            $.errorAlert(errorHtml);
+        },
         ajaxUnLoginHandler: function(callback) {
             // ajax请求返回未登录状态处理
             // 暂时跳转主页面到登录页面，有时间可以做弹出登录窗口登录，成功后继续执行ajax请求处理
-
             $.failAlert("请先登录", function() {
-                top.location.href = "/hf/login";
+                top.location.href = $global_project + "/login";
             })
         },
         ajaxResponseCheck: function(response) {
@@ -260,7 +285,7 @@
             } else if (status.FAIL === resStatus) {
                 $.errorMessage(response.message || "操作失败");
             } else if (status.FAIL_VALID === resStatus) {
-                $.errorMessage(response.message || "验证不成功，操作失败");
+                $.validErrorHandler(response);
             } else {
                 return true;
             }
@@ -312,7 +337,7 @@
                 } else if (status.FAIL === resStatus) {
                     $.errorMessage(response.message || "操作失败");
                 } else if (status.FAIL_VALID === resStatus) {
-                    $.errorMessage(response.message || "验证不成功，操作失败");
+                    $.validErrorHandler(response);
                 } else {
                     if (callback && typeof callback === 'function') {
                         callback(response.result);
@@ -416,8 +441,8 @@
             }
             return url;
         },
-        locationPost: function(url, args) {
-            var form = $("<form method='post' action='" + url + "'></form>");
+        locationPost: function(url, args, target) {
+            var form = $("<form method='post' action='" + url + "' target='" + (target || "_self") + "'></form>");
             $.each(args, function(key, value) {
                 var input = $("<input type='hidden'>");
                 input.attr({ "name": key });
@@ -527,11 +552,18 @@
     //
     // -----------------------------------------
 
+    $.extend($.fn, {
+        resetSearch: function() {
+            $(this)[0].reset();
+        }
+    });
+
+    _initValidator();
+    _initTable();
+
     $.extend({
         initComponment: function(container) {
             _initEnumConstant(container);
-            _initValidator(container);
-            _initTable(container);
             _initForm(container);
             _initAttachment(container);
             _initCommon(container);
@@ -541,13 +573,21 @@
     if (window.needInitComponet !== false) {
         $.initComponment();
     }
+
+
+
 })(jQuery);
 
 
-function _initCommon() {
+function _initCommon(container) {
+
+    container = $(container);
+    if (container.length == 0) {
+        container = $("body");
+    }
 
     // 关键词搜索框添加绑定回车函数
-    $('.tonto - btn - search').each(function() {
+    container.find('.tonto-btn-search').each(function() {
         var btn = $(this);
         $("body").bind('keypress', function(event) {
             if (event.keyCode == "13") {
@@ -556,7 +596,7 @@ function _initCommon() {
         });
     });
 
-    $('.tonto-select').each(function() {
+    container.find('.tonto-select').each(function() {
         var that = $(this);
         var selected = that.attr("selectedvalue");
         if (selected) {
@@ -564,7 +604,7 @@ function _initCommon() {
         }
     });
 
-    $('.tonto-datepicker-date').each(function() {
+    container.find('.tonto-datepicker-date').each(function() {
         $.beautifyInput(this, "fa fa-calendar", false);
         laydate.render({
             elem: this,
@@ -576,7 +616,7 @@ function _initCommon() {
         });
     });
 
-    $('.tonto-datepicker-year').each(function() {
+    container.find('.tonto-datepicker-year').each(function() {
         $.beautifyInput(this, "fa fa-calendar", false);
         laydate.render({
             elem: this,
@@ -588,7 +628,7 @@ function _initCommon() {
         });
     });
 
-    $('.tonto-datepicker-datetime').each(function() {
+    container.find('.tonto-datepicker-datetime').each(function() {
         $.beautifyInput(this, "fa fa-calendar", false);
         laydate.render({
             elem: this,
@@ -600,7 +640,7 @@ function _initCommon() {
         });
     });
 
-    $('.tonto-datepicker-time').each(function() {
+    container.find('.tonto-datepicker-time').each(function() {
         $.beautifyInput(this, "fa fa-clock-o", false);
         laydate.render({
             elem: this,
@@ -612,29 +652,25 @@ function _initCommon() {
         });
     });
 
-    $('input').iCheck({
+    container.find('input').iCheck({
         checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
         radioClass: 'iradio_square-blue'
         //increaseArea: '10%' // optional
     });
 
     // 必须在icheck后面，否则需要更改源代码适用icheck
-    $('.tonto-multiple-select').each(function() {
-        $(this).multiselect({
-            nonSelectedText: $(this).attr("placeholder") || "请选择", //未选择时显示文本
-            allSelectedText: "全部", //全部选择时显示文本
-            nSelectedText: "个选项", //超过显示数目时显示文本
-            numberDisplayed: $(this).attr("number-displayed") || 2, //显示最大选项数目
-            includeSelectAllOption: true, //是否有全选按钮
-            selectAllText: "全选", //全选时显示文本
-            selectAllNumber: false //全选时，不显示全选个数
-            //enableFiltering: true,      // 查询过滤
-            //filterPlaceholder: '输入查询内容', // 没有查询条件时显示文本
+    container.find('.tonto-multiple-select').each(function() {
+        $(this).select2({
+            placeholder: $(this).attr("placeholder") || "请选择", //未选择时显示文本
+            maximumSelectionSize: $(this).attr("max-selection-size") || null, //显示最大选项数目
+            multiple: true,
+            width: '100%',
+            allowClear: true
         });
     });
 
     // 搜索按钮回车
-    $('.tonto-btn-search').each(function() {
+    container.find('.tonto-btn-search').each(function() {
         var a = $(this);
         $(document).keyup(function(event) {
             if (event.keyCode == 13) {
@@ -1066,6 +1102,7 @@ function _initTable() {
                 item.forEach(function(col) {
                     // formatter 定义数据类型转换，例如time，date等，在这里定义
                     if (col.formatter && typeof col.formatter === 'string') {
+                        col.formatType = col.formatter;
                         if (col.formatter == 'date') {
                             col.formatter = function(value, row, index) {
                                 if (value) {
@@ -1092,26 +1129,14 @@ function _initTable() {
                             }
                         } else if (col.formatter == 'identification') {
                             col.formatter = function(value, row, index) {
-                                if (value) {
-                                    var l = value.length;
-                                    if (l > 7) {
-                                        var s = value.substr(0, 3);
-                                        var a = value.length - 7;
-                                        for (; a > 0; a--) s += "*";
-                                        s += value.substr(value.length - 4, 4);
-                                        return s;
-                                    } else {
-                                        return value;
-                                    }
-                                }
-                                return "";
+                                return hideIdentification(value);
                             }
-                        } 
+                        }
                     }
 
                     // 枚举情况
                     if (col.enumcode && !col.formatter) {
-                        col.formatter = $.getEnumColumnFormatter(window._constant_cache, col.enumcode);
+                        col.formatter = $.getEnumColumnFormatter(window._constant_cache, col.enumcode, col.multiple === true);
                     }
 
                     if (!col.align) {
@@ -1132,11 +1157,24 @@ function _initTable() {
             dataField: 'data',
             totalField: 'total',
             treeParentField: 'parentId',
-            pageList: [10, 20, 30],
+            pageList: [10, 20, 50, 100],
             pageSize: 10
         }
 
+
+
         options = $.extend(selfOptions, options);
+
+        // 回显时，页码回显
+        var _limit = $(options.pageLimitEL || "#pageLimit").val() * 1,
+            _offset = $(options.pageOffsetEL || "#pageOffset").val() * 1,
+            _page = (_limit && _offset) ? _offset / _limit + 1 : 1;
+
+        if (_limit) {
+            options.pageSize = _limit;
+            options.pageNumber = _page;
+        }
+
         if (!options.pageSize || options.pageSize * 1 <= 0) {
             options.pageSize = 10;
         } else if (options.pageSize * 1 > 100) {
@@ -1252,16 +1290,37 @@ function _initTable() {
         /**
          * 获取常量formatter方法，用于bootstrap table column *
          */
-        getEnumColumnFormatter: function(enumTypeMap, type) {
+        getEnumColumnFormatter: function(enumTypeMap, type, multiple) {
             if (enumTypeMap && type) {
                 return function(value, row, index) {
-                    var data = enumTypeMap[type];
-                    if (data) {
-                        for (var i = 0; i < data.length; i++)
-                            if (data[i].key == value)
-                                return data[i].value;
+                    if (!value && value !== 0) {
+                        return "";
                     }
-                    return "";
+
+                    var arr = [],
+                        data = enumTypeMap[type];
+
+                    if (!data) {
+                        return "";
+                    }
+
+                    if (!$.isArray(value)) {
+                        if (!multiple) {
+                            value = [value];
+                        } else {
+                            value = value.split(",");
+                        }
+                    }
+
+                    value.forEach(function(v) {
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].key == v) {
+                                arr.push(data[i].value);
+                            }
+                        }
+                    });
+
+                    return arr.length > 0 ? arr.join("，") : "";
                 };
             }
         },
@@ -1376,6 +1435,254 @@ function _initTable() {
                 $(th).find('.sortable').removeClass('desc asc').addClass((sortName || $(th).data('field')) === that.options.sortName ? that.options.sortOrder : 'both');
             });
         };
+
+        BootstrapTable.prototype.export = function() {
+            var columnHtml = "",
+                that = this,
+                exportColumns = [];
+
+            $.each(that.columns, function(i, column) {
+                if (column.radio || column.checkbox) {
+                    return;
+                }
+
+                if (column.field == column.fieldIndex) {
+                    return;
+                }
+
+                if (that.options.cardView && !column.cardVisible) {
+                    return;
+                }
+
+                if (column.exportable === false) {
+                    return;
+                }
+
+                exportColumns.push({
+                    auto: true,
+                    field: column.field,
+                    name: column.title || column.field,
+                    checked: column.visible,
+                    column: column
+                });
+            });
+
+            if (typeof that.options.exportColumn === 'function') {
+                exportColumns = that.options.exportColumn(exportColumns);
+            }
+
+            $.each(exportColumns, function(i, column) {
+                columnHtml += '<label class="control-label radio-label"><input type="checkbox" ' + (column.checked ? ' checked="checked"' : '') + ' name="dataColumn" value="' + column.field + '">&nbsp;&nbsp;' + column.name + '&nbsp;&nbsp;</label>'
+            });
+
+            var exportHtml = '<div style="padding:30px;padding-top:20px">' +
+                '<form id="export_form" action="" method="post" class="form-horizontal" novalidate="novalidate">' +
+                '    <div class="form-group">' +
+                '        <label for="fileType" class="col-sm-3 control-label">文件类型：</label>' +
+                '        <div class="col-sm-8">' +
+                '            <select name="fileType" class="form-control">' +
+                '                <option value="excel">Excel</option>' +
+                '            </select>' +
+                '        </div>' +
+                '    </div>' +
+                '    <div class="form-group">' +
+                '        <label for="dataScope" class="col-sm-3 control-label">导出范围：</label>' +
+                '        <div class="col-sm-8">' +
+                '            <select name="dataScope" class="form-control">' +
+                '                <option value="all">当前全部记录</option>' +
+                '                <option value="page">当前页记录</option>' +
+                '            </select>' +
+                '        </div>' +
+                '    </div>' +
+                '    <div class="form-group">' +
+                '        <label for="dataColumn" class="col-sm-3 control-label">导出列：</label>' +
+                '        <div id="_dataColumnDiv" class="col-sm-9">' +
+                columnHtml +
+                '        </div>' +
+                '    </div>' +
+                '    <div class="form-group">' +
+                '        <div class="col-sm-4 col-sm-offset-3">' +
+                '            <button type="button" id="_exportSubmitBtn" class="btn btn-primary btn-block">导出</button>' +
+                '        </div>' +
+                '    </div>' +
+                '</form></div>';
+
+            $.openPageLayer(exportHtml, {
+                title: "导出",
+                width: 600,
+                height: 420,
+                success: function(layero, layeroIndex) {
+                    $('#_dataColumnDiv').find("input").iCheck({
+                        checkboxClass: 'icheckbox_square-blue', // 注意square和blue的对应关系
+                        radioClass: 'iradio_square-blue'
+                        //increaseArea: '10%' // optional
+                    });
+
+                    $("#_exportSubmitBtn").click(function() {
+                        var param = {
+                                fileType: $("#export_form").find("[name='fileType']").val(),
+                                dataScope: $("#export_form").find("[name='dataScope']").val(),
+                                columns: []
+                            },
+                            firstTd = that.$body.find("tr:eq(0)"),
+                            totalWidth = 0,
+                            totalCount = 0;
+
+                        $("#export_form").find("input[name='dataColumn']:checked").each(function() {
+                            var v = $(this).val(),
+                                c;
+                            for (var i = 0; i < exportColumns.length; i++) {
+                                if (exportColumns[i].field == v) {
+                                    c = exportColumns[i];
+                                    break;
+                                }
+                            }
+
+                            if (c) {
+                                if (c.auto === true) {
+                                    var f = c.column.formatType,
+                                        q = {
+                                            field: c.field,
+                                            name: c.name,
+                                            multiple: c.column.multiple === true ? true : false
+                                        };
+
+                                    if (f) {
+                                        q.dateFormat = f == 'date' ? 'yyyy/MM/dd' : (f == 'datetime' ? 'yyyy/MM/dd HH:mm:ss' : null);
+                                    }
+
+                                    q.enumType = c.column.enumcode ? c.column.enumcode : null;
+
+                                    if (!c.column.exportColumnWidth) {
+                                        // 粗略计算width
+                                        q.width = firstTd.find("td:eq('" + c.column.fieldIndex + "')").width();
+                                        q.realWidth = false;
+                                        totalWidth += q.width;
+                                        totalCount++;
+                                    } else {
+                                        q.width = c.column.exportColumnWidth;
+                                    }
+
+                                    if (c.column.exportOption) {
+                                        q = $.extend(q, c.column.exportOption);
+                                    }
+
+                                    param.columns.push(q);
+                                } else {
+                                    param.columns.push(c);
+                                }
+                            }
+                        });
+
+                        if (param.columns.length == 0) {
+                            $.errorMessage("没有可导出的列");
+                            return;
+                        }
+
+                        param.columns.forEach(function(c) {
+                            if (c.realWidth === false) {
+                                // c.width = Math.ceil(c.width / totalWidth * 1200 * totalCount / 120);
+                                c.width = Math.ceil(c.width * totalCount * 24 / totalWidth);
+                                c.width = Math.max(c.width, c.name.length * 2 + 2);
+                                c.realWidth = true;
+                            }
+
+                            if (c.width > 255 * 256) {
+                                c.width = 255 * 256;
+                            }
+                        });
+
+                        // copy from bootstrap-table begin
+                        var data = {},
+                            index = $.inArray(that.options.sortName, that.header.fields),
+                            params = {
+                                searchText: that.searchText,
+                                sortName: that.options.sortName,
+                                sortOrder: that.options.sortOrder
+                            },
+                            request;
+
+                        if (that.header.sortNames[index]) {
+                            params.sortName = that.header.sortNames[index];
+                        }
+
+                        if (that.options.pagination && that.options.sidePagination === 'server') {
+                            params.pageSize = that.options.pageSize === that.options.formatAllRows() ?
+                                tthatis.options.totalRows : that.options.pageSize;
+                            params.pageNumber = that.options.pageNumber;
+                        }
+
+                        if (that.options.queryParamsType === 'limit') {
+                            params = {
+                                search: params.searchText,
+                                sort: params.sortName,
+                                order: params.sortOrder
+                            };
+
+                            if (that.options.pagination && that.options.sidePagination === 'server') {
+                                params.offset = that.options.pageSize === that.options.formatAllRows() ?
+                                    0 : that.options.pageSize * (that.options.pageNumber - 1);
+                                params.limit = that.options.pageSize === that.options.formatAllRows() ?
+                                    that.options.totalRows : that.options.pageSize;
+                                if (params.limit === 0) {
+                                    delete params.limit;
+                                }
+                            }
+                        }
+
+                        if (!($.isEmptyObject(that.filterColumnsPartial))) {
+                            params.filter = JSON.stringify(that.filterColumnsPartial, null);
+                        }
+
+                        var calculateObjectValue = function(self, name, args, defaultValue) {
+                            var func = name;
+
+                            if (typeof name === 'string') {
+                                // support obj.func1.func2
+                                var names = name.split('.');
+
+                                if (names.length > 1) {
+                                    func = window;
+                                    $.each(names, function(i, f) {
+                                        func = func[f];
+                                    });
+                                } else {
+                                    func = window[name];
+                                }
+                            }
+                            if (typeof func === 'object') {
+                                return func;
+                            }
+                            if (typeof func === 'function') {
+                                return func.apply(self, args || []);
+                            }
+                            if (!func && typeof name === 'string' && sprintf.apply(this, [name].concat(args))) {
+                                return sprintf.apply(this, [name].concat(args));
+                            }
+                            return defaultValue;
+                        };
+
+                        data = calculateObjectValue(that.options, that.options.queryParams, [params], data);
+
+                        if (data === false) {
+                            return;
+                        }
+                        // copy from bootstrap-table end
+
+                        param.query = params;
+
+                        $.postJsonAjax(that.options.exportUrl, param, function(fileUrl) {
+                            $.successAlert("导出数据成功", function() {
+                                layer.close(layeroIndex);
+                            });
+
+                            window.open("/file" + fileUrl);
+                        }, $("#_exportSubmitBtn"));
+                    });
+                }
+            });
+
+        };
     }
 }
 
@@ -1436,7 +1743,7 @@ function _initEnumConstant(container, enumcodes, callback) {
                 var selectedvalue = $s.attr("selectedvalue");
                 if (selectedvalue) {
                     if ($s.attr("multiple")) {
-                        $s.val(selectedvalue.split(","));
+                        $s.val(selectedvalue.split(",")).trigger('change');;
                     } else {
                         $s.val(selectedvalue);
                     }
@@ -1658,27 +1965,7 @@ function _initForm(container) {
                     } else if (status.FAIL === resStatus) {
                         $.errorMessage(data.message || "操作失败");
                     } else if (status.FAIL_VALID === resStatus) {
-                        // $.errorMessage(data.message || "数据验证异常");
-                        var errorHtml, error = data.result;
-                        if (!data.message && $.isArray(error)) {
-                            var errorHtml = "<ul>数据验证失败："
-                            error.forEach(function(item) {
-                                var el = item[1];
-                                var errorMsg = item[2];
-
-                                // 存在可能对不上input输入框，加上存在前端验证保证大部分情况正确，所以这里才有用户体验稍差的方式
-                                // form.find("#" + el + ",[name='" + el + "']").each(function() {
-                                //     layer.tips(errorMsg, $(this), { time: 2000, tips: [3, 'red'] });
-                                // });
-
-                                errorHtml += "<li>" + errorMsg + "</li>";
-                            });
-                            errorHtml += "</ul>"
-                        } else {
-                            errorHtml = data.message || error || "数据验证异常";
-                        }
-
-                        $.errorAlert(errorHtml);
+                        $.validErrorHandler(data);
                     } else if (status.SUCCESS === resStatus) {
                         var handler = formConfig.successCallback || form[0].submitSuccessHandler || form.data("submitSuccessHandler");
                         if (handler) {
@@ -1783,9 +2070,38 @@ function _initAttachment() {
 
 // ------------------------------------------
 //
-// HANGFENG 特有
+// AjaxUploadFile
 //
 // -----------------------------------------
+
+function ajaxUploadFile(files, successCallback, submitBtn) {
+    if (files) {
+        if (!$.isArray(files)) {
+            files = [files];
+        }
+
+        if (files.length > 0) {
+            var formData = new FormData();
+            files.forEach(function(file) {
+                formData.append('files', file);;
+            });
+
+            var success = $.wrapAjaxSuccessCallback(successCallback, submitBtn);
+
+            $.ajax({
+                url: "/common/upload/files",
+                type: "POST",
+                data: formData,
+                processData: false, // 告诉jQuery不要去处理发送的数据
+                contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+                success: success,
+                error: function(xhr, e) {
+                    $.errorMessage("系统异常:" + xhr.status);
+                }
+            });
+        }
+    }
+}
 
 
 // ------------------------------------------
@@ -1867,4 +2183,27 @@ function getSeconds(date) {
         second = "0" + second;
     }
     return second;
+}
+
+function hideIdentification(value) {
+    if (value) {
+        var l = value.length;
+        if (l > 7) {
+            var s = value.substr(0, 3);
+            var a = value.length - 7;
+            for (; a > 0; a--) s += "*";
+            s += value.substr(value.length - 4, 4);
+            return s;
+        } else {
+            return value;
+        }
+    }
+    return "";
+}
+
+function omitString(str, length) {
+    if (str && str.length > length) {
+        return str.substring(0, length) + "...";
+    }
+    return str;
 }
