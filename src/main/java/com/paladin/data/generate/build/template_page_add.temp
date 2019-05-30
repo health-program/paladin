@@ -21,6 +21,7 @@
     <script type="text/javascript">
     var options = {
         id: "model",
+        cancelBtn: false,
         name: "${title}",
         url:"${saveUrl}",
         columns: ${columns}
@@ -29,6 +30,8 @@
     $(function() {       
         var html = generateEditHtml(options);
         $(".content").html(html);
+       	$.initComponment($(".content"));
+        
         var model = new tonto.Model("model", options.columns, {
             pattern:"edit",
             successCallback:function(){
@@ -38,7 +41,6 @@
             }
         });
         model.setData(null);
-        $.initComponment($(".content"));
     });
     </script>
 </body>

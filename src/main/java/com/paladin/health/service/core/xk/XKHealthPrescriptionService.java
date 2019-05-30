@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -112,15 +111,9 @@ public class XKHealthPrescriptionService {
 						continue;
 					}
 
-					Map riskResult = null;
-					try {
-						riskResult = JsonUtil.parseJson(riskResultStr, Map.class);
-					} catch (IOException e) {
-						logger.error("评估[" + name + "]时非法解析json字符串格式：" + riskResultStr);
-						continue;
-					}
-
+					Map riskResult = JsonUtil.parseJson(riskResultStr, Map.class);
 					if (riskResult == null) {
+						logger.error("评估[" + name + "]时非法解析json字符串格式：" + riskResultStr);
 						continue;
 					}
 

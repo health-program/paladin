@@ -38,7 +38,7 @@ public class PageIndexBuilder extends SpringBootPageBuilder {
 			sb.append("\t\t\t\t\t{ title: \"").append(buildOption.getTitle()).append("\", field: \"").append(columnOption.getFieldName()).append("\"");
 
 			if (judge(buildOption.getEnumCode())) {
-				sb.append(", enum: \"").append(buildOption.getEnumCode()).append("\"");
+				sb.append(", enumcode: \"").append(buildOption.getEnumCode()).append("\"");
 				enumcodes.add(buildOption.getEnumCode());
 			}
 
@@ -66,6 +66,7 @@ public class PageIndexBuilder extends SpringBootPageBuilder {
 
 		ControllerClassBuilder controllerBuilder = (ControllerClassBuilder) GenerateBuilderContainer.getFileContentBuilder(BuilderType.CONTROLLER);
 		data.put("searchUrl", controllerBuilder.getBaseRequestMapping(tableOption) + controllerBuilder.getFindPageRequestMapping(tableOption));
+		data.put("exportUrl", controllerBuilder.getBaseRequestMapping(tableOption) + controllerBuilder.getExportRequestMapping(tableOption));
 		data.put("addUrl", controllerBuilder.getBaseRequestMapping(tableOption) + controllerBuilder.getAddRequestMapping(tableOption));
 		data.put("detailUrl", controllerBuilder.getBaseRequestMapping(tableOption) + controllerBuilder.getDetailRequestMapping(tableOption));
 		data.put("removeUrl", controllerBuilder.getBaseRequestMapping(tableOption) + controllerBuilder.getDeleteRequestMapping(tableOption));

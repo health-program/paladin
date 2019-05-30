@@ -15,7 +15,9 @@ import com.paladin.common.core.ConstantsContainer.KeyValue;
 import com.paladin.common.model.syst.SysAttachment;
 import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.common.OffsetPage;
+import com.paladin.framework.core.VersionContainerManager;
 import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.framework.core.session.UserSession;
 import com.paladin.framework.web.response.CommonResponse;
 
 import io.swagger.annotations.Api;
@@ -129,6 +131,29 @@ public class CommonController {
 			@RequestParam(required = false) Integer thumbnailWidth, @RequestParam(required = false) Integer thumbnailHeight) {
 		SysAttachment result = attachmentService.createPictureAndCompress(pictureStr, pictureName, pictureType, userType, thumbnailWidth, thumbnailHeight);
 		return CommonResponse.getSuccessResponse(result);
+	}
+
+	@ApiOperation(value = "重启容器")
+	@ApiImplicitParam(name = "container", value = "容器ID", required = true)
+	@GetMapping("/restart/container")
+	@ResponseBody
+	public Object restartContainer(@RequestParam String container) {
+		if (UserSession.getCurrentUserSession().isSystemAdmin()) {
+			VersionContainerManager.versionChanged(container);
+			return CommonResponse.getSuccessResponse();
+		}
+		return CommonResponse.getNoPermissionResponse("无权限");
+	}
+
+	@ApiOperation(value = "重启所有容器")
+	@GetMapping("/restart/container/all")
+	@ResponseBody
+	public Object restartAllContainer() {
+		if (UserSession.getCurrentUserSession().isSystemAdmin()) {
+			VersionContainerManager.versionChanged();
+			return CommonResponse.getSuccessResponse();
+		}
+		return CommonResponse.getNoPermissionResponse("无权限");
 	}
 
 	@ApiOperation(value = "异常测试")

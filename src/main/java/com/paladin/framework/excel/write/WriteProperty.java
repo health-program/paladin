@@ -28,6 +28,8 @@ public @interface WriteProperty {
 	public boolean wrapText() default true;
 	/**格式化*/
 	public String format() default "";
+	/**日期格式化字符串*/
+	public String dateFormat() default "";
 	/**对齐方式,见{@link org.apache.poi.ss.usermodel.CellStyle}内参数*/
 	public int alignment() default org.apache.poi.ss.usermodel.CellStyle.ALIGN_CENTER;
 	

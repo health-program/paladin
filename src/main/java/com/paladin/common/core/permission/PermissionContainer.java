@@ -1,5 +1,6 @@
 package com.paladin.common.core.permission;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +115,15 @@ public class PermissionContainer implements VersionContainer {
 	public Role getSystemAdminRole() {
 		return systemAdminRole;
 	}
-
+	
+	/**
+	 * 获取角色列表
+	 * @return
+	 */
+	public List<Role> getRoles(){
+		return new ArrayList<>(roleMap.values());
+	}
+	
 	@Override
 	public String getId() {
 		return "permission_container";

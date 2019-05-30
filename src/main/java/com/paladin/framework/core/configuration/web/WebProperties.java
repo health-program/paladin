@@ -2,8 +2,10 @@ package com.paladin.framework.core.configuration.web;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import com.paladin.framework.core.GlobalProperties;
+
 @ConfigurationProperties(prefix = "paladin.web")
-public class MyWebProperties {
+public class WebProperties {
 
 	/**
 	 * 文件存放地址
@@ -14,22 +16,23 @@ public class MyWebProperties {
 	 * 文件最大M数
 	 */
 	private int fileMaxSize = 10;
-	
+
 	/**
 	 * 静态资源路径
 	 */
 	private String staticPath = "classpath:/static/";
-	
+
 	/**
 	 * 图标路径
 	 */
 	private String faviconPath = "classpath:favicon.ico";
-	
+
 	/**
 	 * root view
 	 */
-	private String rootView = "redirect:/health/index";
-
+	private String rootView = "redirect:/" + GlobalProperties.project + "/login";
+	
+	
 	public String getFilePath() {
 		return filePath;
 	}

@@ -27,6 +27,7 @@ public class ControllerClassBuilder extends SpringBootClassBuilder {
 
 		StringBuilder sb = new StringBuilder();
 
+		sb.append("import ").append(GenerateBuilderContainer.getClassImportPackage(BuilderType.EXPORT_QUERY_DTO, tableOption)).append(";\n");
 		sb.append("import ").append(GenerateBuilderContainer.getClassImportPackage(BuilderType.MODEL, tableOption)).append(";\n");
 		sb.append("import ").append(GenerateBuilderContainer.getClassImportPackage(BuilderType.SERVICE, tableOption)).append(";\n");
 		sb.append("import ").append(GenerateBuilderContainer.getClassImportPackage(BuilderType.QUERY_DTO, tableOption)).append(";\n");
@@ -49,6 +50,7 @@ public class ControllerClassBuilder extends SpringBootClassBuilder {
 		params.put("saveRM", getSaveRequestMapping(tableOption));
 		params.put("updateRM", getUpdateRequestMapping(tableOption));
 		params.put("deleteRM", getDeleteRequestMapping(tableOption));
+		params.put("exportRM", getExportRequestMapping(tableOption));
 
 		params.put("indexPage", GenerateBuilderContainer.getViewPath(BuilderType.PAGE_INDEX, tableOption));
 		params.put("addPage", GenerateBuilderContainer.getViewPath(BuilderType.PAGE_ADD, tableOption));
@@ -75,7 +77,11 @@ public class ControllerClassBuilder extends SpringBootClassBuilder {
 	public String getFindPageRequestMapping(GenerateTableOption tableOption) {
 		return "/find/page";
 	}
-
+	
+	public String getExportRequestMapping(GenerateTableOption tableOption) {
+		return "/export";
+	}
+	
 	public String getAddRequestMapping(GenerateTableOption tableOption) {
 		return "/add";
 	}

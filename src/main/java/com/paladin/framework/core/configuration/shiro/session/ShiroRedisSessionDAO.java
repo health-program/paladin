@@ -1,4 +1,4 @@
-package com.paladin.framework.core.configuration.shiro;
+package com.paladin.framework.core.configuration.shiro.session;
 
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
@@ -10,6 +10,8 @@ import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import com.paladin.framework.core.configuration.shiro.ShiroProperties;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -138,10 +140,9 @@ public class ShiroRedisSessionDAO implements SessionDAO {
 			/*
 			 * 如果是{@link ControlledSession}，则需要判断是否只是访问时间更新，如果是，再判断是否超过更新间隔，如果是，则进行时间更新
 			 */
-
 			ControlledSession controlledSession = (ControlledSession) session;
 			if (controlledSession.isValid()) {
-
+				// TODO 需要考虑改变了session中object中值，而并没有调用ControlledSession中方法时isContentChanged值不会改变，所以不会更新问题
 				if (controlledSession.isContentChanged) {
 					cacheSessioin(session.getId(), session);
 					controlledSession.isContentChanged = false;
@@ -266,6 +267,10 @@ public class ShiroRedisSessionDAO implements SessionDAO {
 		public void touch() {
 			previousLastAccessTime = getLastAccessTime();
 			super.touch();
+		}
+		
+		public void contentChanged() {
+			isContentChanged = true;
 		}
 	}
 

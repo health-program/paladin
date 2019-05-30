@@ -30,7 +30,7 @@ import com.paladin.framework.common.Condition;
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.PageResult;
 import com.paladin.framework.core.ServiceSupport;
-import com.paladin.framework.core.configuration.web.MyWebProperties;
+import com.paladin.framework.core.configuration.web.WebProperties;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.exception.SystemException;
 import com.paladin.framework.utils.Base64Util;
@@ -46,7 +46,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	private SysAttachmentMapper sysAttachmentMapper;
 
 	@Autowired
-	private MyWebProperties webProperties;
+	private WebProperties webProperties;
 
 	private long maxFileByteSize;
 
@@ -679,7 +679,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 	 * @param attachmentFiles
 	 * @return
 	 */
-	public List<SysAttachment> checkOrCreateAttachment(String idString, MultipartFile[] attachmentFiles) {
+	public List<SysAttachment> checkOrCreateAttachment(String idString, MultipartFile... attachmentFiles) {
 
 		List<SysAttachment> attIds = null;
 
@@ -693,8 +693,10 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 				attIds = new ArrayList<>(attachmentFiles.length);
 			}
 			for (MultipartFile file : attachmentFiles) {
-				SysAttachment a = createAttachment(file, null);
-				attIds.add(a);
+				if(file != null) {
+					SysAttachment a = createAttachment(file, null);
+					attIds.add(a);
+				}
 			}
 		}
 
@@ -713,7 +715,7 @@ public class SysAttachmentService extends ServiceSupport<SysAttachment> {
 			for (SysAttachment attachment : attachments) {
 				str += attachment.getId() + ",";
 			}
-			return str;
+			return str.substring(0, str.length() - 1);
 		}
 		return null;
 	}

@@ -12,9 +12,10 @@ import java.util.TimerTask;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.paladin.framework.core.configuration.CustomProperties;
+import com.paladin.framework.core.configuration.PaladinProperties;
 import com.paladin.framework.spring.SpringBeanHelper;
 import com.paladin.framework.spring.SpringContainer;
 
@@ -26,10 +27,11 @@ public class VersionContainerManager implements SpringContainer {
 	private Map<String, VersionObject> versionObjectMap = new HashMap<>();
 	private List<VersionObject> versionObjects = new ArrayList<>();
 
-	private CustomProperties customProperties;
+	@Autowired
+	private PaladinProperties paladinProperties;
 
-	public VersionContainerManager(CustomProperties customProperties) {
-		this.customProperties = customProperties;
+	public VersionContainerManager() {
+		
 	}
 
 	private VersionContainerDAO versionContainerDAO;
@@ -38,11 +40,10 @@ public class VersionContainerManager implements SpringContainer {
 
 	@Override
 	public boolean initialize() {
-
 		manager = this;
 
 		Map<String, VersionContainer> versionContainerMap = SpringBeanHelper.getBeansByType(VersionContainer.class);
-
+		
 		// 尝试去spring寻找bean
 		if (versionContainerDAO == null) {
 			versionContainerDAO = SpringBeanHelper.getFirstBeanByType(VersionContainerDAO.class);
@@ -73,23 +74,13 @@ public class VersionContainerManager implements SpringContainer {
 
 			checkVersion();
 
-			if (customProperties.isContainerVersionRun()) {
+			if (paladinProperties.isCluster()) {
 				logger.info("===>启动版本容器管理定时任务<===");
 				startTimer();
 			}
 		}
 
 		return true;
-	}
-
-	@Override
-	public boolean afterInitialize() {
-		return true;
-	}
-
-	@Override
-	public int order() {
-		return 0;
 	}
 
 	/**
@@ -131,6 +122,12 @@ public class VersionContainerManager implements SpringContainer {
 		}, 60 * 1000, 10 * 1000);
 	}
 
+	public void allVersionChangedHandle() {
+		for (String id : versionObjectMap.keySet()) {
+			versionChangedHandle(id);
+		}
+	}
+
 	public void versionChangedHandle(String containerId) {
 
 		VersionObject versionObject = versionObjectMap.get(containerId);
@@ -156,6 +153,16 @@ public class VersionContainerManager implements SpringContainer {
 
 	}
 
+	@Override
+	public boolean afterInitialize() {
+		return true;
+	}
+
+	@Override
+	public int order() {
+		return 0;
+	}
+
 	private static class VersionObject {
 
 		String id;
@@ -171,6 +178,10 @@ public class VersionContainerManager implements SpringContainer {
 
 	public static void versionChanged(String containerId) {
 		manager.versionChangedHandle(containerId);
+	}
+
+	public static void versionChanged() {
+		manager.allVersionChangedHandle();
 	}
 
 	public void setVersionContainerDAO(VersionContainerDAO versionContainerDAO) {

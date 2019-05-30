@@ -1,4 +1,4 @@
-package com.paladin.framework.core.configuration.shiro;
+package com.paladin.framework.core.configuration.shiro.session;
 
 import java.io.Serializable;
 
@@ -16,17 +16,18 @@ import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CommonWebSessionManager extends DefaultWebSessionManager {
+import com.paladin.framework.core.configuration.shiro.ShiroProperties;
 
-	private static Logger logger = LoggerFactory.getLogger(CommonWebSessionManager.class);
+public class PaladinWebSessionManager extends DefaultWebSessionManager {
 
-	private String tokenField;
-	
+	private static Logger logger = LoggerFactory.getLogger(PaladinWebSessionManager.class);
+
+	private String tokenField;	
 	private boolean isCluster = false;
 
-	public CommonWebSessionManager(ShiroProperties shiroProperties) {
+	public PaladinWebSessionManager(ShiroProperties shiroProperties) {
 		super();
-		isCluster = shiroProperties.isCluster();
+		isCluster = shiroProperties.isRedisEnabled();
 		tokenField = shiroProperties.getTokenField();
 		if (tokenField != null && tokenField.length() == 0) {
 			tokenField = null;
