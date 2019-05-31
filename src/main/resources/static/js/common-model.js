@@ -1242,7 +1242,7 @@ var _selectServerFieldBuilder = new _FieldBuilder("SELECT-SERVER", {
     },
     fillDataFromServer: function(column, model) {
         var input = this.getEditTarget(column, model);
-        if (column.serverData && input.length > 0) {
+        if (column.editable !== false && column.serverData && input.length > 0) {
             var k = column.idField || 'id',
                 n = column.nameField || 'name';
             column.serverData.forEach(function(d) {
@@ -1263,7 +1263,11 @@ var _selectServerFieldBuilder = new _FieldBuilder("SELECT-SERVER", {
         }
 
         if (model.status == 'edit') {
-            this.fillEdit(column, model.data, model, column.editable === false ? this.getViewTarget(column, model) : null);
+            if (column.editable === false) {
+                this.fillView(column, model.data, model, this.getEditTarget(column, model));
+            } else {
+                this.fillEdit(column, model.data, model);
+            }
         }
     },
     getDataName: function(column, v) {
