@@ -1,14 +1,29 @@
 package com.paladin.health.service.core.xk;
 
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.paladin.common.core.ConstantsContainer;
+import com.paladin.common.core.TemporaryFileHelper;
+import com.paladin.common.core.TemporaryFileHelper.TemporaryFileOutputStream;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.JsonUtil;
+import com.paladin.framework.utils.time.DateFormatUtil;
 import com.paladin.framework.utils.time.DateTimeUtil;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
+import com.paladin.health.service.core.xk.dto.ConfirmEvaluationItemDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKEvaluation;
@@ -20,9 +35,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -261,28 +280,42 @@ public class XKHealthPrescriptionService {
 	 * @param searchId
 	 * @param accessKey
 	 */
-	public void confirmSimpleEvaluation(List<ConfirmEvaluationDTO> confirmEvaluations, String searchId, String accessKey) {
+	public void confirmSimpleEvaluation(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey) {
+		confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey, false);
+	}
+
+	/**
+	 * 确认评估，并更新确认后评估内容，如果需要创建PDF则创建PDF文件
+	 * 
+	 * @param confirmEvaluation
+	 * @param searchId
+	 * @param accessKey
+	 * @param createPDF
+	 */
+	public String confirmSimpleEvaluationAndCreatePDF(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
 		DiagnoseRecord record = diagnoseRecordService.getRecordBySearchId(searchId, accessKey);
 		String id = record.getId();
 		String identificationId = record.getTargetId();
 
+		List<ConfirmEvaluationItemDTO> evaluationItems = confirmEvaluation.getEvaluationItems();
+
 		List<XKEvaluation> evaluationResultList = null;
-		if (confirmEvaluations != null && confirmEvaluations.size() > 0) {
-			evaluationResultList = new ArrayList<>(confirmEvaluations.size());
-			for (ConfirmEvaluationDTO confirmEvaluation : confirmEvaluations) {
-				String code = confirmEvaluation.getCode();
+		if (evaluationItems != null && evaluationItems.size() > 0) {
+			evaluationResultList = new ArrayList<>(evaluationItems.size());
+			for (ConfirmEvaluationItemDTO evaluationItem : evaluationItems) {
+				String code = evaluationItem.getCode();
 				String name = XKEvaluation.codeNameMap.get(code);
 				if (name == null) {
 					throw new BusinessException("评估数据错误！");
 				}
 
-				Integer level = confirmEvaluation.getRiskLevel();
+				Integer level = evaluationItem.getRiskLevel();
 				String levelName = XKEvaluation.levelNameMap.get(level);
 				if (levelName == null) {
 					throw new BusinessException("评估数据错误！");
 				}
 
-				String suggest = confirmEvaluation.getSuggest();
+				String suggest = evaluationItem.getSuggest();
 				evaluationResultList.add(new XKEvaluation(code, name, level, levelName, suggest));
 			}
 		}
@@ -294,10 +327,22 @@ public class XKHealthPrescriptionService {
 			correctPrescription = JsonUtil.getJson(evaluationResultList);
 		}
 
-		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription);
+		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, confirmEvaluation.getSendMessage());
+
+		if (createPDF) {
+			DiagnoseTarget target = diagnoseTargetService.get(record.getTargetId());
+			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
+			try {
+				createPDF(evaluationResultList, target, record, output);
+				return output.getFileRelativeUrl();
+			} catch (Exception e) {
+				throw new BusinessException("创建PDF失败");
+			}
+		}
+		
+		return null;
 	}
-	
-	
+
 	/**
 	 * 根据居民情况获取短信
 	 * 
@@ -386,6 +431,103 @@ public class XKHealthPrescriptionService {
 			return null;
 		}
 		return (List<String>) result.get("result");
+	}
+
+	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, DiagnoseRecord record, OutputStream output) throws Exception {
+		// 1.创建PDF文件
+		Document document = new Document();
+		// 横向，这个可以自己根据实际情况看需不需要，我的是竖着放不下，只能横向展示
+		Rectangle pageSize = new Rectangle(PageSize.A4);
+		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
+		document.setPageSize(pageSize);
+		document.setMargins(36, 36, 30, 30);// 边距
+		// 2.创建书写器（Writer）对象
+
+		PdfWriter writer = PdfWriter.getInstance(document, output);
+		writer.setViewerPreferences(PdfWriter.PageModeFullScreen);
+		document.open();// 3.打开文档。
+		// 4.向文档中添加内容。
+		// 中文字体,解决中文不能显示问题
+		BaseFont titleChinese = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		Font tTont = new Font(titleChinese, 16);
+
+		Paragraph title = new Paragraph("熙康健康评估记录 ", tTont);
+		title.setAlignment(Element.ALIGN_CENTER);
+		title.add(Chunk.NEWLINE); // 好用的
+		document.add(title);
+
+		/*--------------------------------正文---------------------------------*/
+		if (target != null) {
+			BaseFont sfTTF = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			Font font = new Font(sfTTF);
+			BaseFont sfTTFF = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			Font fontt = new Font(sfTTFF, 14);
+
+			String name = target.getName();
+			Integer sex = target.getSex();
+
+			SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
+			Date birthday = target.getBirthday();
+			Date createTime = record.getCreateTime();
+
+			Paragraph info = new Paragraph();
+			info.add(Chunk.NEWLINE);
+			info.add(new Phrase("姓名：", fontt));
+			info.add(new Phrase(name != null ? name : "", font));
+			info.add("          ");
+			info.add(new Phrase("性别：", fontt));
+			info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
+			info.add("          ");
+			info.add(new Phrase("出生年月：", fontt));
+			info.add(new Phrase(birthday != null ? formatter.format(birthday) : "", font));
+			info.add("          ");
+			info.add(new Phrase("评估时间：", fontt));
+			info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
+			info.add(Chunk.NEWLINE);
+			info.add(Chunk.NEWLINE);
+			info.setAlignment(Element.ALIGN_CENTER);
+			document.add(info);
+
+			String prescription1 = record.getCorrectPrescription();
+			if (prescription1 == null) {
+				prescription1 = record.getPrescription();
+			}
+
+			JSONArray jsonArray = new JSONArray(prescription1);
+			for (int i = 0; i < jsonArray.length(); i++) {
+				BaseColor color = null;
+				JSONObject jsonObject = jsonArray.getJSONObject(i);
+				int riskLevel = jsonObject.getInt("riskLevel");
+				if (riskLevel == 4)
+					color = new BaseColor(255, 0, 0);
+				if (riskLevel == 3)
+					color = new BaseColor(255, 165, 0);
+				if (riskLevel == 2)
+					color = new BaseColor(0, 166, 90);
+				BaseFont sfTTF1 = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
+				Font font1 = new Font(sfTTF1, 13);
+				Paragraph info1 = new Paragraph();
+				info1.add(new Phrase("评估名称：", font1));
+				info1.add(new Phrase(jsonObject.getString("name"), font1));
+				info1.add(Chunk.NEWLINE);
+				info1.add(new Phrase("风险等级：", font1));
+				info1.add(new Phrase(jsonObject.getString("riskLevelName"), fontColor));
+				info1.add(Chunk.NEWLINE);
+				info1.add(new Phrase("分析建议：", font1));
+				document.add(info1);
+				BaseFont sfTTF11 = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				Font font11 = new Font(sfTTF11, 13);
+				Paragraph info11 = new Paragraph();
+				info11.add(new Phrase(jsonObject.getString("suggest"), font11));
+				info11.setIndentationLeft(62);
+				info11.setLeading(20f);
+				info11.setSpacingAfter(20f);
+				document.add(info11);
+			}
+		}
+
+		document.close();
 	}
 
 }

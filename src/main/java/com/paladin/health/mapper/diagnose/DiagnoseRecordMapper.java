@@ -7,7 +7,7 @@ import com.paladin.health.model.diagnose.DiagnoseRecord;
 
 public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
-	int updateCorrectPrescription(@Param("id") String id, @Param("correctPrescription") String correctPrescription);
+	int updateCorrectPrescription(@Param("id") String id, @Param("correctPrescription") String correctPrescription, @Param("sendMessage") String sendMessage);
 
 	DiagnoseRecord findRecordBySearchId(@Param("searchId") String searchId, @Param("accessKey") String accessKey);
 

@@ -1,35 +1,25 @@
 package com.paladin.health.service.core.xk.dto;
 
+import java.util.List;
+
 public class ConfirmEvaluationDTO {
 	
-	private String code;
+	private String sendMessage;
+	private List<ConfirmEvaluationItemDTO> evaluationItems;
 	
-	private Integer riskLevel;
+	public String getSendMessage() {
+		return sendMessage;
+	}
+	public void setSendMessage(String sendMessage) {
+		this.sendMessage = sendMessage;
+	}
+	public List<ConfirmEvaluationItemDTO> getEvaluationItems() {
+		return evaluationItems;
+	}
+	public void setEvaluationItems(List<ConfirmEvaluationItemDTO> evaluationItems) {
+		this.evaluationItems = evaluationItems;
+	}
 	
-	private String suggest;
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getSuggest() {
-		return suggest;
-	}
-
-	public void setSuggest(String suggest) {
-		this.suggest = suggest;
-	}
-
-	public Integer getRiskLevel() {
-		return riskLevel;
-	}
-
-	public void setRiskLevel(Integer riskLevel) {
-		this.riskLevel = riskLevel;
-	}
+	
 	
 }

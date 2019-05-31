@@ -95,6 +95,15 @@ public class DefaultReadColumn extends ReadColumn {
 					if (key == null) {
 						throw new ExcelReadException("第" + (cellIndex + 1) + "列值[" + name + "]为无效值");
 					}
+					
+					if(type == Integer.class) {
+						try {
+							return Integer.valueOf(key);
+						} catch(Exception e) {
+							throw new ExcelReadException("第" + (cellIndex + 1) + "列值[" + name + "]为非法值");
+						}
+					}
+					
 					return key;
 				}
 				return null;

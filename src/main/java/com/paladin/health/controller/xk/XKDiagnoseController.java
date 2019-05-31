@@ -14,8 +14,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -94,13 +92,24 @@ public class XKDiagnoseController {
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@PostMapping("/evaluate/simple/confirm")
 	@ResponseBody
-	public Object confirmSimpleEvaluation(@RequestBody List<ConfirmEvaluationDTO> confirmEvaluations, @RequestParam("searchId") String searchId,
+	public Object confirmSimpleEvaluation(@RequestBody ConfirmEvaluationDTO confirmEvaluation, @RequestParam("searchId") String searchId,
 			@RequestParam String accessKey) {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
-		healthPrescriptionService.confirmSimpleEvaluation(confirmEvaluations, searchId, accessKey);
+		healthPrescriptionService.confirmSimpleEvaluation(confirmEvaluation, searchId, accessKey);
 		return CommonResponse.getSuccessResponse();
+	}
+	
+	@ApiOperation(value = "熙康健康评估记录接口")
+	@PostMapping("/evaluate/simple/confirm2pdf")
+	@ResponseBody
+	public Object confirmSimpleEvaluation2pdf(@RequestBody ConfirmEvaluationDTO confirmEvaluation, @RequestParam("searchId") String searchId,
+			@RequestParam String accessKey) {
+		if (!validAccessKey(accessKey)) {
+			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
+		}		
+		return CommonResponse.getSuccessResponse(healthPrescriptionService.confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,true));
 	}
 
 	@ApiOperation(value = "熙康体检百科接口")
