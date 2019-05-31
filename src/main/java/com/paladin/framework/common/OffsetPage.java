@@ -6,7 +6,8 @@ public class OffsetPage extends QuerySort {
 	public final static int MAX_LIMIT = 100;
 
 	int limit;
-	int offset;
+	int offset = -1;
+	int page;
 
 	public int getLimit() {
 		return limit;
@@ -23,6 +24,10 @@ public class OffsetPage extends QuerySort {
 	}
 
 	public int getOffset() {
+		if (offset < 0) {
+			offset = page > 0 ? ((page - 1) * limit) : 0;
+		}
+
 		return offset;
 	}
 
@@ -31,6 +36,17 @@ public class OffsetPage extends QuerySort {
 			offset = 0;
 		}
 		this.offset = offset;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		if (page <= 0) {
+			page = 1;
+		}
+		this.page = page;
 	}
 
 	/**
