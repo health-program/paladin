@@ -316,6 +316,7 @@ function getRequest(){
 }
 
 function update2pdf(){
+
     if (updating === true) {
         return;
     }
@@ -332,7 +333,10 @@ function update2pdf(){
             dataType: "json",
             success: function(response) {
                 if (response && response.status == 1) {
-                    window.open("/file" + response.result);
+                	
+                	var tempwindow=window.open('_blank'); // 先打开页面
+                	tempwindow.location.href="/file" + response.message; // 后更改页面地址
+                	
                     return;
                 }
                 alert(response.message);

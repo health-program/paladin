@@ -440,7 +440,7 @@ public class XKHealthPrescriptionService {
 		Rectangle pageSize = new Rectangle(PageSize.A4);
 		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
 		document.setPageSize(pageSize);
-		document.setMargins(36, 36, 30, 30);// 边距
+		document.setMargins(30, 30, 25, 25);// 边距
 		// 2.创建书写器（Writer）对象
 
 		PdfWriter writer = PdfWriter.getInstance(document, output);
@@ -451,7 +451,7 @@ public class XKHealthPrescriptionService {
 		BaseFont titleChinese = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		Font tTont = new Font(titleChinese, 16);
 
-		Paragraph title = new Paragraph("熙康健康评估记录 ", tTont);
+		Paragraph title = new Paragraph("健康评估记录 ", tTont);
 		title.setAlignment(Element.ALIGN_CENTER);
 		title.add(Chunk.NEWLINE); // 好用的
 		document.add(title);
@@ -459,7 +459,7 @@ public class XKHealthPrescriptionService {
 		/*--------------------------------正文---------------------------------*/
 		if (target != null) {
 			BaseFont sfTTF = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-			Font font = new Font(sfTTF);
+			Font font = new Font(sfTTF,13);
 			BaseFont sfTTFF = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 			Font fontt = new Font(sfTTFF, 14);
 
@@ -479,7 +479,7 @@ public class XKHealthPrescriptionService {
 			info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
 			info.add("          ");
 			info.add(new Phrase("出生年月：", fontt));
-			info.add(new Phrase(birthday != null ? formatter.format(birthday) : "", font));
+			info.add(new Phrase(birthday != null ? formatter.format(birthday):"", font));
 			info.add("          ");
 			info.add(new Phrase("评估时间：", fontt));
 			info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
@@ -495,34 +495,35 @@ public class XKHealthPrescriptionService {
 
 			JSONArray jsonArray = new JSONArray(prescription1);
 			for (int i = 0; i < jsonArray.length(); i++) {
-				BaseColor color = null;
+				/*BaseColor color = null;*/
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
-				int riskLevel = jsonObject.getInt("riskLevel");
+				/*int riskLevel = jsonObject.getInt("riskLevel");
 				if (riskLevel == 4)
 					color = new BaseColor(255, 0, 0);
 				if (riskLevel == 3)
 					color = new BaseColor(255, 165, 0);
 				if (riskLevel == 2)
-					color = new BaseColor(0, 166, 90);
-				BaseFont sfTTF1 = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-				Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
-				Font font1 = new Font(sfTTF1, 13);
+					color = new BaseColor(0, 166, 90);*/
+				BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				//Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
+				Font font1 = new Font(sfTTF1, 12);
+				Font font111 = new Font(sfTTF1, 11);
 				Paragraph info1 = new Paragraph();
 				info1.add(new Phrase("评估名称：", font1));
-				info1.add(new Phrase(jsonObject.getString("name"), font1));
+				info1.add(new Phrase(jsonObject.getString("name"), font111));
 				info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("风险等级：", font1));
-				info1.add(new Phrase(jsonObject.getString("riskLevelName"), fontColor));
+				info1.add(new Phrase(jsonObject.getString("riskLevelName"), font111));
 				info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("分析建议：", font1));
 				document.add(info1);
-				BaseFont sfTTF11 = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-				Font font11 = new Font(sfTTF11, 13);
+				BaseFont sfTTF11 = BaseFont.createFont("/ttf/STSONG.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				Font font11 = new Font(sfTTF11, 11);
 				Paragraph info11 = new Paragraph();
 				info11.add(new Phrase(jsonObject.getString("suggest"), font11));
-				info11.setIndentationLeft(62);
-				info11.setLeading(20f);
-				info11.setSpacingAfter(20f);
+				info11.setIndentationLeft(60);
+				info11.setLeading(16f);
+				info11.setSpacingAfter(15f);
 				document.add(info11);
 			}
 		}
