@@ -363,8 +363,6 @@ public class XKHealthPrescriptionService {
 			}
 		}
 
-		System.out.println("sendError:" + sendError);
-
 		if (sendError != null && sendError.length() > 200) {
 			sendError = sendError.substring(0, 200);
 		}
