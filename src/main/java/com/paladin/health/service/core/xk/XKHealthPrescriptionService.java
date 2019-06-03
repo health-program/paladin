@@ -1,7 +1,6 @@
 package com.paladin.health.service.core.xk;
 
 import com.github.pagehelper.util.StringUtil;
-import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
@@ -23,6 +22,7 @@ import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
+import com.paladin.health.model.sms.SmsSendResponse;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationItemDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
@@ -32,6 +32,7 @@ import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 import com.paladin.health.service.diagnose.DiagnoseTargetFactorService;
 import com.paladin.health.service.diagnose.DiagnoseTargetService;
+import com.paladin.health.service.sms.SendMsgWebService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -58,6 +60,9 @@ public class XKHealthPrescriptionService {
 	private DiagnoseRecordService diagnoseRecordService;
 	@Autowired
 	private DiagnoseTargetFactorService diagnoseRecordFactorService;
+	
+	@Autowired
+	private SendMsgWebService sendMsgWebService;
 
 	@Autowired
 	private XKKnowledgeServlet knowledgeServlet;
@@ -436,6 +441,15 @@ public class XKHealthPrescriptionService {
 	}
 
     public void createPDF(List<XKEvaluation> evaluationResultList,DiagnoseTarget target, DiagnoseRecord record, OutputStream output)throws Exception {
+	
+	String batchTels = target.getCellphone();
+	String content = record.getMessage();
+	
+	SmsSendResponse resp = sendMsgWebService.sendSms(batchTels, content);
+	if(resp!=null&&StringUtils.equals(resp.getResult(), "0")){
+	    logger.error("【短信发送失败】原因："+resp.getDesc()+",发送失败的手机号码："+batchTels);
+	}
+	
 	// 1.创建PDF文件
 	Document document = new Document();
 	// 横向，这个可以自己根据实际情况看需不需要，我的是竖着放不下，只能横向展示

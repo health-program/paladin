@@ -72,6 +72,20 @@
 			<version>1.0</version>
 		</dependency>
 		<!-- MyBatis 相关结束 -->
+		
+		
+		<dependency>
+		   	<groupId>org.dom4j</groupId>
+		   	<artifactId>dom4j</artifactId>
+		   	<version>2.1.1</version>
+		</dependency>
+		
+		<dependency>
+      		<groupId>org.codehaus.xfire</groupId>
+      		<artifactId>xfire-all</artifactId>
+      		<version>1.2.6</version>
+      </dependency>
+		
 
 		<!-- pdf 开始 -->
 		<!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
