@@ -33,8 +33,8 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 		return record;
 	}
 
-	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage) {
-		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage) > 0;
+	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage, int sendStatus, String sendError) {
+		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage,  sendStatus,  sendError) > 0;
 	}
 
 }

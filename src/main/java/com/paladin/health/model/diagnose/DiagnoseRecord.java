@@ -7,16 +7,20 @@ import tk.mybatis.mapper.annotation.IgnoreInMultipleResult;
 
 public class DiagnoseRecord {
 
+	public final static int SEND_STATUS_SUCCESS = 1;
+	public final static int SEND_STATUS_FAIL = 2;
+	public final static int SEND_STATUS_DEFAULT = -1;
+
 	public final static String TYPE_XK = "XK";
-	public final static String COLUMN_FIELD_TARGET_ID= "targetId";
-	public final static String COLUMN_FIELD_SEARCH_ID= "searchId";
-	public final static String COLUMN_FIELD_CREATE_BY= "createBy";
-	
+	public final static String COLUMN_FIELD_TARGET_ID = "targetId";
+	public final static String COLUMN_FIELD_SEARCH_ID = "searchId";
+	public final static String COLUMN_FIELD_CREATE_BY = "createBy";
+
 	@Id
 	private String id;
 
 	private String targetId;
-	
+
 	private String factors;
 
 	@IgnoreInMultipleResult
@@ -25,20 +29,24 @@ public class DiagnoseRecord {
 	private String prescription;
 	@IgnoreInMultipleResult
 	private String correctPrescription;
-	
+
 	private String type;
 
 	private Date createTime;
-	
+
 	private Date updateTime;
-	
+
 	private String createBy;
-	
+
 	private String searchId;
-	
+
 	private String message;
-	
+
 	private String sendMessage;
+
+	private Integer sendStatus;
+
+	private String sendError;
 
 	public String getId() {
 		return id;
@@ -142,6 +150,22 @@ public class DiagnoseRecord {
 
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+
+	public Integer getSendStatus() {
+		return sendStatus;
+	}
+
+	public void setSendStatus(Integer sendStatus) {
+		this.sendStatus = sendStatus;
+	}
+
+	public String getSendError() {
+		return sendError;
+	}
+
+	public void setSendError(String sendError) {
+		this.sendError = sendError;
 	}
 
 }

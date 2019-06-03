@@ -38,11 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.util.StringUtils;
 
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
@@ -60,10 +57,8 @@ public class XKHealthPrescriptionService {
 	private DiagnoseRecordService diagnoseRecordService;
 	@Autowired
 	private DiagnoseTargetFactorService diagnoseRecordFactorService;
-	
 	@Autowired
 	private SendMsgWebService sendMsgWebService;
-
 	@Autowired
 	private XKKnowledgeServlet knowledgeServlet;
 
@@ -334,10 +329,49 @@ public class XKHealthPrescriptionService {
 			correctPrescription = JsonUtil.getJson(evaluationResultList);
 		}
 
-		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, confirmEvaluation.getSendMessage());
+		DiagnoseTarget target = diagnoseTargetService.get(record.getTargetId());
+
+		String sendMessage = confirmEvaluation.getSendMessage();
+		int sendStatus = DiagnoseRecord.SEND_STATUS_DEFAULT;
+		String sendError = null;
+
+		if (sendMessage != null) {
+			sendMessage = sendMessage.trim();
+			if (sendMessage.length() != 0) {
+				String cellphone = target.getCellphone();
+				if (cellphone != null && cellphone.length() > 0) {
+					try {
+						SmsSendResponse resp = sendMsgWebService.sendSms(cellphone, sendMessage);
+						if (resp != null) {
+							String result = resp.getResult();
+							if (SmsSendResponse.RESULT_SUCCESS.equals(result)) {
+								sendStatus = DiagnoseRecord.SEND_STATUS_SUCCESS;
+							} else {
+								sendStatus = DiagnoseRecord.SEND_STATUS_FAIL;
+								sendError = resp.getDesc();
+							}
+						} else {
+							sendStatus = DiagnoseRecord.SEND_STATUS_FAIL;
+							sendError = "连接异常";
+						}
+
+					} catch (Exception e) {
+						sendStatus = DiagnoseRecord.SEND_STATUS_FAIL;
+						sendError = e.getMessage();
+					}
+				}
+			}
+		}
+
+		System.out.println("sendError:" + sendError);
+
+		if (sendError != null && sendError.length() > 200) {
+			sendError = sendError.substring(0, 200);
+		}
+
+		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, confirmEvaluation.getSendMessage(), sendStatus, sendError);
 
 		if (createPDF) {
-			DiagnoseTarget target = diagnoseTargetService.get(record.getTargetId());
 			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
 			try {
 				createPDF(evaluationResultList, target, record, output);
@@ -346,7 +380,7 @@ public class XKHealthPrescriptionService {
 				throw new BusinessException("创建PDF失败");
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -440,115 +474,94 @@ public class XKHealthPrescriptionService {
 		return (List<String>) result.get("result");
 	}
 
-    public void createPDF(List<XKEvaluation> evaluationResultList,DiagnoseTarget target, DiagnoseRecord record, OutputStream output)throws Exception {
-	
-	String batchTels = target.getCellphone();
-	String content = record.getMessage();
-	
-	SmsSendResponse resp = sendMsgWebService.sendSms(batchTels, content);
-	if(resp!=null&&StringUtils.equals(resp.getResult(), "0")){
-	    logger.error("【短信发送失败】原因："+resp.getDesc()+",发送失败的手机号码："+batchTels);
-	}
-	
-	// 1.创建PDF文件
-	Document document = new Document();
-	// 横向，这个可以自己根据实际情况看需不需要，我的是竖着放不下，只能横向展示
-	Rectangle pageSize = new Rectangle(PageSize.A4);
-	// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
-	document.setPageSize(pageSize);
-	document.setMargins(30, 30, 25, 25);// 边距
-	// 2.创建书写器（Writer）对象
+	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, DiagnoseRecord record, OutputStream output) throws Exception {
 
-	PdfWriter writer = PdfWriter.getInstance(document, output);
-	writer.setViewerPreferences(PdfWriter.PageModeFullScreen);
-	document.open();// 3.打开文档。
-	// 4.向文档中添加内容。
-	// 中文字体,解决中文不能显示问题
-	BaseFont titleChinese = BaseFont.createFont("/ttf/arialuni.ttf",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-	Font tTont = new Font(titleChinese, 16);
-	Paragraph title = new Paragraph("健康评估记录 ", tTont);
-	title.setAlignment(Element.ALIGN_CENTER);
-	title.add(Chunk.NEWLINE); // 好用的
-	document.add(title);
+		// 1.创建PDF文件
+		Document document = new Document();
+		// 横向，这个可以自己根据实际情况看需不需要，我的是竖着放不下，只能横向展示
+		Rectangle pageSize = new Rectangle(PageSize.A4);
+		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
+		document.setPageSize(pageSize);
+		document.setMargins(30, 30, 25, 25);// 边距
+		// 2.创建书写器（Writer）对象
 
-	/*--------------------------------正文---------------------------------*/
-	if (target != null) {
-	    BaseFont sfTTF = BaseFont.createFont("/ttf/STKAITI.TTF",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-	    Font font = new Font(sfTTF, 13);
-	    BaseFont sfTTFF = BaseFont.createFont("/ttf/arialuni.ttf",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-	    Font fontt = new Font(sfTTFF, 14);
+		PdfWriter writer = PdfWriter.getInstance(document, output);
+		writer.setViewerPreferences(PdfWriter.PageModeFullScreen);
+		document.open();// 3.打开文档。
+		// 4.向文档中添加内容。
+		// 中文字体,解决中文不能显示问题
+		BaseFont titleChinese = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		Font tTont = new Font(titleChinese, 16);
+		Paragraph title = new Paragraph("健康评估记录 ", tTont);
+		title.setAlignment(Element.ALIGN_CENTER);
+		title.add(Chunk.NEWLINE); // 好用的
+		document.add(title);
 
-	    String name = target.getName();
-	    Integer sex = target.getSex();
+		/*--------------------------------正文---------------------------------*/
+		if (target != null) {
+			BaseFont sfTTF = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			Font font = new Font(sfTTF, 13);
+			BaseFont sfTTFF = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+			Font fontt = new Font(sfTTFF, 14);
 
-	    SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
-	    Date birthday = target.getBirthday();
-	    Date createTime = record.getCreateTime();
+			String name = target.getName();
+			Integer sex = target.getSex();
 
-	    Paragraph info = new Paragraph();
-	    info.add(Chunk.NEWLINE);
-	    info.add(new Phrase("姓名：", fontt));
-	    info.add(new Phrase(name != null ? name : "", font));
-	    info.add("          ");
-	    info.add(new Phrase("性别：", fontt));
-	    info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
-	    info.add("          ");
-	    info.add(new Phrase("出生年月：", fontt));
-	    info.add(new Phrase(birthday != null ? formatter.format(birthday): "", font));
-	    info.add("          ");
-	    info.add(new Phrase("评估时间：", fontt));
-	    info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
-	    info.add(Chunk.NEWLINE);
-	    info.add(Chunk.NEWLINE);
-	    info.setAlignment(Element.ALIGN_CENTER);
-	    document.add(info);
+			SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
+			Date birthday = target.getBirthday();
+			Date createTime = record.getCreateTime();
 
-	    String prescription1 = record.getCorrectPrescription();
-	    if (prescription1 == null) {
-		prescription1 = record.getPrescription();
-	    }
+			Paragraph info = new Paragraph();
+			info.add(Chunk.NEWLINE);
+			info.add(new Phrase("姓名：", fontt));
+			info.add(new Phrase(name != null ? name : "", font));
+			info.add("          ");
+			info.add(new Phrase("性别：", fontt));
+			info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
+			info.add("          ");
+			info.add(new Phrase("出生年月：", fontt));
+			info.add(new Phrase(birthday != null ? formatter.format(birthday) : "", font));
+			info.add("          ");
+			info.add(new Phrase("评估时间：", fontt));
+			info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
+			info.add(Chunk.NEWLINE);
+			info.add(Chunk.NEWLINE);
+			info.setAlignment(Element.ALIGN_CENTER);
+			document.add(info);
 
-	    JSONArray jsonArray = new JSONArray(prescription1);
-	    for (int i = 0; i < jsonArray.length(); i++) {
-		/* BaseColor color = null; */
-		JSONObject jsonObject = jsonArray.getJSONObject(i);
-		/*
-		 * int riskLevel = jsonObject.getInt("riskLevel"); if (riskLevel
-		 * == 4) color = new BaseColor(255, 0, 0); if (riskLevel == 3)
-		 * color = new BaseColor(255, 165, 0); if (riskLevel == 2) color
-		 * = new BaseColor(0, 166, 90);
-		 */
-		BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		// Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
-		Font font1 = new Font(sfTTF1, 12);
-		Font font111 = new Font(sfTTF1, 11);
-		Paragraph info1 = new Paragraph();
-		info1.add(new Phrase("评估名称：", font1));
-		info1.add(new Phrase(jsonObject.getString("name"), font111));
-		info1.add(Chunk.NEWLINE);
-		info1.add(new Phrase("风险等级：", font1));
-		info1.add(new Phrase(jsonObject.getString("riskLevelName"),font111));
-		info1.add(Chunk.NEWLINE);
-		info1.add(new Phrase("分析建议：", font1));
-		document.add(info1);
-		BaseFont sfTTF11 = BaseFont.createFont("/ttf/STSONG.TTF",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		Font font11 = new Font(sfTTF11, 11);
-		String aaa = jsonObject.getString("suggest");
-		String[] split = aaa.split("\\n");
-		for (String each : split) {
-		    Paragraph info11 = new Paragraph();
-		    if (StringUtil.isNotEmpty(each)) {
-			info11.add(new Phrase(each, font11));
-			info11.setFirstLineIndent(21);
-			info11.setIndentationLeft(55);
-			info11.setLeading(16f);
-			info11.setSpacingAfter(12f);
-			document.add(info11);
-		    }
+			for (XKEvaluation evaluation : evaluationResultList) {
+				BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				// Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
+				Font font1 = new Font(sfTTF1, 12);
+				Font font111 = new Font(sfTTF1, 11);
+				Paragraph info1 = new Paragraph();
+				info1.add(new Phrase("评估名称：", font1));
+				info1.add(new Phrase(evaluation.getName(), font111));
+				info1.add(Chunk.NEWLINE);
+				info1.add(new Phrase("风险等级：", font1));
+				info1.add(new Phrase(evaluation.getRiskLevelName(), font111));
+				info1.add(Chunk.NEWLINE);
+				info1.add(new Phrase("分析建议：", font1));
+				document.add(info1);
+				BaseFont sfTTF11 = BaseFont.createFont("/ttf/STSONG.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				Font font11 = new Font(sfTTF11, 11);
+				String suggest = evaluation.getSuggest();
+				String[] suggests = suggest.split("\\n");
+				// 根据回车分段
+				for (String each : suggests) {
+					Paragraph info11 = new Paragraph();
+					if (StringUtil.isNotEmpty(each)) {
+						info11.add(new Phrase(each, font11));
+						info11.setFirstLineIndent(21);
+						info11.setIndentationLeft(55);
+						info11.setLeading(16f);
+						info11.setSpacingAfter(12f);
+						document.add(info11);
+					}
+				}
+			}
 		}
-	    }
+		document.close();
 	}
-	document.close();
-    }
 
 }

@@ -18,81 +18,91 @@ public class SendMsgWebService {
 	public String account; // 接口账号
 	@Value("${sms.webservice.key}")
 	public String key; // 密码
-//	public static String phone = "18017580238"; // 发送手机，如：13888888888
-//	public static String content = "123456 短信内容"; // 短信内容
+	// public static String phone = "18017580238"; // 发送手机，如：13888888888
+	// public static String content = "123456 短信内容"; // 短信内容
 	@Value("${sms.webservice.url}")
 	public String url; // 卫计委短信平台地址
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SendMsgWebService.class);
-	
+
+	private SmsService service;
+
+	public SmsService getSmsService() {
+		if (service == null) {
+			synchronized (SendMsgWebService.class) {
+				if (service == null) {
+					SmsImplServiceClient client = new SmsImplServiceClient(url);
+					service = client.getSmsService4XMLImplPort();
+				}
+			}
+		}
+
+		return service;
+	}
+
 	// 发送短信方法
-	public SmsSendResponse sendSms(String phone,String content) {
-		SmsImplServiceClient client = new SmsImplServiceClient(url);
-		 try{
-//			//create a default service endpoint
-	        	SmsService service = client.getSmsService4XMLImplPort();
-		//------------------------
-//		SmsService4XMLImplServiceClient smsservice = new SmsService4XMLImplServiceClient();
-//		try {
-//			ISmsService4XML sms = service.getSmsService4XMLImplPort(url);
+	public SmsSendResponse sendSms(String phone, String content) {
+
+		try {
+			// //create a default service endpoint
+			// getSmsService()
+			// ------------------------
+			// SmsService4XMLImplServiceClient smsservice = new
+			// SmsService4XMLImplServiceClient();
+			// try {
+			// ISmsService4XML sms = service.getSmsService4XMLImplPort(url);
 			LOGGER.info("**********发送短信***Begin************");
-			String message=convertToXmlForSubmit(phone, content); // 使用document 对象封装XML
-			LOGGER.info("**短信**请求内容:"+message);
-			String res = service.submit(message);
+			String message = convertToXmlForSubmit(phone, content); // 使用document 对象封装XML
+			LOGGER.info("**短信**请求内容:" + message);
+			String res = getSmsService().submit(message);
 			LOGGER.info("**********发送短信***End************");
-			LOGGER.info("**短信**响应内容:"+res);
+			LOGGER.info("**短信**响应内容:" + res);
 			return MessageConvert.xmlToBean(res, SmsSendResponse.class);
 		} catch (Exception e) {
-			LOGGER.error("短信发送异常:"+e.getMessage());
+			LOGGER.error("短信发送异常:" + e.getMessage());
 		}
 		return null;
 	}
 
-		// 查询余额方法
-		public SmsSendResponse getBalance() {
-			//-------------------------------------------------------
-			SmsImplServiceClient client = new SmsImplServiceClient(url);
-	        try{
-//			//create a default service endpoint
-	        	SmsService service = client.getSmsService4XMLImplPort();
-			
-	        	String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message><account>"
-						+ account
-						+ "</account><password>"
-						+ key
-						+ "</password></message>";
-				LOGGER.info("******查询余额***Begin******请求:"+message);
-				String res = service.balance(message);
-				LOGGER.info("******查询余额***End******响应:"+res);
-				return MessageConvert.xmlToBean(res, SmsSendResponse.class);  
-	        } catch (Exception e) {  
-	            e.printStackTrace(); 
-	            throw new RuntimeException(e);
-	        }  
+	// 查询余额方法
+	public SmsSendResponse getBalance() {
+		// -------------------------------------------------------
+		try {
+			//create a default service endpoint
+			String message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><message><account>" + account + "</account><password>" + key + "</password></message>";
+			LOGGER.info("******查询余额***Begin******请求:" + message);
+			String res = getSmsService().balance(message);
+			LOGGER.info("******查询余额***End******响应:" + res);
+			return MessageConvert.xmlToBean(res, SmsSendResponse.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		
-		/**
-		 * 使用document 对象封装XML
-		 * @param account
-		 * @param key
-		 * @param phones
-		 * @param content
-		 * @return
-		 */
-		public String convertToXmlForSubmit(String phones,String content) {
-			//封装XML
-			Document doc = DocumentHelper.createDocument();
-			doc.setXMLEncoding("UTF-8");
-			Element message = doc.addElement("message");
-			Element accountEl = message.addElement("account");
-			accountEl.setText(account);
-			Element password = message.addElement("key");
-			password.setText(key);
-			Element phonesEl = message.addElement("phones");
-			phonesEl.setText(phones);
-			Element contentEL = message.addElement("content");
-			contentEL.setText(content);
-			return doc.asXML();
-		}
-		
+	}
+
+	/**
+	 * 使用document 对象封装XML
+	 * 
+	 * @param account
+	 * @param key
+	 * @param phones
+	 * @param content
+	 * @return
+	 */
+	public String convertToXmlForSubmit(String phones, String content) {
+		// 封装XML
+		Document doc = DocumentHelper.createDocument();
+		doc.setXMLEncoding("UTF-8");
+		Element message = doc.addElement("message");
+		Element accountEl = message.addElement("account");
+		accountEl.setText(account);
+		Element password = message.addElement("key");
+		password.setText(key);
+		Element phonesEl = message.addElement("phones");
+		phonesEl.setText(phones);
+		Element contentEL = message.addElement("content");
+		contentEL.setText(content);
+		return doc.asXML();
+	}
+
 }
