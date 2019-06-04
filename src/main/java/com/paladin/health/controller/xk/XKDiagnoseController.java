@@ -72,7 +72,7 @@ public class XKDiagnoseController {
 
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@GetMapping("/evaluate/simple/record/page")
-	public Object getEvaluationRecordPage(@RequestParam("searchId") String searchId, @RequestParam String accessKey, Model model) {
+	public Object getEvaluationRecordConfirmPage(@RequestParam("searchId") String searchId, @RequestParam String accessKey, Model model) {
 		if (!validAccessKey(accessKey)) {
 			model.addAttribute("errorMessage", "未授权访问，请传入AccessKey");
 			return "/health/xk/error";
@@ -86,7 +86,25 @@ public class XKDiagnoseController {
 		model.addAttribute("searchId", searchId);
 		model.addAttribute("accessKey", accessKey);
 		model.addAttribute("record", JsonUtil.getJson(record));
-		return "/health/xk/prescription";
+		return "/health/xk/prescription_confirm";
+	}
+	
+	@ApiOperation(value = "熙康健康评估记录接口")
+	@GetMapping("/evaluate/simple/record/view")
+	public Object getEvaluationRecordPage(@RequestParam("identificationId") String identificationId, @RequestParam String accessKey, Model model) {
+		if (!validAccessKey(accessKey)) {
+			model.addAttribute("errorMessage", "未授权访问，请传入AccessKey");
+			return "/health/xk/error";
+		}
+
+		DiagnoseRecord record = diagnoseRecordService.getLastRecordByIdentificationId(identificationId, accessKey);
+		if (record == null) {
+			model.addAttribute("errorMessage", "您没有创建过健康处方");
+			return "/health/xk/error";
+		}
+		
+		model.addAttribute("record", JsonUtil.getJson(record));
+		return "/health/xk/prescription_view";
 	}
 
 	@ApiOperation(value = "熙康健康评估记录接口")

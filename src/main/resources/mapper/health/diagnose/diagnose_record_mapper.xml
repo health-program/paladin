@@ -26,5 +26,25 @@
 		AND create_by=#{accessKey}
 		ORDER BY create_time DESC LIMIT 1		
 	</select>
+	
+	<select id="findLastRecordByIdentificationId" resultType="com.paladin.health.model.diagnose.DiagnoseRecord">
+		SELECT
+			id,
+			target_id AS targetId,
+			factors,
+			target_condition AS targetCondition,
+			prescription,
+			correct_prescription AS correctPrescription,
+			type,
+			create_time AS createTime,
+			update_time AS updateTime,
+			create_by AS createBy,
+			search_id AS searchId,
+			message,
+			send_message AS sendMessage
+		FROM diagnose_record
+		WHERE target_id=#{identificationId}
+		ORDER BY create_time DESC LIMIT 1		
+	</select>
 
 </mapper>

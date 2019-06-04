@@ -32,6 +32,11 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 		}
 		return record;
 	}
+	
+	public DiagnoseRecord getLastRecordByIdentificationId(String identificationId, String accessKey) {	
+		DiagnoseRecord record = diagnoseRecordMapper.findLastRecordByIdentificationId(identificationId);		
+		return record;
+	}
 
 	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage, int sendStatus, String sendError) {
 		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage,  sendStatus,  sendError) > 0;

@@ -36,16 +36,61 @@ body {
     size: auto;
     margin: 0mm;
 }
-</style>
 
-</html>
+.container1 {
+    width: 1070px;
+    margin: 0 auto;
+
+    /*设置整个容器在浏览器中水平居中*/
+}
+
+.container2 {
+    width: 1070px;
+    margin: 0 auto;
+    padding-right: 40px;
+}
+
+dl {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+dt {
+    float: left;
+    width: 120px;
+    overflow: hidden;
+    clear: left;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.42857143;
+    font-weight: 700;
+    display: block;
+}
+
+dd {
+    margin-left: 130px;
+    line-height: 1.42857143;
+}
+</style>
 
 <body onload="load()">
     <input type="hidden" th:value="${searchId}" id="searchId" />
     <input type="hidden" th:value="${accessKey}" id="accessKey" />
     <div style="display: none" th:utext="${record}" id="prescription" />
-    <div><a href="javascript:void(0);" style="margin-right: 20px" onclick="preview();">打印</a><a href="javascript:void(0);" id="updateBtn" onclick="update();">确认</a></div>
-    <div id="content"></div>
+    <div class="container1">
+        <div>
+            <!-- <a href="javascript:void(0);" style="margin-right: 20px" onclick="preview();">打印</a> -->
+            <a href="javascript:void(0);" style="margin-right: 20px" id="updateBtn" onclick="update();">确认</a>
+            <a href="javascript:void(0);" id="update2pdfBtn" onclick="update2pdf();">确认并获取PDF</a>
+        </div>
+        <div id="content"></div>
+    </div>
 </body>
 <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
@@ -60,6 +105,7 @@ function load() {
     record = JSON.parse(dom.textContent);
     record.targetCondition = JSON.parse(record.targetCondition);
     record.prescription = JSON.parse(record.prescription);
+    record.message = record.message ? JSON.parse(record.message) : null;
 
     var target = record.targetCondition;
     if (target) {
@@ -87,10 +133,27 @@ function createHtml(isPrint) {
         '    <td>评估时间</td>' +
         '    <td>' + (record.createTime || '') + '</td>' +
         '</tr>';
-
+    html += createMessageHtml(record.message);
     html += createEvaluateHtml(record.prescription, isPrint);
     html += "</table>";
     return html;
+}
+
+function createMessageHtml(message) {
+    return '<tr>' +
+        '    <td><input type="checkbox" checked onclick="checkMessage(this)"/>短信提醒</td>' +
+        '    <td colspan="3" style="text-align:left">' +
+        '    <textarea id="messageInput" rows="3" style="width:100%">' + message[0] + '</textarea>' +
+        '    </td>' +
+        '</tr>';
+
+}
+
+
+var messageChecked = true;
+
+function checkMessage(checkbox) {
+    messageChecked = checkbox.checked;
 }
 
 function check(checkbox, i) {
@@ -162,20 +225,69 @@ function getEditedPrescription() {
 function preview() {
     getEditedPrescription();
     var bdhtml = window.document.body.innerHTML; //获取当前页的html代码
-    var prnhtml = '<!--startprint--><div>' + createHtml(true) + "</div><!--endprint-->";
+    var prnhtml = '<!--startprint--><div>' + createPrintHtml() + "</div><!--endprint-->";
 
     window.document.body.innerHTML = prnhtml;
+
+    // if($(document).height() >1600) {
+    //     var h = 70;
+    //     var dls = $("dl");
+    //     for(var i=0;i<dls.length;i++) {
+    //         h += $(dls[i]).height();
+    //         if(h>1700) {
+    //             $('<div style="page-break-after: always;"></div>').insertBefore($(dls[i]));
+    //             break;
+    //         }
+    //     }
+    // }
+
+
     window.print();
     window.document.body.innerHTML = bdhtml;
 }
 
+function createPrintHtml() {
+
+    var target = record.targetCondition;
+    var html = '<div class="container2"><h3 style="text-align: center;">健康风险评估</h3>';
+    html += '<div style="height: 40px;text-align: center;">' +
+        '    <span style="width:100px;display: inline-block;">姓名：' + (target.name || '') + '</span>' +
+        '    <span style="width:80px;display: inline-block;">性别：' + (target.sex || '') + '</span>' +
+        '    <span style="width:150px;display: inline-block;">出生年月：' + (target.birthday || '') + '</span>' +
+        '    <span style="width:150px;display: inline-block;">评估时间：' + (target.createTime || '') + '</span>' +
+        '</div>';
+
+    html += createPrintEvaluateHtml(record.prescription);
+    html += '</div>';
+
+    return html;
+}
+
+function createPrintEvaluateHtml(data) {
+    var html = "";
+    if (data) {
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i];
+            if (item.checked === false) continue;
+
+            html += '<dl>' +
+                ' <dt>评估内容：</dt>' +
+                ' <dd>' + item.name + '</dd>' +
+                ' <dt>风险等级：</dt>' +
+                ' <dd>' + item.riskLevelName + '</dd>' +
+                ' <dt>分析建议：</dt>' +
+                ' <dd><pre>' + editedPrescription[i] + '</pre>' +
+                ' </dd>' +
+                '</dl>';
+        }
+    }
+    return html;
+}
+
+
 var updating = false;
 
-function update() {
-    if (updating === true) {
-        return;
-    }
-
+function getRequest(){
     getEditedPrescription();
     var request = [];
     var prescription = record.prescription;
@@ -192,7 +304,61 @@ function update() {
         }
     }
 
-    if (prescription) {
+    if(!prescription) return null;
+
+    var message = messageChecked ? $("#messageInput").val() : null;
+    request = {
+        sendMessage: message,
+        evaluationItems: request
+    }
+
+    return request;
+}
+
+function update2pdf(){
+
+    if (updating === true) {
+        return;
+    }
+
+    request = getRequest();
+    
+    if (request) {
+        updating = true;
+        $.ajax({
+            type: "POST",
+            url: "/evaluate/simple/confirm2pdf?searchId=" + searchId + "&accessKey=" + accessKey,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(request),
+            dataType: "json",
+            success: function(response) {
+                if (response && response.status == 1) {
+                	
+                	var tempwindow=window.open('_blank'); // 先打开页面
+                	tempwindow.location.href="/file" + response.message; // 后更改页面地址
+                	
+                    return;
+                }
+                alert(response.message);
+            },
+            error: function(result) {
+                alert(result);
+            },
+            complete: function() {
+                updating = false;
+            }
+        });
+    }
+}
+
+function update() {
+    if (updating === true) {
+        return;
+    }
+
+    request = getRequest();
+    
+    if (request) {
         updating = true;
         $.ajax({
             type: "POST",

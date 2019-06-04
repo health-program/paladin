@@ -12,4 +12,6 @@ public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
 	DiagnoseRecord findRecordBySearchId(@Param("searchId") String searchId, @Param("accessKey") String accessKey);
 
+	DiagnoseRecord findLastRecordByIdentificationId(@Param("identificationId") String identificationId);
+
 }
