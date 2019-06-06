@@ -25,6 +25,7 @@ import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
 import com.paladin.health.model.sms.SmsSendResponse;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationItemDTO;
+import com.paladin.health.service.core.xk.message.MessageContainer;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKEvaluation;
@@ -61,7 +62,9 @@ public class XKHealthPrescriptionService {
 	private SendMsgWebService sendMsgWebService;
 	@Autowired
 	private XKKnowledgeServlet knowledgeServlet;
-
+	@Autowired
+	private MessageContainer messageContainer;
+	
 	@Value("${xk.knowledge.url}")
 	private String knowledgeUrl;
 
@@ -414,7 +417,10 @@ public class XKHealthPrescriptionService {
 			}
 		}
 
-		return getTips("festival");
+		String message = messageContainer.getOneFestivalMessage();
+		List<String> msgs = new ArrayList<>();
+		msgs.add(message);
+		return msgs;
 	}
 
 	/**
