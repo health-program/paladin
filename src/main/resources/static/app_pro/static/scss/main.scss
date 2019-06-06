@@ -1,0 +1,53 @@
+@charset "UTF-8";
+@import "basic";
+
+$bg_color: #6EAFFF;
+$one_percent: 100%;
+
+img{
+  width: $one_percent;
+  height: $one_percent;
+}
+
+// 文本溢出
+.text-overflow{
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.con-overflow{
+  height: 20px;
+  overflow: hidden;
+  -ms-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+  display:-webkit-box; //将对象作为弹性伸缩盒子模型显示
+  -webkit-box-orient:vertical; //设置或检索伸缩盒对象的子元素的排列方式
+  -webkit-line-clamp:1; //设置显示多少行
+}
+
+// 组件样式重置
+.van-swipe{
+  height: $one_percent;
+}
+
+//页面样式
+#home {
+
+  // tab样式重置
+  .van-tabs__wrap{
+    position: fixed !important;
+    top: 50% !important;
+  }
+  .van-tabs__line{
+    display: none !important;
+  }
+  .van-tab--active{
+    color: #6EAFFF;
+  }
+}
+
+//视频插件样式
+.vjs-custom-skin > .video-js .vjs-big-play-button{
+  font-size: 2em !important;
+}
