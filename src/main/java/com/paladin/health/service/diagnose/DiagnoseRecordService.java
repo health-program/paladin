@@ -41,5 +41,13 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage, int sendStatus, String sendError) {
 		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage,  sendStatus,  sendError) > 0;
 	}
+	
+        public DiagnoseRecord getHealthRecord(String targrtId) {
+    	if (targrtId == null || targrtId.length() == 0) {
+    	    throw new BusinessException("身份证号码不能为空");
+    	}
+    	return diagnoseRecordMapper.findLastRecordByIdentificationId(targrtId);
+    
+        }
 
 }
