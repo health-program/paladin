@@ -1610,6 +1610,10 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
             }
         });
     },
+    getEditTarget: function(column, model) {
+        // 获取编辑目标
+        return model.editBody.find("div[name='" + column.name + "']");
+    },
     fillView: function(column, data, model, target) {
         var p = target || this.getViewTarget(column, model);
         if (!p || p.length == 0) return;
@@ -1655,10 +1659,8 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
         var colspan = column.colspan || 1,
             required = column.required === 'required';
         var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
         var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
-        html += '<div name="' + column.name + '" class="tonto-radio-constant" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
-        html += '</div>\n';
+        html += '<div name="' + column.name + '" class="tonto-radio-constant col-sm-' + this.getEditColSize(column, colspan, options) + '" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
         return {
             colspan: colspan,
             html: html
@@ -1681,6 +1683,10 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
             vals.push($(this).val());
         });
         return vals.join();
+    },
+    getEditTarget: function(column, model) {
+        // 获取编辑目标
+        return model.editBody.find("div[name='" + column.name + "']");
     },
     dependTrigger: function(column, model) {
         // 这里使用icheck 所以调用ifChecked事件
@@ -1740,10 +1746,8 @@ var _checkBoxFieldBuilder = new _FieldBuilder("CHECKBOX", {
         var colspan = column.colspan || 1,
             required = column.required === 'required';
         var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
         var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
-        html += '<div name="' + column.name + '" class="tonto-checkbox-constant" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
-        html += '</div>\n';
+        html += '<div name="' + column.name + '" class="tonto-checkbox-constant col-sm-' + this.getEditColSize(column, colspan, options) + '" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
         return {
             colspan: colspan,
             html: html

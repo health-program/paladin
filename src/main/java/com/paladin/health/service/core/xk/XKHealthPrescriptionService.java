@@ -114,7 +114,7 @@ public class XKHealthPrescriptionService {
 		if (evaluateCondition != null) {
 			Map evaluationResult = getEvaluation(evaluateCondition);
 			if (evaluationResult != null) {
-				evaluationResultList = new ArrayList<>(10);
+				evaluationResultList = new ArrayList<>(8);
 				for (ConstantsContainer.KeyValue kv : ConstantsContainer.getType(CONSTANT_EVALUATE_TYPE)) {
 
 					String code = kv.getKey();
@@ -457,6 +457,21 @@ public class XKHealthPrescriptionService {
 	 * @return
 	 */
 	public Map getEvaluation(XKEvaluateCondition condition) {
+		// 【不经常晒太阳】和【不经常参加运动锻炼】对外输入 为【 经常晒太阳】和【经常参加运动锻炼】，所以需要转换下值给熙康
+		String rarelyBask =  condition.getRarelyBask();
+		if("1".equals(rarelyBask)) {
+			condition.setRarelyBask("0");
+		} else if("0".equals(rarelyBask)) {
+			condition.setRarelyBask("1");
+		}
+		
+		String rarelysports = condition.getRarelysports();
+		if("1".equals(rarelysports)) {
+			condition.setRarelysports("0");
+		} else if("0".equals(rarelysports)) {
+			condition.setRarelysports("1");
+		}
+		
 		return knowledgeServlet.postJsonRequest(evaluationUrl, condition, Map.class);
 	}
 

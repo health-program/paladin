@@ -110,10 +110,10 @@
             { name: "vegOrFruits", title: "每天是否吃水果或蔬菜", inputType: "RADIO", enum: "boolean" },
             { name: "dyazide", title: "是否服用降压药", inputType: "RADIO", enum: "boolean" },
             { name: "hormone", title: "是否连续6个月以上服用激素类药品", inputType: "RADIO", enum: "boolean" },
-            { name: "menopause", title: "45岁前是否绝经", inputType: "RADIO", enum: "boolean" },
+            { name: "menopause", title: "45岁前是否绝经", inputType: "RADIO", enum: "boolean",dependency:["sex","0"] },
             { name: "diarrhea", title: "腹泻、腹痛或大便习惯", inputType: "RADIO", enum: "boolean" },
-            { name: "rarelyBask", title: "不经常晒太阳", inputType: "RADIO", enum: "boolean" },
-            { name: "rarelysports", title: "不经常参加运动锻炼", inputType: "RADIO", enum: "boolean" },
+            { name: "rarelyBask", title: "经常晒太阳", inputType: "RADIO", enum: "boolean" },
+            { name: "rarelysports", title: "经常参加运动锻炼", inputType: "RADIO", enum: "boolean" },
             { name: "family_osteoporosis", title: "是否有质疏松家族史", inputType: "RADIO", enum: "boolean" },
             { name: "family_hypertension", title: "是否有高血压家族史", inputType: "RADIO", enum: "family-hypertension-type", colspan: 2 }
         ]
@@ -123,6 +123,8 @@
 
     $(function() {
         $("#evaluate").html(generateHtml(evaluate_options));
+        $.initComponment($("#evaluate"));
+
         evaluateModel = new tonto.Model("evaluate", evaluate_options.columns, {
             submitClick: function(model) {
                 var jsonData = model.formBody.serializeArray();
@@ -138,6 +140,7 @@
                 model.toView();
             }
         });
+
         evaluateModel.setData({
             age: "47",
             dbp: "90",
@@ -172,6 +175,7 @@
 
         html = generateHtml(base_options);
         $("#base").html(generateHtml(base_options));
+        $.initComponment($("#base"));
 
         baseModel = new tonto.Model("base", base_options.columns, {
             submitClick: function(model) {
@@ -197,6 +201,7 @@
         });
 
         $("#disease").html(generateHtml(disease_options));
+         $.initComponment($("#disease"));
         diseaseModel = new tonto.Model("disease", disease_options.columns, {
             submitClick: function(model) {
                 var jsonData = model.formBody.serializeArray();
@@ -215,7 +220,6 @@
         diseaseModel.setData({
             index: "HR51.03.057,CM.0134"
         });
-        $.initComponment($(".content"));
     });
 
     // function diagnose() {
