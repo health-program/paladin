@@ -47,6 +47,14 @@ public class DiagnoseRecord {
 	private Integer sendStatus;
 
 	private String sendError;
+	
+	private String sendCellphone;
+	
+	private String doctorName;
+	
+	private String hospitalName;
+	
+	private String confirmer;
 
 	public String getId() {
 		return id;
@@ -166,6 +174,38 @@ public class DiagnoseRecord {
 
 	public void setSendError(String sendError) {
 		this.sendError = sendError;
+	}
+
+	public String getDoctorName() {
+		return doctorName;
+	}
+
+	public void setDoctorName(String doctorName) {
+		this.doctorName = doctorName;
+	}
+
+	public String getConfirmer() {
+		return confirmer;
+	}
+
+	public void setConfirmer(String confirmer) {
+		this.confirmer = confirmer;
+	}
+
+	public String getSendCellphone() {
+		return sendCellphone;
+	}
+
+	public void setSendCellphone(String sendCellphone) {
+		this.sendCellphone = sendCellphone;
+	}
+
+	public String getHospitalName() {
+		return hospitalName;
+	}
+
+	public void setHospitalName(String hospitalName) {
+		this.hospitalName = hospitalName;
 	}
 
 }

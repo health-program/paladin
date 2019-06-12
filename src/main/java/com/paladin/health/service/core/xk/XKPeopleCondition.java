@@ -21,6 +21,8 @@ public class XKPeopleCondition {
 			
 	private String doctorName;
 	
+	private String hospitalName;
+	
 	private List<String> diseases;
 	
 	private XKEvaluateCondition condition;
@@ -95,6 +97,14 @@ public class XKPeopleCondition {
 
 	public void setDoctorName(String doctorName) {
 		this.doctorName = doctorName;
+	}
+
+	public String getHospitalName() {
+		return hospitalName;
+	}
+
+	public void setHospitalName(String hospitalName) {
+		this.hospitalName = hospitalName;
 	}
 
 	

@@ -25,29 +25,30 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 		return searchPage(query);
 	}
 
-	public DiagnoseRecord getRecordBySearchId(String searchId, String accessKey) {	
-		DiagnoseRecord record = diagnoseRecordMapper.findRecordBySearchId(searchId,accessKey);		
+	public DiagnoseRecord getRecordBySearchId(String searchId, String accessKey) {
+		DiagnoseRecord record = diagnoseRecordMapper.findRecordBySearchId(searchId, accessKey);
 		if (record == null) {
 			throw new BusinessException("找不到对应健康处方记录");
 		}
 		return record;
 	}
-	
-	public DiagnoseRecord getLastRecordByIdentificationId(String identificationId, String accessKey) {	
-		DiagnoseRecord record = diagnoseRecordMapper.findLastRecordByIdentificationId(identificationId);		
+
+	public DiagnoseRecord getLastRecordByIdentificationId(String identificationId, String accessKey) {
+		DiagnoseRecord record = diagnoseRecordMapper.findLastRecordByIdentificationId(identificationId);
 		return record;
 	}
 
-	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage, int sendStatus, String sendError) {
-		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage,  sendStatus,  sendError) > 0;
+	public boolean updateCorrectPrescription(String id, String correctPrescription, String sendMessage, int sendStatus, String sendError, String sendCellphone,
+			String confirmer) {
+		return diagnoseRecordMapper.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, sendCellphone, confirmer) > 0;
 	}
-	
-        public DiagnoseRecord getHealthRecord(String targrtId) {
-    	if (targrtId == null || targrtId.length() == 0) {
-    	    throw new BusinessException("身份证号码不能为空");
-    	}
-    	return diagnoseRecordMapper.findLastRecordByIdentificationId(targrtId);
-    
-        }
+
+	public DiagnoseRecord getHealthRecord(String targrtId) {
+		if (targrtId == null || targrtId.length() == 0) {
+			throw new BusinessException("身份证号码不能为空");
+		}
+		return diagnoseRecordMapper.findLastRecordByIdentificationId(targrtId);
+
+	}
 
 }

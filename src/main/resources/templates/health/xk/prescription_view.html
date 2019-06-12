@@ -79,7 +79,7 @@ dd {
         <div id="content"></div>
     </div>
 </body>
-<script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="/static/assets/jquery/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
 var record;
 
@@ -122,10 +122,10 @@ function createTableHtml() {
         '    <td width="415px">' + (target.sex || '') + '</td>' +
         '</tr>' +
         '<tr>' +
-        '    <td>出生年月</td>' +
-        '    <td>' + (target.birthday || '') + '</td>' +
-        '    <td>评估时间</td>' +
-        '    <td>' + (record.createTime || '') + '</td>' +
+        '    <td>确认医生</td>' +
+         '   <td><input id="cellphone" value="' + (target.cellphone || '') + '"/></td>' +
+        '    <td>医生姓名</td>' +
+        '    <td><input id="confirmer" value="' + (record.doctorName || '') + '"/></td>' +
         '</tr>';
     html += createEvaluateHtml(record.prescription);
     html += "</table>";
@@ -175,8 +175,8 @@ function createDivHtml() {
     html += '<div style="height: 40px;text-align: center;">' +
         '    <span style="width:100px;display: inline-block;">姓名：' + (target.name || '') + '</span>' +
         '    <span style="width:80px;display: inline-block;">性别：' + (target.sex || '') + '</span>' +
-        '    <span style="width:150px;display: inline-block;">出生年月：' + (target.birthday || '') + '</span>' +
-        '    <span style="width:150px;display: inline-block;">评估时间：' + (target.createTime || '') + '</span>' +
+        '    <span style="width:150px;display: inline-block;">确认医生：' + (record.doctorName || '') + '</span>' +
+        '    <span style="width:150px;display: inline-block;">评估时间：' + (record.createTime || '') + '</span>' +
         '</div>';
 
     html += createDivEvaluateHtml(record.prescription);

@@ -64,7 +64,7 @@ public class XKHealthPrescriptionService {
 	private XKKnowledgeServlet knowledgeServlet;
 	@Autowired
 	private MessageContainer messageContainer;
-	
+
 	@Value("${xk.knowledge.url}")
 	private String knowledgeUrl;
 
@@ -238,8 +238,11 @@ public class XKHealthPrescriptionService {
 			record.setCreateTime(now);
 			record.setCreateBy(accessKey);
 			record.setSearchId(searchId);
+			record.setDoctorName(condition.getDoctorName());
+			record.setHospitalName(condition.getHospitalName());
 			record.setMessage(JsonUtil.getJson(messages));
-
+			
+			
 			diagnoseRecordService.save(record);
 
 			XKHealthPrescription result = new XKHealthPrescription();
@@ -298,9 +301,15 @@ public class XKHealthPrescriptionService {
 	 * @param createPDF
 	 */
 	public String confirmSimpleEvaluationAndCreatePDF(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
+		String confirmer = confirmEvaluation.getConfirmer();
+		if (confirmer == null || confirmer.length() == 0) {
+			throw new BusinessException("评估确认人不能为空！");
+		}
+
 		DiagnoseRecord record = diagnoseRecordService.getRecordBySearchId(searchId, accessKey);
 		String id = record.getId();
 		String identificationId = record.getTargetId();
+		String hospitalName = record.getHospitalName();
 
 		List<ConfirmEvaluationItemDTO> evaluationItems = confirmEvaluation.getEvaluationItems();
 
@@ -337,12 +346,18 @@ public class XKHealthPrescriptionService {
 		String sendMessage = confirmEvaluation.getSendMessage();
 		int sendStatus = DiagnoseRecord.SEND_STATUS_DEFAULT;
 		String sendError = null;
+		String cellphone = null;
 
 		if (sendMessage != null) {
 			sendMessage = sendMessage.trim();
 			if (sendMessage.length() != 0) {
-				String cellphone = target.getCellphone();
+				cellphone = confirmEvaluation.getCellphone();
+				if (cellphone == null || cellphone.length() == 0) {
+					cellphone = target.getCellphone();
+				}
+
 				if (cellphone != null && cellphone.length() > 0) {
+					sendMessage += "——" + hospitalName + "·" + confirmer;
 					try {
 						SmsSendResponse resp = sendMsgWebService.sendSms(cellphone, sendMessage);
 						if (resp != null) {
@@ -370,12 +385,13 @@ public class XKHealthPrescriptionService {
 			sendError = sendError.substring(0, 200);
 		}
 
-		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, confirmEvaluation.getSendMessage(), sendStatus, sendError);
+		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, cellphone,
+				confirmer);
 
 		if (createPDF) {
 			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
 			try {
-				createPDF(evaluationResultList, target, record, output);
+				createPDF(evaluationResultList, target, output, new Date(), confirmer);
 				return output.getFileRelativeUrl();
 			} catch (Exception e) {
 				throw new BusinessException("创建PDF失败");
@@ -458,20 +474,20 @@ public class XKHealthPrescriptionService {
 	 */
 	public Map getEvaluation(XKEvaluateCondition condition) {
 		// 【不经常晒太阳】和【不经常参加运动锻炼】对外输入 为【 经常晒太阳】和【经常参加运动锻炼】，所以需要转换下值给熙康
-		String rarelyBask =  condition.getRarelyBask();
-		if("1".equals(rarelyBask)) {
+		String rarelyBask = condition.getRarelyBask();
+		if ("1".equals(rarelyBask)) {
 			condition.setRarelyBask("0");
-		} else if("0".equals(rarelyBask)) {
+		} else if ("0".equals(rarelyBask)) {
 			condition.setRarelyBask("1");
 		}
-		
+
 		String rarelysports = condition.getRarelysports();
-		if("1".equals(rarelysports)) {
+		if ("1".equals(rarelysports)) {
 			condition.setRarelysports("0");
-		} else if("0".equals(rarelysports)) {
+		} else if ("0".equals(rarelysports)) {
 			condition.setRarelysports("1");
 		}
-		
+
 		return knowledgeServlet.postJsonRequest(evaluationUrl, condition, Map.class);
 	}
 
@@ -493,7 +509,20 @@ public class XKHealthPrescriptionService {
 		return (List<String>) result.get("result");
 	}
 
-	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, DiagnoseRecord record, OutputStream output) throws Exception {
+	private static Map<String, String> referenceMap;
+	static {
+		referenceMap = new HashMap<>();
+		referenceMap.put(XKEvaluation.CODE_AF, "基于Wang, Massaro, Levy et al于2003年在JAMA上发表的文章《通过社区新发作的AF预测中风或者死亡的风险分数》");
+		referenceMap.put(XKEvaluation.CODE_CHD, "基于D Agostino Russe Mw. Huse DM等人在2000年美国心脏期刊发表的《原发性和继发性冠心病评估:从 Framingham研究中获得的新结果》");
+		referenceMap.put(XKEvaluation.CODE_CVD, "基于2型糖尿病患者未来5年内发生CVD事件的评分模型");
+		referenceMap.put(XKEvaluation.CODE_DIABETES, "基于芬兰Undstrom高危糖尿病人群预测模型");
+		referenceMap.put(XKEvaluation.CODE_HYPERTENSION, "基于中国35-64岁人群15年高血压发生风险预测研究");
+		referenceMap.put(XKEvaluation.CODE_ICVD, "基于国家“十五“攻关课题‘冠心病、脑卒中综合危险度评估及干预方案的研究《课题组在此开发的用于评估个体10年ICVD发病危险的工具》");
+		// referenceMap.put(XKEvaluation.CODE_OSTEOPOROSIS, "骨质疏松症风险评估");
+	}
+
+	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer)
+			throws Exception {
 
 		// 1.创建PDF文件
 		Document document = new Document();
@@ -509,26 +538,25 @@ public class XKHealthPrescriptionService {
 		document.open();// 3.打开文档。
 		// 4.向文档中添加内容。
 		// 中文字体,解决中文不能显示问题
-		BaseFont titleChinese = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		Font tTont = new Font(titleChinese, 16);
-		Paragraph title = new Paragraph("健康评估记录 ", tTont);
+		BaseFont titleFont = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		BaseFont contentFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+
+		Font tTont = new Font(titleFont, 16);
+		Paragraph title = new Paragraph("健康风险评估与健康教育处方 ", tTont);
 		title.setAlignment(Element.ALIGN_CENTER);
 		title.add(Chunk.NEWLINE); // 好用的
 		document.add(title);
 
 		/*--------------------------------正文---------------------------------*/
 		if (target != null) {
-			BaseFont sfTTF = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-			Font font = new Font(sfTTF, 13);
-			BaseFont sfTTFF = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-			Font fontt = new Font(sfTTFF, 14);
+			Font font = new Font(contentFont, 13);
+			Font fontt = new Font(titleFont, 14);
+			Font referenceFont = new Font(contentFont, 11);
 
 			String name = target.getName();
 			Integer sex = target.getSex();
 
 			SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
-			Date birthday = target.getBirthday();
-			Date createTime = record.getCreateTime();
 
 			Paragraph info = new Paragraph();
 			info.add(Chunk.NEWLINE);
@@ -538,8 +566,8 @@ public class XKHealthPrescriptionService {
 			info.add(new Phrase("性别：", fontt));
 			info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
 			info.add("          ");
-			info.add(new Phrase("出生年月：", fontt));
-			info.add(new Phrase(birthday != null ? formatter.format(birthday) : "", font));
+			info.add(new Phrase("确认医生：", fontt));
+			info.add(new Phrase(confirmer != null ? confirmer : "", font));
 			info.add("          ");
 			info.add(new Phrase("评估时间：", fontt));
 			info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
@@ -578,6 +606,19 @@ public class XKHealthPrescriptionService {
 						document.add(info11);
 					}
 				}
+
+				String reference = referenceMap.get(evaluation.getCode());
+				if (reference != null) {
+					reference = "注：" + reference;
+					Paragraph p = new Paragraph();
+					p.add(new Phrase(reference, referenceFont));
+					// p.setFirstLineIndent(21);
+					p.setIndentationLeft(55);
+					p.setLeading(16f);
+					p.setSpacingAfter(12f);
+					document.add(p);
+				}
+
 			}
 		}
 		document.close();

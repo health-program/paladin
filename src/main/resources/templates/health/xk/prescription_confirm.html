@@ -92,7 +92,7 @@ dd {
         <div id="content"></div>
     </div>
 </body>
-<script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="/static/assets/jquery/jquery-1.11.3.min.js"></script>
 <script type="text/javascript">
 var record;
 var editedPrescription;
@@ -106,6 +106,7 @@ function load() {
     record.targetCondition = JSON.parse(record.targetCondition);
     record.prescription = JSON.parse(record.prescription);
     record.message = record.message ? JSON.parse(record.message) : null;
+    record.prescription = evaluationFilter(record.prescription);
 
     var target = record.targetCondition;
     if (target) {
@@ -119,6 +120,29 @@ function load() {
     $("#content").html(createHtml());
 }
 
+function evaluationFilter(data) {
+    if (data && data.length > 0) {
+        var arr = [];
+        for (var i = 0; i < data.length; i++) {
+            var item = data[i],
+                l;
+            if (item.riskLevel == 3) {
+                if (l && l > 3 && arr.length > 5) {
+                    break;
+                }
+            } else if (item.riskLevel < 3) {
+                if (arr.length > 0) {
+                    break;
+                }
+            }
+            l = item.riskLevel
+            arr.push(item);
+        }
+        return arr;
+    }
+    return [];
+}
+
 function createHtml(isPrint) {
     var target = record.targetCondition;
     var html = '<table><tr>' +
@@ -128,10 +152,10 @@ function createHtml(isPrint) {
         '    <td width="415px">' + (target.sex || '') + '</td>' +
         '</tr>' +
         '<tr>' +
-        '    <td>出生年月</td>' +
-        '    <td>' + (target.birthday || '') + '</td>' +
-        '    <td>评估时间</td>' +
-        '    <td>' + (record.createTime || '') + '</td>' +
+        '    <td>手机号码</td>' +
+        '    <td><input id="cellphone" value="' + (target.cellphone || '') + '"/></td>' +
+        '    <td>医生姓名</td>' +
+        '    <td><input id="confirmer" value="' + (record.doctorName || '') + '"/></td>' +
         '</tr>';
     html += createMessageHtml(record.message);
     html += createEvaluateHtml(record.prescription, isPrint);
@@ -141,19 +165,18 @@ function createHtml(isPrint) {
 
 function createMessageHtml(message) {
     return '<tr>' +
-        '    <td><input type="checkbox" checked onclick="checkMessage(this)"/>短信提醒</td>' +
+        '    <td><input type="checkbox" onclick="checkMessage(this)"/>短信提醒</td>' +
         '    <td colspan="3" style="text-align:left">' +
-        '    <textarea id="messageInput" rows="3" style="width:100%">' + message[0] + '</textarea>' +
+        '    <textarea id="messageInput" disabled rows="3" style="width:99%">' + message[0] + '</textarea>' +
         '    </td>' +
         '</tr>';
-
 }
 
-
-var messageChecked = true;
+var messageChecked = false;
 
 function checkMessage(checkbox) {
     messageChecked = checkbox.checked;
+    $("#messageInput").attr("disabled", !messageChecked);
 }
 
 function check(checkbox, i) {
@@ -170,18 +193,19 @@ function createEvaluateHtml(data, isPrint) {
             if (isPrint) {
                 html += '<tr><td>' + data[i].name + '</br><b>(' + data[i].riskLevelName + ')</b>' + '</td><td colspan="3" style="text-align:left">' + createEvaluateItemHtml(data, i, isPrint) + '</td></tr>';
             } else {
-                html += '<tr><td><input type="checkbox" checked onclick="check(this,' + i + ')">' + data[i].name + '</br><b>(' + data[i].riskLevelName + ')</b>' + '</td><td colspan="3" style="text-align:left">' + createEvaluateItemHtml(data, i, isPrint) + '</td></tr>';
+                html += '<tr><td><input type="checkbox" checked onclick="check(this,' + i + ')">' + data[i].name + '</br><b>(' + data[i].riskLevelName + ')</b></td><td colspan="3" style="text-align:left">' + createEvaluateItemHtml(data, i, isPrint) + '</td></tr>';
             }
         }
     }
     return html;
 }
 
+
 function createEvaluateItemHtml(data, index, isPrint) {
     if (isPrint) {
         return parseEvaluateContentForPrint(editedPrescription[index]);
     } else {
-        return "<textarea class='suggest' id='suggest" + index + "' rows='10' style='width:100%'>" + parseEvaluateContent(data[index]) + "</textarea>";
+        return "<textarea class='suggest' id='suggest" + index + "' rows='14' style='width:99%'>" + parseEvaluateContent(data[index]) + "</textarea>";
     }
 }
 
@@ -287,7 +311,7 @@ function createPrintEvaluateHtml(data) {
 
 var updating = false;
 
-function getRequest(){
+function getRequest() {
     getEditedPrescription();
     var request = [];
     var prescription = record.prescription;
@@ -304,10 +328,16 @@ function getRequest(){
         }
     }
 
-    if(!prescription) return null;
+    if (!prescription) return null;
 
     var message = messageChecked ? $("#messageInput").val() : null;
+    var cellphone = $("#cellphone").val();
+    var confirmer = $("#confirmer").val();
+    if (!confirmer) throw "请输入确认医师姓名！";
+    if (!cellphone && messageChecked) throw "因为您选择了发送短信，所以手机号码不能为空！";
     request = {
+        confirmer: confirmer,
+        cellphone: cellphone,
         sendMessage: message,
         evaluationItems: request
     }
@@ -315,14 +345,19 @@ function getRequest(){
     return request;
 }
 
-function update2pdf(){
-
+function update2pdf() {
     if (updating === true) {
         return;
     }
 
-    request = getRequest();
-    
+    var request;
+    try {
+        request = getRequest();
+    } catch (err) {
+        alert(err);
+        return;
+    }
+
     if (request) {
         updating = true;
         $.ajax({
@@ -333,10 +368,10 @@ function update2pdf(){
             dataType: "json",
             success: function(response) {
                 if (response && response.status == 1) {
-                	
-                	var tempwindow=window.open('_blank'); // 先打开页面
-                	tempwindow.location.href="/file" + response.message; // 后更改页面地址
-                	
+
+                    var tempwindow = window.open('_blank'); // 先打开页面
+                    tempwindow.location.href = "/file" + response.message; // 后更改页面地址
+
                     return;
                 }
                 alert(response.message);
@@ -356,8 +391,14 @@ function update() {
         return;
     }
 
-    request = getRequest();
-    
+    var request;
+    try {
+        request = getRequest();
+    } catch (err) {
+        alert(err);
+        return;
+    }
+
     if (request) {
         updating = true;
         $.ajax({

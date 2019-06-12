@@ -8,10 +8,11 @@ import com.paladin.health.model.diagnose.DiagnoseRecord;
 public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
 	int updateCorrectPrescription(@Param("id") String id, @Param("correctPrescription") String correctPrescription, @Param("sendMessage") String sendMessage,
-			@Param("sendStatus") int sendStatus, @Param("sendError") String sendError);
+			@Param("sendStatus") int sendStatus, @Param("sendError") String sendError, @Param("sendCellphone") String sendCellphone,
+			@Param("confirmer") String confirmer);
 
 	DiagnoseRecord findRecordBySearchId(@Param("searchId") String searchId, @Param("accessKey") String accessKey);
 
 	DiagnoseRecord findLastRecordByIdentificationId(@Param("identificationId") String identificationId);
-	
+
 }

@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 public class MessageConvert<T>{
 
+	@SuppressWarnings("unused")
 	private static  Logger logger = LoggerFactory.getLogger(MessageConvert.class);
 	
+	@SuppressWarnings("unchecked")
 	public static <T> T xmlToBean(String xml, Class<T> clazz) {
         JAXBContext context;
 		try {

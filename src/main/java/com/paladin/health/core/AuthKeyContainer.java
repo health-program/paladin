@@ -19,24 +19,29 @@ public class AuthKeyContainer implements VersionContainer {
 	private PrescriptionInterfaceManageService prescriptionInterfaceManageService;
 
 	private Map<String, PrescriptionInterfaceManage> interfaceMap;
-	
+
 	private void initData() {
 		Map<String, PrescriptionInterfaceManage> interfaceMap = new HashMap<>();
 		List<PrescriptionInterfaceManage> results = prescriptionInterfaceManageService.findAll();
-		for(PrescriptionInterfaceManage item: results) {
+		for (PrescriptionInterfaceManage item : results) {
 			interfaceMap.put(item.getAppKey(), item);
-		}	
+		}
 		this.interfaceMap = interfaceMap;
 	}
-	
+
 	public boolean hasAccessKey(String accessKey) {
 		return interfaceMap.containsKey(accessKey);
+	}
+
+	public String getAccessKeyName(String accessKey) {
+		PrescriptionInterfaceManage o = interfaceMap.get(accessKey);
+		return o != null ? o.getName() : null;
 	}
 
 	public void updateData() {
 		VersionContainerManager.versionChanged(getId());
 	}
-	
+
 	@Override
 	public String getId() {
 		return "auth_key_container";
