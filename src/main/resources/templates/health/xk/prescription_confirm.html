@@ -368,10 +368,8 @@ function update2pdf() {
             dataType: "json",
             success: function(response) {
                 if (response && response.status == 1) {
-
-                    var tempwindow = window.open('_blank'); // 先打开页面
-                    tempwindow.location.href = "/file" + response.message; // 后更改页面地址
-
+                	var pdfUrl = "/file" + response.result;
+                    window.open(pdfUrl); // 先打开页面
                     return;
                 }
                 alert(response.message);

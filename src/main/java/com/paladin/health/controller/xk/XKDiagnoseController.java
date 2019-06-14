@@ -127,7 +127,7 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}		
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,true));
+		return CommonResponse.getSuccessResponse("success", healthPrescriptionService.confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,true));
 	}
 
 	@ApiOperation(value = "熙康体检百科接口")
