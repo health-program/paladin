@@ -16,10 +16,10 @@
 				<div class="box-header with-border">
 					<i class="glyphicon glyphicon-user"></i>
 					<h3 class="box-title">详情</h3>
-					<div class="box-tools pull-right">
+					<!--<div class="box-tools pull-right">
 						<a class="btn" id="model_edit_btn" href="javascript:void(0)"><i
 							class="fa fa-edit"></i>编辑</a>
-					</div>
+					</div>-->
 				</div>
 				<div id="model_view" class="box-body">
 					<form class="form-horizontal">
@@ -56,10 +56,12 @@
 						</div>
 						<div class="form-group">
 							<label for="grantTargetName" class="col-sm-3 control-label">发放对象：</label>
-							<div class="col-sm-3">
+							<div class="col-sm-3" id="orgName">
+								<p name="grantTargetOrgName" class="form-control-static description"></p>
+							</div>
+							<div class="col-sm-3" id="name">
 								<p name="grantTargetName" class="form-control-static description"></p>
 							</div>
-							
 						</div>
 						<div class="form-group">
 							<label for="grantor" class="col-sm-3 control-label">发放人：</label>
@@ -84,7 +86,7 @@
 						</div>
 					</form>
 				</div>
-				<!-- 编辑 -->
+<!--				&lt;!&ndash; 编辑 &ndash;&gt;
 				<div id="model_edit" class="box-body" style="display: none">
 					<form id="model_form"
 						action="/health/publicity/material/grant/update" method="post"
@@ -104,12 +106,12 @@
 						<div class="form-group">
 							<label for="materialType" class="col-sm-3 control-label">资料类型：</label>
 							<div class="col-sm-3">
-								<select name="materialType" class="form-control tonto-select-constant" enumcode="publicity-material-type" readonly="readonly">
+								<select name="materialType" class="form-control tonto-select-constant" enumcode="publicity-material-type" disabled>
 								</select>
 							</div>
 							<label for="count" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>数量：</label>
 							<div class="col-sm-3">
-								<input name="count" required="required" placeholder="请输入数量" type="number" onchange="checkCount(this.value);"
+								<input name="count" required="required" placeholder="请输入数量" type="number" min="1"
 									class="form-control" autocomplete="off">
 							</div>
 						</div>
@@ -173,10 +175,13 @@
 							</div>
 						</div>
 					</form>
-				</div>
+				</div>-->
 			</div>
 		</section>
 	</section>
+	<div class="col-sm-2 col-sm-offset-5 btn-back">
+		<a  href="/health/publicity/material/grant/index" class="btn btn-primary btn-block">返回</a>
+	</div>
 	<input type="hidden" id="id" th:value="${id}" />
 	<div th:include="/health/footer" />
 	<script type="text/javascript">
@@ -192,8 +197,8 @@
 			            {title : "数量",name : "count",inputType : "TEXT"},
 			            {title : "发放日期",name : "grantDate",inputType : "DATE"}, 
 			            {title : "发放对象类型",name : "grantTargetType",enum : "grant-target-type",inputType : "SELECT"},
-			            {title : "发放对象",name : "grantTarget",inputType : "TEXT",dependency: ["grantTargetType", "1"]},
-			            {title : "发放对象名称",name : "grantTargetName",inputType : "TEXT",dependency: ["grantTargetType", "1"]}, 
+			            {title : "发放对象",name : "grantTargetOrgName",inputType : "TEXT"},
+			            {title : "发放对象名称",name : "grantTargetName",inputType : "TEXT"},
 			            {title : "发放机构Id",name : "grantorAgency",inputType : "TEXT"},
 			            {title : "发放机构",name : "agencyName",inputType : "TEXT"},
 			            {title : "发放人",name : "grantor",inputType : "TEXT"},
@@ -222,6 +227,13 @@
 			    
 			$.getAjax("/health/publicity/material/grant/get?id="+ $("#id").val(), 
 				function(data) {
+					if (data.grantTargetType == 1) {
+						$("#orgName").show();
+						$("#name").hide();
+					}else if (data.grantTargetType == 2) {
+						$("#orgName").hide();
+						$("#name").show();
+					}
 					model.setData(data);
 				});
 			});

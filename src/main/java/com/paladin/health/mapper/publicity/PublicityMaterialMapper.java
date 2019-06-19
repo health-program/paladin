@@ -1,12 +1,17 @@
 package com.paladin.health.mapper.publicity;
 
-import java.util.List;
+import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.health.model.publicity.PublicityMaterial;
 import com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialVO;
-import com.paladin.framework.core.configuration.mybatis.CustomMapper;
+import org.apache.ibatis.annotations.Param;
 
-public interface PublicityMaterialMapper extends CustomMapper<PublicityMaterial>{
+import java.util.List;
+
+public interface PublicityMaterialMapper extends CustomMapper<PublicityMaterial> {
 	public List<PublicityMaterialVO> selectByQuery(PublicityMaterialQueryDTO query);
+
 	public PublicityMaterialVO getOne(String id);
+
+    int updateCountById(@Param("id") String id, @Param("count") int count);
 }

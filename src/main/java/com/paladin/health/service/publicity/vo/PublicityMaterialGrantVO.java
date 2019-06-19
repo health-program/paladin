@@ -18,8 +18,11 @@ public class PublicityMaterialGrantVO {
 	private Integer grantTargetType;
 	//发放对象
 	private String grantTarget;
-	//发放对象名称(冗余)
-	private String grantTargetName;
+
+	//发放对象名称
+	private  String grantTargetName;
+
+	private String grantTargetOrgName;
 	//发放人
 	private String grantor;
 	//发放机构的name
@@ -117,11 +120,20 @@ public class PublicityMaterialGrantVO {
 	public void setMaterialId(String materialId) {
 		this.materialId = materialId;
 	}
+
 	public String getGrantTargetName() {
 		return grantTargetName;
 	}
+
 	public void setGrantTargetName(String grantTargetName) {
 		this.grantTargetName = grantTargetName;
 	}
-	
+
+	public String getGrantTargetOrgName() {
+		return grantTargetOrgName;
+	}
+
+	public void setGrantTargetOrgName(String grantTargetOrgName) {
+		this.grantTargetOrgName = grantTargetOrgName;
+	}
 }

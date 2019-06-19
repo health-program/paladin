@@ -1,18 +1,20 @@
 package com.paladin.health.controller.publicity;
 
-import java.util.Calendar;
+import com.paladin.framework.core.ControllerSupport;
+import com.paladin.framework.core.exception.BusinessException;
+import com.paladin.framework.core.query.QueryInputMethod;
+import com.paladin.framework.core.query.QueryOutputMethod;
+import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.publicity.PublicityMaterialGrant;
 import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.publicity.PublicityMaterialGrantService;
+import com.paladin.health.service.publicity.PublicityMaterialService;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantDTO;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialGrantVO;
-import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.query.QueryInputMethod;
-import com.paladin.framework.core.query.QueryOutputMethod;
-import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.health.service.publicity.vo.PublicityMaterialVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +22,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.validation.Valid;
+import java.util.Calendar;
 
 @Controller
 @RequestMapping("/health/publicity/material/grant")
@@ -30,6 +34,9 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 	
     @Autowired
     private PublicityMaterialGrantService publicityMaterialGrantService;
+
+    @Autowired
+    private PublicityMaterialService publicityMaterialService;
 
     @RequestMapping("/index")
     @QueryInputMethod(queryClass = PublicityMaterialGrantQueryDTO.class)
@@ -68,6 +75,11 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 		HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
 		model.addAttribute("agencyId", userSession.getAgencyId());
 		model.addAttribute("agencyList", orgAgencyService.findAll());
+        PublicityMaterialVO materialVO = publicityMaterialService.getOne(id);
+        if (materialVO == null) {
+            throw new BusinessException("发放的宣传资料不存在");
+        }
+        model.addAttribute("count",materialVO.getCount());
         return "/health/publicity/publicity_material_grant_add";
     }
 
@@ -84,10 +96,14 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
+        int i =  publicityMaterialService.saveTargetMaterial(publicityMaterialGrantDTO);
+        if (i <= 0) {
+            throw  new BusinessException("发送宣传资料失败");
+        }
 		PublicityMaterialGrant model = beanCopy(publicityMaterialGrantDTO, new PublicityMaterialGrant());
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
-		if (publicityMaterialGrantService.save(model) > 0) {
+        if (publicityMaterialGrantService.save(model) > 0) {
 			return CommonResponse.getSuccessResponse(publicityMaterialGrantService.get(id));
 		}
 		return CommonResponse.getFailResponse();

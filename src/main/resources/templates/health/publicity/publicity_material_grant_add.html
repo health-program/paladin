@@ -43,7 +43,7 @@
 						</div>
 						<label for="count" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>数量：</label>
 						<div class="col-sm-3">
-							<input name="count" required="required" placeholder="请输入数量" type="number" onchange="checkCount(this.value);"
+							<input name="count" required="required"  th:placeholder="${count == 0 ? '该资料已发放完' : '请输入不超过'+ count +'的数量'}" type="number"  th:attr="max=${count}" min="1" th:disabled="${count == 0}"
 								class="form-control" autocomplete="off">
 						</div>
 						<!-- <label style ="color:red;" class="col-sm-2 control-label" id="spare"></label> -->
@@ -56,19 +56,22 @@
 						</div>
 						<label for="grantTargetType" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放对象类型：</label>
 						<div class="col-sm-3">
-							<select name="grantTargetType"
-								class="form-control tonto-select-constant" enumcode="grant-target-type">
+							<select name="grantTargetType" id="grantTargetType"
+								class="form-control tonto-select-constant" enumcode="grant-target-type" onchange="changTargetDiv()">
 							</select>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="grantTarget" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放对象：</label>
-						<div class="col-sm-3">
+						<div class="col-sm-3" id="targetOrg" >
 							<select name="grantTarget" class="form-control">
                                 <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
                                 th:selected="${grantTarget == agency.Id}"
                                 th:text="${agency.name}"></option>
                             </select>
+						</div>
+						<div class="col-sm-3" id="targetName" style="display: none">
+							<input type="text" name="grantTargetName" placeholder="请输入发放对象名称" class="form-control">
 						</div>
 						<label for="grantorAgency" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放机构：</label>
 						<div class="col-sm-3">
@@ -80,15 +83,15 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="grantor" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放人：</label>
-						<div class="col-sm-3">
-							<input name="grantor" required="required" placeholder="请输入发放人" type="text"
-								class="form-control" autocomplete="off">
-						</div>
-						<label for="receiver" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>接收人：</label>
+						<label for="receiver" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>接收人：</label>
 						<div class="col-sm-3">
 							<input name="receiver" required="required" placeholder="请输入接收人" type="text"
-								class="form-control" autocomplete="off">
+								   class="form-control" autocomplete="off">
+						</div>
+						<label for="grantor" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放人：</label>
+						<div class="col-sm-3">
+							<input name="grantor" required="required" placeholder="请输入发放人" type="text"
+							class="form-control" autocomplete="off">
 						</div>
 					</div>
 					<div class="form-group">
@@ -102,6 +105,9 @@
 						<div class="col-sm-2 col-sm-offset-3">
 							<button type="submit" id="model_form_submit_btn"
 								class="btn btn-primary btn-block">保存</button>
+						</div>
+						<div class="col-sm-2 col-sm-offset-1">
+							<button type="button" id="reply_btn" class="btn btn-default btn-block">返回</button>
 						</div>
 					</div>
 				</form>
@@ -131,6 +137,9 @@
 		}
 
 		$(function() {
+			$("#reply_btn").click(function () {
+				window.location = "/health/publicity/material/index";
+			});
 			var model = new tonto.Model(
 				"model",
 				options.columns,
@@ -150,7 +159,7 @@
 			          }
 				});
 			$("select[name='materialType']").val($("input[name='type']").val());
-			$.getAjax("/health/publicity/material/grant/checkCount?id="+ $("input[name='materialId']").val(), 
+/*			$.getAjax("/health/publicity/material/grant/checkCount?id="+ $("input[name='materialId']").val(),
 				function(data) {
 				var total,reduce;
 				if(!data.reduce){
@@ -160,22 +169,17 @@
 				}
 				var spare=data.total-reduce;
 				document.getElementById("spare").innerText ="剩余数量："+ spare;
-			});
+			});*/
 		});
-		function checkCount(value){
-			$.getAjax("/health/publicity/material/grant/checkCount?id="+ $("input[name='materialId']").val(), 
-				function(data) {
-				var total,reduce;
-				if(!data.reduce){
-					reduce=0;
-				}else{
-					reduce=data.reduce;
-				}
-				var spare=data.total-reduce;
-				if(value > spare){
-					layer.msg("所选数量过大！最多可选数量："+spare);
-				}
-			});
+		function changTargetDiv() {
+			let val = $("#grantTargetType option:selected").val();
+			if (val == 1) {
+				$("#targetOrg").show();
+				$("#targetName").hide();
+			}else if (val == 2) {
+				$("#targetOrg").hide();
+				$("#targetName").show();
+			}
 		}
 	</script>
 </body>

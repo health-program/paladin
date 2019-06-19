@@ -19,6 +19,14 @@
     var options = {
         id: "model",
         name: "新增",
+        cancelBtn: false,
+        formButtonBar:[{
+            id:  'reply_btn',
+            type: 'button',
+            name:  '返回',
+            class: 'btn btn-default btn-block',
+            order: 2
+        }],
         url:"/health/org/agency/save",
         columns: [
 				{ title: "机构名称", name: "name", inputType: "TEXT" },
@@ -27,7 +35,7 @@
     }
 
     $(function() {       
-        var html = generateEditHtml(options);
+        var html = generateHtml(options);
         $(".content").html(html);
         var model = new tonto.Model("model", options.columns, {
             pattern:"edit",
@@ -38,6 +46,9 @@
             }
         });
         model.setData(null);
+        $("#reply_btn").click(function () {
+            window.location = "/health/org/agency/index";
+        });
         $.initComponment();
     });
     </script>

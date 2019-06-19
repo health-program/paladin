@@ -1,18 +1,17 @@
 package com.paladin.health.controller.publicity;
 
-import java.util.Calendar;
+import com.paladin.framework.core.ControllerSupport;
+import com.paladin.framework.core.query.QueryInputMethod;
+import com.paladin.framework.core.query.QueryOutputMethod;
+import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.publicity.PublicityMaterial;
 import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.publicity.PublicityMaterialService;
-import com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO;
 import com.paladin.health.service.publicity.dto.PublicityMaterialDTO;
+import com.paladin.health.service.publicity.dto.PublicityMaterialQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialVO;
-import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.query.QueryInputMethod;
-import com.paladin.framework.core.query.QueryOutputMethod;
-import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.framework.utils.uuid.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +19,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.validation.Valid;
+import java.util.Calendar;
 
 @Controller
 @RequestMapping("/health/publicity/material")
@@ -31,7 +32,7 @@ public class PublicityMaterialController extends ControllerSupport {
 
     @Autowired
     private OrgAgencyService orgAgencyService;
-    
+
     @RequestMapping("/index")
     @QueryInputMethod(queryClass = PublicityMaterialQueryDTO.class)
     public String index(Model model) {
@@ -45,6 +46,8 @@ public class PublicityMaterialController extends ControllerSupport {
     @ResponseBody
     @QueryOutputMethod(queryClass = PublicityMaterialQueryDTO.class, paramIndex = 0)
     public Object findPage(PublicityMaterialQueryDTO query) {
+        HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
+        query.setAgencyId(userSession.getAgencyId());
         return CommonResponse.getSuccessResponse(publicityMaterialService.selectByQuery(query));
     }
     

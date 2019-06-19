@@ -14,12 +14,14 @@ public class PublicityMaterialGrantDTO {
 	//类型
 	private Integer materialType;
 	//数量
-	@NotNull(message = "数量不能为空！")
+	@NotNull(message = "没有可发放的健康教育资料!")
 	private Integer count;
 	//发放对象
 	private Integer grantTargetType;
 	//发放对象
 	private String grantTarget;
+	//发放对象名称
+	private  String grantTargetName;
 	//发放人
 	@NotEmpty(message = "发放人不能为空！")
 	private String grantor;
@@ -106,5 +108,12 @@ public class PublicityMaterialGrantDTO {
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
-	
+
+	public String getGrantTargetName() {
+		return grantTargetName;
+	}
+
+	public void setGrantTargetName(String grantTargetName) {
+		this.grantTargetName = grantTargetName;
+	}
 }

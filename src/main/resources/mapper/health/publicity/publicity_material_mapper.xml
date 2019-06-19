@@ -55,4 +55,7 @@
 		LEFT JOIN org_agency oa ON pm.agency_id = oa.id
 		WHERE oa.is_delete = 0 AND pm.id = #{id}
 	</select>
+    <update id="updateCountById">
+		UPDATE  publicity_material  SET  count = count - #{count} WHERE  id = #{id}  AND  count >= #{count}
+	</update>
 </mapper>

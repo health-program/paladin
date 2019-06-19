@@ -1,8 +1,9 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.BaseModel;
-import java.util.Date;
+
 import javax.persistence.Id;
+import java.util.Date;
 
 public class PublicityMaterialGrant extends BaseModel{
 	@Id
@@ -19,6 +20,8 @@ public class PublicityMaterialGrant extends BaseModel{
     private Integer grantTargetType;
     //发放对象
     private String grantTarget;
+	//发放对象名称
+    private  String grantTargetName;
     //发放人
     private String grantor;
     //发放机构的Id
@@ -102,5 +105,12 @@ public class PublicityMaterialGrant extends BaseModel{
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
 	}
-    
+
+	public String getGrantTargetName() {
+		return grantTargetName;
+	}
+
+	public void setGrantTargetName(String grantTargetName) {
+		this.grantTargetName = grantTargetName;
+	}
 }

@@ -81,6 +81,9 @@
 							<button type="submit" id="model_form_submit_btn"
 								class="btn btn-primary btn-block">保存</button>
 						</div>
+						<div class="col-sm-2 col-sm-offset-1">
+							<button type="button" id="reply_btn" class="btn btn-default btn-block">返回</button>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -104,8 +107,10 @@
 				]
     }
 
-    $(function() {       
-  
+    $(function() {
+		$("#reply_btn").click(function () {
+			window.location = "/health/publicity/material/index";
+		});
         var model = new tonto.Model("model", options.columns, {
             pattern:"edit",
             successCallback:function(){

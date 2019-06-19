@@ -7,7 +7,7 @@ public class PublicityMaterialVO {
 	private String id;
 
 	// 工作周期
-	private String workCycle;
+	private Integer workCycle;
 	
 	// 所属机构
 	private String agencyId;
@@ -19,7 +19,7 @@ public class PublicityMaterialVO {
 	private String name;
 
 	// 健康教育宣传资料类型
-	private String type;
+	private Integer type;
 
 	// 编发单位
 	private String compileIssueUnit;
@@ -53,14 +53,6 @@ public class PublicityMaterialVO {
 		this.id = id;
 	}
 
-	public String getWorkCycle() {
-		return workCycle;
-	}
-
-	public void setWorkCycle(String workCycle) {
-		this.workCycle = workCycle;
-	}
-
 	public String getAgencyId() {
 		return agencyId;
 	}
@@ -75,14 +67,6 @@ public class PublicityMaterialVO {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public String getCompileIssueUnit() {
@@ -157,4 +141,19 @@ public class PublicityMaterialVO {
 		this.agencyName = agencyName;
 	}
 
+	public Integer getWorkCycle() {
+		return workCycle;
+	}
+
+	public void setWorkCycle(Integer workCycle) {
+		this.workCycle = workCycle;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
 }
