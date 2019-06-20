@@ -551,8 +551,7 @@ public class XKHealthPrescriptionService {
 		if (target != null) {
 			Font font = new Font(contentFont, 13);
 			Font fontt = new Font(titleFont, 14);
-			Font referenceFont = new Font(contentFont, 11);
-
+			
 			String name = target.getName();
 			Integer sex = target.getSex();
 
@@ -607,17 +606,19 @@ public class XKHealthPrescriptionService {
 					}
 				}
 
-				String reference = referenceMap.get(evaluation.getCode());
-				if (reference != null) {
-					reference = "注：" + reference;
-					Paragraph p = new Paragraph();
-					p.add(new Phrase(reference, referenceFont));
-					// p.setFirstLineIndent(21);
-					p.setIndentationLeft(55);
-					p.setLeading(16f);
-					p.setSpacingAfter(12f);
-					document.add(p);
-				}
+				// 加入出处说明
+//				Font referenceFont = new Font(contentFont, 11);
+//				String reference = referenceMap.get(evaluation.getCode());
+//				if (reference != null) {
+//					reference = "注：" + reference;
+//					Paragraph p = new Paragraph();
+//					p.add(new Phrase(reference, referenceFont));
+//					// p.setFirstLineIndent(21);
+//					p.setIndentationLeft(55);
+//					p.setLeading(16f);
+//					p.setSpacingAfter(12f);
+//					document.add(p);
+//				}
 
 			}
 		}
