@@ -1,10 +1,10 @@
 package com.paladin.health.service.publicity.dto;
 
-import java.util.Date;
-
 import com.paladin.framework.common.OffsetPage;
 import com.paladin.framework.common.QueryCondition;
 import com.paladin.framework.common.QueryType;
+
+import java.util.Date;
 
 public class PublicityMaterialQueryDTO extends OffsetPage {
 	
@@ -28,11 +28,12 @@ public class PublicityMaterialQueryDTO extends OffsetPage {
 	public void setWorkCycle(Integer workCycle) {
 		this.workCycle = workCycle;
 	}
-	
+
+	@QueryCondition(type = QueryType.EQUAL)
 	public String getAgencyId() {
 		return agencyId;
 	}
-	@QueryCondition(type = QueryType.EQUAL)
+
 	public void setAgencyId(String agencyId) {
 		this.agencyId = agencyId;
 	}

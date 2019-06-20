@@ -69,7 +69,7 @@
                                         </div>
                                         <div class="col-md-8">
                                             <div class="pull-right">
-                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
+                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
                                                 <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar2')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
                                             </div>
                                         </div>
@@ -119,10 +119,9 @@
                 ]
             ],
             url: '/health/video/play/count/agency',
-            searchbar: '#searchbar',
+            searchbar: '#searchbar2',
             showColumns: true,
             pagination: true,
-            clickToSelect: true,
             toolbar: "#toolbar",
             showRefresh: true
         });

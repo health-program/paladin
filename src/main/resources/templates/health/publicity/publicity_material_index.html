@@ -13,11 +13,12 @@
         <div class="box box-solid">
             <div class="box-body">
                 <form id="searchbar" class="form-horizontal form-search">
+                    <input type="hidden" name="agencyId" th:value="${agencyId}">
                     <div class="form-group">
                         <div class="col-md-2">
-                            <select name="agencyId" class="form-control" th:value="${query?.agencyId}">
+                            <select name="agencyId" class="form-control" th:value="${agencyId}" th:disabled="${agencyId != null}">
                                 <option value="">请选择机构</option>
-                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}"></option>
+                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}" th:selected="${agencyId == agency.Id}"></option>
                             </select>
                         </div>
                         <div class="col-md-2">

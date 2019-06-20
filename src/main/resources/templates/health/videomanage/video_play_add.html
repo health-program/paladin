@@ -74,12 +74,12 @@
                         <div class="col-sm-2 col-sm-offset-3">
                             <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
                         </div>
+                        <div class="col-sm-2 col-sm-offset-1">
+                            <button type="button" id="reply_btn" class="btn btn-default btn-block">返回</button>
+                        </div>
                     </div>
                 </form>
             </div>
-        </div>
-        <div class="col-sm-2 col-sm-offset-5 btn-back">
-            <a href="javascript:back()" class="btn btn-primary btn-block">返回</a>
         </div>
     </section>
     <div th:include="/health/footer" />
@@ -103,6 +103,9 @@
     }
 
     $(function() {
+        $("#reply_btn").click(function () {
+            window.location = "/health/video/play/index?id=" + $("input[name='videoId']").val() + "&name=" + $("input[name='videoName']").val();
+        });
         var model = new tonto.Model("model", options.columns, {
             pattern: "edit",
             successCallback: function() {
@@ -111,9 +114,6 @@
         });
     });
 
-    function back() {
-        window.location = "/health/video/play/index?id=" + $("input[name='videoId']").val() + "&name=" + $("input[name='videoName']").val();
-    }
     </script>
 </body>
 

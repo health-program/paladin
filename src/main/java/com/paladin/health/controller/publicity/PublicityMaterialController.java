@@ -38,7 +38,11 @@ public class PublicityMaterialController extends ControllerSupport {
     public String index(Model model) {
     	 Calendar calendar = Calendar.getInstance();//日历对象
     	 model.addAttribute("year", calendar.get(Calendar.YEAR));
-    	 model.addAttribute("agencyList", orgAgencyService.findAll());
+        HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
+        model.addAttribute("agencyList", orgAgencyService.findAll());
+        if ( userSession.getRoleLevel() == HealthUserSession.ROLE_LEVEL_AGENCY ) {
+            model.addAttribute("agencyId", userSession.getAgencyId());
+        }
         return "/health/publicity/publicity_material_index";
     }
 
@@ -46,8 +50,6 @@ public class PublicityMaterialController extends ControllerSupport {
     @ResponseBody
     @QueryOutputMethod(queryClass = PublicityMaterialQueryDTO.class, paramIndex = 0)
     public Object findPage(PublicityMaterialQueryDTO query) {
-        HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
-        query.setAgencyId(userSession.getAgencyId());
         return CommonResponse.getSuccessResponse(publicityMaterialService.selectByQuery(query));
     }
     
