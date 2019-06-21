@@ -65,6 +65,7 @@
 			a.create_user_id AS createUserId,
 			c.name AS createUserName,
 			a.status,
+			a.send_hour AS sendHour,
 			a.publish_time AS publishTime,
 			a.publish_target AS publishTarget
 		FROM publicity_message a 
@@ -168,11 +169,11 @@
 	
 	<select id="findSendMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
 		SELECT id, content,publish_target AS publishTarget FROM publicity_message 
-		WHERE `status` = 9 AND is_delete = 0 AND type = 3 AND now() > publish_time AND is_send = 0
+		WHERE `status` = 9 AND is_delete = 0 AND type = 3 AND send_hour=#{hour} AND now() > publish_time AND is_send IS NULL
 	</select>
 	
 	<update id="updateToSended">
-		UPDATE publicity_message SET is_send = 1 WHERE id = #{id}
+		UPDATE publicity_message SET is_send = 1,count_sended=#{count} WHERE id = #{id}
 	</update>
 	
 </mapper>

@@ -33,6 +33,8 @@ public class PublicityMessageVO {
 	private String attachments;
 
 	private Date publishTime;
+	
+	private Integer sendHour;
 
 	private String publishTarget;
 
@@ -185,6 +187,14 @@ public class PublicityMessageVO {
 
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
+	}
+
+	public Integer getSendHour() {
+		return sendHour;
+	}
+
+	public void setSendHour(Integer sendHour) {
+		this.sendHour = sendHour;
 	}
 
 }

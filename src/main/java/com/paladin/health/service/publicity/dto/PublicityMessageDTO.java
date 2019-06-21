@@ -27,6 +27,8 @@ public class PublicityMessageDTO {
 	
 	private Date publishTime;
 	
+	private Integer sendHour;
+	
 	private String publishTarget;
 	
 	private Integer status;
@@ -125,6 +127,14 @@ public class PublicityMessageDTO {
 
 	public void setThumbnail(String thumbnail) {
 		this.thumbnail = thumbnail;
+	}
+
+	public Integer getSendHour() {
+		return sendHour;
+	}
+
+	public void setSendHour(Integer sendHour) {
+		this.sendHour = sendHour;
 	}
 
 	

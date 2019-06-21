@@ -18,14 +18,14 @@ public interface PublicityMessageMapper extends CustomMapper<PublicityMessage> {
 	public PublicityMessageVO getMessage(@Param("id") String id);
 
 	public List<PublicityMessageVO> findDisplay();
-    
+
 	public List<PublicityMessageVO> findPublishedMessage(PublicityMessageQueryDTO query);
 
-	public PublicityMessageVO findPreMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
+	public PublicityMessageVO findPreMessage(@Param("id") String id, @Param("publishTime") Date publishTime);
 
-	public PublicityMessageVO findNextMessage(@Param("id")String id, @Param("publishTime")Date publishTime);
+	public PublicityMessageVO findNextMessage(@Param("id") String id, @Param("publishTime") Date publishTime);
 
-	public List<PublicityMessageVO> findSendMessage();
-	
-	public int updateToSended(@Param("id")String id);
+	public List<PublicityMessageVO> findSendMessage(@Param("hour") Integer hour);
+
+	public int updateToSended(@Param("id") String id, @Param("count") Integer count);
 }

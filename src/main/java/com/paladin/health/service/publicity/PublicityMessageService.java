@@ -235,11 +235,11 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return publicityMessageMapper.findNextMessage(id, publishTime);
 	}
 
-	public List<PublicityMessageVO> findSendMessage() {
-		return publicityMessageMapper.findSendMessage();
+	public List<PublicityMessageVO> findSendMessage(int hour) {
+		return publicityMessageMapper.findSendMessage(hour);
 	}
 
-	public boolean updateToSended(String id) {
-		return publicityMessageMapper.updateToSended(id) > 0;
+	public boolean updateToSended(String id, int count) {
+		return publicityMessageMapper.updateToSended(id, count) > 0;
 	}
 }

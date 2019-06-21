@@ -53,7 +53,11 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	private String publishTarget;
 	
+	private Integer sendHour;
+	
 	private Integer isSend;
+	
+	private Integer countSended;
 		
 	public String getId() {
 		return id;
@@ -165,6 +169,22 @@ public class PublicityMessage extends UnDeleteBaseModel {
 
 	public void setIsSend(Integer isSend) {
 		this.isSend = isSend;
+	}
+
+	public Integer getCountSended() {
+		return countSended;
+	}
+
+	public void setCountSended(Integer countSended) {
+		this.countSended = countSended;
+	}
+
+	public Integer getSendHour() {
+		return sendHour;
+	}
+
+	public void setSendHour(Integer sendHour) {
+		this.sendHour = sendHour;
 	}
 
 }
