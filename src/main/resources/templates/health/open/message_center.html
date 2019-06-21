@@ -137,7 +137,8 @@
                     </div>
                     <div id="body" class="box-body">
                         <div class="post" style="padding-right: 30px;padding-left: 30px" th:each="message,iter: ${messages}">
-                            <img  th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
+                            <img th:if="${message.thumbnailUrl!=null}" th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT" style="width:20%">
+                            <img  th:if="${message.thumbnailUrl==null}" src="/static/image/health/article.png" alt="ATTACHMENT" style="width:20%">
                             <div class="notice-box">
                                 <div>
                                     <h4><a th:href="${'/open/health/message/center/display/index?id='+ message.id}"><strong th:text="${message.title}"></strong></a></h4>

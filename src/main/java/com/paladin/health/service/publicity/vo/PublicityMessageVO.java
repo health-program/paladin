@@ -13,9 +13,9 @@ public class PublicityMessageVO {
 	private Integer type;
 
 	private String title;
-	
+
 	private String thumbnail;
-	
+
 	private String subtitle;
 
 	private String summary;
@@ -29,9 +29,9 @@ public class PublicityMessageVO {
 	private Integer status;
 
 	private String label;
-	
+
 	private String attachments;
-	
+
 	private Date publishTime;
 
 	private String publishTarget;
@@ -39,22 +39,26 @@ public class PublicityMessageVO {
 	private String createUserId;
 
 	private String createUserName;
-	
-	 // 获取附件文件
-    public List<SysAttachment> getAttachmentFiles() {
-        if (attachments != null && attachments.length() != 0) {
-            return AttachmentContainer.getAttachments(attachments.split(","));
-        }
-        return null;
-    }
-    
-    public SysAttachment getThumbnailUrl() {
-    	if (thumbnail != null && thumbnail.length() != 0) {
-			return AttachmentContainer.getAttachment(thumbnail);
+
+	private SysAttachment thumbnailAtt;
+
+	// 获取附件文件
+	public List<SysAttachment> getAttachmentFiles() {
+		if (attachments != null && attachments.length() != 0) {
+			return AttachmentContainer.getAttachments(attachments.split(","));
 		}
 		return null;
-    }
-    
+	}
+
+	public SysAttachment getThumbnailUrl() {
+		if (thumbnailAtt == null) {
+			if (thumbnail != null && thumbnail.length() != 0) {
+				thumbnailAtt = AttachmentContainer.getAttachment(thumbnail);
+			}
+		}
+		return thumbnailAtt;
+	}
+
 	public String getId() {
 		return id;
 	}

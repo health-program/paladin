@@ -25,11 +25,15 @@ public class VideoShowVO {
 
 	private Date publishTime;
 
+	private SysAttachment showImageAtt;
+
 	public SysAttachment getShowImageUrl() {
-		if (showImage != null && showImage.length() != 0) {
-			return AttachmentContainer.getAttachment(showImage);
+		if (showImageAtt == null) {
+			if (showImage != null && showImage.length() != 0) {
+				return AttachmentContainer.getAttachment(showImage);
+			}
 		}
-		return null;
+		return showImageAtt;
 	}
 
 	public String getId() {

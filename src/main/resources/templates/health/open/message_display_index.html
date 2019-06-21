@@ -50,7 +50,9 @@
                                 <div class="box-body">
                                     <ul class="products-list product-list-in-box">
                                         <li class="item" th:each="message,iter: ${messageList}">
-                                            <div class="product-img"><img th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="Product Image"/></div>
+                                            <div class="product-img">
+                                            	<img th:if="${message.thumbnailUrl!=null}" th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT">
+                            					<img  th:if="${message.thumbnailUrl==null}" src="/static/image/health/article.png" alt="ATTACHMENT">
                                                 <div class="product-info">
                                                     <a  th:href="${'/open/health/message/center/display/index?id='+ message.id}" th:text="${message.title}"></a>
                                                     <span class="product-description" th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span>
