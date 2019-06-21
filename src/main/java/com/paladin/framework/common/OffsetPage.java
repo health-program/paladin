@@ -5,7 +5,7 @@ public class OffsetPage extends QuerySort {
 	public final static int DEFAULT_LIMIT = 10;
 	public final static int MAX_LIMIT = 100;
 
-	int limit;
+	int limit = DEFAULT_LIMIT;
 	int offset = -1;
 	int page;
 

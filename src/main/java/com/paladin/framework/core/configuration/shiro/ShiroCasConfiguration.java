@@ -1,5 +1,8 @@
 package com.paladin.framework.core.configuration.shiro;
 
+import org.apache.shiro.authc.AbstractAuthenticator;
+import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.realm.Realm;
@@ -16,6 +19,7 @@ import org.pac4j.cas.config.CasConfiguration;
 import org.pac4j.cas.config.CasProtocol;
 import org.pac4j.core.client.Clients;
 import org.pac4j.core.config.Config;
+import org.pac4j.core.context.J2EContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator;
@@ -28,15 +32,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.paladin.framework.core.configuration.shiro.filter.CallbackHttpActionAdapter;
 import com.paladin.framework.core.configuration.shiro.filter.PaladinCasAuthenticationFilter;
 import com.paladin.framework.core.configuration.shiro.filter.PaladinCasLogoutFilter;
+import com.paladin.framework.core.configuration.shiro.filter.PaladinShiroCallbackLogic;
 import com.paladin.framework.core.configuration.shiro.session.ClusterSessionFactory;
 import com.paladin.framework.core.configuration.shiro.session.PaladinWebSessionManager;
 import com.paladin.framework.core.configuration.shiro.session.ShiroRedisSessionDAO;
 import com.paladin.framework.utils.LogContentUtil;
 
 import io.buji.pac4j.context.ShiroSessionStore;
+import io.buji.pac4j.engine.ShiroCallbackLogic;
 import io.buji.pac4j.filter.CallbackFilter;
 import io.buji.pac4j.subject.Pac4jSubjectFactory;
 
@@ -106,13 +111,20 @@ public class ShiroCasConfiguration {
 	}
 
 	@Bean(name = "securityManager")
-	public DefaultWebSecurityManager defaultWebSecurityManage(DefaultWebSessionManager defaultWebSessionManager, List<Realm> realms) {
+	public DefaultWebSecurityManager defaultWebSecurityManage(DefaultWebSessionManager defaultWebSessionManager, List<Realm> realms, List<AuthenticationListener> authenticationListeners) {
 		logger.info(LogContentUtil.createComponent(WebSecurityManager.class, DefaultWebSecurityManager.class));
 
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+
+		// 这是shiro提供的验证成功失败接口，如果在filter中处理登录成功失败不一定能覆盖所有情况
+		Authenticator authenticator = securityManager.getAuthenticator();
+		if (authenticator instanceof AbstractAuthenticator) {
+			((AbstractAuthenticator) authenticator).setAuthenticationListeners(authenticationListeners);
+		}
+		
 		securityManager.setRealms(realms);
 		securityManager.setSubjectFactory(new Pac4jSubjectFactory()); // cas
-
+		
 		// 注入缓存管理器;
 		// securityManager.setCacheManager(redisCacheManager());
 		securityManager.setSessionManager(defaultWebSessionManager);
@@ -135,8 +147,9 @@ public class ShiroCasConfiguration {
 
 		CallbackFilter callbackFilter = new CallbackFilter();
 		callbackFilter.setConfig(config);
-		callbackFilter.setDefaultUrl(shiroCasProperties.getSuccessUrl());
-		callbackFilter.setHttpActionAdapter(new CallbackHttpActionAdapter(shiroCasProperties));
+		callbackFilter.setDefaultUrl(shiroCasProperties.getSuccessUrl());	
+		ShiroCallbackLogic<Object, J2EContext> callbackLogic=  new PaladinShiroCallbackLogic<>(shiroCasProperties);
+		callbackFilter.setCallbackLogic(callbackLogic);
 		filters.put("callback", callbackFilter);
 
 		PaladinCasLogoutFilter logoutFilter = new PaladinCasLogoutFilter(shiroCasProperties, config);
@@ -159,7 +172,7 @@ public class ShiroCasConfiguration {
 	private Config getConfig(ShiroCasProperties cas) {
 		CasConfiguration casConfiguration = new CasConfiguration(cas.getCasServerLoginUrl(), cas.getCasServerUrl() + "/");
 		casConfiguration.setAcceptAnyProxy(true);
-		casConfiguration.setProtocol(CasProtocol.CAS30);
+		casConfiguration.setProtocol(CasProtocol.valueOf(cas.getCasProtocol()));
 
 		CasClient casClient = new CasClient(casConfiguration);
 		casClient.setCallbackUrl(cas.getClientServerUrl() + cas.getCasFilterUrlPattern() + "?client_name=CasClient");
@@ -188,7 +201,6 @@ public class ShiroCasConfiguration {
 	@Bean(name = "lifecycleBeanPostProcessor")
 	public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
 		logger.info(LogContentUtil.createComponent(LifecycleBeanPostProcessor.class, LifecycleBeanPostProcessor.class));
-
 		return new LifecycleBeanPostProcessor();
 	}
 

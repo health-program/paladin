@@ -71,5 +71,4 @@ public class PaladinFormAuthenticationFilter extends FormAuthenticationFilter {
 
 	}
 
-
 }

@@ -32,6 +32,16 @@ public class ShiroCasProperties extends ShiroProperties{
 	 */
 	private String casFilterUrlPattern = "/" + GlobalProperties.project + "/cas";
 
+	/**
+	 * CAS 协议
+	 */
+	private String casProtocol = "CAS30";
+	
+	/**
+	 * 
+	 */
+	private String casErrorUrl = "/static/html/error_cas_500.html";
+	
 
 	public String getCasServerUrl() {
 		return casServerUrl;
@@ -72,6 +82,23 @@ public class ShiroCasProperties extends ShiroProperties{
 	public void setCasFilterUrlPattern(String casFilterUrlPattern) {
 		this.casFilterUrlPattern = casFilterUrlPattern;
 	}
+
+	public String getCasProtocol() {
+		return casProtocol;
+	}
+
+	public void setCasProtocol(String casProtocol) {
+		this.casProtocol = casProtocol;
+	}
+
+	public String getCasErrorUrl() {
+		return casErrorUrl;
+	}
+
+	public void setCasErrorUrl(String casErrorUrl) {
+		this.casErrorUrl = casErrorUrl;
+	}
+
 
 	
 

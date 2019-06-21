@@ -1,5 +1,8 @@
 package com.paladin.framework.core.configuration.shiro;
 
+import org.apache.shiro.authc.AbstractAuthenticator;
+import org.apache.shiro.authc.AuthenticationListener;
+import org.apache.shiro.authc.Authenticator;
 import org.apache.shiro.authc.pam.AuthenticationStrategy;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.realm.Realm;
@@ -32,6 +35,7 @@ import com.paladin.framework.utils.LogContentUtil;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
@@ -78,7 +82,7 @@ public class ShiroConfiguration {
 			// sessionManager.setCacheManager(new RedisCacheManager());
 			sessionManager.setSessionFactory(new ClusterSessionFactory());
 		}
-		
+
 		// session 监听
 		// Collection<SessionListener> sessionListeners = new ArrayList<>();
 		// sessionListeners.add(new CustomSessionListener());
@@ -99,11 +103,18 @@ public class ShiroConfiguration {
 	}
 
 	@Bean(name = "securityManager")
-	public DefaultWebSecurityManager getDefaultWebSecurityManage(DefaultWebSessionManager defaultWebSessionManager, Realm realm) {
+	public DefaultWebSecurityManager getDefaultWebSecurityManage(DefaultWebSessionManager defaultWebSessionManager, Realm realm,
+			List<AuthenticationListener> authenticationListeners) {
 		logger.info(LogContentUtil.createComponent(WebSecurityManager.class, DefaultWebSecurityManager.class));
 
 		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
 		securityManager.setRealm(realm);
+
+		// 这是shiro提供的验证成功失败接口，如果在filter中处理登录成功失败不一定能覆盖所有情况
+		Authenticator authenticator = securityManager.getAuthenticator();
+		if (authenticator instanceof AbstractAuthenticator) {
+			((AbstractAuthenticator) authenticator).setAuthenticationListeners(authenticationListeners);
+		}
 
 		// 注入缓存管理器;
 		// securityManager.setCacheManager(redisCacheManager());
@@ -129,7 +140,9 @@ public class ShiroConfiguration {
 
 		// 增加自定义过滤
 		Map<String, Filter> filters = new HashMap<>();
-		filters.put("authc", new PaladinFormAuthenticationFilter());
+
+		PaladinFormAuthenticationFilter authenticationFilter = new PaladinFormAuthenticationFilter();
+		filters.put("authc", authenticationFilter);
 		filters.put("logout", new PaladinLogoutFilter());
 
 		shiroFilterFactoryBean.setFilters(filters);
@@ -139,10 +152,10 @@ public class ShiroConfiguration {
 		// anon（匿名） org.apache.shiro.web.filter.authc.AnonymousFilter
 		// authc（身份验证） org.apache.shiro.web.filter.authc.FormAuthenticationFilter
 		// authcBasic（http基本验证）org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
-		// logout（退出） org.apache.shiro.web.filter.authc.LogoutFilter 
+		// logout（退出） org.apache.shiro.web.filter.authc.LogoutFilter
 		// noSessionCreation org.apache.shiro.web.filter.session.NoSessionCreationFilter
 		// perms(许可验证) org.apache.shiro.web.filter.authz.PermissionsAuthorizationFilter
-		// port（端口验证） org.apache.shiro.web.filter.authz.PortFilter 
+		// port（端口验证） org.apache.shiro.web.filter.authz.PortFilter
 		// rest (rest方面) org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter
 
 		filterChainDefinitionMap.put(shiroProperties.getLogoutUrl(), "logout");
