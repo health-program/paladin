@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<link rel="stylesheet" href="/static/assets/ueditor/themes/default/css/ueditor.min.css" />
+<body>
+    
+    <section class="content-header">
+        <h1 th:text="|年度健康教育工作${type == '1' ?  '计划' : '总结'}|"></h1>
+        <ol class="breadcrumb">
+            <li><a th:href="@{'/health/org/annual/work/index/'+ ${type}}"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+        <a th:href="@{'/health/org/annual/work/index/'+ ${type}}" class="btn btn-primary btn-block">返回</a>
+    </div>
+    <input type="hidden" id="id" th:value="${id}"/>
+    <input type="hidden" name="type" id="type" th:value="${type}">
+    <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript">
+    var type;
+    $(function() {
+        type = $("#type").val();
+    	var options = {
+	        id: "model",
+	        name: "详情",
+	        url:"/health/org/annual/work/update?id="+$("#id").val(),
+	        columns: [
+				{ title: "名称", name: "name", required: "required", inputType: "TEXT" },
+				{ title: "负责人", name: "principal", required: "required", inputType: "TEXT" },
+				{ title: "内容", name: "content", required: "required", inputType: "EDITOR" },
+				{ title: "开始时间", name: "beginTime", required: "required", inputType: "DATE" },
+				{ title: "结束时间", name: "endTime", required: "required", inputType: "DATE" },
+				{ title: "备注", name: "remarks", inputType: "TEXTAREA" },
+				{ title: "附件", name: "attachments", fileName: "attachmentsFile", maxFileCount: 4, required: "required", inputType: "ATTACHMENT" }
+				]
+	    }
+    
+        $.getAjax("/health/org/annual/work/get?id="+$("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            var model = new tonto.Model("model", options.columns,{
+                extraParam:{
+                    type : type
+                },
+                successCallback:function(){
+                $.successAlert("修改成功",function(){
+                    window.location = "/health/org/annual/work/index/" + type;
+                });
+            }
+            });
+            model.setData(data);
+            $.initComponment();
+        });
+    });
+    </script>
+</body>
+
+</html>

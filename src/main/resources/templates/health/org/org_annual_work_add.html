@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<link rel="stylesheet" href="/static/assets/ueditor/themes/default/css/ueditor.min.css" />
+<body>
+    
+    <section class="content-header">
+        <h1 th:text="|年度健康教育工作${type == '1' ?  '计划' : '总结'}|"></h1>
+        <ol class="breadcrumb">
+            <li><a  th:href="@{'/health/org/annual/work/index/'+ ${type}}" ><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <input type="hidden" name="type" id="type" th:value="${type}">
+    <section class="content">
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="/static/assets/ueditor/ueditor.all.min.js"></script>
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增",
+        url:"/health/org/annual/work/save",
+        cancelBtn: false,
+        formButtonBar:[{
+            id:  'reply_btn',
+            type: 'button',
+            name:  '返回',
+            class: 'btn btn-default btn-block',
+            order: 2
+        }],
+        columns: [
+				{ title: "名称", name: "name", required: "required", inputType: "TEXT" },
+				{ title: "负责人", name: "principal", required: "required", inputType: "TEXT" },
+				{ title: "内容", name: "content", required: "required", inputType: "EDITOR" },
+				{ title: "开始时间", name: "beginTime", required: "required", inputType: "DATE" },
+				{ title: "结束时间", name: "endTime", required: "required", inputType: "DATE" },
+				{ title: "备注", name: "remarks", inputType: "TEXTAREA" },
+				{ title: "附件(最多上传4个附件)", name: "attachments", fileName: "attachmentsFile", maxFileCount: 4, required: "required", inputType: "ATTACHMENT" }
+				]
+    }
+    var type;
+    $(function() {
+        type = $("#type").val();
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            extraParam:{
+                type : type
+            },
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/org/annual/work/index/" + type;
+                });
+            }
+        });
+        model.setData(null);
+        $("#reply_btn").click(function () {
+            window.location = "/health/org/annual/work/index/" + type;
+        });
+        $.initComponment();
+    });
+    </script>
+</body>
+
+</html>
