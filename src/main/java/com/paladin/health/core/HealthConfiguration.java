@@ -8,6 +8,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import com.paladin.common.core.CommonHandlerExceptionResolver;
 import com.paladin.common.core.TontoDialect;
+import com.paladin.framework.core.configuration.shiro.ShiroCasProperties;
 
 import io.buji.pac4j.realm.Pac4jRealm;
 
@@ -26,8 +27,8 @@ public class HealthConfiguration {
 	
 	@Bean("casRealm")
 	@ConditionalOnProperty(prefix = "paladin", value = "cas-enabled", havingValue = "true", matchIfMissing = false)
-	public Pac4jRealm getCasRealm() {
-		return new HealthCasUserRealm();
+	public Pac4jRealm getCasRealm(ShiroCasProperties shiroCasProperties) {
+		return new HealthCasUserRealm(shiroCasProperties);
 	}
 
 	@Bean("localRealm")

@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.paladin.common.model.syst.SysUser;
 import com.paladin.common.service.syst.SysUserService;
+import com.paladin.framework.core.configuration.shiro.ShiroCasProperties;
 import com.paladin.framework.core.session.UserSession;
 
 import io.buji.pac4j.realm.Pac4jRealm;
@@ -34,9 +35,12 @@ public class HealthCasUserRealm extends Pac4jRealm {
 
 	@Autowired
 	private HealthUserSessionFactory userSessionFactory;
+	
+	private String idCardField;
 
-	public HealthCasUserRealm() {	
+	public HealthCasUserRealm(ShiroCasProperties shiroCasProperties) {	
 		this.setAuthenticationTokenClass(Pac4jToken.class);
+		this.idCardField = shiroCasProperties.getCasIdCardField();
 	}
 
 	/**
@@ -54,6 +58,11 @@ public class HealthCasUserRealm extends Pac4jRealm {
 		final Pac4jToken token = (Pac4jToken) authenticationToken;
         final List<CommonProfile> profiles = token.getProfiles();
         final Pac4jPrincipal principal = new Pac4jPrincipal(profiles, getPrincipalNameAttribute());
+        
+        String idcard = (String) principal.getProfile().getAttribute(idCardField);
+        if(idcard == null || idcard.length() == 0) {
+        	throw new UnknownAccountException();
+        }
         
 		String username = principal.getName();
 		SysUser sysUser = sysUserService.getUserByAccount(username);
