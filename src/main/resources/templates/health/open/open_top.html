@@ -11,18 +11,31 @@
                     <li><a href="/open/health/message/center/message/index">文章</a></li>
                     <li><a href="/xk/symptom/index">百科</a></li>
                 </ul>
-                <form class="navbar-form navbar-left" role="search">
-                    <div class="form-group">
-                        <!--  <input type="text" class="form-control" id="navbar-search-input" placeholder="Search"> -->
+                <form action="/credit/home/page/count/event" method="post" class="navbar-form navbar-right" role="search">
+                    <div class="input-group" style="width: 300px">
+                        <input type="text" name="label" id="label" class="form-control" placeholder="请输入要查询视频或文章的关键字" >
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-flat"  onclick="openTopSearch()"><i class="fa fa-search"></i></button>
+                        </span>
                     </div>
                 </form>
             </div>
             <div class="navbar-custom-menu">
                 <ul class="nav navbar-nav">
-                    <li><a href="/open/health/message/center/topVideo" alt="主页"><i class="glyphicon glyphicon-home"></i></a> </li>
+                    <li><a href="/open/health/message/center/topVideo" alt="主页"><i class="glyphicon glyphicon-home"></i></a>
+                    </li>
                 </ul>
             </div>
         </div>
         <!-- /.container-fluid -->
     </nav>
 </header>
+<script type="text/javascript">
+    function openTopSearch() {
+        let label = $("#label").val();
+        if (label) {
+            window.location = "/open/health/message/center/messageAndVideo/search/index?label="+label;
+        }
+    }
+
+</script>

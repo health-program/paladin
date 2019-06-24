@@ -223,6 +223,12 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return new PageResult<>(page);
 	}
 
+	public PageResult<PublicityMessageVO> findSearchMessagePage(PublicityMessageQueryDTO query) {
+		Page<PublicityMessageVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		publicityMessageMapper.findSearchMessage(query);
+		return new PageResult<>(page);
+	}
+
 	public List<PublicityMessageVO> showDisplayMessage() {
 		return publicityMessageMapper.findDisplay();
 	}
@@ -242,4 +248,5 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	public boolean updateToSended(String id, int count) {
 		return publicityMessageMapper.updateToSended(id, count) > 0;
 	}
+
 }

@@ -101,5 +101,23 @@
 		LEFT JOIN org_user c ON a.create_user_id = c.id
 		WHERE a.id=#{id}
 	</select>
-    
+	<select id="findSearchVideo" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
+		SELECT
+		id,
+		show_image AS showImage,
+		summary,
+		url,
+		`name`,
+		label,
+		publish_time AS publishTime
+		FROM
+		video
+		WHERE status = 9 AND now() > publish_time
+		<if test="query.label != null and query.label != ''">
+			AND `name` LIKE CONCAT ('%',#{query.label},'%')
+			OR label LIKE CONCAT ('%',#{query.label},'%')
+		</if>
+		ORDER BY publish_time DESC
+	</select>
+
 </mapper>

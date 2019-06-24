@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>宣教系统</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
+    <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="/static/css/ionicons.min.css"/>
+    <link rel="stylesheet" href="/static/css/iconfont.css"/>
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css"/>
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css"/>
+    <style type="text/css">
+        .video-list {
+            list-style: none;
+            text-align: center;
+        }
+
+        .right-tool {
+            float: right;
+        }
+
+        .list {
+            list-style: none;
+            float: left;
+            text-align: center;
+            width: 23%
+        }
+
+        .right-text {
+            display: inline;
+            float: right;
+        }
+
+        .name-box {
+            display: inline-block;
+            height: 54px;
+            width: 140px;
+        }
+
+        .fa-check-square-o {
+            font-size: 54px;
+        }
+
+        .p1 {
+            color: #666666;
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        .p2 {
+            color: #666666;
+            line-height: 20px;
+            font-size: 22px;
+        }
+
+        .go-todo-btn {
+            padding
+        }
+
+        .name {
+            color: #000;
+        }
+
+        .name:hover,
+        .name:active,
+        .name:focus {
+            color: #000;
+            text-decoration: underline
+        }
+
+        .btn-primary {
+            background-color: #00a65a;
+            border-color: #00a65a
+        }
+
+        .btn-primary:hover {
+            background-color: #1ddc50;
+            border-color: #1ddc50
+        }
+
+        .video-li {
+            margin-bottom: 20px;
+            float: left;
+            width: 32%;
+        }
+
+        .notice-box {
+            display: inline-block;
+            width: 76%;
+            text-align: left;
+            text-height: 200px;
+            padding-left: 20px;
+            vertical-align: top;
+        }
+
+        #noticeContent {
+            height: 70px;
+            overflow: hidden;
+            font-size: 15px;
+            padding-top: 5px;
+            /* 内容超出宽度时隐藏超出部分的内容 */
+            text-overflow: ellipsis;
+            /* 当对象内文本溢出时显示省略标记(...) ；需与overflow:hidden;一起使用。*/
+        }
+
+        .btn-detail {
+            margin-top: 15px;
+            border: none;
+            float: right;
+            color: #3c8dbc
+        }
+
+        .block {
+            padding: 20px;
+            padding-right: 50px;
+            padding-left: 50px;
+        }
+
+        .sli {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body class="layout-top-nav skin-green-light">
+<div class="wrapper">
+    <div th:include="/health/open/open_top" />
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+        <div class="container">
+            <div class="box box-solid" style="margin-top: 20px">
+                <div class="box-header with-border">
+                    <h3 class="box-title" th:text="|搜索关键字: ${label}|"></h3>
+                </div>
+                <div id="videoBody" class="box-body"></div>
+                <hr>
+                <div id="messageBody" class="box-body"></div>
+                <input type="hidden" id="label1" th:value="${label}">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="/static/assets/jquery/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" src="/static/assets/bootstrap3/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/assets/adminLTE/js/adminlte.min.js"></script>
+    <script type="text/javascript" src="/static/js/common.js"></script>
+    <script type="text/javascript">
+        /*<![CDATA[*/
+        var table,label;
+        $(function() {
+            label = $("#label1").val();
+            getVideoPageInfo(0);
+            getMessagePageInfo(0);
+        });
+
+        function initDataGrid(limit,total,page) {
+                t = 5;
+            if (total > limit) {
+                var totalPage = Math.ceil(total / limit);
+                var html = '<div class="text-center"><ul class="pagination">';
+                html += page > 1 ? '<li><a  onclick="getVideoPageInfo(' + ((page - 2) * limit)+')"   href="javascript:void(0)">&laquo;</a></li>' : '<li><a href="javascript:void(0)">&laquo;</a></li>';
+
+                var i = page - Math.floor(t / 2);
+                if (i < 1) i = 1;
+                if (i > totalPage) i = totalPage;
+
+                for (var k = 0; i <= totalPage && k < t; k++) {
+                    html += '<li ' + (i == page ? 'class="active"' : '') + '><a  onclick="getVideoPageInfo(' + ((i - 1) * limit)+')"  href="javascript:void(0)">' + i + '</a></li>';
+                    i++;
+                }
+
+                html += page < totalPage ? '<li><a  onclick="getVideoPageInfo(' +(page * limit)+')"  href="javascript:void(0)">&raquo;</a></li>' : '<li><a href="javascript:void(0)">&raquo;</a></li>';
+                html += '</ul></div>';
+                $("#videoBody").append(html);
+            }
+
+        }
+
+        function getVideoPageInfo(offset) {
+            $.getAjax('/open/health/message/center/video/search/find?offset='+offset+'&label='+label,function (result) {
+                let videos = result.data;
+                var html = " <h4 align='center'><strong>视频列表</strong></h4>";
+                if (videos && videos.length > 0) {
+                    let vHtml = "";
+                    $.each(videos,function (i, video) {
+                        vHtml += "<div class='post'>" ;
+                        if (video.showImageUrl == null) {
+                            vHtml += " <img   src='/static/image/health/video.png' alt='ATTACHMENT' style='width:20%'/>";
+                        } else {
+                            vHtml += "  <img   src='"+'/file/'+"" + video.showImageUrl.thumbnailPelativePath+"'  alt='ATTACHMENT' style='width:20%'/>";
+                        }
+                        vHtml += "<div class='notice-box'>" ;
+                        vHtml +=    "<div> <h4><a  href='"+'/open/health/message/center/play?id='+"" + video.id+"'><strong >"+video.name+"</strong></a></h4></div>";
+                        vHtml +=      "<div style='font-size:10px; color:#999'>" ;
+                        vHtml +=            " <span>"+dateFormat(video.publishTime)+"</span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>";
+                        vHtml +=            " <span>"+video.label+"</span>";
+                        vHtml +=      "</div>";
+                        vHtml +=      "<div id='noticeContent'>"+ (video.summary.length  > 0 ? video.summary : '无内容') +"</div>";
+                        vHtml +=   "</div>";
+                        vHtml += "</div>";
+                    });
+                    html += vHtml;
+                } else {
+                    html += "<p>暂无数据 :(</p>";
+                }
+                $("#videoBody").html(html);
+                initDataGrid(result.limit,result.total,result.page)
+            })
+        }
+
+        function initDataGrid1(limit,total,page) {
+            t = 5;
+            if (total > limit) {
+                var totalPage = Math.ceil(total / limit);
+                var html = '<div class="text-center"><ul class="pagination">';
+                html += page > 1 ? '<li><a  onclick="getMessagePageInfo(' + ((page - 2) * limit)+')"   href="javascript:void(0)">&laquo;</a></li>' : '<li><a href="javascript:void(0)">&laquo;</a></li>';
+
+                var i = page - Math.floor(t / 2);
+                if (i < 1) i = 1;
+                if (i > totalPage) i = totalPage;
+
+                for (var k = 0; i <= totalPage && k < t; k++) {
+                    html += '<li ' + (i == page ? 'class="active"' : '') + '><a  onclick="getMessagePageInfo(' + ((i - 1) * limit)+')"  href="javascript:void(0)">' + i + '</a></li>';
+                    i++;
+                }
+
+                html += page < totalPage ? '<li><a  onclick="getMessagePageInfo(' +(page * limit)+')"  href="javascript:void(0)">&raquo;</a></li>' : '<li><a href="javascript:void(0)">&raquo;</a></li>';
+                html += '</ul></div>';
+                $("#messageBody").append(html);
+            }
+
+        }
+
+        function getMessagePageInfo(offset) {
+            $.getAjax('/open/health/message/center/message/search/find?offset='+offset+'&label='+label,function (result) {
+                let messages = result.data;
+                var html = " <h4 align='center'><strong>文章列表</strong></h4>";
+                if (messages && messages.length > 0) {
+                    let mHtml = "";
+                    $.each(messages,function (i, message) {
+                        mHtml += "<div class='post'>" ;
+                        if (message.thumbnailUrl == null) {
+                            mHtml += " <img   src='/static/image/health/article.png' alt='ATTACHMENT' style='width:20%'/>";
+                        } else {
+                            mHtml += "  <img   src='"+'/file/'+"" + message.thumbnailUrl.thumbnailPelativePath +"'  alt='ATTACHMENT' style='width:20%'/>";
+                        }
+                        mHtml += "<div class='notice-box'>" ;
+                        mHtml +=    "<div> <h4><a  href='"+'/open/health/message/center/display/index?id='+"" + message.id+"'><strong >"+message.title+"</strong></a></h4></div>";
+                        mHtml +=      "<div style='font-size:10px; color:#999'>" ;
+                        mHtml +=            " <span>"+dateFormat(message.publishTime)+"</span><span>&nbsp;&nbsp;|&nbsp;&nbsp;关键词&nbsp;&nbsp;</span>";
+                        mHtml +=            " <span>"+message.label+"</span>";
+                        mHtml +=      "</div>";
+                        mHtml +=      "<div id='noticeContent'>"+ (message.summary.length  > 0 ? message.summary : '无内容') +"</div>";
+                        mHtml +=   "</div>";
+                        mHtml += "</div>";
+                    });
+                    html += mHtml;
+                } else {
+                    html += "<p>暂无数据 :(</p>";
+                }
+                $("#messageBody").html(html);
+                initDataGrid1(result.limit,result.total,result.page)
+            })
+        }
+        /*]]>*/
+    </script>
+</body>
+
+</html>

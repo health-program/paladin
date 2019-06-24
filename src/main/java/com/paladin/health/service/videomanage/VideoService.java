@@ -11,6 +11,7 @@ import com.paladin.health.controller.videomanage.VideoExamineQueryVO;
 import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.mapper.videomanage.VideoMapper;
 import com.paladin.health.model.videomanage.Video;
+import com.paladin.health.service.videomanage.dto.VideoMessageQuery;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVO;
 import com.paladin.health.service.videomanage.vo.VideoVO;
@@ -35,6 +36,12 @@ public class VideoService extends ServiceSupport<Video> {
 	public PageResult<VideoShowVO> findPlayVideoPage(VideoQueryDTO pages) {
 		Page<VideoShowVO> page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
 		videoMapper.findPlayVideo(pages);
+		return new PageResult<>(page);
+	}
+
+	public PageResult<VideoShowVO> findSearchVideoPage(VideoMessageQuery query) {
+		Page<VideoShowVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		videoMapper.findSearchVideo(query);
 		return new PageResult<>(page);
 	}
 	

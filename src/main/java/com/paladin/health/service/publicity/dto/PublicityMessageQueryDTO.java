@@ -1,8 +1,8 @@
 package com.paladin.health.service.publicity.dto;
 
-import java.util.List;
-
 import com.paladin.framework.common.OffsetPage;
+
+import java.util.List;
 
 public class PublicityMessageQueryDTO extends OffsetPage{
 	
@@ -12,6 +12,7 @@ public class PublicityMessageQueryDTO extends OffsetPage{
 	private List<Integer> statuses;
 	private String createUserName;
 	private String createUserId;
+	private String label;
 
 	public String getTitle() {
 		return title;
@@ -60,5 +61,12 @@ public class PublicityMessageQueryDTO extends OffsetPage{
 	public void setStatuses(List<Integer> statuses) {
 		this.statuses = statuses;
 	}
-	
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
 }

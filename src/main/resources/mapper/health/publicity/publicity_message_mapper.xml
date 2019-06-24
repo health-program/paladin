@@ -175,5 +175,33 @@
 	<update id="updateToSended">
 		UPDATE publicity_message SET is_send = 1,count_sended=#{count} WHERE id = #{id}
 	</update>
-	
+    <select id="findSearchMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
+		   SELECT
+			a.id,
+			a.type,
+			a.title,
+			a.thumbnail,
+			a.subtitle,
+			a.summary,
+			a.label,
+			a.attachments,
+			a.examine_user_id AS examineUserId,
+			b.name AS examineUserName,
+			a.create_user_id AS createUserId,
+			c.name AS createUserName,
+			a.status,
+			a.publish_time AS publishTime,
+			a.publish_target AS publishTarget
+		FROM publicity_message a
+		LEFT JOIN org_user b ON a.examine_user_id = b.id
+		LEFT JOIN org_user c ON a.create_user_id = c.id
+		WHERE a.`status` = 9 AND a.is_delete = 0 AND  a.type = 2 AND now() > a.publish_time
+		<if test="query.label != null and query.label != ''">
+			AND a.title LIKE CONCAT ('%',#{query.label},'%')
+			OR a.label LIKE CONCAT ('%',#{query.label},'%')
+			OR a.subtitle  LIKE CONCAT ('%',#{query.label},'%')
+		</if>
+		ORDER BY a.publish_time DESC
+	</select>
+
 </mapper>

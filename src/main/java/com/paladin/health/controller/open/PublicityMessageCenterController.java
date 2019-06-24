@@ -8,6 +8,7 @@ import com.paladin.health.service.publicity.dto.PublicityMessageQueryDTO;
 import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import com.paladin.health.service.videomanage.VideoPlayPublishService;
 import com.paladin.health.service.videomanage.VideoService;
+import com.paladin.health.service.videomanage.dto.VideoMessageQuery;
 import com.paladin.health.service.videomanage.dto.VideoPlayPublishQueryDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
 import com.paladin.health.service.videomanage.vo.VideoShowVO;
@@ -54,7 +55,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	@RequestMapping("/topVideo")
 	public String topVideo(Model model) {
 		VideoQueryDTO queryDTO = new VideoQueryDTO();
-		queryDTO.setLimit(9);
+		queryDTO.setLimit(5);
 		queryDTO.setOffset(0);
 		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
 		List<PublicityMessageVO> messages = publicityMessageService.showDisplayMessage();
@@ -256,7 +257,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		
 		VideoQueryDTO query = new VideoQueryDTO();
 		query.setOffset(offset);
-		query.setLimit(10);
+		query.setLimit(3);
 		
 		PageResult<VideoShowVO> result = videoService.findPlayVideoPage(query);
 		
@@ -266,6 +267,26 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		model.addAttribute("limit", result.getLimit());
 
 		return "/health/open/video_center";
+	}
+
+	@RequestMapping("/messageAndVideo/search/index")
+	public String searchVideoAndMessageIndex(@RequestParam String label, Model model) {
+		model.addAttribute("label", label);
+		return "/health/open/open_search_index";
+	}
+
+	@RequestMapping("/video/search/find")
+	@ResponseBody
+	public Object searchVideoByQuery(VideoMessageQuery query) {
+		query.setLimit(3);
+		return CommonResponse.getSuccessResponse(videoService.findSearchVideoPage(query));
+	}
+
+	@RequestMapping("/message/search/find")
+	@ResponseBody
+	public Object searchMessageByQuery(PublicityMessageQueryDTO query) {
+		query.setLimit(3);
+		return CommonResponse.getSuccessResponse(publicityMessageService.findSearchMessagePage(query));
 	}
 
 	@RequestMapping("/updateCount")
