@@ -29,7 +29,8 @@
         }],
         url:"/health/org/agency/save",
         columns: [
-				{ title: "机构名称", name: "name", inputType: "TEXT" },
+                { title: "上级机构", name:"parentId", inputType:"SELECT-TREE-SERVER", url:"/health/org/agency/find/all/tree"},
+				{ title: "机构名称", name: "name", inputType: "TEXT", required: "required" },
 				{ title: "备注", name: "remarks", inputType: "TEXT" }
 				]
     }

@@ -12,6 +12,9 @@ public class OrgAgency extends UnDeleteBaseModel{
 
 	// 机构名称
 	private String name;
+	
+	// 父机构
+	private String parentId;
 
 	// 备注
 	private String remarks;
@@ -38,6 +41,14 @@ public class OrgAgency extends UnDeleteBaseModel{
 
 	public void setRemarks(String remarks) {
 		this.remarks = remarks;
+	}
+
+	public String getParentId() {
+		return parentId;
+	}
+
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 
 }

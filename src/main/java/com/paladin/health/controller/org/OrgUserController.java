@@ -4,11 +4,8 @@ import com.paladin.common.model.org.OrgRole;
 import com.paladin.common.service.org.OrgRoleService;
 import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.core.query.QueryInputMethod;
-import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.model.org.OrgAgency;
 import com.paladin.health.model.org.OrgUser;
 import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.org.OrgUserService;
@@ -45,16 +42,14 @@ public class OrgUserController extends ControllerSupport {
 
 
     @RequestMapping("/index")
-    @QueryInputMethod(queryClass = OrgUserQueryDTO.class)
     public String index() {
         return "/health/org/org_user_index";
     }
 
     @RequestMapping("/find/page")
     @ResponseBody
-    @QueryOutputMethod(queryClass = OrgUserQueryDTO.class,paramIndex = 0)
     public Object findPage(OrgUserQueryDTO query) {
-        return CommonResponse.getSuccessResponse(orgUserService.searchAllUsersByQuery(query));
+        return CommonResponse.getSuccessResponse(orgUserService.findOwnUsersPage(query));
     }
     
     @RequestMapping("/get")
@@ -65,10 +60,10 @@ public class OrgUserController extends ControllerSupport {
     
     @RequestMapping("/add")
     public String addInput(Model model) {
-        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
-        if (agencies != null) {
-            model.addAttribute("agencies",agencies);
-        }
+//        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
+//        if (agencies != null) {
+//            model.addAttribute("agencies",agencies);
+//        }
         List<OrgRole> roles = orgUserService.searchOwnedRoles();
         if (roles != null) {
             model.addAttribute("roles",roles);
@@ -79,10 +74,10 @@ public class OrgUserController extends ControllerSupport {
     @RequestMapping("/detail")
     public String detailInput(@RequestParam String id, Model model) {
     	model.addAttribute("id", id);
-        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
-        if (agencies != null) {
-            model.addAttribute("agencies",agencies);
-        }
+//        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
+//        if (agencies != null) {
+//            model.addAttribute("agencies",agencies);
+//        }
         List<OrgRole> roles = orgUserService.searchOwnedRoles();
         if (roles != null) {
             model.addAttribute("roles",roles);

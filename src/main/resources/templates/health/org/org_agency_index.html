@@ -41,6 +41,7 @@
         </div>
     </section>
     <div th:include="/health/footer" />
+    <script type="text/javascript" src="/static/assets/bootstrap-table/treetable.js"></script>
     <script type="text/javascript">
     var table;
     $(function() {
@@ -56,34 +57,42 @@
             idField: "id",
             columns: [
                 [
-                    { title: "机构名称", align: "center", field: "name" },
-                    { title: "备注", align: "center", field: "remarks" },
+                    { title: "机构名称", align: "left", field: "name" },
                     {
                         title: "操作",
                         align: "center",
-                        width: "200px",
+                        width: "250px",
                         events: {
                             'click .detail': function(e, value, row, index) {
                                 detail(row);
                             },
                             'click .remove': function(e, value, row, index) {
                                 remove(row);
+                            },
+                            'click .add': function(e, value, row, index) {
+                                add(row);
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
                             return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
+                                '<button class="add btn btn-xs btn-success" style="margin-right:10px"><i class="glyphicon glyphicon-plus"></i>添加子项</button>' +
                                 '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
 
                         }
                     }
                 ]
             ],
-            url: '/health/org/agency/find/page',
+            url: '/health/org/agency/find/all/list',
             searchbar: '#searchbar',
             showColumns: true,
             pageSize: limit || undefined,
             pageNumber: page || 1,
-            pagination: true,
+            pagination: false, //分页请设置为false
+            treeView: true, //是否开启树视图
+            treeId: "id", //id字段
+            treeParentFilter: true, //过滤掉父节点不正确的（置为空）
+            treeParentField: "parentId", //父ID字段
+            treeField: "name", //展示树的字段
             clickToSelect: true,
             toolbar: "#toolbar",
             showRefresh: true

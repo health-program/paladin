@@ -1397,7 +1397,7 @@ var _selectTreeServerFieldBuilder = new _FieldBuilder("SELECT-TREE-SERVER", {
     formDataHandler: function(column, formData, model) {
         if (column.editDisplay !== "hide") {
             var setted = false;
-            for (; i < formData.length; i++) {
+            for (var i = 0; i < formData.length; i++) {
                 if (formData[i].name == column.name) {
                     formData[i].value = column.selectItem ? column.selectItem.value : null;
                     setted = true;
@@ -1471,7 +1471,7 @@ var _selectTreeServerFieldBuilder = new _FieldBuilder("SELECT-TREE-SERVER", {
                                 }
                             }
                             nodes.push(node);
-                            list.push(node);
+                            treeList.push(node);
                         });
                         return nodes;
                     }
@@ -1651,7 +1651,7 @@ var _selectTreeServerFieldBuilder = new _FieldBuilder("SELECT-TREE-SERVER", {
 
         var inputAttr = {
             name: column.name,
-            placeholder: column.placeholder || null,
+            placeholder: column.placeholder || "请选择" + column.title,
             class: "form-control",
             autocomplete: "off",
             readonly: "readonly",

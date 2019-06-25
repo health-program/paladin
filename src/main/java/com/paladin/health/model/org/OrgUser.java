@@ -22,6 +22,9 @@ public class OrgUser extends UnDeleteBaseModel {
 
 	// 账号
 	private String account;
+	
+	// 身份ID
+	private String identificationId;
 
 	// 描述
 	private String description;
@@ -72,6 +75,14 @@ public class OrgUser extends UnDeleteBaseModel {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getIdentificationId() {
+		return identificationId;
+	}
+
+	public void setIdentificationId(String identificationId) {
+		this.identificationId = identificationId;
 	}
 
 }

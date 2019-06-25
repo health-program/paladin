@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.org.OrgAgencyMapper">
-
+	<update id="removeAgency">
+		UPDATE org_agency t1,
+		  (SELECT count(1) AS c
+		   FROM org_user
+		   WHERE agency_id=#{id}) t2 ,
+		  (SELECT count(1) AS c
+		   FROM org_agency
+		   WHERE parent_id =#{id}) t3
+		SET t1.is_delete=1
+		WHERE t1.id=#{id}
+		  AND t2.c =0
+		  AND t3.c=0
+	</update>
 </mapper>
