@@ -22,6 +22,9 @@ public class OrgUserDTO {
 	// 账号
     @NotEmpty
 	private String account;
+    
+    // 身份ID
+ 	private String identificationId;
 
 	// 描述
 	private String description;
@@ -73,4 +76,12 @@ public class OrgUserDTO {
     public void setId(String id) {
         this.id = id;
     }
+
+	public String getIdentificationId() {
+		return identificationId;
+	}
+
+	public void setIdentificationId(String identificationId) {
+		this.identificationId = identificationId;
+	}
 }

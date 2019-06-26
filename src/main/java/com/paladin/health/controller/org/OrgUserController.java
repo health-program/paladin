@@ -1,13 +1,9 @@
 package com.paladin.health.controller.org;
 
-import com.paladin.common.model.org.OrgRole;
-import com.paladin.common.service.org.OrgRoleService;
 import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthUserSession;
-import com.paladin.health.model.org.OrgUser;
-import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.org.OrgUserService;
 import com.paladin.health.service.org.dto.OrgUserDTO;
 import com.paladin.health.service.org.dto.OrgUserQueryDTO;
@@ -21,25 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/health/org/user")
 public class OrgUserController extends ControllerSupport {
-
 
     @Autowired
     private OrgUserService orgUserService;
 
     @Autowired
     private SysUserService sysUserService;
-
-    @Autowired
-    private  OrgAgencyService orgAgencyService;
-
-    @Autowired
-    private OrgRoleService orgRoleService;
-
 
     @RequestMapping("/index")
     public String index() {
@@ -58,39 +45,19 @@ public class OrgUserController extends ControllerSupport {
         return CommonResponse.getSuccessResponse(beanCopy(orgUserService.get(id), new OrgUserVO()));
     }
     
+	@RequestMapping("/find/own/role")
+	@ResponseBody
+	public Object findOwnRoles() {
+		return CommonResponse.getSuccessResponse(orgUserService.searchOwnedRoles());
+	}
     @RequestMapping("/add")
     public String addInput(Model model) {
-//        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
-//        if (agencies != null) {
-//            model.addAttribute("agencies",agencies);
-//        }
-        List<OrgRole> roles = orgUserService.searchOwnedRoles();
-        if (roles != null) {
-            model.addAttribute("roles",roles);
-        }
         return "/health/org/org_user_add";
     }
 
     @RequestMapping("/detail")
     public String detailInput(@RequestParam String id, Model model) {
     	model.addAttribute("id", id);
-//        List<OrgAgency> agencies = orgUserService.searchOwnedAgencies();
-//        if (agencies != null) {
-//            model.addAttribute("agencies",agencies);
-//        }
-        List<OrgRole> roles = orgUserService.searchOwnedRoles();
-        if (roles != null) {
-            model.addAttribute("roles",roles);
-        }
-        OrgUser orgUser = orgUserService.get(id);
-        if (orgUser.getAgencyId() != null ) {
-            String agencyName = orgAgencyService.get(orgUser.getAgencyId()).getName();
-            model.addAttribute("agencyName",agencyName);
-        }
-        if (orgUser.getRoleId() != null) {
-            String roleName = orgRoleService.get(orgUser.getRoleId()).getRoleName();
-            model.addAttribute("roleName",roleName);
-        }
         return "/health/org/org_user_detail";
     }
 
@@ -110,7 +77,7 @@ public class OrgUserController extends ControllerSupport {
         if (userSession.isAdminRoleLevel() || orgUserDTO.getAgencyId().equals(userSession.getAgencyId())){
             return CommonResponse.getSuccessResponse(orgUserService.createUser(orgUserDTO));
         }else {
-            return  CommonResponse.getFailResponse();
+            return  CommonResponse.getFailResponse("没有权限添加用户到该机构");
         }
 	}
 
@@ -124,7 +91,7 @@ public class OrgUserController extends ControllerSupport {
         if (userSession.isAdminRoleLevel() || orgUserDTO.getAgencyId().equals(userSession.getAgencyId())){
             return CommonResponse.getSuccessResponse(orgUserService.updateUser(orgUserDTO));
         }else {
-            return  CommonResponse.getFailResponse();
+            return  CommonResponse.getFailResponse("没有权限添加用户到该机构");
         }
 	}
 

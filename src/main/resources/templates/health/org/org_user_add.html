@@ -4,96 +4,44 @@
 <head th:include="/health/header" />
 
 <body>
-    
     <section class="content-header">
         <h1>用户管理</h1>
         <ol class="breadcrumb">
-            <li><a href="/health/org/user/index"><i class="fa fa-list-alt"></i>列表</a></li>
-            <li class="active">新增</li>
+            <li><a href="/health/org/user/index"><i class="fa fa-list-alt"></i>用户列表</a></li>
+            <li class="active">添加用户</li>
         </ol>
     </section>
     <section class="content">
-        <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="glyphicon glyphicon-user"></i>
-                <h3 class="box-title">新增</h3>
-                <div class="box-tools pull-right">
-                </div>
-            </div>
-            <div id="model_edit" class="box-body" >
-                <form id="model_form" action="/health/org/user/save" method="post" class="form-horizontal edit-body" >
-                    <div class="form-group">
-                        <label for="account" class="col-sm-3 control-label">账号：</label>
-                        <div class="col-sm-3">
-                            <input name="account" required data-type="account" id="account" placeholder="请输入账号,5~30位数字,字母或下划线" type="text" class="form-control"/>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" onclick="validateAccount()" class="btn btn-success">检测账号</button>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="name" class="col-sm-3 control-label">姓名：</label>
-                        <div class="col-sm-3">
-                            <input name="name"  required placeholder="请输入姓名" type="text" class="form-control"/>
-                        </div>
-                        <label for="roleId" class="col-sm-1 control-label">角色：</label>
-                        <div class="col-sm-3">
-                            <select name="roleId" required class="form-control" >
-                                <option value="">请选择角色</option>
-                                <option th:each="role:${roles}" th:value="${role.id}" th:text="${role.roleName}"></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="agencyId" class="col-sm-3 control-label">所属机构：</label>
-                        <div class="col-sm-3">
-                            <select id="agencyId" name="agencyId"  class="form-control"  required>
-                                <option value="">请选择机构</option>
-                                <option th:each="agency:${agencies}" th:value="${agency.id}" th:text="${agency.name}"></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="description" class="col-sm-3 control-label">描述：</label>
-                        <div class="col-sm-3">
-                            <textarea rows="4"  name="description"  style="resize: none;" class="form-control"></textarea>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-2 col-sm-offset-3">
-                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
-                        </div>
-                        <div class="col-sm-2 col-sm-offset-1">
-                            <button type="button" id="reply_btn" class="btn btn-default btn-block">返回</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
     </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+        <a href="/health/org/user/index" class="btn btn-primary btn-block">返回</a>
+    </div>
     <div th:include="/health/footer" />
     <script type="text/javascript">
     var options = {
         id: "model",
-        name: "新增",
-        url:"/health/org/user/save",
+        cancelBtn: false,
+        name: "添加用户",
+        url: "/health/org/user/save",
         columns: [
-				{ title: "账号", name: "account", inputType: "TEXT" },
-				{ title: "姓名", name: "name", inputType: "TEXT" },
-				{ title: "所属机构", name: "agencyId", inputType: "SELECT" },
-				{ title: "角色", name: "roleId", inputType: "TEXT" },
-				{ title: "描述", name: "description", inputType: "TEXT" }
-				]
+            { title: "账号", name: "account", inputType: "TEXT", required: "required" },
+            { title: "姓名", name: "name", inputType: "TEXT", required: "required" },
+            { title: "所属机构", name: "agencyId", inputType: "SELECT-TREE-SERVER", url: "/health/org/agency/find/own/tree", required: "required" },
+            { title: "角色", name: "roleId", inputType: "SELECT-SERVER", url: "/health/org/user/find/own/role", nameField: "roleName", multiple:false, required: "required" },
+            { title: "身份证", name: "identificationId", inputType: "TEXT" },
+            { title: "描述", name: "description", inputType: "TEXTAREA" }
+        ]
     };
 
     $(function() {
-        $("#reply_btn").click(function () {
-            window.location = "/health/org/user/index";
-        });
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        $.initComponment($(".content"));
+
         var model = new tonto.Model("model", options.columns, {
             pattern: "edit",
-            successCallback: function () {
-                $.successAlert("保存成功", function () {
+            successCallback: function() {
+                $.successAlert("保存成功", function() {
                     window.location = "/health/org/user/index";
                 })
             }
@@ -106,12 +54,12 @@
         $.ajax({
             url: "/health/org/user/validate",
             type: "GET",
-            data: {account: account},
-            success: function (data) {
+            data: { account: account },
+            success: function(data) {
                 if (data.status === 1)
-                    layer.msg("账号可用", {icon: 1});
+                    layer.msg("账号可用", { icon: 1 });
                 else
-                    layer.msg("账号不可用", {icon: 2});
+                    layer.msg("账号不可用", { icon: 2 });
             }
         });
     }
