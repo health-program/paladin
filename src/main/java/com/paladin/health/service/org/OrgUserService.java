@@ -161,4 +161,8 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 		}
 		return i;
 	}
+
+	public OrgUser geUserByIdCard(String idcard) {
+		return searchOne(new Condition(OrgUser.COLUMN_FIELD_IDENTIFICATION_ID, QueryType.EQUAL, idcard));
+	}
 }

@@ -21,6 +21,8 @@ import com.paladin.common.model.syst.SysUser;
 import com.paladin.common.service.syst.SysUserService;
 import com.paladin.framework.core.configuration.shiro.ShiroCasProperties;
 import com.paladin.framework.core.session.UserSession;
+import com.paladin.health.model.org.OrgUser;
+import com.paladin.health.service.org.OrgUserService;
 
 import io.buji.pac4j.realm.Pac4jRealm;
 import io.buji.pac4j.subject.Pac4jPrincipal;
@@ -32,6 +34,9 @@ public class HealthCasUserRealm extends Pac4jRealm {
 
 	@Autowired
 	private SysUserService sysUserService;
+	
+	@Autowired
+	private OrgUserService orgUserService;
 
 	@Autowired
 	private HealthUserSessionFactory userSessionFactory;
@@ -64,7 +69,16 @@ public class HealthCasUserRealm extends Pac4jRealm {
         	throw new UnknownAccountException();
         }
         
-		String username = principal.getName();
+        OrgUser orgUser = orgUserService.geUserByIdCard(idcard);
+        if(orgUser == null) {
+        	throw new UnknownAccountException();
+        }
+		
+        String username = orgUser.getAccount();
+        if(username == null || username.length() == 0) {
+        	throw new UnknownAccountException();
+        }
+       
 		SysUser sysUser = sysUserService.getUserByAccount(username);
 
 		if (sysUser == null) {
