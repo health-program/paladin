@@ -1,17 +1,15 @@
 package com.paladin.health.controller.videomanage;
 
-import java.util.Calendar;
-import com.paladin.health.core.HealthUserSession;
+import com.paladin.framework.core.ControllerSupport;
+import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.model.videomanage.VideoPlay;
 import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.videomanage.VideoPlayService;
 import com.paladin.health.service.videomanage.VideoService;
+import com.paladin.health.service.videomanage.dto.VideoPlayDTO;
 import com.paladin.health.service.videomanage.dto.VideoPlayQueryDTO;
 import com.paladin.health.service.videomanage.dto.VideoQueryDTO;
-import com.paladin.health.service.videomanage.dto.VideoPlayDTO;
-import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.framework.utils.uuid.UUIDUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +17,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import javax.validation.Valid;
+import java.util.Calendar;
 
 @Controller
 @RequestMapping("/health/video/play")
@@ -71,9 +71,6 @@ public class VideoPlayController extends ControllerSupport {
 		model.addAttribute("videoName", name);
 		Calendar calendar = Calendar.getInstance();// 日历对象
 		model.addAttribute("workCycle", calendar.get(Calendar.YEAR));
-		HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
-		model.addAttribute("agencyId", userSession.getAgencyId());
-		model.addAttribute("agencyList", orgAgencyService.findAll());
 		return "/health/videomanage/video_play_add";
 	}
 

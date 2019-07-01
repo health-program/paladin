@@ -6,7 +6,6 @@ import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.publicity.PublicityMaterialGrant;
 import com.paladin.health.service.org.OrgAgencyService;
 import com.paladin.health.service.publicity.PublicityMaterialGrantService;
@@ -67,19 +66,16 @@ public class PublicityMaterialGrantController extends ControllerSupport {
     }
     
     @RequestMapping("/add")
-    public String addInput(@RequestParam String id, @RequestParam String name, @RequestParam String type, Model model) {
+    public String addInput(@RequestParam String id, @RequestParam String name, @RequestParam String type,@RequestParam String agencyId, Model model) {
 		model.addAttribute("workCycle",Calendar.getInstance().get(Calendar.YEAR));
 		model.addAttribute("name", name);
 		model.addAttribute("type", type);
 		model.addAttribute("materialId", id);
-		HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
-		model.addAttribute("agencyId", userSession.getAgencyId());
-		model.addAttribute("agencyList", orgAgencyService.findAll());
         PublicityMaterialVO materialVO = publicityMaterialService.getOne(id);
         if (materialVO == null) {
             throw new BusinessException("发放的宣传资料不存在");
         }
-        model.addAttribute("count",materialVO.getCount());
+        model.addAttribute("material",materialVO);
         return "/health/publicity/publicity_material_grant_add";
     }
 

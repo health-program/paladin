@@ -134,7 +134,7 @@
     }
 
     function distribute(row) {
-        window.location = '/health/publicity/material/grant/add' + (row ? ('?name=' + row.name + '&type=' + row.type + '&id=' + row.id) : '');
+        window.location = '/health/publicity/material/grant/add' + (row ? ('?name=' + row.name + '&type=' + row.type + '&id=' + row.id+'&agencyId='+row.agencyId) : '');
     }
 
     function remove(row) {

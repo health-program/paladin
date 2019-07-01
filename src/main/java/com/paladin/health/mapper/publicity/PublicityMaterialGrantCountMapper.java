@@ -1,22 +1,24 @@
 package com.paladin.health.mapper.publicity;
 
 
-
 import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.health.model.publicity.PublicityMaterialGrant;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantQueryCountDTO;
 import com.paladin.health.service.publicity.vo.PublicityMaterialGrantCountVO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**   
+/**
  * @author 黄伟华
- * @version 2018年12月28日 下午1:30:32 
+ * @version 2018年12月28日 下午1:30:32
  */
-public interface PublicityMaterialGrantCountMapper extends CustomMapper<PublicityMaterialGrant>{
-    
-     List<PublicityMaterialGrantCountVO> publictyYearCount(PublicityMaterialGrantQueryCountDTO query);
-     
-     List<PublicityMaterialGrantCountVO>publictyAgencyCount(PublicityMaterialGrantQueryCountDTO query);
-    
+public interface PublicityMaterialGrantCountMapper extends CustomMapper<PublicityMaterialGrant> {
+
+     List<PublicityMaterialGrantCountVO> publictyYearCount(@Param("query") PublicityMaterialGrantQueryCountDTO query, @Param("grantorAgencyId") String grantorAgencyId);
+
+     List<PublicityMaterialGrantCountVO> publictyAgencyCount(@Param("query") PublicityMaterialGrantQueryCountDTO query, @Param("pIds") List<String> pIds, @Param("childIds") List<String> childIds);
+
+     List<PublicityMaterialGrantCountVO> publictyAgencyCountByIds(@Param("childIds") List<String> childIds, @Param("query") PublicityMaterialGrantQueryCountDTO query);
+
 }

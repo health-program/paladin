@@ -55,9 +55,8 @@
                     <div class="form-group">
                     	<label for="agencyId" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>所属机构：</label>
                         <div class="col-sm-3">
-                            <select name="agencyId" class="form-control" th:value="${agencyId}">
-                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:selected="${agencyId == agency.Id}" th:text="${agency.name}"></option>
-                            </select>
+                            <div class="input-group"><input name="agencyId" placeholder="请选择所属机构" class="form-control" autocomplete="off" readonly="readonly" style="background: rgb(255, 255, 255);" required="required">
+                                <span class="input-group-addon" id="tonto-tree-select-remove-agencyId" style="cursor:pointer"><i class="glyphicon glyphicon-remove"></i></span></div>
                         </div>
                         <label for="principal" class="col-sm-2 control-label">负责人：</label>
                         <div class="col-sm-3">
@@ -97,7 +96,7 @@
             { title: "观看人数", name: "visitorCount", inputType: "TEXT" },
             { title: "播放开始时间", name: "playStartTime", inputType: "TIME" },
             { title: "播放结束时间", name: "playEndTime", inputType: "TIME" },
-            { title: "所属机构", name: "agencyId", inputType: "SELECT" },
+            { title: "所属机构", name: "agencyId", inputType: "SELECT-TREE-SERVER", url: "/health/org/agency/find/own/tree" },
             { title: "备注", name: "remarks", inputType: "TEXT" }
         ]
     }
@@ -109,7 +108,9 @@
         var model = new tonto.Model("model", options.columns, {
             pattern: "edit",
             successCallback: function() {
-                $.successAlert("保存成功", back);
+                $.successAlert("保存成功", function () {
+                    window.location = "/health/video/play/index?id=" + $("input[name='videoId']").val() + "&name=" + $("input[name='videoName']").val();
+                });
             }
         });
     });

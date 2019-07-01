@@ -76,7 +76,7 @@ public class OrgAnnualWorkController extends ControllerSupport {
         HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
         String agencyId = userSession.getAgencyId();
         if (Strings.isNullOrEmpty(agencyId)) {
-            throw new BusinessException("管理机构为空");
+            throw new BusinessException("您没有操作该功能的权限");
         }
         orgAnnualWorkDTO.setAgencyId(agencyId);
         List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(orgAnnualWorkDTO.getAttachments(), attachmentsFile);
@@ -102,7 +102,7 @@ public class OrgAnnualWorkController extends ControllerSupport {
         HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
         String agencyId = userSession.getAgencyId();
         if (Strings.isNullOrEmpty(agencyId)) {
-            throw new BusinessException("管理机构为空");
+            throw new BusinessException("您没有操作该功能的权限");
         }
         orgAnnualWorkDTO.setAgencyId(agencyId);
         List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(orgAnnualWorkDTO.getAttachments(), attachmentsFile);

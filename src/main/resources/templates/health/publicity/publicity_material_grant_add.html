@@ -29,7 +29,7 @@
 						</div>
 						<label for="materialName" class="col-sm-2 control-label">资料名称：</label>
 						<div class="col-sm-3">
-							<input name="materialId" type="hidden" th:value="${materialId}">
+							<input name="materialId" type="hidden" th:value="${materialId}" >
 							<input name="materialName" type="text" th:value="${name}" class="form-control" readonly="readonly">
 						</div>
 					</div>
@@ -43,7 +43,7 @@
 						</div>
 						<label for="count" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>数量：</label>
 						<div class="col-sm-3">
-							<input name="count" required="required"  th:placeholder="${count == 0 ? '该资料已发放完' : '请输入不超过'+ count +'的数量'}" type="number"  th:attr="max=${count}" min="1" th:disabled="${count == 0}"
+							<input name="count" required="required"  th:placeholder="${material.count == 0 ? '该资料已发放完' : '请输入不超过'+ material.count +'的数量'}" type="number"  th:attr="max=${material.count}" min="1" th:disabled="${material.count == 0}"
 								class="form-control" autocomplete="off">
 						</div>
 						<!-- <label style ="color:red;" class="col-sm-2 control-label" id="spare"></label> -->
@@ -62,24 +62,19 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="grantTarget" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放对象：</label>
+						<label for="grantTarget"  id="targetOrgLabel" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放对象：</label>
 						<div class="col-sm-3" id="targetOrg" >
-							<select name="grantTarget" class="form-control">
-                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
-                                th:selected="${grantTarget == agency.Id}"
-                                th:text="${agency.name}"></option>
-                            </select>
+							<div class="input-group"><input name="grantTarget" placeholder="请选择发放对象" class="form-control" autocomplete="off" readonly="readonly" style="background: rgb(255, 255, 255);" required="required">
+								<span class="input-group-addon" id="tonto-tree-select-remove-agencyId" style="cursor:pointer"><i class="glyphicon glyphicon-remove"></i></span></div>
 						</div>
-						<div class="col-sm-3" id="targetName" style="display: none">
+						<label for="grantTarget"  id="targetNameLabel" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发放对象：</label>
+						<div class="col-sm-3" id="targetName">
 							<input type="text" name="grantTargetName" placeholder="请输入发放对象名称" class="form-control">
 						</div>
 						<label for="grantorAgency" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>发放机构：</label>
 						<div class="col-sm-3">
-					       <select name="grantorAgency" class="form-control" th:value="${agencyId}">
-                               <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
-                               th:selected="${agencyId == agency.Id}"
-                               th:text="${agency.name}"></option>
-                           </select>
+							<input type="text" th:value="${material.agencyName}" class="form-control" readonly>
+							<input type="hidden"  name="grantorAgency"  th:value="${material.agencyId}">
 						</div>
 					</div>
 					<div class="form-group">
@@ -128,7 +123,7 @@
 			            {title : "数量", name : "count", inputType : "TEXT"},
 			            {title : "发放日期", name : "grantDate", inputType : "DATE"},
 			            {title : "发放对象类型", name : "grantTargetType", enum : "grant-target-type", inputType : "SELECT"},
-			            {title : "发放对象", name : "grantTarget", inputType : "TEXT", dependency: ["grantTargetType", "1"]},
+			            {title : "发放对象", name : "grantTarget",inputType: "SELECT-TREE-SERVER", url: "/health/org/agency/find/own/tree"},
 			            {title : "发放机构", name : "grantorAgency", inputType : "TEXT"}, 
 			            {title : "发放人", name : "grantor", inputType : "TEXT"}, 
 			            {title : "接收人", name : "receiver", inputType : "TEXT"},
@@ -137,6 +132,7 @@
 		}
 
 		$(function() {
+			changTargetDiv();
 			$("#reply_btn").click(function () {
 				window.location = "/health/publicity/material/index";
 			});
@@ -174,10 +170,14 @@
 		function changTargetDiv() {
 			let val = $("#grantTargetType option:selected").val();
 			if (val == 1) {
+				$("#targetOrgLabel").show();
 				$("#targetOrg").show();
+				$("#targetNameLabel").hide();
 				$("#targetName").hide();
 			}else if (val == 2) {
+				$("#targetOrgLabel").hide();
 				$("#targetOrg").hide();
+				$("#targetNameLabel").show();
 				$("#targetName").show();
 			}
 		}

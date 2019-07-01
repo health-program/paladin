@@ -1,19 +1,14 @@
 package com.paladin.health.core;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.core.VersionContainerManager;
 import com.paladin.health.model.org.OrgAgency;
 import com.paladin.health.service.org.OrgAgencyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class AgencyContainer implements VersionContainer {
@@ -259,6 +254,25 @@ public class AgencyContainer implements VersionContainer {
 		return getAgencyChildren(agency);
 	}
 
+
+	/**
+	 * 根据ID获取单位，并且返回该单位下子单位Id集合（非所有子单位）
+	 *
+	 * @param id
+	 * @return
+	 */
+	public static List<String> getAgencyChildrenIds(String id) {
+		Agency agency = getAgency(id);
+		return getAgencyChildrenIds(agency);
+	}
+
+
+    public static List<String> getAgencyAllChildrenIds(String id) {
+        Agency agency = getAgency(id);
+        return getAgencyAllChildrenIds(agency);
+    }
+
+
 	/**
 	 * 返回该单位下所有子单位集合，
 	 * 
@@ -274,6 +288,28 @@ public class AgencyContainer implements VersionContainer {
 		}
 		return agencys;
 	}
+
+
+
+	public static List<String> getAgencyChildrenIds(Agency agency) {
+		List<String> ids = new ArrayList<>();
+		if (agency != null) {
+			for (Agency child : agency.children) {
+				ids.add(child.getId());
+			}
+		}
+		return ids;
+	}
+
+    public static List<String> getAgencyAllChildrenIds(Agency agency) {
+        List<String> ids = new ArrayList<>();
+        if (agency != null) {
+            for (Agency child : agency.children) {
+                getAgencyAndChildrenIds(child,ids);
+            }
+        }
+        return ids;
+    }
 
 	/**
 	 * 获取该单位以及子单位的ID集合

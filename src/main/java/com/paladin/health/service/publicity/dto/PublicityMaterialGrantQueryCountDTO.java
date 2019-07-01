@@ -7,10 +7,13 @@ import com.paladin.framework.common.OffsetPage;
  * @version 2018年12月28日 下午4:44:08 
  */
 public class PublicityMaterialGrantQueryCountDTO extends OffsetPage{
+
+    private  String id;
     
     private String workCycle;
     
     private String agencyName;
+
 
     public String getWorkCycle()
     {
@@ -31,6 +34,13 @@ public class PublicityMaterialGrantQueryCountDTO extends OffsetPage{
     {
         this.agencyName = agencyName;
     }
-    
-    
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
 }

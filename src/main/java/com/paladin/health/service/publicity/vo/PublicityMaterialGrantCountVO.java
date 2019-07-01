@@ -1,5 +1,6 @@
 package com.paladin.health.service.publicity.vo;
-/**   
+
+/**
  * @author 黄伟华
  * @version 2018年12月28日 下午1:28:26 
  */
@@ -12,6 +13,10 @@ public class PublicityMaterialGrantCountVO{
     private String name;
     
     private Integer total;
+
+    private  String pId;
+
+    private  String pName;
 
     public String getWorkCycle()
     {
@@ -52,5 +57,20 @@ public class PublicityMaterialGrantCountVO{
     {
         this.total = total;
     }
-    
+
+    public String getpId() {
+        return pId;
+    }
+
+    public void setpId(String pId) {
+        this.pId = pId;
+    }
+
+    public String getpName() {
+        return pName;
+    }
+
+    public void setpName(String pName) {
+        this.pName = pName;
+    }
 }

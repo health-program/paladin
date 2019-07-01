@@ -86,7 +86,8 @@
                                 </div>
                             </li>
                             <li class="item">
-                            	 <div class="col-sm-12">
+                                <span class="pull-right" id="daohang"></span>
+                                <div class="col-sm-12">
                                     <div id="agencyCharts" style="height: 400px"></div>
                                 </div>
                             </li>
@@ -140,16 +141,18 @@
         var agencyName = agencyNameVal.length > 0 ? agencyNameVal : null;
         var workCycle = workCycleVal.length > 0 ? workCycleVal : null;
         $.postAjax("/health/publicity/material/grant/count/agency", { 'agencyName': agencyName, 'workCycle': workCycle }, function(result) {
-            var list = result;
+            var list = result.data;
             if (list.length === 1 && list[0].total === 0) {
                 showChartInfo(agencyCharts, '暂无数据');
                 return false;
             }
+            initDaohang(null);
             var chartValue = [];
             var chartName = [];
             list.forEach(function(item) {
                 chartValue.push({
-                    value: item.total
+                    value: item.total,
+                    id:item.id
                 });
                 chartName.push({
                     value: item.name
@@ -191,18 +194,8 @@
                     bottom: '3%',
                     containLabel: true
                 },
-                toolbox: {
-                    show: true,
-                    right: 75,
-                    feature: {
-                        mark: { show: true },
-                        dataView: { show: true, readOnly: false },
-                        magicType: { show: true, type: ['line', 'bar'] },
-                        restore: { show: true },
-                        saveAsImage: { show: true }
-                    }
-                },
                 xAxis: [{
+                    name:'机构',
                     type: 'category',
                     data: chartName,
                     axisTick: {
@@ -210,6 +203,7 @@
                     }
                 }],
                 yAxis: [{
+                    name:'发放量',
                     type: 'value'
                 }],
                 series: [{
@@ -223,8 +217,10 @@
             };
             agencyCharts.setOption(option, true);
         });
+        agencyCharts.on('click',function (param) {
+           initChildChart(param.data.id,param.name);
+        })
     }
-
     function chartsYear(yearCharts) {
         var workCycle = $("#workCycle").val();
         $.postAjax("/health/publicity/material/grant/count/year", { 'workCycle': workCycle }, function(result) {
@@ -323,6 +319,122 @@
     function yearQuery() {
         chartsYear(yearCharts);
     }
+
+    function initChildChart(id,name) {
+        $.get('/health/publicity/material/grant/count/agency?id='+ id).done(function(res) {
+            var myChart1 = echarts.init(document.getElementById('agencyCharts'));
+            var list = res.result;
+            if (list == null || list[0].total === 0) {
+                showChartInfo(myChart1, name +'：下方机构暂无发放量');
+                return false;
+            }
+            initDaohang(list);
+            var chartValue = [];
+            var chartName = [];
+            list.forEach(function(item) {
+                chartValue.push({
+                    value: item.total,
+                    id:item.id
+                });
+                chartName.push({
+                    value: item.name
+                });
+            })
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'top',
+                    distance: 15,
+                    align: 'center',
+                    verticalAlign: 'top',
+                    rotate: 0,
+                    formatter: '{name|{a}}	 {c}',
+                    fontSize: 12,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+
+
+            var month = {
+                color: ['#3398DB'],
+                title: {
+                    show: true,
+                    textStyle: {
+                        color: 'grey',
+                        fontSize: 20
+                    },
+                    text: name,
+                    left: 'center',
+                    top: 'top'
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    },
+                    formatter: function(params) {
+                        return params[0].name + '<br/> ' +
+                            params[0].seriesName + ':' +
+                            params[0].data.value + '(个数)<br/>'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: [{
+                    name:'机构',
+                    type: 'category',
+                    data: chartName,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }],
+                yAxis: [{
+                    name:'发放量',
+                    type: 'value'
+                }],
+                series: [{
+                    name: '发放量',
+                    type: 'bar',
+                    barWidth: '60%',
+                    label: labelOption,
+                    barGap: 0,
+                    data: chartValue
+                }]
+            };
+            myChart1.clear(); //initChart(divId): get echarts instance, you can get it by using other method
+            myChart1.hideLoading();
+            myChart1.setOption(month);
+        })
+    }
+    var  pId, pName;
+    function initDaohang(data) {
+        let $daohang = $("#daohang");
+        let dHtml = $daohang.html();
+        if (!dHtml || !data) {
+            dHtml = '  <a   href="javascript:void (0)" onclick="chartsAgency(agencyCharts)" ><i class="fa fa-reply"></i>全部</a>';
+        }
+        if (data) {
+            if (pId && pName) {
+                dHtml += '  <a   href="javascript:void (0)" onclick="initChildChart(' + pId + ","+pName + ')">' +pName+ '</a>';
+            }
+            data.forEach(function (m) {
+                pId = m.pId;
+                pName = m.pName;
+                dHtml += '<span >' + "&nbsp;> &nbsp;" + '</span>';
+                dHtml += '<span id="' +pId+ '">' + m.pName + '</span>';
+            });
+        }
+        $daohang.html(dHtml);
+    }
+
 
     //无数据展示
     var showChartInfo = function(chart, infoStr) {

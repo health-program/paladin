@@ -1,13 +1,13 @@
 package com.paladin.health.controller.publicity;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.publicity.PublicityMaterialGrantCountService;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantQueryCountDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**   
  * @author 黄伟华
@@ -38,7 +38,11 @@ public class PublicityMaterialGrantCountController{
     @ResponseBody
     @QueryOutputMethod(queryClass = PublicityMaterialGrantQueryCountDTO.class, paramIndex = 0)
     public Object publictyAgencyCount(PublicityMaterialGrantQueryCountDTO query) {
-        return CommonResponse.getSuccessResponse(publicityMaterialGrantCountService.publictyAgencyCount(query));
+        if (query.getId() == null) {
+            return CommonResponse.getSuccessResponse(publicityMaterialGrantCountService.publictyAgencyPageCount(query));
+        }else {
+            return CommonResponse.getSuccessResponse(publicityMaterialGrantCountService.publictyAgencyChildsCount(query.getId()));
+        }
     }
-    
+
 }
