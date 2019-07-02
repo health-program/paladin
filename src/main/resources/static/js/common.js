@@ -680,14 +680,14 @@ function _initCommon(container) {
     })
 
     $.extend({
-        createTreeSelectComponment: function(input, type) {
+        createTreeSelectComponment: function(input, options) {
             var $input = $(input);
             var $wrap = $('<div class="input-group"/>');
             var name = $input.attr("name") || $input.attr("id");
             $input.attr("name", "_" + name);
             var $hideinput = $('<input type="text" style="display:none" name="' + name + '" id="' + name + '"  />');
             var $removeBtn = $('<span class="input-group-addon" style="cursor:pointer"><i class="glyphicon glyphicon-remove"> </i></span>');
-            var initValue = $input.attr("selectedvalue") || $input.val();
+            var initValue = options.selectedValue || $input.attr("selectedvalue") || $input.val();
 
             $input.attr("readonly", true);
             $input.css("background", "#fff");
@@ -696,16 +696,12 @@ function _initCommon(container) {
             $input.after($removeBtn);
             $input.after($hideinput);
 
-            var com = {
+            var com = $.extend(options, {
                 input: $input,
                 removeBtn: $removeBtn,
                 name: name,
                 valueInput: $hideinput,
-                current: null,
                 initValue: initValue,
-                type: type,
-                treedata: null,
-                changedCallback: null,
                 setCurrent: function(val) {
                     var that = this;
 
@@ -743,80 +739,120 @@ function _initCommon(container) {
                         this.input.css("background", "#eee");
                     }
                 },
-                setData: function(datalist) {
+                setData: function(data) {
                     var that = this;
-                    that.datalist = datalist;
-                    var initValue = that.initValue;
-                    var current;
 
-                    var g = function(ns, all) {
-                        if (!all) {
-                            all = ns;
-                            ns = $.grep(all, function(a, b) {
-                                return a.parentValue === "-";
-                            });
-                        }
-                        var nodes = [];
-                        ns.forEach(function(n) {
-                            var node = {
-                                text: n.name,
-                                data: n
-                            };
-
-                            if (n.value === initValue) {
-                                current = n;
-                            }
-
-                            var parentValue = n.value;
-                            var children = $.grep(all, function(a, b) {
-                                return a.parentValue == parentValue;
-                            });
-
-                            if (children && children.length > 0) {
-                                node.nodes = g(children, all);
-                            }
-
-                            nodes.push(node);
-                        });
-                        return nodes;
+                    if (typeof that.selectDataFilter === 'function') {
+                        data = that.selectDataFilter(that, data);
                     }
 
-                    that.treedata = g(datalist);
-                    that.setCurrent(current);
+                    var k = that.idField || 'id',
+                        n = that.nameField || 'name',
+                        c = that.childrenField || 'children',
+                        p = that.parentField || 'parentId',
+                        rv = that.rootParentValue;
 
-                    that.removeBtn.on("click", function() {
-                        that.setCurrent(null);
-                    });
+                    var treeList = [],
+                        treeData = null;
+
+                    if (data) {
+                        if (!$.isArray(data)) data = [data];
+                        if (that.isListData) {
+                            data.forEach(function(item) {
+                                item.text = item[n];
+                                item.keyValue = item[k];
+
+                                var pid = item[k];
+                                children = $.grep(data, function(n, i) {
+                                    return n[p] == pid;
+                                });
+
+                                item.nodes = children && children.length == 0 ? null : children;
+                                treeList.push(item);
+                            });
+
+                            treeData = $.grep(data, function(n, i) {
+                                if (rv) {
+                                    return n[p] == rv;
+                                } else {
+                                    return !n[p];
+                                }
+                            });
+                        } else {
+                            var g = function(items) {
+                                var nodes = [];
+                                items.forEach(function(item) {
+                                    var node = {
+                                        text: item[n],
+                                        keyValue: item[k],
+                                        data: item
+                                    };
+
+                                    var children = item[c];
+                                    if (children) {
+                                        node.nodes = g(children);
+                                        if (node.nodes.length == 0) {
+                                            node.nodes = null;
+                                        }
+                                    }
+                                    nodes.push(node);
+                                    treeList.push(node);
+                                });
+                                return nodes;
+                            }
+                            treeData = g(data);
+                        }
+                    }
+
+                    that.serverTreeData = treeData;
+                    that.serverTreeListData = treeList;
 
                     that.input.click(function() {
                         layer.open({
                             type: 1,
-                            title: "",
-                            content: "<div class='tonto-tree-div'></div>",
-                            area: ['350px', '460px'],
+                            title: that.selectTitle || " ",
+                            content: "<div class='tonto-tree-select-div'></div>",
+                            area: that.layerArea || ['350px', '460px'],
                             success: function(layero, index) {
-                                $tree = $(layero).find('.tonto-tree-div');
+                                if (!that.serverTreeData) return;
 
+                                var $tree = $(layero).find('.tonto-tree-select-div');
                                 $tree.treeview({
-                                    data: that.treedata,
-                                    levels: 1
+                                    data: that.serverTreeData,
+                                    levels: that.treeSelectLevel || 1
                                 });
 
-                                $tree.on('nodeSelected', function(event, node) {
-                                    var data = node.data;
+                                $tree.on('nodeSelected', function(event, data) {
+                                    var item = { name: data.text, value: data.keyValue };
+                                    if (typeof that.selectedHandler == 'function') {
+                                        var result = that.selectedHandler(data);
+                                        if (result === false) {
+                                            return;
+                                        }
 
-                                    if (data.description === '不可选') {
-                                        $.infoMessage("您不能选择该选项");
-                                        return;
+                                        if (result && result !== true) {
+                                            item = result;
+                                        }
                                     }
-
-                                    that.setCurrent(data);
+                                    that.setCurrent(item);
                                     layer.close(index);
                                 });
                             }
                         });
                     });
                 }
+            });
+    
+            com.removeBtn.click(function(){
+                com.setCurrent(null);
+            });
+
+            if (com.data) {
+                com.setData(data);
+            } else if (com.url) {
+                $.getAjax(com.url, function(data) {
+                    com.setData(data);
+                });
             }
 
             $input.data("Tree_Select", com);

@@ -7,7 +7,7 @@
     <tt:constant enumcode="publicity-material-type" />
     <input type="hidden" name="year" />
     <section class="content-header">
-        <h1>健康教育宣传资料登记表</h1>
+        <h1>健康教育宣传资料管理</h1>
     </section>
     <section class="content">
         <div class="box box-solid">
@@ -16,10 +16,7 @@
                     <input type="hidden" name="agencyId" th:value="${agencyId}">
                     <div class="form-group">
                         <div class="col-md-2">
-                            <select name="agencyId" class="form-control" th:value="${agencyId}" th:disabled="${agencyId != null}">
-                                <option value="">请选择机构</option>
-                                <option th:each="agency : ${agencyList}" th:value="${agency.Id}" th:text="${agency.name}" th:selected="${agencyId == agency.Id}"></option>
-                            </select>
+                            <input id="agencyInput" placeholder="请选择机构" name="agencyId" class="form-control"/>
                         </div>
                         <div class="col-md-2">
                             <input type="text" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请输入工作周期" th:value="${query}? ${query.workCycle} : ${year}">
@@ -70,6 +67,9 @@
     var table;
     $(function() {
         initDataGrid();
+        $.createTreeSelectComponment($("#agencyInput"),{
+            url:"/health/org/agency/find/own/tree"
+        });
     });
 
     function initDataGrid() {
