@@ -1,5 +1,6 @@
 package com.paladin.health.controller.org;
 
+import com.google.common.base.Strings;
 import com.paladin.health.core.AgencyContainer;
 import com.paladin.health.core.AgencyContainer.Agency;
 import com.paladin.health.model.org.OrgAgency;
@@ -87,6 +88,9 @@ public class OrgAgencyController extends ControllerSupport {
 		model.setId(id);
 
 		String pid = model.getParentId();
+		if (Strings.isNullOrEmpty(pid)) {
+			model.setParentId(null);
+		}
 		if (pid != null && pid.length() > 0 && AgencyContainer.getAgency(pid) == null) {
 			return CommonResponse.getFailResponse();
 		}
@@ -108,7 +112,9 @@ public class OrgAgencyController extends ControllerSupport {
 		String id = orgAgencyDTO.getId();
 		Agency agency = AgencyContainer.getAgency(id);
 		String nowPid = orgAgencyDTO.getParentId();
-		
+		if (Strings.isNullOrEmpty(nowPid)) {
+			orgAgencyDTO.setParentId(null);
+		}
 		if(nowPid != null && nowPid.length() >0) {				
 			if(nowPid.equals(id)) {
 				return CommonResponse.getFailResponse("不能选择自己为上级机构");
