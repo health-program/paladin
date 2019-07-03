@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body class="layout-top-nav">
+<tt:constant enumcode="publicity-message-type,publicity-message-status" />
+    <div class="container" style="width: 1000px">
+        <div class="box box-solid" style="margin-top:20px">
+            <div class="box-header with-border">
+                <i class="fa fa-list"></i>
+                <h3 class="box-title">更多公告</h3>
+                <div class="pull-right box-tools">
+                    <a class="btn btn-box-tool" id="model_edit_btn" href="/health/home/page/index"><i class="fa fa-times"></i></a>
+                </div>
+            </div>
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+            </div>
+            <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+            <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+        </div>
+        <div class="col-sm-3 col-sm-offset-4 btn-back">
+            <a  class="btn btn-primary btn-block"  href="/health/home/page/index">返回</a>
+        </div>
+    </div>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    /*<![CDATA[*/
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "标题", field: "title" },
+                    { title: "发布时间", field: "publishTime", formatter: "date" },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "100px",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return    '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>';
+                        }
+                    }
+                ]
+            ],
+            url: '/health/publicity/message/find/more',
+            searchbar: '#searchbar',
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true
+        });
+    }
+
+    function detail(row) {
+        if (row) {
+            window.location = '/health/home/page/notice/view?id=' + row.id;
+        }
+    }
+
+    /*]]>*/
+</script>
+</body>
+
+</html>

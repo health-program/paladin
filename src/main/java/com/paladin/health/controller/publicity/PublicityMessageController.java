@@ -42,6 +42,18 @@ public class PublicityMessageController extends ControllerSupport {
 		return "/health/publicity/message_index";
 	}
 
+
+	@RequestMapping("/more/index")
+	public String moreIndex() {
+		return "/health/publicity/message_more_index";
+	}
+
+	@RequestMapping("/find/more")
+	@ResponseBody
+	public Object findMore(PublicityMessageQueryDTO query) {
+		return CommonResponse.getSuccessResponse(publicityMessageService.findMoreMessage(query));
+	}
+
 	/**
 	 * 查询自己能看到信息
 	 * 

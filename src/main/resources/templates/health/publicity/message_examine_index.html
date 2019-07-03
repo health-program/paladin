@@ -71,7 +71,7 @@
                     { title: "发布时间", field: "publishTime", sortable: true, formatter: "date" },
                     { title: "状态", field: "status", sortable: true, enumcode: "publicity-message-status" },
                     { title: "创建人", field: "createUserName", formatter: function(value, row, index) { return value ? value : "管理员" } },
-                    { title: "审核人", field: "examineUserName", formatter: function(value, row, index) { return row.status == 9 ? (value || "管理员") : "" } },
+                   /* { title: "审核人", field: "examineUserName", formatter: function(value, row, index) { return row.status == 9 ? (value || "管理员") : "" } },*/
                     {
                         title: "操作",
                         align: "center",

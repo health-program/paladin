@@ -249,4 +249,13 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		return publicityMessageMapper.updateToSended(id, count) > 0;
 	}
 
+	public List<PublicityMessageVO> searchHomePagNotices() {
+		return publicityMessageMapper.searchHomePagNotices();
+	}
+
+	public PageResult<PublicityMessageVO> findMoreMessage(PublicityMessageQueryDTO query) {
+		Page<PublicityMessageVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		publicityMessageMapper.findMoreMessage(query);
+		return new PageResult<>(page);
+	}
 }

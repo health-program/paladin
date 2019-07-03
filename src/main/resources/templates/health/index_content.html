@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+<style>
+    .notice-list {
+        list-style: none;
+    }
+
+    .right-tool {
+        float: right;
+        padding-top: auto;
+    }
+    .ul-dashed {
+        border-bottom: 1px dashed #dddddd;
+        padding-left: 12px;
+        line-height: 14px;
+        margin-right: 21px;
+        height: auto;
+    }
+
+    .notice-li {
+        margin-bottom: 6px;
+    }
+    .name {
+        color: #000;
+    }
+
+    .name:hover,
+    .name:active,
+    .name:focus {
+        color: #000;
+        text-decoration: underline
+    }
+
+    #labelP {
+        position: absolute;
+        z-index: 1001;
+        margin-left: 250px;
+        margin-top: -20px;
+    }
+</style>
+
+<body class="layout-top-nav">
+    <div class="container" style="width: 1000px">
+        <div class="box box-solid" style="margin-top: 20px;">
+            <div class="box-header with-border">
+                <i class="fa fa-bell-o"></i>
+                <h3 class="box-title">最新公告</h3>
+                <a style="float:right" href="/health/publicity/message/more/index">更多>></a>
+            </div>
+            <div class="box-body">
+                <ul class="notice-list ul-dashed" th:each="notice,iter: ${notices}">
+                    <li class="notice-li" >
+                        <strong><a class="name" th:href="${'/health/home/page/notice/view?id='+ notice.id+'&isHomePage=true'}"
+                                   th:text="${notice.title.length()>30}?${#strings.substring(notice.title,0,30)+'....'}:${notice.title}"></a>
+                        </strong>
+                        <p id="labelP"  class="labelP description"  th:if="${notice.label != null && notice.label.length() > 0}">
+                            <span class="label label-info" style="margin-right:10px" th:text="${label}"  th:each="label:${#strings.listSplit(notice.label,',')}"></span>
+                        </p>
+                        <div class="right-tool">
+                            <span th:text="${#dates.format(notice.publishTime, 'yyyy-MM-dd')}"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $(function () {
+        $(".labelP").each(function (index, e) {
+            let width = $(this).prev().width();
+            $(this).css("margin-left",width+5);
+        });
+    })
+    /*]]>*/
+</script>
+</body>
+</html>

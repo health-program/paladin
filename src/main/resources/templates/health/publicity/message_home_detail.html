@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="/health/header" />
+<style>
+    .title{
+        text-align: center;
+        border-bottom: 1px solid #eee;
+        font-family:unset;
+        color: 524949;
+        font-size: 24px;
+    }
+    .with-border{
+        border-bottom:none;
+    }
+    .textarea1{
+        resize: none;
+        border: none;
+        min-height: 500px;
+        background-color:white;
+    }
+    .date{
+        font-size: 14px;
+        color: #777;
+    }
+    .box-tools{top: 4px;}
+
+    .attachment{
+        padding-left: 0;
+        padding-right: 20px;
+        width: auto;
+    }
+
+    #labelP {
+        position: absolute;
+        z-index: 1001;
+        margin-left: 610px;
+        margin-top: 60px;
+    }
+
+</style>
+<body>
+<div class="container">
+    <tt:constant enumcode="is_release,importance" />
+    <section class="content">
+        <div class="box box-solid">
+            <div id="model_view">
+                <div class="box-body">
+                    <form class="form-horizontal" style="padding-left:25px;padding-right: 25px" th:object="${object}">
+                        <div class="form-group">
+                            <div class="col-sm-12 title">
+                                <p name="title" th:text="${object.title}"  class="form-control-static description"></p>
+                                <p class="form-control-static description date">发布时间:<span name="publishTime" th:text="${#dates.format(object.publishTime, 'yyyy-MM-dd')}"></span></p>
+                            </div>
+                            <p id="labelP"  class="labelP description"  th:if="${object.label != null && object.label.length() > 0}">
+                                <span class="label label-info" style="margin-right:10px" th:text="${label}"  th:each="label:${#strings.listSplit(object.label,',')}"></span>
+                            </p>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <pre th:utext="${object.content}" class="form-control textarea1" style="background-color:#fff;"></pre>
+                            </div>
+                        </div>
+                        <div class="form-group" style="border-top: 1px solid #eee;padding-top: 10px" th:if="${!#lists.isEmpty(object.attachmentFiles)}">
+                            <label class="col-sm-2 control-label" style="width: 100px">附件:</label>
+                            <div th:each="attachment,iterStat: ${object.attachmentFiles}" style="text-align: left" class="col-sm-2 control-label attachment">
+                                <a target="_blank" th:href="${'/file/'+attachment.pelativePath}">
+                                    <span th:text="${attachment.name + attachment.suffix}"></span>
+                                    <i class="fa fa-download"></i></a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 col-sm-offset-5 btn-back">
+            <a class="btn btn-primary btn-block"  th:href="${isHomePage == true ? '/health/home/page/index' : '/health/publicity/message/more/index'}">返回</a>
+        </div>
+    </section>
+</div>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    /*<![CDATA[*/
+    $(function () {
+        //显示分数
+        $(".atar_Show p").each(function(index, element) {
+            var num=$(this).attr("value");
+            var www=num*22;//
+            $(this).css("width",www);
+        });
+    });
+    /*]]>*/
+</script>
+</body>
+</html>

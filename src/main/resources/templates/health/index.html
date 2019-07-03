@@ -152,7 +152,7 @@
     <script src="/static/assets/layer/layer.js"></script>
     <script type="text/javascript">
     $(function() {
-
+        goHome();
         //密码修改后提交
         $("#submitted").click(
             function() {
@@ -198,7 +198,7 @@
     });
 
     function  goHome(){
-        window.location = "/health/index";
+        addTabs({ id: '0001', title: '首页', close: true, url: '/home/page/index', urlType: 'relative' });
     }
 
     function go(id, url, title) {

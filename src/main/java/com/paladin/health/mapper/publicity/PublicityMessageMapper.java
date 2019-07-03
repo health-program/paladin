@@ -28,9 +28,14 @@ public interface PublicityMessageMapper extends CustomMapper<PublicityMessage> {
 	public List<PublicityMessageVO> findSendMessage(@Param("hour") Integer hour);
 
 	public int updateToSended(@Param("id") String id, @Param("count") Integer count);
+
 	public List<PublicityMessageVO> findSendMessage();
 
 	public int updateToSended(@Param("id") String id);
 
 	List<PublicityMessageVO> findSearchMessage(@Param("query") PublicityMessageQueryDTO query);
+
+	List<PublicityMessageVO> searchHomePagNotices();
+
+	List<PublicityMessageVO> findMoreMessage(@Param("query") PublicityMessageQueryDTO query);
 }
