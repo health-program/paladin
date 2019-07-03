@@ -155,7 +155,7 @@ function createHtml(isPrint) {
         '    <td>手机号码</td>' +
         '    <td><input id="cellphone" value="' + (target.cellphone || '') + '"/></td>' +
         '    <td>医生姓名</td>' +
-        '    <td><input id="confirmer" value="' + (record.doctorName || '') + '"/></td>' +
+        '    <td>' + (record.doctorName || '') + '</td>' +
         '</tr>';
     html += createMessageHtml(record.message);
     html += createEvaluateHtml(record.prescription, isPrint);
@@ -332,11 +332,11 @@ function getRequest() {
 
     var message = messageChecked ? $("#messageInput").val() : null;
     var cellphone = $("#cellphone").val();
-    var confirmer = $("#confirmer").val();
-    if (!confirmer) throw "请输入确认医师姓名！";
+    //var confirmer = $("#confirmer").val();
+    //if (!confirmer) throw "请输入确认医师姓名！";
     if (!cellphone && messageChecked) throw "因为您选择了发送短信，所以手机号码不能为空！";
     request = {
-        confirmer: confirmer,
+        //confirmer: confirmer,
         cellphone: cellphone,
         sendMessage: message,
         evaluationItems: request

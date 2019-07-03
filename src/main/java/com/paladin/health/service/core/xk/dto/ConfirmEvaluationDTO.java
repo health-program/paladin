@@ -5,7 +5,6 @@ import java.util.List;
 public class ConfirmEvaluationDTO {
 	
 	private String sendMessage;
-	private String confirmer;
 	private String cellphone;
 	private List<ConfirmEvaluationItemDTO> evaluationItems;
 	
@@ -20,12 +19,6 @@ public class ConfirmEvaluationDTO {
 	}
 	public void setEvaluationItems(List<ConfirmEvaluationItemDTO> evaluationItems) {
 		this.evaluationItems = evaluationItems;
-	}
-	public String getConfirmer() {
-		return confirmer;
-	}
-	public void setConfirmer(String confirmer) {
-		this.confirmer = confirmer;
 	}
 	public String getCellphone() {
 		return cellphone;

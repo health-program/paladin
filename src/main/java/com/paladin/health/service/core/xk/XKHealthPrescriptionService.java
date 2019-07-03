@@ -301,15 +301,11 @@ public class XKHealthPrescriptionService {
 	 * @param createPDF
 	 */
 	public String confirmSimpleEvaluationAndCreatePDF(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
-		String confirmer = confirmEvaluation.getConfirmer();
-		if (confirmer == null || confirmer.length() == 0) {
-			throw new BusinessException("评估确认人不能为空！");
-		}
-
 		DiagnoseRecord record = diagnoseRecordService.getRecordBySearchId(searchId, accessKey);
 		String id = record.getId();
 		String identificationId = record.getTargetId();
 		String hospitalName = record.getHospitalName();
+		String confirmer = record.getDoctorName();
 
 		List<ConfirmEvaluationItemDTO> evaluationItems = confirmEvaluation.getEvaluationItems();
 
