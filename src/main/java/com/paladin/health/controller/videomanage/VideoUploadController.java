@@ -18,7 +18,7 @@ public class VideoUploadController {
 
 	@RequestMapping("/index")
 	public String index() {
-		if (!HealthUserSession.getCurrentUserSession().isSystemAdmin()) {
+		if (!HealthUserSession.getCurrentUserSession().isAdminRoleLevel()) {
 			throw new BusinessException("没有权限访问");
 		}
 		return "redirect:" + uploaderUrl + "?accessKey=" + accessKey;
