@@ -377,7 +377,7 @@
             var myChart1 = echarts.init(document.getElementById('agencyChart'));
             var data = res;
             if (data == null || data[0].visitorCount === 0) {
-                showChartInfo(myChart1, name +'：下方机构暂无发放量');
+                showChartInfo(myChart1, name +'：下方机构暂无视频播放记录');
                 return false;
             }
             // 填入数据
@@ -424,8 +424,20 @@
                             params[1].data + '(小时)';
                     }
                 },
+                title: {
+                    show: true,
+                    textStyle: {
+                        color: 'grey',
+                        fontSize: 20
+                    },
+                    text: name,
+                    left: 'center',
+                    top: 'top'
+                },
                 legend: {
-                    data: ['观看总人数', '播放总时长']
+                    data: ['观看总人数', '播放总时长'],
+                    left: 'left',
+                    top: 'top'
                 },
                 calculable: true,
                 xAxis: [{
