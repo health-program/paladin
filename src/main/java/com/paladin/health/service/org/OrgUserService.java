@@ -17,6 +17,8 @@ import com.paladin.health.core.HealthUserSession;
 import com.paladin.health.model.org.OrgUser;
 import com.paladin.health.service.org.dto.OrgUserDTO;
 import com.paladin.health.service.org.dto.OrgUserQueryDTO;
+import com.paladin.health.service.org.vo.OrgUserVO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -114,7 +116,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public PageResult<OrgUser> findOwnUsersPage(OrgUserQueryDTO query) {
+	public PageResult<OrgUserVO> findOwnUsersPage(OrgUserQueryDTO query) {
 		HealthUserSession session = HealthUserSession.getCurrentUserSession();
 		if (session.isAdminRoleLevel()) {
 
@@ -132,7 +134,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 			return getEmptyPageResult(query);
 		}
 
-		return searchPage(query);
+		return searchPage(query).convert(OrgUserVO.class);
 	}
 
 	/**

@@ -1,5 +1,9 @@
 package com.paladin.health.service.org.vo;
 
+import com.paladin.common.core.permission.PermissionContainer;
+import com.paladin.common.core.permission.Role;
+import com.paladin.health.core.AgencyContainer;
+
 public class OrgUserVO {
 
 	// id
@@ -8,21 +12,15 @@ public class OrgUserVO {
 	// 姓名
 	private String name;
 
-	// 角色名称
-	private String roleName;
-
 	// 角色id
 	private String roleId;
-
-	// 机构
-	private String agencyName;
 
 	// 机构ID
 	private String agencyId;
 
 	// 账号
 	private String account;
-	
+
 	// 身份ID
 	private String identificationId;
 
@@ -78,19 +76,14 @@ public class OrgUserVO {
 	}
 
 	public String getAgencyName() {
-		return agencyName;
-	}
-
-	public void setAgencyName(String agencyName) {
-		this.agencyName = agencyName;
+		return agencyId != null ? AgencyContainer.getAgencyName(agencyId) : null;
 	}
 
 	public String getRoleName() {
-		return roleName;
-	}
-
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
+		if (roleId == null)
+			return null;
+		Role role = PermissionContainer.getInstance().getRole(roleId);
+		return role != null ? role.getRoleName() : null;
 	}
 
 	public String getIdentificationId() {

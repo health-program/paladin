@@ -44,11 +44,6 @@
                     $.successAlert("保存成功", function() {
                         window.location = "/health/org/user/index";
                     });
-                },
-                extraParam: function() {
-                    return {
-                        id: $("#id").val() || "",
-                    }
                 }
             });
             model.setData(data);
