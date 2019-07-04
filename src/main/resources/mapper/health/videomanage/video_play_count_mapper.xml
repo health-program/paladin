@@ -1,34 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.paladin.health.mapper.videomanage.VideoPlayCountMapper">
-    <!-- 内部按机构分组播放量统计 -->
-    <select id="getStatisticsByAgency" resultType="com.paladin.health.service.videomanage.vo.VideoPlayCountVO">
-        SELECT
-        COALESCE ( t1.`name`, #{query.agencyName} ,"无" ) AS agencyName,
-        COALESCE ( t1.duration, 0 ) AS duration,
-        COALESCE ( t1.visitorCount, 0 ) AS visitorCount
-        FROM
-        (
-        SELECT
-        SUM( vp.play_duration ) duration,
-        SUM( vp.visitor_count ) visitorCount,
-        org.name
-        FROM
-        video_play vp
-        LEFT JOIN org_agency org ON vp.agency_id = org.id
-        WHERE
-        org.is_delete = 0
-        <if test="query.agencyName != null and query.agencyName != ''">
-            AND org.name LIKE CONCAT('%',#{query.agencyName},'%')
-        </if>
-        <if test="query.workCycle != null and query.workCycle != ''">
-            AND vp.work_cycle =#{query.workCycle}
-        </if>
-        GROUP BY vp.agency_id
-        ) t1
-        RIGHT JOIN ( SELECT 0 ) t2 ON 1 = 1
-    </select>
-
     <!-- 内部按时间分组播放量统计 -->
     <select id="getStatisticsByYear" resultType="com.paladin.health.service.videomanage.vo.VideoPlayCountVO">
         SELECT vp.work_cycle workCycle,SUM(vp.play_duration)duration,SUM(vp.visitor_count)visitorCount FROM
@@ -39,5 +11,42 @@
             AND vp.work_cycle =#{query.workCycle}
         </if>
         GROUP BY vp.work_cycle ORDER BY vp.work_cycle
+    </select>
+    <!-- 内部按机构分组播放量统计 -->
+    <select id="getStatisticsByAgencyIds"
+            resultType="com.paladin.health.service.videomanage.vo.VideoPlayCountShowVO">
+        SELECT
+        t1.id,
+        COALESCE ( t1.`name`, #{query.agencyName} ,"无" ) AS agencyName,
+        COALESCE ( t1.duration, 0 ) AS duration,
+        COALESCE ( t1.visitorCount, 0 ) AS visitorCount
+        FROM
+        (
+        SELECT
+        org.id,
+        SUM( vp.play_duration ) duration,
+        SUM( vp.visitor_count ) visitorCount,
+        org.name
+        FROM
+        video_play vp
+        LEFT JOIN org_agency org ON vp.agency_id = org.id
+        WHERE
+        org.is_delete = 0
+        <if test="childIds != null and childIds.size() != 0">
+            AND vp.agency_id IN
+            <foreach collection="childIds" open="(" item="id" close=")" separator="," index="index">
+                #{id}
+            </foreach>
+        </if>
+        <if test="query.agencyName != null and query.agencyName != ''">
+            AND org.name LIKE CONCAT('%',#{query.agencyName},'%')
+        </if>
+        <if test="query.workCycle != null and query.workCycle != ''">
+            AND vp.work_cycle =#{query.workCycle}
+        </if>
+        GROUP BY vp.agency_id
+        ) t1
+        RIGHT JOIN ( SELECT 0 ) t2 ON 1 = 1
+
     </select>
 </mapper>

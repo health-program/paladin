@@ -151,10 +151,10 @@
             list.forEach(function(item) {
                 chartValue.push({
                     value: item.total,
-                    id:item.id
                 });
                 chartName.push({
-                    value: item.name
+                    value: item.name,
+                    id:item.id
                 });
             })
             var labelOption = {
@@ -216,9 +216,23 @@
             };
             agencyCharts.setOption(option, true);
         });
-        agencyCharts.on('click',function (param) {
-           initChildChart(param.data.id,param.name);
-        })
+        //扩大点击范围
+        agencyCharts.getZr().on('click',params=>{
+            const pointInPixel= [params.offsetX, params.offsetY];
+            if (agencyCharts.containPixel('grid',pointInPixel)) {
+                let xIndex=agencyCharts.convertFromPixel({seriesIndex:0},[params.offsetX, params.offsetY])[0];
+                /*事件处理代码书写位置*/
+
+                //获取当前图表的option
+                let option = agencyCharts.getOption();
+
+                //获得图表中我们想要的数据
+                let data=option.xAxis[0].data[xIndex];
+
+                initChildChart(data.id,data.value);
+
+            }
+        });
     }
     function chartsYear(yearCharts) {
         var workCycle = $("#workCycle").val();

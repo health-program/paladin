@@ -1,6 +1,9 @@
 package com.paladin.health.service.videomanage.dto;
 
-public class VideoPlayCountQueryDTO {
+import com.paladin.framework.common.OffsetPage;
+
+public class VideoPlayCountQueryDTO extends OffsetPage {
+	private  String id;
 	private Integer workCycle;
 	private String agencyName;
 	public Integer getWorkCycle() {
@@ -14,5 +17,13 @@ public class VideoPlayCountQueryDTO {
 	}
 	public void setAgencyName(String agencyName) {
 		this.agencyName = agencyName;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 }

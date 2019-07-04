@@ -1,6 +1,5 @@
 package com.paladin.health.controller.videomanage;
 
-import java.util.List;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.query.QueryOutputMethod;
 import com.paladin.framework.web.response.CommonResponse;
@@ -11,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/health/video/play/count")
@@ -43,12 +44,10 @@ public class VideoPlayCountController extends ControllerSupport {
     @ResponseBody
     @QueryOutputMethod(queryClass = VideoPlayCountQueryDTO.class, paramIndex = 0)
     public Object publictyAgencyCount(VideoPlayCountQueryDTO query) {
-    	List<VideoPlayCountShowVO>list=beanCopyList(videoPlayCountService.getStatisticsByAgency(query),VideoPlayCountShowVO.class);
-    	if(!list.isEmpty()){
-    		for(VideoPlayCountShowVO videoPlayCountShowVO :list){
-    			videoPlayCountShowVO.setDurations((videoPlayCountShowVO.getDuration()/(1000*3600.0)));
-        	}
-    	}
-        return CommonResponse.getSuccessResponse(list);
+        if (query.getId() == null) {
+            return CommonResponse.getSuccessResponse(videoPlayCountService.getStatisticsByAgency(query));
+        }else {
+            return CommonResponse.getSuccessResponse(videoPlayCountService.videoAgencyChildsCount(query.getId()));
+        }
     }
 }
