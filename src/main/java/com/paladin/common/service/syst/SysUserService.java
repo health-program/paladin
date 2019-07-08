@@ -155,7 +155,6 @@ public class SysUserService extends ServiceSupport<SysUser> {
 		SysUser sysUser = getUserByAccount(account);
 		SysUser user = new SysUser();
 		user.setId(sysUser.getId());
-		user.setIsFirstLogin(0);
 		user.setLastLoginTime(new Date());
 		sysUserMapper.updateByPrimaryKeySelective(user);
 	}

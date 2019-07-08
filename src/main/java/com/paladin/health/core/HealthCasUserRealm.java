@@ -69,18 +69,18 @@ public class HealthCasUserRealm extends Pac4jRealm {
         	throw new UnknownAccountException();
         }
         
-        OrgUser orgUser = orgUserService.geUserByIdCard(idcard);
-        if(orgUser == null) {
-        	throw new UnknownAccountException();
+        SysUser sysUser = sysUserService.getUserByAccount(idcard);
+        
+        if(sysUser == null) {
+        	OrgUser orgUser = orgUserService.geUserByIdCard(idcard);
+            if(orgUser != null) {
+            	 String username = orgUser.getAccount();
+                 if(username != null && username.length() > 0) {
+              		sysUser = sysUserService.getUserByAccount(username);
+                 }               
+            }    		        
         }
-		
-        String username = orgUser.getAccount();
-        if(username == null || username.length() == 0) {
-        	throw new UnknownAccountException();
-        }
-       
-		SysUser sysUser = sysUserService.getUserByAccount(username);
-
+                
 		if (sysUser == null) {
 			throw new UnknownAccountException();
 		}
@@ -102,10 +102,10 @@ public class HealthCasUserRealm extends Pac4jRealm {
         PrincipalCollection principalCollection = new SimplePrincipalCollection(principals, getName());       
         SimpleAuthenticationInfo authenticationInfo=  new SimpleAuthenticationInfo(principalCollection, token.getCredentials());
 
-		logger.info("===>用户[" + username + ":" + userSession.getUserName() + "]登录系统<===");
+		logger.info("===>用户[" + sysUser.getAccount() + ":" + userSession.getUserName() + "]登录系统<===");
 
 		// 登录日志与更新最近登录时间
-		sysUserService.updateLastTime(username);
+		sysUserService.updateLastTime(sysUser.getAccount());
 
 		return authenticationInfo;
 	}
