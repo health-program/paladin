@@ -1,15 +1,20 @@
 package com.paladin.health.service.core.xk;
 
 import com.github.pagehelper.util.StringUtil;
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.TemporaryFileHelper;
@@ -42,7 +47,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -390,6 +398,7 @@ public class XKHealthPrescriptionService {
 				createPDF(evaluationResultList, target, output, new Date(), confirmer);
 				return output.getFileRelativeUrl();
 			} catch (Exception e) {
+			    e.printStackTrace();
 				throw new BusinessException("创建PDF失败");
 			}
 		}
@@ -526,7 +535,7 @@ public class XKHealthPrescriptionService {
 		Rectangle pageSize = new Rectangle(PageSize.A4);
 		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
 		document.setPageSize(pageSize);
-		document.setMargins(30, 30, 25, 25);// 边距
+		document.setMargins(0, 30, 25, 25);// 边距
 		// 2.创建书写器（Writer）对象
 
 		PdfWriter writer = PdfWriter.getInstance(document, output);
@@ -536,13 +545,29 @@ public class XKHealthPrescriptionService {
 		// 中文字体,解决中文不能显示问题
 		BaseFont titleFont = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		BaseFont contentFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-
-		Font tTont = new Font(titleFont, 16);
-		Paragraph title = new Paragraph("健康风险评估与健康教育处方 ", tTont);
-		title.setAlignment(Element.ALIGN_CENTER);
-		title.add(Chunk.NEWLINE); // 好用的
-		document.add(title);
-
+		
+		Paragraph paragraph = new Paragraph();
+		paragraph.setIndentationLeft(24);
+		URL url5 = ClassLoader.getSystemResource("static/image/health_code.png");
+	    	File file5 = new File(url5.getPath());
+	    	Image img5 = Image.getInstance(file5.toString()); 
+	    	img5.scaleToFit(110,110);
+		paragraph.add(new Chunk(img5, 0, 0, true));
+		URL url4 = ClassLoader.getSystemResource("static/image/health1.jpg");
+	    	File file4 = new File(url4.getPath());
+	    	Image img4 = Image.getInstance(file4.toString()); 
+	    	img4.scaleToFit(250,250);
+	    	paragraph.add("                                                      ");
+		paragraph.add(new Chunk(img4, 0, 0, true));
+		document.add(paragraph);//增加到文档中
+		
+		Paragraph signatureImg2 = new Paragraph(); 
+		URL url2 = ClassLoader.getSystemResource("static/image/line.jpg");
+		File file2 = new File(url2.getPath());
+		Image img2 = Image.getInstance(file2.toString());
+		signatureImg2.add(img2);
+		document.add(signatureImg2);	
+		        
 		/*--------------------------------正文---------------------------------*/
 		if (target != null) {
 			Font font = new Font(contentFont, 13);
@@ -577,6 +602,7 @@ public class XKHealthPrescriptionService {
 				Font font1 = new Font(sfTTF1, 12);
 				Font font111 = new Font(sfTTF1, 11);
 				Paragraph info1 = new Paragraph();
+				info1.setIndentationLeft(24);
 				info1.add(new Phrase("评估名称：", font1));
 				info1.add(new Phrase(evaluation.getName(), font111));
 				info1.add(Chunk.NEWLINE);
@@ -595,30 +621,41 @@ public class XKHealthPrescriptionService {
 					if (StringUtil.isNotEmpty(each)) {
 						info11.add(new Phrase(each, font11));
 						info11.setFirstLineIndent(21);
-						info11.setIndentationLeft(55);
+						info11.setIndentationLeft(78);
 						info11.setLeading(16f);
 						info11.setSpacingAfter(12f);
 						document.add(info11);
 					}
 				}
-
-				// 加入出处说明
-//				Font referenceFont = new Font(contentFont, 11);
-//				String reference = referenceMap.get(evaluation.getCode());
-//				if (reference != null) {
-//					reference = "注：" + reference;
-//					Paragraph p = new Paragraph();
-//					p.add(new Phrase(reference, referenceFont));
-//					// p.setFirstLineIndent(21);
-//					p.setIndentationLeft(55);
-//					p.setLeading(16f);
-//					p.setSpacingAfter(12f);
-//					document.add(p);
-//				}
-
 			}
+			 writer.setPageEvent(new PdfPageHelper());
 		}
 		document.close();
 	}
+	
+    class PdfPageHelper extends PdfPageEventHelper {
+
+	@Override
+	public void onEndPage(PdfWriter writer, Document document) {
+
+	    PdfContentByte cb = writer.getDirectContent();// 得到层
+	    cb.saveState();
+	    // 开始
+	    cb.beginText();
+	    try {
+		BaseFont footer = BaseFont.createFont("/ttf/STSONG.TTF",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		cb.setFontAndSize(footer, 10);
+		float y = document.bottom(0);
+		cb.setColorFill(new BaseColor(105,105,105));
+		cb.showTextAligned(PdfContentByte.ALIGN_CENTER,"温馨提示:为了您和您家人的健康,请到辖区内的社区卫生服务机构进行相关的健康咨询",(document.right() + document.left()) / 2, y, 0);
+		cb.endText();
+		cb.restoreState();
+	    } catch (DocumentException e) {
+		e.printStackTrace();
+	    } catch (IOException e) {
+		e.printStackTrace();
+	    }
+	}
+    }
 
 }
