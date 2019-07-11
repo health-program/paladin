@@ -535,7 +535,7 @@ public class XKHealthPrescriptionService {
 		Rectangle pageSize = new Rectangle(PageSize.A4);
 		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
 		document.setPageSize(pageSize);
-		document.setMargins(0, 30, 25, 25);// 边距
+		document.setMargins(0, 0, 25, 25);// 边距
 		// 2.创建书写器（Writer）对象
 
 		PdfWriter writer = PdfWriter.getInstance(document, output);
@@ -595,19 +595,28 @@ public class XKHealthPrescriptionService {
 			info.add(Chunk.NEWLINE);
 			info.setAlignment(Element.ALIGN_CENTER);
 			document.add(info);
-
+			//int num = 0;
 			for (XKEvaluation evaluation : evaluationResultList) {
 				BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-				// Font fontColor = new Font(sfTTF1, 13, Font.NORMAL, color);
+				BaseColor color = null;
+				int riskLevel = evaluation.getRiskLevel();
+				if (riskLevel == 4)
+					color = new BaseColor(255, 0, 0);
+				if (riskLevel == 3)
+					color = new BaseColor(255, 165, 0);
+				if (riskLevel == 2)
+					color = new BaseColor(0, 166, 90);
+				Font fontColor = new Font(sfTTF1, 11, Font.NORMAL, color);
 				Font font1 = new Font(sfTTF1, 12);
 				Font font111 = new Font(sfTTF1, 11);
 				Paragraph info1 = new Paragraph();
 				info1.setIndentationLeft(24);
-				info1.add(new Phrase("评估名称：", font1));
+				//info1.add(Chunk.NEWLINE);
+				info1.add(new Phrase("评估内容：", font1));
 				info1.add(new Phrase(evaluation.getName(), font111));
 				info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("风险等级：", font1));
-				info1.add(new Phrase(evaluation.getRiskLevelName(), font111));
+				info1.add(new Phrase(evaluation.getRiskLevelName(), fontColor));
 				info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("分析建议：", font1));
 				document.add(info1);
@@ -618,6 +627,7 @@ public class XKHealthPrescriptionService {
 				// 根据回车分段
 				for (String each : suggests) {
 					Paragraph info11 = new Paragraph();
+					info11.setIndentationRight(24);
 					if (StringUtil.isNotEmpty(each)) {
 						info11.add(new Phrase(each, font11));
 						info11.setFirstLineIndent(21);
@@ -627,6 +637,13 @@ public class XKHealthPrescriptionService {
 						document.add(info11);
 					}
 				}
+			//num++;
+			/*if(evaluationResultList.size() != num){
+			    info1.add(Chunk.NEWLINE);
+				LineSeparator line = new LineSeparator(1f,91,new BaseColor(32,178,170),Element.ALIGN_CENTER,-6f);
+				document.add(line);
+			}*/
+			
 			}
 			 writer.setPageEvent(new PdfPageHelper());
 		}
