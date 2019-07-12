@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<style>
+    .tab-content>.tab-pane, .pill-content>.pill-pane {
+        display: block;
+        height: 0;
+        overflow-y: hidden;
+    }
+
+    .tab-content>.active, .pill-content>.active {
+        height: auto;
+    }
+</style>
+
+<body>
+<tt:constant enumcode="publicity-material-type,grant-target-type" />
+<input type="hidden" name="year" />
+<section class="content-header">
+    <h1>指导短信统计</h1>
+</section>
+<section class="content">
+    <div class="box box-solid">
+        <div class="box-body">
+            <ul class="products-list product-list-in-box">
+                <li class="item">
+                    <form id="searchbar1" class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-2" >
+                                <input type="text" id="hospitalName" name="hospitalName" class="form-control"  placeholder="请输入机构名称">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" id="bgTime" name="bgTime" class="form-control tonto-datepicker-datetime" autocomplete="off" placeholder="请选择开始时间">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" id="endTime" name="endTime" class="form-control tonto-datepicker-datetime" autocomplete="off" placeholder="请选择结束时间">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="pull-right">
+                                    <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
+                                    <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar1')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                        <input type="text" style="display:none">
+                    </form>
+                </li>
+                <li class="item">
+                    <div class="col-sm-12">
+                        <div id="agencyCharts" style="height: 400px"></div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    var table;
+    $(function() {
+        chartsAgency(agencyCharts);
+
+    });
+
+/*    function initDataGrid() {
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "机构名称", align: "center", field: "name" },
+                    { title: "发放量", align: "center", field: "total" },
+                ]
+            ],
+            url: '/health/publicity/material/grant/count/agency',
+            searchbar: '#searchbar2',
+            showColumns: true,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }*/
+
+    //图表自适应大小
+    window.addEventListener("resize", function() {
+        agencyCharts.resize();
+    });
+    var agencyCharts = echarts.init(document.getElementById('agencyCharts'));
+
+    function chartsAgency(agencyCharts) {
+        var hospitalNameVal = $("#hospitalName").val();
+        var bgTimeVal = $("#bgTime").val();
+        var endTimeVal = $("#endTime").val();
+        hospitalName =  hospitalNameVal.length > 0 ? hospitalNameVal : null;
+        bgTime =  bgTimeVal.length > 0 ? bgTimeVal : null;
+        endTime =  endTimeVal.length > 0 ? endTimeVal : null;
+        $.postAjax("/health/diagnose/record/count/name", { 'hospitalName': hospitalName,'bgTime':bgTime,'endTime':endTime}, function(data) {
+            var list = data;
+            if (list.length === 1 && list[0].total === 0) {
+                showChartInfo(agencyCharts, '暂无数据');
+                return false;
+            }
+            var chartValue = [];
+            var chartName = [];
+            list.forEach(function(item) {
+                chartValue.push({
+                    value: item.total
+                });
+                chartName.push({
+                    value: item.hospitalName
+                });
+            })
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'top',
+                    distance: 15,
+                    align: 'center',
+                    verticalAlign: 'top',
+                    rotate: 0,
+                    formatter: '{name|{a}}	 {c}',
+                    fontSize: 12,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            option = {
+                color: ['#3398DB'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { // 坐标轴指示器，坐标轴触发有效
+                        type: 'shadow' // 默认为直线，可选为：'line' | 'shadow'
+                    },
+                    formatter: function(params) {
+                        return params[0].name + '&nbsp;'+
+                            params[0].seriesName + ':' +
+                            params[0].data.value + '(个数)<br/>'
+                    }
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                toolbox: {
+                    show: true,
+                    right: 75,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                xAxis: [{
+                    name:'机构',
+                    type: 'category',
+                    data: chartName,
+                    axisTick: {
+                        alignWithLabel: true
+                    }
+                }],
+                yAxis: [{
+                    name:'发送量',
+                    type: 'value'
+                }],
+                series: [{
+                    name: '发送量',
+                    type: 'bar',
+                    barWidth: '60%',
+                    label: labelOption,
+                    barGap: 0,
+                    data: chartValue,
+                }]
+            };
+            agencyCharts.setOption(option, true);
+        });
+    }
+
+
+    function agencyQuery() {
+        chartsAgency(agencyCharts);
+    }
+
+    //无数据展示
+    var showChartInfo = function(chart, infoStr) {
+        var msgOption = {
+            title: {
+                show: true,
+                textStyle: {
+                    color: 'grey',
+                    fontSize: 20
+                },
+                text: infoStr,
+                left: 'center',
+                top: 'center'
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: {
+                show: false
+            },
+            series: []
+        };
+        chart.clear(); //initChart(divId): get echarts instance, you can get it by using other method
+        chart.hideLoading();
+        chart.setOption(msgOption)
+    };
+</script>
+</body>
+
+</html>

@@ -7,8 +7,12 @@ import com.paladin.health.mapper.diagnose.DiagnoseRecordMapper;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.service.diagnose.dto.DiagnoseRecordQuery;
 
+import com.paladin.health.service.diagnose.vo.DiagnoseRecordCountVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
@@ -51,4 +55,7 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 
 	}
 
+	public List<DiagnoseRecordCountVO> countRecordByHospitalName(String hospitalName, Date bgTime, Date endTime) {
+		return diagnoseRecordMapper.countRecordByHospitalName(hospitalName, bgTime, endTime);
+	}
 }
