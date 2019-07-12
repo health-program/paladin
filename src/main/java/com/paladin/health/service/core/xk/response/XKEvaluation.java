@@ -41,13 +41,13 @@ public class XKEvaluation {
 		}
 
 		codeNameMap = new HashMap<>();
-		codeNameMap.put(CODE_AF, "心房颤动后中风风险评估");
-		codeNameMap.put(CODE_CHD, "冠心病风险评估");
-		codeNameMap.put(CODE_CVD, "五年内糖尿病患者发生心脑血管并发症风险评估");
-		codeNameMap.put(CODE_DIABETES, "糖尿病风险评估");
-		codeNameMap.put(CODE_HYPERTENSION, "高血压风险评估");
-		codeNameMap.put(CODE_ICVD, "缺血性心血管病风险评估");
-		codeNameMap.put(CODE_OSTEOPOROSIS, "骨质疏松症风险评估");
+		codeNameMap.put(CODE_AF, "心房颤动后中风风险");
+		codeNameMap.put(CODE_CHD, "冠心病风险");
+		codeNameMap.put(CODE_CVD, "五年内糖尿病患者发生心脑血管并发症风险");
+		codeNameMap.put(CODE_DIABETES, "糖尿病风险");
+		codeNameMap.put(CODE_HYPERTENSION, "高血压风险");
+		codeNameMap.put(CODE_ICVD, "缺血性心血管病风险");
+		codeNameMap.put(CODE_OSTEOPOROSIS, "骨质疏松症风险");
 
 	}
 

@@ -1,9 +1,12 @@
 package com.paladin.health.mapper.diagnose;
 
-import org.apache.ibatis.annotations.Param;
-
 import com.paladin.framework.core.configuration.mybatis.CustomMapper;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
+import com.paladin.health.service.diagnose.vo.DiagnoseRecordCountVO;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
@@ -14,5 +17,7 @@ public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 	DiagnoseRecord findRecordBySearchId(@Param("searchId") String searchId, @Param("accessKey") String accessKey);
 
 	DiagnoseRecord findLastRecordByIdentificationId(@Param("identificationId") String identificationId);
+
+	List<DiagnoseRecordCountVO> countRecordByHospitalName(@Param("hospitalName") String hospitalName, @Param("bgTime") Date bgTime, @Param("endTime") Date endTime);
 
 }

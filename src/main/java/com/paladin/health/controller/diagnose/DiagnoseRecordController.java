@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 import com.paladin.health.service.diagnose.dto.DiagnoseRecordQuery;
+
+import java.util.Date;
 
 @Controller
 @RequestMapping("/health/diagnose/record")
@@ -56,6 +59,15 @@ public class DiagnoseRecordController {
 	public Object getRecord(String id) {
 		return CommonResponse.getSuccessResponse(diagnoseRecordService.get(id));
 	}
-	
+
+
+	@RequestMapping("/count/index")
+	public String countIndex() { return "/health/diagnose/diagnose_record_count"; }
+
+	@RequestMapping("/count/name")
+	@ResponseBody
+	public Object countByName(@RequestParam(required =false) String hospitalName, @RequestParam(required =false)Date bgTime, @RequestParam(required =false)Date endTime) {
+		return CommonResponse.getSuccessResponse(diagnoseRecordService.countRecordByHospitalName(hospitalName, bgTime , endTime));
+	}
 
 }
