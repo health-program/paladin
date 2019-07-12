@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>短信发送记录</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/publicity/send/message/record/index"><i class="fa fa-list-alt"></i>列表</a></li>
+            <li class="active">详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+    	<a href="/health/publicity/send/message/record/index" class="btn btn-primary btn-block">返回</a>
+    </div>
+    <input type="hidden" id="id" th:value="${id}"/>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+
+    $(function() {
+    	var options = {
+	        id: "model",
+	        name: "详情",
+	        url:"/health/publicity/send/message/record/update?id="+$("#id").val(),
+	        columns: [
+				{ title: "短信ID", name: "messageId", required: "required", inputType: "TEXT" },
+				{ title: "目标手机", name: "targetCellphone", required: "required", inputType: "TEXT" },
+				{ title: "目标姓名", name: "targetName", required: "required", inputType: "TEXT" },
+				{ title: "状态", name: "status", inputType: "TEXT" }
+				]
+	    }
+    
+        $.getAjax("/health/publicity/send/message/record/get?id="+$("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            $.initComponment($(".content"));
+           
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
+        });
+    });
+    </script>
+</body>
+
+</html>

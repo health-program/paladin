@@ -1,6 +1,7 @@
 package com.paladin.framework.core.configuration.web;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -60,10 +61,19 @@ public class MyWebMvcConfigurer implements WebMvcConfigurer {
 
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
-		String rootView = webProperties.getRootView();
-
-		registry.addViewController("/").setViewName(rootView);
 		registry.setOrder(Ordered.HIGHEST_PRECEDENCE);
+
+		String rootView = webProperties.getRootView();
+		if (rootView != null && rootView.length() > 0) {
+			registry.addViewController("/").setViewName(rootView);
+		}
+
+		List<UrlForwardOption> forwards = webProperties.getForwards();
+		if (forwards != null) {
+			for (UrlForwardOption forward : forwards) {
+				registry.addViewController(forward.getFrom()).setViewName(forward.getTo());
+			}
+		}
 	}
 
 	public void addInterceptors(InterceptorRegistry registry) {

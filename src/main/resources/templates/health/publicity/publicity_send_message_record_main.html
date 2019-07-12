@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="publicity-message-type,publicity-message-status" />
+    <section class="content-header">
+        <h1>短信发送记录</h1>
+    </section>
+    <section class="content">
+        <div class="box box-solid">
+            <div class="box-body">
+                <form id="searchbar" class="form-horizontal form-search">
+                    <div class="form-group">
+                        <div class="col-md-2">
+                            <input name="title" class="form-control" th:value="${query?.title}" placeholder="请输入标题"/>
+                        </div>
+                        <div class="col-md-10">
+                            <div class="pull-right">
+                                <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+                <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+            </div>
+        </div>
+        <div class="box box-widget" style="margin-top:20px">
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    /*<![CDATA[*/
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "标题", field: "title" },
+                    { title: "发布时间", field: "publishTime", formatter: "date" },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>发送记录</button>';
+                        }
+                    }
+                ]
+            ],
+            url: '/health/publicity/send/message/record/main/find/page',
+            searchbar: '#searchbar',
+            showColumns: true,
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    function detail(row) {
+        if (row) {
+            window.location = '/health/publicity/send/message/record/index?messageId=' + row.id + "&messageTitle=" + row.title;
+        }
+    }
+
+    /*]]>*/
+    </script>
+</body>
+
+</html>

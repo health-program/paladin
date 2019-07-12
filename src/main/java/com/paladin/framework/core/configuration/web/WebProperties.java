@@ -1,5 +1,8 @@
 package com.paladin.framework.core.configuration.web;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import com.paladin.framework.core.GlobalProperties;
@@ -31,6 +34,9 @@ public class WebProperties {
 	 * root view
 	 */
 	private String rootView = "redirect:/" + GlobalProperties.project + "/login";
+	
+	
+	private List<UrlForwardOption> forwards = new ArrayList<>();
 	
 	
 	public String getFilePath() {
@@ -72,5 +78,15 @@ public class WebProperties {
 	public void setRootView(String rootView) {
 		this.rootView = rootView;
 	}
+	
+	public List<UrlForwardOption> getForwards() {
+		return forwards;
+	}
+
+	public void setForwards(List<UrlForwardOption> forwards) {
+		this.forwards = forwards;
+	}
+
+
 
 }

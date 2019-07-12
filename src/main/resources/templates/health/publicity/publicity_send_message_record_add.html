@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1>短信发送记录</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/publicity/send/message/record/index"><i class="fa fa-table"></i>列表</a></li>
+            <li class="active">新增</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+    	<a href="/health/publicity/send/message/record/index" class="btn btn-primary btn-block">返回</a>
+    </div>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        cancelBtn: false,
+        name: "新增",
+        url:"/health/publicity/send/message/record/save",
+        columns: [
+				{ title: "短信ID", name: "messageId", required: "required", inputType: "TEXT" },
+				{ title: "目标手机", name: "targetCellphone", required: "required", inputType: "TEXT" },
+				{ title: "目标姓名", name: "targetName", required: "required", inputType: "TEXT" },
+				{ title: "状态", name: "status", inputType: "TEXT" }
+				]
+    }
+
+    $(function() {       
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+       	$.initComponment($(".content"));
+        
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/publicity/send/message/record/index";
+                });
+            }
+        });
+        model.setData(null);
+    });
+    </script>
+</body>
+
+</html>

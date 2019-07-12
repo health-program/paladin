@@ -1,6 +1,7 @@
 package com.paladin.health.schedule;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -11,10 +12,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.paladin.framework.common.PageResult;
+import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.health.model.publicity.PublicitySendMessageRecord;
 import com.paladin.health.model.sms.SmsSendResponse;
 import com.paladin.health.service.diagnose.DiagnoseTargetService;
 import com.paladin.health.service.diagnose.vo.DiagnoseTargetSimpleVO;
 import com.paladin.health.service.publicity.PublicityMessageService;
+import com.paladin.health.service.publicity.PublicitySendMessageRecordService;
 import com.paladin.health.service.publicity.vo.PublicityMessageVO;
 import com.paladin.health.service.sms.SendMsgWebService;
 
@@ -31,6 +35,9 @@ public class MessageScheduleService {
 
 	@Autowired
 	private SendMsgWebService sendMsgWebService;
+	
+	@Autowired
+	private PublicitySendMessageRecordService sendMessageRecordService;
 
 	
 	private Pattern cellphonePattern = Pattern.compile("^[1][3,4,5,7,8][0-9]{9}$");
@@ -70,25 +77,34 @@ public class MessageScheduleService {
 					break;
 				}
 
-				for (DiagnoseTargetSimpleVO target : targets.getData()) {
-					try {
-						String cellphone = target.getCellphone();
-						if(!cellphonePattern.matcher(cellphone).matches()) {
-							continue;
-						}
-						
-						System.out.println("发送短信----------"+cellphone);
-						
+				for (DiagnoseTargetSimpleVO target : targets.getData()) {				
+					String cellphone = target.getCellphone();
+					if(!cellphonePattern.matcher(cellphone).matches()) {
+						continue;
+					}
+					
+					PublicitySendMessageRecord sendRecord = new PublicitySendMessageRecord();
+					sendRecord.setId(UUIDUtil.createUUID());
+					sendRecord.setMessageId(id);
+					sendRecord.setTargetCellphone(cellphone);
+					sendRecord.setTargetName(target.getName());
+										
+					try {															
 						SmsSendResponse resp = sendMsgWebService.sendSms(cellphone, content);
 						if (resp != null && SmsSendResponse.RESULT_SUCCESS.equals(resp.getResult())) {
 							count++;
-							continue;
+							sendRecord.setStatus(PublicitySendMessageRecord.SEND_STATUS_SUCCESS);							
+						}  else {
+							sendRecord.setStatus(PublicitySendMessageRecord.SEND_STATUS_ERROR);
+							logger.error("发送短信[ID:" + id + "]失败，发送目标[" + target.getName() + ":" + target.getCellphone() + "]");
 						}
-						
-						logger.error("发送短信[ID:" + id + "]失败，发送目标[" + target.getName() + ":" + target.getCellphone() + "]");
 					} catch (Exception e) {
+						sendRecord.setStatus(PublicitySendMessageRecord.SEND_STATUS_ERROR);
 						logger.error("发送短信[ID:" + id + "]失败，发送目标[" + target.getName() + ":" + target.getCellphone() + "]", e);
 					}
+					
+					sendRecord.setCreateTime(new Date());
+					sendMessageRecordService.save(sendRecord);
 				}
 
 				offset += limit;
