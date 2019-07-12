@@ -18,6 +18,11 @@ public interface DiagnoseRecordMapper extends CustomMapper<DiagnoseRecord> {
 
 	DiagnoseRecord findLastRecordByIdentificationId(@Param("identificationId") String identificationId);
 
-	List<DiagnoseRecordCountVO> countRecordByHospitalName(@Param("hospitalName") String hospitalName, @Param("bgTime") Date bgTime, @Param("endTime") Date endTime);
+	List<DiagnoseRecordCountVO> countRecordByHospitalName(@Param("hospitalName") String hospitalName, @Param("bgTime") Date bgTime,
+			@Param("endTime") Date endTime);
 
+	List<DiagnoseRecordCountVO> countSendedRecordByHospitalName(@Param("hospitalName") String hospitalName, @Param("bgTime") Date bgTime,
+			@Param("endTime") Date endTime);
+
+	
 }

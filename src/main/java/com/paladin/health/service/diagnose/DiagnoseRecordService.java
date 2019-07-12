@@ -52,10 +52,10 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 			throw new BusinessException("身份证号码不能为空");
 		}
 		return diagnoseRecordMapper.findLastRecordByIdentificationId(targrtId);
-
 	}
 
-	public List<DiagnoseRecordCountVO> countRecordByHospitalName(String hospitalName, Date bgTime, Date endTime) {
-		return diagnoseRecordMapper.countRecordByHospitalName(hospitalName, bgTime, endTime);
+	public List<DiagnoseRecordCountVO> countRecordByHospitalName(String hospitalName, Date bgTime, Date endTime, boolean isSendMessage) {
+		return isSendMessage ? diagnoseRecordMapper.countSendedRecordByHospitalName(hospitalName, bgTime, endTime)
+				: diagnoseRecordMapper.countRecordByHospitalName(hospitalName, bgTime, endTime);
 	}
 }

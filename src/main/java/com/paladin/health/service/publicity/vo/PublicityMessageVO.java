@@ -43,6 +43,8 @@ public class PublicityMessageVO {
 	private String createUserName;
 
 	private SysAttachment thumbnailAtt;
+	
+	private Integer countSended;
 
 	// 获取附件文件
 	public List<SysAttachment> getAttachmentFiles() {
@@ -195,6 +197,14 @@ public class PublicityMessageVO {
 
 	public void setSendHour(Integer sendHour) {
 		this.sendHour = sendHour;
+	}
+
+	public Integer getCountSended() {
+		return countSended;
+	}
+
+	public void setCountSended(Integer countSended) {
+		this.countSended = countSended;
 	}
 
 }

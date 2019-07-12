@@ -40,7 +40,7 @@ public class DiagnoseRecordController {
 	public Object diagnoseRecordsFindPage(DiagnoseRecordQuery query) {
 		return CommonResponse.getSuccessResponse(diagnoseRecordService.findRecordByTarget(query));
 	}
-	
+
 	@RequestMapping("/detail")
 	public String detail(String recordId, String targetId, String targetName, String time, Model model) {
 		model.addAttribute("recordId", recordId);
@@ -49,7 +49,7 @@ public class DiagnoseRecordController {
 		model.addAttribute("time", time);
 		return "/health/diagnose/diagnose_record_detail";
 	}
-	
+
 	/**
 	 * 功能描述: <br>
 	 * 〈病人历史诊断记录〉
@@ -60,14 +60,17 @@ public class DiagnoseRecordController {
 		return CommonResponse.getSuccessResponse(diagnoseRecordService.get(id));
 	}
 
-
 	@RequestMapping("/count/index")
-	public String countIndex() { return "/health/diagnose/diagnose_record_count"; }
+	public String countIndex() {
+		return "/health/diagnose/diagnose_record_count";
+	}
 
 	@RequestMapping("/count/name")
 	@ResponseBody
-	public Object countByName(@RequestParam(required =false) String hospitalName, @RequestParam(required =false)Date bgTime, @RequestParam(required =false)Date endTime) {
-		return CommonResponse.getSuccessResponse(diagnoseRecordService.countRecordByHospitalName(hospitalName, bgTime , endTime));
+	public Object countByName(@RequestParam(required = false) String hospitalName, @RequestParam(required = false) Date bgTime,
+			@RequestParam(required = false) Date endTime, @RequestParam(required = false) String sendMessage) {
+		boolean isSend = "1".equals(sendMessage);
+		return CommonResponse.getSuccessResponse(diagnoseRecordService.countRecordByHospitalName(hospitalName, bgTime, endTime, isSend));
 	}
 
 }

@@ -74,9 +74,35 @@
 		COUNT( d.hospital_name ) AS count
 		FROM
 		diagnose_record AS d
-		WHERE
-		d.correct_prescription IS NOT NULL
-		AND LENGTH( d.hospital_name ) > 0
+		WHERE send_status IS NOT NULL
+		<if test="hospitalName != null and hospitalName != ''">
+			AND d.hospital_name LIKE CONCAT('%',#{hospitalName} ,'%')
+		</if>
+		<if test="bgTime != null">
+			AND d.update_time >= #{bgTime}
+		</if>
+		<if test="endTime != null">
+			AND d.update_time <![CDATA[ <=]]> #{endTime}
+		</if>
+		GROUP BY
+		d.hospital_name
+		) t1
+		RIGHT JOIN ( SELECT 0 ) t2 ON 1 = 1
+	</select>
+	
+	<select id="countSendedRecordByHospitalName"
+			resultType="com.paladin.health.service.diagnose.vo.DiagnoseRecordCountVO">
+		SELECT
+		COALESCE ( t1.`name`,#{hospitalName} , "无" ) AS hospitalName,
+		COALESCE ( t1.count, 0 ) AS total
+		FROM
+		(
+		SELECT
+		d.hospital_name AS `name`,
+		COUNT( d.hospital_name ) AS count
+		FROM
+		diagnose_record AS d
+		WHERE send_status IS NOT NULL AND send_status != -1
 		<if test="hospitalName != null and hospitalName != ''">
 			AND d.hospital_name LIKE CONCAT('%',#{hospitalName} ,'%')
 		</if>
