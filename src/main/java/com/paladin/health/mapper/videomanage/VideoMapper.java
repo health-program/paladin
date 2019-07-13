@@ -26,4 +26,8 @@ public interface VideoMapper extends CustomMapper<Video> {
       public VideoVO getVideo(@Param("id") String id);
 
       List<VideoShowVO> findSearchVideo(@Param("query") VideoMessageQuery query);
+
+	public int upVideo(@Param("id") String id);
+	
+	public int offVideo(@Param("id") String id);
 }

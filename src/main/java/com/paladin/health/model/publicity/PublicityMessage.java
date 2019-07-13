@@ -15,6 +15,7 @@ public class PublicityMessage extends UnDeleteBaseModel {
 	public final static int STATUS_SUBMIT_EXAMINE = 1;
 	public final static int STATUS_EXAMINE_FAIL = 2;
 	public final static int STATUS_EXAMINE_SUCCESS = 9;
+	public final static int STATUS_EXAMINE_OFF = 10;
 
 	
 	public final static int TYPE_NOTICE = 1;

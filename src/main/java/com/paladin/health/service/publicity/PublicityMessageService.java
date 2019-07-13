@@ -193,7 +193,7 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 	 */
 	public PageResult<PublicityMessageVO> findExamineMessage(PublicityMessageQueryDTO query) {
 		// query.setStatus(PublicityMessage.STATUS_SUBMIT_EXAMINE);
-		query.setCreateUserId(null);
+		query.setCreateUserId(null);		
 		query.setStatuses(null);
 
 		return findMessage(query);
@@ -257,5 +257,13 @@ public class PublicityMessageService extends ServiceSupport<PublicityMessage> {
 		Page<PublicityMessageVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
 		publicityMessageMapper.findMoreMessage(query);
 		return new PageResult<>(page);
+	}
+
+	public boolean offMessage(String id) {	
+		return publicityMessageMapper.offMessage(id) >0;
+	}
+	
+	public boolean upMessage(String id) {	
+		return publicityMessageMapper.upMessage(id) >0;
 	}
 }

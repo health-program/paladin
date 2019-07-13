@@ -120,4 +120,12 @@ public class VideoService extends ServiceSupport<Video> {
 		return updateSelective(model);
 	}
 
+	public boolean offVideo(String id) {
+		return videoMapper.offVideo(id) >0;
+	}
+
+	public boolean upVideo(String id) {
+		return videoMapper.upVideo(id) >0;
+	}
+
 }

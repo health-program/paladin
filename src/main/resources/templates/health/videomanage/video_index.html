@@ -118,25 +118,20 @@
                             },
                             'click .remove': function(e, value, row, index) {
                                 remove(row);
+                            },
+                            'click .off': function(e, value, row, index) {
+                                off(row);
+                            },
+                            'click .up': function(e, value, row, index) {
+                                up(row);
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
-                            if (row.status === 0 || row.status === 2) {
-                                return [
-                                    '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
-                                    '<i class="glyphicon glyphicon-edit"></i>详情',
-                                    '</button>',
-                                    '<button class="remove btn btn-xs btn-danger" style="margin-right:10px">',
-                                    '<i class="glyphicon glyphicon-remove"></i>删除',
-                                    '</button>'
-                                ].join('');
-                            } else {
-                                return [
-                                    '<button class="detail btn btn-xs btn-info" style="margin-right:10px">',
-                                    '<i class="glyphicon glyphicon-edit"></i>详情',
-                                    '</button>'
-                                ].join('');
-                            }
+                            var html  =  '<button style="margin-right:10px" class="detail btn btn-xs btn-info"><i class="glyphicon glyphicon-edit"></i>详情</button>';
+                            html += (row.status === 0 || row.status === 2) ? '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>' : '';
+                            html += (row.status === 9) ? '<button class="off btn btn-xs btn-warning"><i class="glyphicon glyphicon-arrow-down"></i>下架</button>' : '';
+                            html += (row.status === 10) ? '<button class="up btn btn-xs btn-success"><i class="glyphicon glyphicon-arrow-up"></i>上架</button>' : '';
+                            return html;
                         }
                     }
                 ]
@@ -175,6 +170,29 @@
         }
 
     }
+
+    function off(row) {
+        if (row) {
+            layer.confirm('确定下架吗?', function() {
+                $.getAjax('/health/video/off?id=' + row.id, function() {
+                    $.successMessage("下架成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
+    function up(row) {
+        if (row) {
+            layer.confirm('确定上架吗?', function() {
+                $.getAjax('/health/video/up?id=' + row.id, function() {
+                    $.successMessage("上架成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
     var sortCount = [];
 
     function addSortNo(row) {

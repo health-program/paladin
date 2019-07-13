@@ -214,6 +214,19 @@ public class VideoController extends ControllerSupport {
 		model.addAttribute("id", id);
 		return "/health/videomanage/video_examine_detail";
 	}
+	
+	@RequestMapping("/off")
+	@ResponseBody
+	public Object offMessage(@RequestParam String id) {
+		return CommonResponse.getResponse(videoService.offVideo(id));
+	}
+	
+	@RequestMapping("/up")
+	@ResponseBody
+	public Object upMessage(@RequestParam String id) {
+		return CommonResponse.getResponse(videoService.upVideo(id));
+	}
+
 
 	/**
 	 * 审核成功

@@ -175,6 +175,15 @@
 	<update id="updateToSended">
 		UPDATE publicity_message SET is_send = 1,count_sended=#{count} WHERE id = #{id}
 	</update>
+	
+	<update id="offMessage">
+		UPDATE publicity_message SET status = 10 WHERE id = #{id} AND status=9
+	</update>
+	
+	<update id="upMessage">
+		UPDATE publicity_message SET status = 9 WHERE id = #{id} AND status=10
+	</update>
+	
     <select id="findSearchMessage" resultType="com.paladin.health.service.publicity.vo.PublicityMessageVO">
 		   SELECT
 			a.id,
