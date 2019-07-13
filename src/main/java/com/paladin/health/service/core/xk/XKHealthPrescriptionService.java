@@ -44,13 +44,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.FileCopyUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -249,8 +249,7 @@ public class XKHealthPrescriptionService {
 			record.setDoctorName(condition.getDoctorName());
 			record.setHospitalName(condition.getHospitalName());
 			record.setMessage(JsonUtil.getJson(messages));
-			
-			
+
 			diagnoseRecordService.save(record);
 
 			XKHealthPrescription result = new XKHealthPrescription();
@@ -389,8 +388,7 @@ public class XKHealthPrescriptionService {
 			sendError = sendError.substring(0, 200);
 		}
 
-		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, cellphone,
-				confirmer);
+		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, cellphone, confirmer);
 
 		if (createPDF) {
 			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
@@ -398,7 +396,7 @@ public class XKHealthPrescriptionService {
 				createPDF(evaluationResultList, target, output, new Date(), confirmer);
 				return output.getFileRelativeUrl();
 			} catch (Exception e) {
-			    e.printStackTrace();
+				e.printStackTrace();
 				throw new BusinessException("创建PDF失败");
 			}
 		}
@@ -515,6 +513,7 @@ public class XKHealthPrescriptionService {
 	}
 
 	private static Map<String, String> referenceMap;
+
 	static {
 		referenceMap = new HashMap<>();
 		referenceMap.put(XKEvaluation.CODE_AF, "基于Wang, Massaro, Levy et al于2003年在JAMA上发表的文章《通过社区新发作的AF预测中风或者死亡的风险分数》");
@@ -524,6 +523,19 @@ public class XKHealthPrescriptionService {
 		referenceMap.put(XKEvaluation.CODE_HYPERTENSION, "基于中国35-64岁人群15年高血压发生风险预测研究");
 		referenceMap.put(XKEvaluation.CODE_ICVD, "基于国家“十五“攻关课题‘冠心病、脑卒中综合危险度评估及干预方案的研究《课题组在此开发的用于评估个体10年ICVD发病危险的工具》");
 		// referenceMap.put(XKEvaluation.CODE_OSTEOPOROSIS, "骨质疏松症风险评估");
+	}
+
+	private static byte[] pdfImage1;
+	private static byte[] pdfImage2;
+	private static byte[] pdfImage3;
+	static {
+		try {
+			pdfImage1 = FileCopyUtils.copyToByteArray(new ClassPathResource("static/image/health_code.png").getInputStream());
+			pdfImage2 = FileCopyUtils.copyToByteArray(new ClassPathResource("static/image/health1.jpg").getInputStream());
+			pdfImage3 = FileCopyUtils.copyToByteArray(new ClassPathResource("static/image/line.jpg").getInputStream());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer)
@@ -545,34 +557,29 @@ public class XKHealthPrescriptionService {
 		// 中文字体,解决中文不能显示问题
 		BaseFont titleFont = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		BaseFont contentFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		
+
 		Paragraph paragraph = new Paragraph();
 		paragraph.setIndentationLeft(24);
-		URL url5 = ClassLoader.getSystemResource("static/image/health_code.png");
-	    	File file5 = new File(url5.getPath());
-	    	Image img5 = Image.getInstance(file5.toString()); 
-	    	img5.scaleToFit(110,110);
+		Image img5 = Image.getInstance(pdfImage1);
+		img5.scaleToFit(110, 110);
 		paragraph.add(new Chunk(img5, 0, 0, true));
-		URL url4 = ClassLoader.getSystemResource("static/image/health1.jpg");
-	    	File file4 = new File(url4.getPath());
-	    	Image img4 = Image.getInstance(file4.toString()); 
-	    	img4.scaleToFit(250,250);
-	    	paragraph.add("                                                      ");
+
+		Image img4 = Image.getInstance(pdfImage2);
+		img4.scaleToFit(250, 250);
+		paragraph.add("                                                      ");
 		paragraph.add(new Chunk(img4, 0, 0, true));
-		document.add(paragraph);//增加到文档中
-		
-		Paragraph signatureImg2 = new Paragraph(); 
-		URL url2 = ClassLoader.getSystemResource("static/image/line.jpg");
-		File file2 = new File(url2.getPath());
-		Image img2 = Image.getInstance(file2.toString());
+		document.add(paragraph);// 增加到文档中
+
+		Paragraph signatureImg2 = new Paragraph();
+		Image img2 = Image.getInstance(pdfImage3);
 		signatureImg2.add(img2);
-		document.add(signatureImg2);	
-		        
+		document.add(signatureImg2);
+
 		/*--------------------------------正文---------------------------------*/
 		if (target != null) {
 			Font font = new Font(contentFont, 13);
 			Font fontt = new Font(titleFont, 14);
-			
+
 			String name = target.getName();
 			Integer sex = target.getSex();
 
@@ -595,7 +602,7 @@ public class XKHealthPrescriptionService {
 			info.add(Chunk.NEWLINE);
 			info.setAlignment(Element.ALIGN_CENTER);
 			document.add(info);
-			//int num = 0;
+			// int num = 0;
 			for (XKEvaluation evaluation : evaluationResultList) {
 				BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 				BaseColor color = null;
@@ -611,7 +618,7 @@ public class XKHealthPrescriptionService {
 				Font font111 = new Font(sfTTF1, 11);
 				Paragraph info1 = new Paragraph();
 				info1.setIndentationLeft(24);
-				//info1.add(Chunk.NEWLINE);
+				// info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("评估内容：", font1));
 				info1.add(new Phrase(evaluation.getName(), font111));
 				info1.add(Chunk.NEWLINE);
@@ -637,42 +644,42 @@ public class XKHealthPrescriptionService {
 						document.add(info11);
 					}
 				}
-			//num++;
-			/*if(evaluationResultList.size() != num){
-			    info1.add(Chunk.NEWLINE);
-				LineSeparator line = new LineSeparator(1f,91,new BaseColor(32,178,170),Element.ALIGN_CENTER,-6f);
-				document.add(line);
-			}*/
-			
+				// num++;
+				/*
+				 * if(evaluationResultList.size() != num){ info1.add(Chunk.NEWLINE);
+				 * LineSeparator line = new LineSeparator(1f,91,new
+				 * BaseColor(32,178,170),Element.ALIGN_CENTER,-6f); document.add(line); }
+				 */
+
 			}
-			 writer.setPageEvent(new PdfPageHelper());
+			writer.setPageEvent(new PdfPageHelper());
 		}
 		document.close();
 	}
-	
-    class PdfPageHelper extends PdfPageEventHelper {
 
-	@Override
-	public void onEndPage(PdfWriter writer, Document document) {
+	class PdfPageHelper extends PdfPageEventHelper {
 
-	    PdfContentByte cb = writer.getDirectContent();// 得到层
-	    cb.saveState();
-	    // 开始
-	    cb.beginText();
-	    try {
-		BaseFont footer = BaseFont.createFont("/ttf/STSONG.TTF",BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		cb.setFontAndSize(footer, 10);
-		float y = document.bottom(0);
-		cb.setColorFill(new BaseColor(105,105,105));
-		cb.showTextAligned(PdfContentByte.ALIGN_CENTER,"温馨提示:为了您和您家人的健康,请到辖区内的社区卫生服务机构进行相关的健康咨询",(document.right() + document.left()) / 2, y, 0);
-		cb.endText();
-		cb.restoreState();
-	    } catch (DocumentException e) {
-		e.printStackTrace();
-	    } catch (IOException e) {
-		e.printStackTrace();
-	    }
+		@Override
+		public void onEndPage(PdfWriter writer, Document document) {
+
+			PdfContentByte cb = writer.getDirectContent();// 得到层
+			cb.saveState();
+			// 开始
+			cb.beginText();
+			try {
+				BaseFont footer = BaseFont.createFont("/ttf/STSONG.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+				cb.setFontAndSize(footer, 10);
+				float y = document.bottom(0);
+				cb.setColorFill(new BaseColor(105, 105, 105));
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "温馨提示:为了您和您家人的健康,请到辖区内的社区卫生服务机构进行相关的健康咨询", (document.right() + document.left()) / 2, y, 0);
+				cb.endText();
+				cb.restoreState();
+			} catch (DocumentException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-    }
 
 }
