@@ -1,6 +1,3 @@
-// 需要修改
-var $global_project = "health";
-
 (function($) {
 
     // --------------------------------------
@@ -266,7 +263,7 @@ var $global_project = "health";
             // ajax请求返回未登录状态处理
             // 暂时跳转主页面到登录页面，有时间可以做弹出登录窗口登录，成功后继续执行ajax请求处理
             $.failAlert("请先登录", function() {
-                top.location.href = $global_project + "/login";
+                top.location.href = "/";
             })
         },
         ajaxResponseCheck: function(response) {
