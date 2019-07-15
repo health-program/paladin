@@ -38,4 +38,8 @@ public interface PublicityMessageMapper extends CustomMapper<PublicityMessage> {
 	List<PublicityMessageVO> searchHomePagNotices();
 
 	List<PublicityMessageVO> findMoreMessage(@Param("query") PublicityMessageQueryDTO query);
+
+	public int offMessage(@Param("id") String id);
+
+	public int upMessage(@Param("id") String id);
 }

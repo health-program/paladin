@@ -237,6 +237,18 @@ public class PublicityMessageController extends ControllerSupport {
 	public Object remove(@RequestParam String id) {
 		return CommonResponse.getResponse(publicityMessageService.removeMessage(id));
 	}
+	
+	@RequestMapping("/off")
+	@ResponseBody
+	public Object offMessage(@RequestParam String id) {
+		return CommonResponse.getResponse(publicityMessageService.offMessage(id));
+	}
+	
+	@RequestMapping("/up")
+	@ResponseBody
+	public Object upMessage(@RequestParam String id) {
+		return CommonResponse.getResponse(publicityMessageService.upMessage(id));
+	}
 
 	/**
 	 * 审核

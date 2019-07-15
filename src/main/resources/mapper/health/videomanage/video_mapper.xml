@@ -81,6 +81,14 @@
     <update id="updateExamineStatus">
         UPDATE video SET status = #{status}, examine_user_id = #{examinerId} WHERE id = #{id} AND status = 1
     </update>
+    
+     <update id="offVideo">
+        UPDATE video SET status=10 WHERE id = #{id} AND status = 9
+    </update>
+    
+    <update id="upVideo">
+        UPDATE video SET status=9 WHERE id = #{id} AND status = 10
+    </update>
    
    	<select id="getVideo" resultType="com.paladin.health.service.videomanage.vo.VideoVO">
 		SELECT 

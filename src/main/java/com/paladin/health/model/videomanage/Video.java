@@ -17,6 +17,7 @@ public class Video extends BaseModel {
 	public final static int STATUS_SUBMIT_EXAMINE = 1;
 	public final static int STATUS_EXAMINE_FAIL = 2;
 	public final static int STATUS_EXAMINE_SUCCESS = 9;
+	public final static int STATUS_EXAMINE_OFF = 10;
 
 	@Id
 	private String id;

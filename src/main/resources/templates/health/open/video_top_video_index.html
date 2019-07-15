@@ -137,7 +137,8 @@
                         <div id="example1" class="slider-pro sli">
                             <div class="sp-slides" >
                                 <div class="sp-slide" th:each="video,iter: ${videos}">
-                                    <img class="sp-image"  th:src="@{'/file/'+${video.showImageUrl.pelativePath}}" th:onclick="play([[${video.id}]])"/>
+                                    <img class="sp-image" th:if="${video.showImageUrl!=null}" th:src="@{'/file/'+${video.showImageUrl.thumbnailPelativePath}}" th:onclick="play([[${video.id}]])">
+                            		<img  th:if="${video.showImageUrl==null}" src="/static/image/health/video.png" th:onclick="play([[${video.id}]])">
                                     <p class="sp-layer sp-white sp-padding" style="text-align: center" data-horizontal="17%" data-vertical="5" data-width="50%" data-show-transition="left" data-hide-transition="up" data-show-delay="400" data-hide-delay="200" th:text="${video.name.length()>30}?${#strings.substring(video.name,0,30)+'.........'}:${video.name}">
                                     </p>
                                 </div>

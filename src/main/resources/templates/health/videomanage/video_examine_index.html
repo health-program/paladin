@@ -17,6 +17,7 @@
                             <select name="status" class="form-control tonto-select">
                                 <option value="1">待审核</option>
                                 <option value="9">审核成功</option>
+                                <option value="10">下架</option>
                             </select>
                         </div>
                         <div class="col-md-10">
@@ -76,13 +77,22 @@
                             },
                             'click .detail': function(e, value, row, index) {
                                 view(row);
+                            },
+                            'click .off': function(e, value, row, index) {
+                                off(row);
+                            },
+                            'click .up': function(e, value, row, index) {
+                                up(row);
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
                             if (row.status === 1) {
                                 return '<button class="check btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>审核</button>';
                             } else {
-                                return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-eye-open"></i>查看</button>';
+                               var html = '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-eye-open"></i>查看</button>';
+                                html += (row.status === 9) ? '<button class="off btn btn-xs btn-warning"><i class="glyphicon glyphicon-arrow-down"></i>下架</button>' : '';
+                                html += (row.status === 10) ? '<button class="up btn btn-xs btn-success"><i class="glyphicon glyphicon-arrow-up"></i>上架</button>' : '';
+                                return html;
                             }
                         }
                     }
@@ -121,6 +131,28 @@
     function view(row) {
         if (row) {
             window.location = '/health/video/examine/detail?id=' + row.id;
+        }
+    }
+
+    function off(row) {
+        if (row) {
+            layer.confirm('确定下架吗?', function() {
+                $.getAjax('/health/video/off?id=' + row.id, function() {
+                    $.successMessage("下架成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
+    function up(row) {
+        if (row) {
+            layer.confirm('确定上架吗?', function() {
+                $.getAjax('/health/video/up?id=' + row.id, function() {
+                    $.successMessage("上架成功");
+                    table.refresh();
+                });
+            });
         }
     }
     </script>

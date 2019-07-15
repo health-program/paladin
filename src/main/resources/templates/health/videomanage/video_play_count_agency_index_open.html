@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+<style>
+    .tab-content>.tab-pane, .pill-content>.pill-pane {
+    display: block;
+    height: 0;
+    overflow-y: hidden;
+}
+
+.tab-content>.active, .pill-content>.active {
+    height: auto;
+}
+</style>
+
+<body>
+    <tt:constant enumcode="publicity-material-type,grant-target-type" />
+    <input type="hidden" name="year" />
+    <section class="content-header">
+        <h1>视频播放记录统计</h1>
+    </section>
+    <section class="content">
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="#tab1" data-toggle="tab" aria-expanded="true">按年份统计</a></li>
+                <li class=""><a href="#tab2" data-toggle="tab" aria-expanded="false">按机构统计</a></li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab1">
+                    <div class="box-body">
+                        <ul class="products-list product-list-in-box">
+                            <li class="item">
+                                <form id="searchbar1" class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-2">
+                                            <input type="text" id="workCycle" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择时间">
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="pull-right">
+                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="yearQuery()"><i class="fa fa-search"></i>查询</button>
+                                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar1')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                                    <input type="text" style="display:none">
+                                </form>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <div id="yearChart" style="height: 400px"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tab-pane" id="tab2">
+                    <div class="box-body">
+                        <ul class="products-list product-list-in-box">
+                            <li class="item">
+                                <form id="searchbar2" class="form-horizontal">
+                                    <div class="form-group">
+                                        <div class="col-md-2">
+                                            <input type="text" id="agencyName1" name="agencyName" class="form-control" placeholder="请输入机构名称">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="text" id="workCycle1" name="workCycle" class="form-control tonto-datepicker-year" autocomplete="off" placeholder="请选择工作周期">
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="pull-right">
+                                                <button type="button" style="width:100px" class="btn btn-primary " onclick="agencyQuery()"><i class="fa fa-search"></i>查询</button>
+                                                <button type="button" style="width:100px" class="btn btn-default" onclick="$('#searchbar2')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                                    <input type="text" style="display:none">
+                                </form>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <table id="dataGrid"></table>
+                                </div>
+                            </li>
+                            <li class="item">
+                                <div class="col-sm-12">
+                                    <div id="agencyChart" style="height: 350px"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table;
+
+    $(function() {
+        initDataGrid();
+        agencyCharts(agencyChart);
+        yearCharts(yearChart);
+    });
+
+
+    // 机构统计
+
+
+    function initDataGrid() {
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "机构名称", align: "center", field: "agencyName" },
+                    { title: "观看总人数", align: "center", field: "visitorCount" },
+                    { title: "观看总时长", align: "center", field: "durations", formatter: function getDuration(value, row, index) { return value.toFixed(2) + '小时'; } }
+                ]
+            ],
+            url: '/platform/video/play/agency',
+            searchbar: '#searchbar2',
+            showColumns: true,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    //图表自适应大小
+    window.addEventListener("resize", function() {
+        agencyChart.resize();
+        yearChart.resize();
+    });
+    var yearChart = echarts.init(document.getElementById('yearChart'));
+    var agencyChart = echarts.init(document.getElementById('agencyChart'));
+
+
+    function agencyCharts(chart) {
+        var agencyNameVal = $("#agencyName1").val();
+        var workCycleVal = $("#workCycle1").val();
+        var agencyName = agencyNameVal.length > 0 ? agencyNameVal : null;
+        var workCycle = workCycleVal.length > 0 ? workCycleVal : null;
+        $.postAjax("/platform/video/play/agency", { 'agencyName': agencyName, 'workCycle': workCycle }, function(res) {
+            var data = res.data;
+            if (data.length === 1 && data[0].visitorCount === 0) {
+                showChartInfo(chart, '暂无数据');
+                return false;
+            }
+            // 填入数据
+            var xdata = new Array();
+            var visitorCounts = new Array();
+            var durations = new Array();
+            for (var i in data) {
+                xdata.push({
+                    value:data[i].agencyName,
+                    id:data[i].id
+                });
+                visitorCounts.push(data[i].visitorCount);
+                durations.push((data[i].durations).toFixed(2));
+            }
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'top',
+                    distance: 15,
+                    align: 'center',
+                    verticalAlign: 'top',
+                    rotate: 0,
+                    formatter: '{name|{a}}   {c}',
+                    fontSize: 12,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            option = {
+                color: ['#006699', '#4cabce'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    formatter: function(params) {
+                        return params[0].name + '<br/> ' +
+                            params[0].seriesName + ':' +
+                            params[0].data + '(人次)<br/>' +
+                            params[1].seriesName + ':' +
+                            params[1].data + '(小时)';
+                    }
+                },
+                legend: {
+                    data: ['观看总人数', '播放总时长']
+                },
+                toolbox: {
+                    show: true,
+                    right: 75,
+                    feature: {
+                        mark: { show: true },
+                        dataView: { show: true, readOnly: false },
+                        magicType: { show: true, type: ['line', 'bar'] },
+                        restore: { show: true },
+                        saveAsImage: { show: true }
+                    }
+                },
+                calculable: true,
+                xAxis: [{
+                    name: '机构名称',
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    data: xdata
+                }],
+                yAxis: [{
+                    name: '总量',
+                    type: 'value',
+                    axisLabel: {
+                        formatter: function(value, index) {
+                            return value.toFixed(2);
+                        }
+                    }
+                }],
+                series: [{
+                    name: '观看总人数',
+                    type: 'bar',
+                    label: labelOption,
+                    barGap: 0,
+                    data: visitorCounts
+                }, {
+                    name: '播放总时长',
+                    type: 'bar',
+                    label: labelOption,
+                    data: durations
+                }]
+            };
+            chart.setOption(option, true);
+        });
+        chart.getZr().on('click',params=>{
+            const pointInPixel= [params.offsetX, params.offsetY];
+            if (chart.containPixel('grid',pointInPixel)) {
+                let xIndex=chart.convertFromPixel({seriesIndex:0},[params.offsetX, params.offsetY])[0];
+                /*事件处理代码书写位置*/
+
+                //获取当前图表的option
+                let option = chart.getOption();
+
+                //获得图表中我们想要的数据
+                var data=option.xAxis[0].data[xIndex];
+
+                initChildChart(data.id,data.value);
+
+            }
+        });
+    }
+
+    // 查询 
+    function agencyQuery() {
+        agencyCharts(agencyChart);
+        table.refresh();
+    }
+
+
+    //年份统计 
+
+    function yearCharts(yearChart) {
+        var workCycle = $("#workCycle").val();
+        $.get('/platform/video/play/year?workCycle=' + workCycle).done(
+            function(res) {
+                if (res.status !== 1) {
+                    return false;
+                }
+                var data = res.result;
+                if (data.length === 0) {
+                    showChartInfo(yearChart, '暂无数据')
+                    return false;
+                }
+                // 填入数据
+                var xdata = new Array();
+                var visitorCounts = new Array();
+                var durations = new Array();
+                for (var i in data) {
+                    xdata.push(data[i].workCycle + '年');
+                    visitorCounts.push(data[i].visitorCount);
+                    durations.push((data[i].durations).toFixed(2));
+                }
+                var labelOption = {
+                    normal: {
+                        show: true,
+                        position: 'top',
+                        distance: 15,
+                        align: 'center',
+                        verticalAlign: 'top',
+                        rotate: 0,
+                        formatter: '{name|{a}}   {c}',
+                        fontSize: 12,
+                        rich: {
+                            name: {
+                                textBorderColor: '#fff'
+                            }
+                        }
+                    }
+                };
+                option = {
+                    color: ['#006699', '#4cabce'],
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {
+                            type: 'shadow'
+                        },
+                        formatter: function(params) {
+                            return params[0].name + '<br/> ' +
+                                params[0].seriesName + ':' +
+                                params[0].data + '(人次)<br/>' +
+                                params[1].seriesName + ':' +
+                                params[1].data + '(小时)';
+                        }
+                    },
+                    legend: {
+                        data: ['观看总人数', '播放总时长']
+                    },
+                    toolbox: {
+                        show: true,
+                        right: 75,
+                        feature: {
+                            mark: { show: true },
+                            dataView: { show: true, readOnly: false },
+                            magicType: { show: true, type: ['line', 'bar'] },
+                            restore: { show: true },
+                            saveAsImage: { show: true }
+                        }
+                    },
+                    calculable: true,
+                    xAxis: [{
+                        name: '年份',
+                        type: 'category',
+                        axisTick: {
+                            show: false
+                        },
+                        data: xdata
+                    }],
+                    yAxis: [{
+                        name: '总量',
+                        type: 'value',
+                        axisLabel: {
+                            formatter: function(value, index) {
+                                return value.toFixed(2);
+                            }
+                        }
+                    }],
+                    series: [{
+                        name: '观看总人数',
+                        type: 'bar',
+                        label: labelOption,
+                        barGap: 0,
+                        data: visitorCounts
+                    }, {
+                        name: '播放总时长',
+                        type: 'bar',
+                        label: labelOption,
+                        data: durations
+                    }]
+                };
+                yearChart.setOption(option, true);
+            })
+    }
+    //查询
+    function yearQuery() {
+        yearCharts(yearChart);
+    }
+
+    function initChildChart(id, name) {
+        $.postAjax("/platform/video/play/agency?id="+id,  function(res) {
+            console.log(res)
+            var myChart1 = echarts.init(document.getElementById('agencyChart'));
+            var data = res;
+            if (data == null || data[0].visitorCount === 0) {
+                showChartInfo(myChart1, name +'：下方机构暂无视频播放记录');
+                return false;
+            }
+            // 填入数据
+            var xdata = new Array();
+            var visitorCounts = new Array();
+            var durations = new Array();
+            for (var i in data) {
+                xdata.push({
+                    value:data[i].agencyName,
+                    id:data[i].id
+                });
+                visitorCounts.push(data[i].visitorCount);
+                durations.push((data[i].durations).toFixed(2));
+            }
+            var labelOption = {
+                normal: {
+                    show: true,
+                    position: 'top',
+                    distance: 15,
+                    align: 'center',
+                    verticalAlign: 'top',
+                    rotate: 0,
+                    formatter: '{name|{a}}   {c}',
+                    fontSize: 12,
+                    rich: {
+                        name: {
+                            textBorderColor: '#fff'
+                        }
+                    }
+                }
+            };
+            option = {
+                color: ['#006699', '#4cabce'],
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    },
+                    formatter: function(params) {
+                        return params[0].name + '<br/> ' +
+                            params[0].seriesName + ':' +
+                            params[0].data + '(人次)<br/>' +
+                            params[1].seriesName + ':' +
+                            params[1].data + '(小时)';
+                    }
+                },
+                title: {
+                    show: true,
+                    textStyle: {
+                        color: 'grey',
+                        fontSize: 20
+                    },
+                    text: name,
+                    left: 'center',
+                    top: 'top'
+                },
+                legend: {
+                    data: ['观看总人数', '播放总时长'],
+                    left: 'left',
+                    top: 'top'
+                },
+                calculable: true,
+                xAxis: [{
+                    name: '机构名称',
+                    type: 'category',
+                    axisTick: {
+                        show: false
+                    },
+                    data: xdata
+                }],
+                yAxis: [{
+                    name: '总量',
+                    type: 'value',
+                    axisLabel: {
+                        formatter: function(value, index) {
+                            return value.toFixed(2);
+                        }
+                    }
+                }],
+                series: [{
+                    name: '观看总人数',
+                    type: 'bar',
+                    label: labelOption,
+                    barGap: 0,
+                    data: visitorCounts
+                }, {
+                    name: '播放总时长',
+                    type: 'bar',
+                    label: labelOption,
+                    data: durations
+                }]
+            };
+            myChart1.setOption(option, true);
+        });
+    }
+
+    //无数据展示
+    var showChartInfo = function(chart, infoStr) {
+        var msgOption = {
+            title: {
+                show: true,
+                textStyle: {
+                    color: 'grey',
+                    fontSize: 20
+                },
+                text: infoStr,
+                left: 'center',
+                top: 'center'
+            },
+            xAxis: {
+                show: false
+            },
+            yAxis: {
+                show: false
+            },
+            series: []
+        };
+        chart.clear(); //initChart(divId): get echarts instance, you can get it by using other method
+        chart.hideLoading();
+        chart.setOption(msgOption)
+    };
+    </script>
+</body>
+
+</html>
