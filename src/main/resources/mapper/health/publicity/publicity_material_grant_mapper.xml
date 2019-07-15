@@ -62,7 +62,8 @@ resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantVO">
 	oa.name agencyName,
 	pmg.grant_date as grantDate,
 	pmg.receiver,
-	pmg.remarks 
+	pmg.remarks,
+	pmg.attachments
 	FROM publicity_material_grant pmg
 	LEFT JOIN publicity_material pm ON pmg.material_id = pm.id
 	LEFT JOIN org_agency oa ON pmg.grantor_agency = oa.id

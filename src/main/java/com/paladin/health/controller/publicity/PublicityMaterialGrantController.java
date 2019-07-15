@@ -1,5 +1,7 @@
 package com.paladin.health.controller.publicity;
 
+import com.paladin.common.model.syst.SysAttachment;
+import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.core.query.QueryInputMethod;
@@ -21,9 +23,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Calendar;
+import java.util.List;
 
 @Controller
 @RequestMapping("/health/publicity/material/grant")
@@ -36,6 +40,9 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 
     @Autowired
     private PublicityMaterialService publicityMaterialService;
+
+    @Autowired
+    private SysAttachmentService attachmentService;
 
     @RequestMapping("/index")
     @QueryInputMethod(queryClass = PublicityMaterialGrantQueryDTO.class)
@@ -66,10 +73,7 @@ public class PublicityMaterialGrantController extends ControllerSupport {
     }
     
     @RequestMapping("/add")
-    public String addInput(@RequestParam String id, @RequestParam String name, @RequestParam String type,@RequestParam String agencyId, Model model) {
-		model.addAttribute("workCycle",Calendar.getInstance().get(Calendar.YEAR));
-		model.addAttribute("name", name);
-		model.addAttribute("type", type);
+    public String addInput(@RequestParam String id, Model model) {
 		model.addAttribute("materialId", id);
         PublicityMaterialVO materialVO = publicityMaterialService.getOne(id);
         if (materialVO == null) {
@@ -88,7 +92,7 @@ public class PublicityMaterialGrantController extends ControllerSupport {
     
     @RequestMapping("/save")
 	@ResponseBody
-    public Object save(@Valid PublicityMaterialGrantDTO publicityMaterialGrantDTO, BindingResult bindingResult) {
+    public Object save(@Valid PublicityMaterialGrantDTO publicityMaterialGrantDTO, @RequestParam(required = false) MultipartFile[] attachmentFiles, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
@@ -96,6 +100,11 @@ public class PublicityMaterialGrantController extends ControllerSupport {
         if (i <= 0) {
             throw  new BusinessException("发送宣传资料失败");
         }
+        List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMaterialGrantDTO.getAttachments(), attachmentFiles);
+        if (attachments != null && attachments.size() > 4) {
+            return CommonResponse.getErrorResponse("附件数量不能超过4张");
+        }
+        publicityMaterialGrantDTO.setAttachments(attachmentService.splicingAttachmentId(attachments));
 		PublicityMaterialGrant model = beanCopy(publicityMaterialGrantDTO, new PublicityMaterialGrant());
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
@@ -105,7 +114,7 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 		return CommonResponse.getFailResponse();
 	}
 
-    @RequestMapping("/update")
+/*    @RequestMapping("/update")
 	@ResponseBody
     public Object update(@Valid PublicityMaterialGrantDTO publicityMaterialGrantDTO, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
@@ -117,7 +126,7 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 			return CommonResponse.getSuccessResponse(publicityMaterialGrantService.get(id));
 		}
 		return CommonResponse.getFailResponse();
-	}
+	}*/
 
     @RequestMapping("/delete")
     @ResponseBody

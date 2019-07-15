@@ -228,7 +228,6 @@
 
                 //获得图表中我们想要的数据
                 let data=option.xAxis[0].data[xIndex];
-
                 initChildChart(data.id,data.value);
 
             }
@@ -345,11 +344,11 @@
             var chartName = [];
             list.forEach(function(item) {
                 chartValue.push({
-                    value: item.total,
-                    id:item.id
+                    value: item.total
                 });
                 chartName.push({
-                    value: item.name
+                    value: item.name,
+                    id:item.id
                 });
             })
             var labelOption = {

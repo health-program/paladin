@@ -84,6 +84,11 @@
 								<p name="remarks" class="form-control-static description"></p>
 							</div>
 						</div>
+						<div class="form-group" id="attachments">
+							<label for="attachments" class="col-sm-3 control-label">附件：</label>
+							<div name="attachments" class="col-sm-8">
+							</div>
+						</div>
 					</form>
 				</div>
 <!--				&lt;!&ndash; 编辑 &ndash;&gt;
@@ -202,7 +207,9 @@
 			            {title : "发放机构Id",name : "grantorAgency",inputType : "TEXT"},
 			            {title : "发放机构",name : "agencyName",inputType : "TEXT"},
 			            {title : "发放人",name : "grantor",inputType : "TEXT"},
-			            {title : "接收人",name : "receiver",inputType : "TEXT"}, {title : "备注",name : "remarks",inputType : "TEXT"}
+			            {title : "接收人",name : "receiver",inputType : "TEXT"},
+						{title : "备注",name : "remarks",inputType : "TEXT"},
+						{ title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles"}
 			           ]
 		}
 
@@ -211,6 +218,7 @@
 				"model",
 					options.columns,
 					{
+						pattern : 'view',
 						successCallback : function() {
 							$.successAlert(
 							"保存成功",

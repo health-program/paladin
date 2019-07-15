@@ -1,6 +1,10 @@
 package com.paladin.health.service.publicity.vo;
 
+import com.paladin.common.core.AttachmentContainer;
+import com.paladin.common.model.syst.SysAttachment;
+
 import java.util.Date;
+import java.util.List;
 
 public class PublicityMaterialGrantVO {
 	private String id;
@@ -35,6 +39,16 @@ public class PublicityMaterialGrantVO {
 	private String receiver;
 	//备注
 	private String remarks;
+
+	private String attachments;
+
+	// 获取附件文件
+	public List<SysAttachment> getAttachmentFiles() {
+		if (attachments != null && attachments.length() != 0) {
+			return AttachmentContainer.getAttachments(attachments.split(","));
+		}
+		return null;
+	}
 	
 	public String getId() {
 		return id;
@@ -135,5 +149,13 @@ public class PublicityMaterialGrantVO {
 
 	public void setGrantTargetOrgName(String grantTargetOrgName) {
 		this.grantTargetOrgName = grantTargetOrgName;
+	}
+
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
 	}
 }

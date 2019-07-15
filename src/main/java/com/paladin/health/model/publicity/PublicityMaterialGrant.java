@@ -32,7 +32,9 @@ public class PublicityMaterialGrant extends BaseModel{
     private String receiver;
     //备注
     private String remarks;
-    
+
+	private String attachments;
+
 	public String getId() {
 		return id;
 	}
@@ -112,5 +114,13 @@ public class PublicityMaterialGrant extends BaseModel{
 
 	public void setGrantTargetName(String grantTargetName) {
 		this.grantTargetName = grantTargetName;
+	}
+
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
 	}
 }
