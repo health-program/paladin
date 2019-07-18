@@ -31,7 +31,7 @@ public class XKAPPDiagnoseController {
 	@GetMapping("/symptom/code")
 	@ResponseBody
 	public Object dict() {
-		return CommonResponse.getSuccessResponse(ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE,XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
+		return CommonResponse.getSuccessResponse(ConstantsContainer.getTypeChildren(ConstantsContainer.CONSTANT_INDEX_TYPE,ConstantsContainer.CONSTANT_DISEASE_TYPE));
 	}
 	
 	/**

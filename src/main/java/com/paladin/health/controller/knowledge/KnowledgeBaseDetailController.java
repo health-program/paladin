@@ -1,9 +1,7 @@
 package com.paladin.health.controller.knowledge;
 
 import com.paladin.framework.core.ControllerSupport;
-import com.paladin.framework.utils.uuid.UUIDUtil;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.model.knowledge.KnowledgeBaseDetail;
 import com.paladin.health.service.knowledge.KnowledgeBaseDetailService;
 import com.paladin.health.service.knowledge.dto.KnowledgeBaseDetailDTO;
 import com.paladin.health.service.knowledge.dto.KnowledgeBaseDetailQuery;

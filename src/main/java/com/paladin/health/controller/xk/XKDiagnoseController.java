@@ -6,7 +6,6 @@ import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.AuthKeyContainer;
 import com.paladin.health.core.knowledge.KnowledgeManageContainer;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
-import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
@@ -162,7 +161,7 @@ public class XKDiagnoseController {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
 		return CommonResponse.getSuccessResponse(
-				ConstantsContainer.getTypeChildren(XKHealthPrescriptionService.CONSTANT_INDEX_TYPE, XKHealthPrescriptionService.CONSTANT_DISEASE_TYPE));
+				ConstantsContainer.getTypeChildren(ConstantsContainer.CONSTANT_INDEX_TYPE, ConstantsContainer.CONSTANT_DISEASE_TYPE));
 	}
 
 	private boolean validAccessKey(String accessKey) {

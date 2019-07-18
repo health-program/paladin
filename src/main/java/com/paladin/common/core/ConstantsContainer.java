@@ -5,7 +5,10 @@ import com.paladin.common.service.syst.SysConstantService;
 import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.core.VersionContainerManager;
 import com.paladin.health.model.diagnose.DiagnoseCodeComparison;
+import com.paladin.health.model.knowledge.KnowledgeBase;
 import com.paladin.health.service.diagnose.DiagnoseCodeComparisonService;
+import com.paladin.health.service.knowledge.KnowledgeBaseService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +23,9 @@ public class ConstantsContainer implements VersionContainer {
 
 	@Autowired
 	private DiagnoseCodeComparisonService diagnoseCodeComparisonService;
+
+	@Autowired
+	private KnowledgeBaseService knowledgeBaseService;
 
 	private static Map<String, List<DiagnoseCodeComparison>> diagnoseMap = new HashMap<>();
 	private static Map<String, List<KeyValue>> constantMap = new HashMap<>();
@@ -58,6 +64,24 @@ public class ConstantsContainer implements VersionContainer {
 
 			keyMap.put(code, name);
 		}
+
+		List<KnowledgeBase> kbs = knowledgeBaseService.findAll();
+		for (KnowledgeBase kb : kbs) {
+			String code = kb.getCode();
+			String name = kb.getName();
+			Integer type = kb.getType();
+
+			String enumType = type == 1 ? CONSTANT_INDEX_TYPE : CONSTANT_DISEASE_TYPE;
+
+			List<KeyValue> kvList = enumConstantMap.get(enumType);
+			if (kvList == null) {
+				kvList = new ArrayList<>();
+				enumConstantMap.put(enumType, kvList);
+			}
+
+			kvList.add(new KeyValue(code, name));
+		}
+
 		constantMap = enumConstantMap;
 
 		List<DiagnoseCodeComparison> lists = diagnoseCodeComparisonService.findAll();
@@ -70,8 +94,14 @@ public class ConstantsContainer implements VersionContainer {
 				diagnoseMap.put(icd10Code, diagnoseCodeComparisons);
 			}
 		}
+
 		return true;
 	}
+
+	/** 熙康疾病类型 */
+	public static String CONSTANT_DISEASE_TYPE = "xk-disease-type";
+	/** 熙康指标类型 */
+	public static String CONSTANT_INDEX_TYPE = "xk-index-type";
 
 	@Override
 	public String getId() {

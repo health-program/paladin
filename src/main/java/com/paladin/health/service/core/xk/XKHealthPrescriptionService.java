@@ -86,14 +86,6 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	@Value("${xk.tips.url}")
 	private String tipsUrl;
 
-	/** 熙康疾病类型 */
-	public static String CONSTANT_DISEASE_TYPE = "xk-disease-type";
-	/** 熙康指标类型 */
-	public static String CONSTANT_INDEX_TYPE = "xk-index-type";
-
-	/** 熙康评估类型 */
-	// public static String CONSTANT_EVALUATE_TYPE = "xk-evaluate-type";
-
 	@Override
 	public String getKnowledgeServiceCode() {
 		return KnowledgeManageContainer.SERVICE_CODE_XK;
@@ -460,14 +452,14 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	 */
 	public XKDiseaseKnowledge getKnowledge(String code) {
 		String url = knowledgeUrl + code;
-		String diseaseName = ConstantsContainer.getTypeValue(CONSTANT_DISEASE_TYPE, code);
+		String diseaseName = ConstantsContainer.getTypeValue(ConstantsContainer.CONSTANT_DISEASE_TYPE, code);
 		if (diseaseName != null && diseaseName.length() > 0) {
 			List knowledge = knowledgeServlet.getRequest(url, null, List.class);
 			if (knowledge != null) {
 				return new XKDiseaseKnowledge(code, diseaseName, XKDiseaseKnowledge.TYPE_DISEASE, knowledge);
 			}
 		} else {
-			diseaseName = ConstantsContainer.getTypeValue(CONSTANT_INDEX_TYPE, code);
+			diseaseName = ConstantsContainer.getTypeValue(ConstantsContainer.CONSTANT_INDEX_TYPE, code);
 			if (diseaseName != null && diseaseName.length() > 0) {
 				List knowledge = knowledgeServlet.getRequest(url, null, List.class);
 				if (knowledge != null) {
