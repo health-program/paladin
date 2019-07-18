@@ -31,7 +31,6 @@ public class VideoPlayCountService {
 		return new PageResult<>(page);
 	}
 
-	@SuppressWarnings("unused")
 	private List<VideoPlayCountShowVO> videoAgencyCountByQuery(VideoPlayCountQueryDTO query){
 		List<VideoPlayCountShowVO> countShowVOS = videoPlayCountMapper.getStatisticsByAgencyIds(null, query);
 		for (VideoPlayCountShowVO vo : countShowVOS) {
@@ -40,7 +39,6 @@ public class VideoPlayCountService {
 		return  countShowVOS;
 	}
 
-	@SuppressWarnings("unused")
 	private List<VideoPlayCountShowVO> videoAllAgencyCount(){
 		List<VideoPlayCountShowVO> vCounts;
 		List<AgencyContainer.Agency> roots = AgencyContainer.getRoots();

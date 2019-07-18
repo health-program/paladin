@@ -67,7 +67,6 @@ public class PublicityMaterialGrantCountService extends ServiceSupport<Publicity
         return lists;
     }
 
-    @SuppressWarnings("unused")
     private List<PublicityMaterialGrantCountVO> publictyAgencyCount(PublicityMaterialGrantQueryCountDTO query){
              List<PublicityMaterialGrantCountVO> pCounts;
             List<AgencyContainer.Agency> roots = AgencyContainer.getRoots();
