@@ -64,11 +64,10 @@ public class ConstantsContainer implements VersionContainer {
 		for (DiagnoseCodeComparison list : lists) {
 			String icd10Code = list.getIcd10Code();
 			if (icd10Code != null) {
-        	List<DiagnoseCodeComparison> diagnoseCodeComparisons =
-				lists.stream()
-					.filter(codeComparison -> codeComparison.getIcd10Code() != null && icd10Code.equals(codeComparison.getIcd10Code()) )
-					.collect(Collectors.toList());
-				diagnoseMap.put(icd10Code,diagnoseCodeComparisons);
+				List<DiagnoseCodeComparison> diagnoseCodeComparisons = lists.stream()
+						.filter(codeComparison -> codeComparison.getIcd10Code() != null && icd10Code.equals(codeComparison.getIcd10Code()))
+						.collect(Collectors.toList());
+				diagnoseMap.put(icd10Code, diagnoseCodeComparisons);
 			}
 		}
 		return true;
@@ -103,7 +102,7 @@ public class ConstantsContainer implements VersionContainer {
 		}
 		return result;
 	}
-	
+
 	public static List<KeyValue> getType(String typeCode) {
 		return constantMap.get(typeCode);
 	}
@@ -128,12 +127,13 @@ public class ConstantsContainer implements VersionContainer {
 
 	/**
 	 * 获取所有key集合
+	 * 
 	 * @return
 	 */
 	public static Collection<String> getAllKey() {
 		return (Collection<String>) constantMap.keySet();
 	}
-	
+
 	/**
 	 * 根据类型和编码得到常量值
 	 * 
@@ -177,8 +177,11 @@ public class ConstantsContainer implements VersionContainer {
 
 	/**
 	 * 功能描述: <通过ICD10编码查找熙康编码>
+	 * 
 	 * @param code
-	 * @return  java.util.List<com.paladin.health.model.diagnose.DiagnoseCodeComparison>
+	 * @return java.util.List<com.paladin.health.model.diagnose.DiagnoseCodeComparison>
 	 */
-  public static List<DiagnoseCodeComparison> getDiagnoseCodesByIcd10Code(String code) { return diagnoseMap.get(code); }
+	public static List<DiagnoseCodeComparison> getDiagnoseCodesByIcd10Code(String code) {
+		return diagnoseMap.get(code);
+	}
 }

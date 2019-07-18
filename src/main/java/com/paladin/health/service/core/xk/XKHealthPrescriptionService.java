@@ -24,10 +24,14 @@ import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.utils.time.DateFormatUtil;
 import com.paladin.framework.utils.time.DateTimeUtil;
 import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.health.core.knowledge.KnowledgeManageContainer;
+import com.paladin.health.core.knowledge.KnowledgeManageContainer.EvaluateConfig;
+import com.paladin.health.core.knowledge.KnowledgeManageContainer.KnowledgeServiceBean;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
 import com.paladin.health.model.sms.SmsSendResponse;
+import com.paladin.health.service.core.HealthPrescriptionService;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationItemDTO;
 import com.paladin.health.service.core.xk.message.MessageContainer;
@@ -56,7 +60,7 @@ import java.util.*;
 
 @Service
 @SuppressWarnings("rawtypes")
-public class XKHealthPrescriptionService {
+public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 	private static Logger logger = LoggerFactory.getLogger(XKHealthPrescriptionService.class);
 
@@ -86,23 +90,29 @@ public class XKHealthPrescriptionService {
 	public static String CONSTANT_DISEASE_TYPE = "xk-disease-type";
 	/** 熙康指标类型 */
 	public static String CONSTANT_INDEX_TYPE = "xk-index-type";
-	/** 熙康评估类型 */
-	public static String CONSTANT_EVALUATE_TYPE = "xk-evaluate-type";
 
-	@Transactional
-	public List<XKDiseaseKnowledge> diagnoseDiseases(List<String> codes) {
-		List<XKDiseaseKnowledge> diseaseKnowledge = null;
-		if (codes != null && codes.size() > 0) {
-			Set<String> diseaseSet = new HashSet<>(codes);
-			diseaseKnowledge = new ArrayList<>();
-			for (String disease : diseaseSet) {
-				XKDiseaseKnowledge k = getKnowledge(disease);
-				if (k != null) {
-					diseaseKnowledge.add(k);
+	/** 熙康评估类型 */
+	// public static String CONSTANT_EVALUATE_TYPE = "xk-evaluate-type";
+
+	@Override
+	public String getKnowledgeServiceCode() {
+		return KnowledgeManageContainer.SERVICE_CODE_XK;
+	}
+
+	private List<EvaluateConfig> evaluatableds = new ArrayList<>();
+
+	@Override
+	public void setKnowledgeServiceBean(KnowledgeServiceBean bean) {
+		List<EvaluateConfig> evaluatableds = new ArrayList<>();
+		List<EvaluateConfig> configs = bean.getEvaluates();
+		if (configs != null) {
+			for (EvaluateConfig config : configs) {
+				if (config.isEnabled()) {
+					evaluatableds.add(config);
 				}
 			}
 		}
-		return diseaseKnowledge;
+		this.evaluatableds = evaluatableds;
 	}
 
 	/**
@@ -123,10 +133,10 @@ public class XKHealthPrescriptionService {
 			Map evaluationResult = getEvaluation(evaluateCondition);
 			if (evaluationResult != null) {
 				evaluationResultList = new ArrayList<>(8);
-				for (ConstantsContainer.KeyValue kv : ConstantsContainer.getType(CONSTANT_EVALUATE_TYPE)) {
+				for (EvaluateConfig kv : evaluatableds) {
 
-					String code = kv.getKey();
-					String name = kv.getValue();
+					String code = kv.getCode();
+					String name = kv.getName();
 
 					Map single = (Map) evaluationResult.get(code);
 					if (single == null)

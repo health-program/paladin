@@ -14,7 +14,7 @@ import com.paladin.framework.utils.WebUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.IndexContainer;
 import com.paladin.health.core.factor.PeopleCondition;
-import com.paladin.health.service.core.HealthPrescriptionService;
+import com.paladin.health.service.core.HealthPrescriptionServiceImpl;
 
 /**
  * 该接口方法为最初设想，已经作废
@@ -26,7 +26,7 @@ import com.paladin.health.service.core.HealthPrescriptionService;
 public class DiagnoseController {
 
 	@Autowired
-	private HealthPrescriptionService healthPrescriptionService;
+	private HealthPrescriptionServiceImpl healthPrescriptionService;
 
 	@Autowired
 	private IndexContainer indexContainer;

@@ -4,10 +4,12 @@ import com.paladin.common.core.ConstantsContainer;
 import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.AuthKeyContainer;
+import com.paladin.health.core.knowledge.KnowledgeManageContainer;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
+import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 
 import io.swagger.annotations.Api;
@@ -31,8 +33,6 @@ import org.springframework.web.bind.annotation.*;
 public class XKDiagnoseController {
 
 	@Autowired
-	private XKHealthPrescriptionService healthPrescriptionService;
-	@Autowired
 	private DiagnoseRecordService diagnoseRecordService;
 	@Autowired
 	private AuthKeyContainer authKeyContainer;
@@ -44,8 +44,11 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
-
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.doSimpleEvaluation(condition, accessKey));
+		XKHealthPrescription result = KnowledgeManageContainer.getCurrentHealthPrescriptionService().doSimpleEvaluation(condition, accessKey);
+		if (result == null) {
+			return CommonResponse.getFailResponse("无法调取相关服务");
+		}
+		return CommonResponse.getSuccessResponse(result);
 	}
 
 	@ApiOperation(value = "熙康健康评估接口")
@@ -55,8 +58,11 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
-		
-		healthPrescriptionService.doSimpleEvaluation(condition, accessKey);
+
+		XKHealthPrescription result = KnowledgeManageContainer.getCurrentHealthPrescriptionService().doSimpleEvaluation(condition, accessKey);
+		if (result == null) {
+			return CommonResponse.getFailResponse("无法调取相关服务");
+		}
 		return CommonResponse.getSuccessResponse();
 	}
 
@@ -88,7 +94,7 @@ public class XKDiagnoseController {
 		model.addAttribute("record", JsonUtil.getJson(record));
 		return "/health/xk/prescription_confirm";
 	}
-	
+
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@GetMapping("/evaluate/simple/record/view")
 	public Object getEvaluationRecordPage(@RequestParam("identificationId") String identificationId, @RequestParam String accessKey, Model model) {
@@ -102,7 +108,7 @@ public class XKDiagnoseController {
 			model.addAttribute("errorMessage", "您没有创建过健康处方");
 			return "/health/xk/error";
 		}
-		
+
 		model.addAttribute("record", JsonUtil.getJson(record));
 		return "/health/xk/prescription_view";
 	}
@@ -115,10 +121,10 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
-		healthPrescriptionService.confirmSimpleEvaluation(confirmEvaluation, searchId, accessKey);
+		KnowledgeManageContainer.getCurrentHealthPrescriptionService().confirmSimpleEvaluation(confirmEvaluation, searchId, accessKey);
 		return CommonResponse.getSuccessResponse();
 	}
-	
+
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@PostMapping("/evaluate/simple/confirm2pdf")
 	@ResponseBody
@@ -126,8 +132,15 @@ public class XKDiagnoseController {
 			@RequestParam String accessKey) {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
-		}		
-		return CommonResponse.getSuccessResponse("success", healthPrescriptionService.confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,true));
+		}
+
+		String path = KnowledgeManageContainer.getCurrentHealthPrescriptionService().confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,
+				true);
+		if (path == null || path.length() == 0) {
+			return CommonResponse.getFailResponse("无法调取相关服务");
+		} else {
+			return CommonResponse.getSuccessResponse("success", path);
+		}
 	}
 
 	@ApiOperation(value = "熙康体检百科接口")
@@ -138,7 +151,7 @@ public class XKDiagnoseController {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getKnowledge(code));
+		return CommonResponse.getSuccessResponse(KnowledgeManageContainer.getCurrentHealthPrescriptionService().getKnowledge(code));
 	}
 
 	@ApiOperation(value = "疾病和指标数据接口")

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="enabled-type," />
+    <section class="content-header">
+        <h1>知识库评估管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/service/index"><i class="fa fa-table"></i>服务列表</a></li>
+            <li><a href="javascript:back()">
+                    <font th:text="${serviceName}"></font>
+                </a></li>
+            <li class="active">添加评估</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+        <a href="javascript:back()" class="btn btn-primary btn-block">返回</a>
+    </div>
+    <input type="hidden" id="serviceId" th:value="${serviceId}" />
+    <input type="hidden" id="serviceName" th:value="${serviceName}" />
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        cancelBtn: false,
+        name: "添加评估",
+        url: "/health/knowledge/evaluate/save?serviceId=" + $("#serviceId").val(),
+        columns: [
+            { title: "评估编码", name: "code", required: "required", inputType: "TEXT" },
+            { title: "评估名称", name: "name", required: "required", inputType: "TEXT" },
+            { title: "是否启用", name: "enabled", enum: "enabled-type", inputType: "RADIO" },
+            { title: "备注", name: "note", inputType: "TEXTAREA" }
+        ]
+    }
+
+    $(function() {
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        $.initComponment($(".content"));
+
+        var model = new tonto.Model("model", options.columns, {
+            pattern: "edit",
+            successCallback: function() {
+                $.successAlert("保存成功", back);
+            }
+        });
+        model.setData(null);
+    });
+
+    function back() {
+        window.location = "/health/knowledge/evaluate/index?serviceId=" + $("#serviceId").val() + "&serviceName=" + $("#serviceName").val();
+    }
+    </script>
+</body>
+
+</html>

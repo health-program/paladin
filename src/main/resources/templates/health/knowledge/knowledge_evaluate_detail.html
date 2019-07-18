@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="enabled-type," />
+    <section class="content-header">
+        <h1>知识库评估管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/service/index"><i class="fa fa-table"></i>服务列表</a></li>
+            <li><a href="javascript:back()">
+                    <font th:text="${serviceName}"></font>
+                </a></li>
+            <li class="active">评估详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+        <a href="javascript:back()" class="btn btn-primary btn-block">返回</a>
+    </div>
+    <input type="hidden" id="id" th:value="${id}" />
+    <input type="hidden" id="serviceId" th:value="${serviceId}" />
+    <input type="hidden" id="serviceName" th:value="${serviceName}" />
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    $(function() {
+        var options = {
+            id: "model",
+            name: "评估详情",
+            url: "/health/knowledge/evaluate/update?code=" + $("#id").val() + "&serviceId=" + $("#serviceId").val(),
+            columns: [
+                { title: "评估编码", name: "code", required: "required", inputType: "TEXT", editable: false },
+                { title: "评估名称", name: "name", required: "required", inputType: "TEXT" },
+                { title: "是否启用", name: "enabled", enum: "enabled-type", inputType: "RADIO" },
+                { title: "备注", name: "note", inputType: "TEXTAREA" }
+            ]
+        }
+
+        $.getAjax("/health/knowledge/evaluate/get?id=" + $("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            $.initComponment($(".content"));
+
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
+        });
+    });
+
+    function back() {
+        window.location = "/health/knowledge/evaluate/index?serviceId=" + $("#serviceId").val() + "&serviceName=" + $("#serviceName").val();
+    }
+    </script>
+</body>
+
+</html>

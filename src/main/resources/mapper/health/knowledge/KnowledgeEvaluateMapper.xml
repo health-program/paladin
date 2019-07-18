@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.knowledge.KnowledgeEvaluateMapper">
+	<update id="stopEvaluate">
+		UPDATE knowledge_evaluate SET enabled=0 WHERE code=#{id}
+	</update>
+	<update id="startEvaluate">
+		UPDATE knowledge_evaluate SET enabled=1 WHERE code=#{id}
+	</update>
+</mapper>

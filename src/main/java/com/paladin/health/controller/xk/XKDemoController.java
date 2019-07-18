@@ -2,16 +2,13 @@ package com.paladin.health.controller.xk;
 
 import com.paladin.framework.spring.DevCondition;
 import com.paladin.framework.web.response.CommonResponse;
-import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
+import com.paladin.health.core.knowledge.KnowledgeManageContainer;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 
-import java.util.Arrays;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +24,6 @@ import org.springframework.web.bind.annotation.*;
 @Conditional(DevCondition.class)
 public class XKDemoController {
 
-	@Autowired
-	private XKHealthPrescriptionService healthPrescriptionService;
-
 	@RequestMapping("/evaluate/input")
 	public Object input() {
 		return "/health/xk/evaluate_input";
@@ -40,7 +34,7 @@ public class XKDemoController {
 	@RequestMapping("/evaluate")
 	@ResponseBody
 	public Object getEvaluation(XKEvaluateCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getEvaluation(condition));
+		return CommonResponse.getSuccessResponse(KnowledgeManageContainer.getCurrentHealthPrescriptionService().getEvaluation(condition));
 	}
 
 	@RequestMapping("/diagnose/input")
@@ -48,22 +42,10 @@ public class XKDemoController {
 		return "/health/xk/diagnose_input";
 	}
 
-	@PostMapping("/diagnose/disease")
-	@ResponseBody
-	public Object diagnoseDisease(@RequestParam("code[]") String[] codes) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseDiseases(Arrays.asList(codes)));
-	}
-
-	@PostMapping("/diagnose/index")
-	@ResponseBody
-	public Object diagnoseIndex(@RequestParam("code[]") String[] codes) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.diagnoseDiseases(Arrays.asList(codes)));
-	}
-
 	@PostMapping("/diagnose/evaluation")
 	@ResponseBody
 	public Object diagnoseEvaluation(@RequestBody XKPeopleCondition condition) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.doSimpleEvaluation(condition, "demo"));
+		return CommonResponse.getSuccessResponse(KnowledgeManageContainer.getCurrentHealthPrescriptionService().doSimpleEvaluation(condition, "demo"));
 	}
 
 	@GetMapping("/tips/output")
@@ -74,7 +56,7 @@ public class XKDemoController {
 	@GetMapping("/tips/{typeCode}")
 	@ResponseBody
 	public Object getTips(@PathVariable String typeCode) {
-		return CommonResponse.getSuccessResponse(healthPrescriptionService.getTips(typeCode));
+		return CommonResponse.getSuccessResponse(KnowledgeManageContainer.getCurrentHealthPrescriptionService().getTips(typeCode));
 	}
 
 }

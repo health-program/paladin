@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <tt:constant enumcode="enabled-type," />
+    <section class="content-header">
+        <h1>知识库评估管理</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/service/index"><i class="fa fa-list-alt"></i>服务列表</a></li>
+            <li class="active" th:text="${serviceName}"></li>
+        </ol>
+    </section>
+    <section class="content">
+        <div class="box box-solid" style="margin-top:20px">
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                        <a onclick="add()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>添加评估</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <input type="hidden" id="serviceId" th:value="${serviceId}" />
+    <input type="hidden" id="serviceName" th:value="${serviceName}" />
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table, serviceId, serviceName;
+    $(function() {
+        serviceId = $("#serviceId").val();
+        serviceName = $("#serviceName").val();
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "编码", field: "code" },
+                    { title: "名称", field: "name" },
+                    { title: "是否启用", field: "enabled", enumcode: "enabled-type" },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            },
+                            'click .stop': function(e, value, row, index) {
+                                stop(row);
+                            },
+                            'click .start': function(e, value, row, index) {
+                                start(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            var html = '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>';
+                            if (row.enabled == 1) {
+                                html += '<button class="stop btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>停用</button>';
+                            } else {
+                                html += '<button class="start btn btn-xs btn-success"><i class="glyphicon glyphicon-ok"></i>启用</button>';
+                            }
+                            return html;
+                        }
+                    }
+                ]
+            ],
+            url: '/health/knowledge/evaluate/find/page?serviceId=' + serviceId,
+            showColumns: true,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    function add() {
+        window.location = '/health/knowledge/evaluate/add?serviceId=' + serviceId + '&serviceName=' + serviceName;
+    }
+
+    function detail(row) {
+        window.location = '/health/knowledge/evaluate/detail' + (row ? ('?id=' + row.code + '&serviceId=' + serviceId + '&serviceName=' + serviceName) : '');;
+    }
+
+    function start(row) {
+        if (row) {
+            layer.confirm('确定启用评估吗?', function() {
+                $.getAjax('/health/knowledge/evaluate/start?id=' + row.code, function() {
+                    $.successMessage("启用服务成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
+    function stop(row) {
+        if (row) {
+            layer.confirm('确定停用评估吗?', function() {
+                $.getAjax('/health/knowledge/evaluate/stop?id=' + row.code, function() {
+                    $.successMessage("停用服务成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+    </script>
+</body>
+
+</html>

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.HealthPrescriptionContainer;
-import com.paladin.health.service.core.HealthPrescriptionService;
+import com.paladin.health.service.core.HealthPrescriptionServiceImpl;
 import com.paladin.health.service.prescription.PrescriptionFactorItemService;
 import com.paladin.health.service.prescription.PrescriptionItemService;
 
@@ -23,7 +23,7 @@ public class HealthPrescriptionController {
 	@Autowired
 	private PrescriptionItemService prescriptionItemService;
 	@Autowired
-	private HealthPrescriptionService healthPrescriptionService;
+	private HealthPrescriptionServiceImpl healthPrescriptionService;
 	@Autowired
 	private HealthPrescriptionContainer healthPrescriptionContainer;
 
