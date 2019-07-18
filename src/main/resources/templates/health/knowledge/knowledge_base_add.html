@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+<tt:constant enumcode="knowledge-data-type" />
+    <section class="content-header">
+        <h1>知识库</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/base/index"><i class="fa fa-list-alt"></i>信息列表</a></li>
+            <li class="active">新增基本信息</li>
+        </ol>
+    </section>
+    <section class="content">
+        <div id="model_container" class="box box-widget" >
+            <div class="box-header no-border" >
+                <h3 class="box-title">新增基本信息</h3>
+                <div class="box-tools pull-right">
+                    <a class="btn tonto-model-tool-view-btn" id="model_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>
+                </div>
+            </div>
+            <div id="model_edit" class="box-body" >
+                <form id="model_form" action="/health/knowledge/base/save" method="post" class="form-horizontal null" style="padding-left:100px">
+                    <div class="form-group">
+                        <label for="type" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>类型：</label>
+                        <div class="col-sm-3">
+                            <select name="type" class="form-control tonto-select-constant" required="required" enumcode="knowledge-data-type">
+                                <option value="">请选择类型</option>
+                            </select>
+                        </div>
+                        <label for="name" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>名称：</label>
+                        <div class="col-sm-3">
+                            <input name="name" placeholder="请输入名称" type="text" class="form-control" required="required"></input></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="code" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>疾病或指标编码：</label>
+                        <div class="col-sm-3">
+                            <input name="code" placeholder="请输入疾病或指标编码" type="text" class="form-control" required="required"></input></div>
+                        <label for="department" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>所在科室：</label>
+                        <div class="col-sm-3">
+                            <input name="department" placeholder="请输入所在科室" type="text" class="form-control" required="required"></input></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inspectionPurpose" class="col-sm-2 control-label">检查目的：</label>
+                        <div class="col-sm-8">
+                            <textarea name="inspectionPurpose" placeholder="请输入检查目的" rows="5" type="text" class="form-control"></textarea></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="diseaseOverview" class="col-sm-2 control-label">疾病概述：</label>
+                        <div class="col-sm-8">
+                            <textarea name="diseaseOverview" placeholder="请输入疾病概述" rows="5" type="text" class="form-control"></textarea></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="judgementStandard" class="col-sm-2 control-label">判定标准：</label>
+                        <div class="col-sm-8">
+                            <input name="judgementStandard" placeholder="请输入判定标准" type="text" class="form-control"></input></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="diseaseClassification" class="col-sm-2 control-label">疾病分类：</label>
+                        <div class="col-sm-8">
+                            <input name="diseaseClassification" placeholder="请输入疾病分类" type="text" class="form-control"></input></div>
+                    </div>
+                    <div class="form-group form-button-bar">
+                        <div class="col-sm-2 col-sm-offset-3">
+                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存</button>
+                        </div>
+                        <div class="col-sm-2 col-sm-offset-1">
+                            <button type="button" id="reply_btn" class="btn btn-default btn-block">返回</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var options = {
+        id: "model",
+        name: "新增基本信息",
+        url:"/health/knowledge/base/save",
+        cancelBtn:false,
+        columns: [
+            { title: "类型", name: "type", required: "required", inputType: "SELECT", enum:"knowledge-data-type" },
+            { title: "名称", name: "name", required: "required", inputType: "TEXT" },
+            { title: "疾病或指标编码", name: "code", required: "required", inputType: "TEXT" },
+            { title: "所在科室", name: "department", required: "required", inputType: "TEXT" },
+            { title: "检查目的", name: "inspectionPurpose", inputType: "TEXTAREA", dependency: ["type", "1"], colspan:2},
+            { title: "疾病概述", name: "diseaseOverview", inputType: "TEXTAREA", dependency: ["type", "2"] , colspan:2},
+            { title: "判定标准", name: "judgementStandard", inputType: "TEXT" , dependency: ["type", "1"], colspan:2},
+            { title: "疾病分类", name: "diseaseClassification", inputType: "TEXT" , dependency: ["type", "2"], colspan:2}
+				]
+    }
+
+    $(function() {       
+   /*     var html = generateEditHtml(options);
+        $(".content").html(html);*/
+        var model = new tonto.Model("model", options.columns, {
+            pattern:"edit",
+            successCallback:function(){
+                $.successAlert("保存成功",function(){
+                    window.location = "/health/knowledge/base/index";
+                });
+            }
+        });
+        model.setData(null);
+        $("#reply_btn").click(function () {
+            window.location = "/health/knowledge/base/index";
+        });
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    
+    <section class="content-header">
+        <h1 th:text="|${name}——${title}|"></h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/base/index"><i class="fa fa-list-alt"></i>疾病/指标列表</a></li>
+            <li><a th:href="@{/health/knowledge/base/detail/index(name=${name},knowledgeId=${knowledgeId})}"><i class="fa fa-list-alt"></i>[[${name}]]详细列表</a></li>
+            <li class="active" th:text="${title}"></li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+    <input type="hidden" id="id" th:value="${id}"/>
+    <input type="hidden" id="knowledgeId" th:value="${knowledgeId}">
+    <input type="hidden" id="name" th:value="${name}">
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+        var knowledgeId,name,id,knowledgeModel;
+    $(function() {
+        id = $("#id").val();
+        knowledgeId = $("#knowledgeId").val();
+        name = $("#name").val();
+    	var options = {
+	        id: "model",
+	        name: "详情",
+            server: false,
+            editFormClass: false,
+            cancelBtn:false,
+            formButtonBar:[{
+                id:  'reply_btn',
+                type: 'button',
+                name:  '返回',
+                class: 'btn btn-default btn-block',
+                order: 2
+            }],
+	        url:"/health/knowledge/base/detail/update",
+	        columns: [
+				{ title: "名称", name: "title", required: "required", inputType: "TEXT" },
+				{
+				    title: "原因",
+                    name: "cause",
+                    inputType: "SUB-MODEL",
+                    subViewField: "causeFiled",
+                    addSubModelBtnTitle: '添加原因',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                    if (data.value) {
+                        s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                    } else {
+                        s += "<dt>" + data.key + "</dt>"
+                    }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{
+				    title: "症状",
+                    name: "symptom",
+                    inputType: "SUB-MODEL",
+                    subViewField: "symptomFiled",
+                    addSubModelBtnTitle: '添加症状',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "风险",
+                    name: "risk",
+                    inputType: "SUB-MODEL",
+                    subViewField: "riskFiled",
+                    addSubModelBtnTitle: '添加风险',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "生活方式",
+                    name: "lifestyle",
+                    inputType: "SUB-MODEL",
+                    subViewField: "lifestyleFiled",
+                    addSubModelBtnTitle: '添加生活方式',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "饮食建议",
+                    name: "dietaryAdvice",
+                    inputType: "SUB-MODEL",
+                    subViewField: "dietaryAdviceFiled",
+                    addSubModelBtnTitle: '添加饮食建议',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "饮食宜吃",
+                    name: "dietaryShouldEat",
+                    inputType: "SUB-MODEL",
+                    subViewField: "dietaryShouldEatFiled",
+                    addSubModelBtnTitle: '添加饮食宜吃',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "饮食忌吃",
+                    name: "dietaryAvoidEat",
+                    inputType: "SUB-MODEL",
+                    subViewField: "dietaryAvoidEatFiled",
+                    addSubModelBtnTitle: '添加饮食忌吃',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "运动建议",
+                    name: "sportsAdvice",
+                    inputType: "SUB-MODEL",
+                    subViewField: "sportsAdviceFiled",
+                    addSubModelBtnTitle: '添加运动建议',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "运动宜做",
+                    name: "sportsShouldDo",
+                    inputType: "SUB-MODEL",
+                    subViewField: "sportsShouldDoFiled",
+                    addSubModelBtnTitle: '添加运动宜做',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "运动忌做",
+                    name: "sportsAvoidDo",
+                    inputType: "SUB-MODEL",
+                    subViewField: "sportsAvoidDoFiled",
+                    addSubModelBtnTitle: '添加运动忌做',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "医疗保健",
+                    name: "medicalInsurance",
+                    inputType: "SUB-MODEL",
+                    subViewField: "medicalInsuranceFiled",
+                    addSubModelBtnTitle: '添加医疗保健',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "就医复查指南",
+                    name: "medicalReviewGuide",
+                    inputType: "SUB-MODEL",
+                    subViewField: "medicalReviewGuideFiled",
+                    addSubModelBtnTitle: '添加就医复查指南',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+                },
+				{ title: "生活常识",
+                    name: "lifeCommonSense",
+                    inputType: "SUB-MODEL",
+                    subViewField: "lifeCommonSenseFiled",
+                    addSubModelBtnTitle: '添加生活常识',
+                    subTitleViewHtmml: function(data) {
+                        var s = "";
+                        if (data.value) {
+                            s += "<dt style='color:orange'>" + data.key + "</dt>" + "<dd>" + data.value + "</dd>";
+                        } else {
+                            s += "<dt>" + data.key + "</dt>"
+                        }
+
+                        return s;
+                    },
+                    subModelOptions: {
+                        headBorder: false,
+                        hearderBox: false,
+                        server: false,
+                        layerOption: {
+                            height: 400,
+                            width: 700
+                        },
+                        columns: [
+                            { title: "标题", name: "key", inputType: "TEXT", required: "required" },
+                            { title: "内容", name: "value", inputType: "TEXTAREA" }
+                        ]
+                    }
+				}
+				]
+	    }
+    
+        $.getAjax("/health/knowledge/base/detail/get?id="+id, function(data) {
+            var html = generateEditHtml(options);
+            $(".content").html(html);
+            knowledgeModel = new tonto.Model("model", options.columns,{
+                pattern:"edit",
+                server: false,
+                submitClick: function() {
+                    save();
+                }
+        });
+            knowledgeModel.setData(data);
+            $("#reply_btn").click(function () {
+                window.location = "/health/knowledge/base/detail/index?knowledgeId="+knowledgeId+'&name='+name;
+            });
+            $.initComponment();
+        });
+    });
+        function save() {
+            var data = knowledgeModel.getFormData();
+            data['knowledgeId'] = knowledgeId;
+            data['id'] = id;
+            $.postJsonAjax("/health/knowledge/base/detail/save",data,function () {
+                $.successAlert("修改成功", function() {
+                    window.location = "/health/knowledge/base/detail/index?knowledgeId="+knowledgeId+'&name='+name;
+                });
+            },$("#model_form_submit_btn"));
+        }
+    </script>
+</body>
+
+</html>

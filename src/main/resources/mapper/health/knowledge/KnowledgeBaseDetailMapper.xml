@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.paladin.health.mapper.knowledge.KnowledgeBaseDetailMapper">
+
+    <select id="searchknowledgeSimpleInfo"
+            resultType="com.paladin.health.service.knowledge.vo.KnowledgeBaseSimpleVO">
+        SELECT
+        id,knowledge_id as knowledgeId,title
+        FROM knowledge_base_detail where 1 = 1
+        <if test="query.knowledgeId != null">
+            AND knowledge_id = #{query.knowledgeId}
+        </if>
+    </select>
+</mapper>

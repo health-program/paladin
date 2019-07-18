@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+    <section class="content-header">
+        <h1 th:text="${name}"></h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/base/index"><i class="fa fa-list-alt"></i>疾病/指标列表</a></li>
+            <li class="active" th:text="${name}"></li>
+        </ol>
+    </section>
+    <section class="content">
+        <input type="hidden" id="knowledgeId" th:value="${knowledgeId}">
+        <input type="hidden" id="name" th:value="${name}">
+        <div class="box box-solid">
+            <div class="box-header with-border">
+                <i class="fa fa-list-ul"></i>
+                <h3 class="box-title">详细信息列表</h3>
+            </div>
+            <div id="result" class="box-body">
+                <table id="dataGrid"></table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                        <a onclick="add()" class="btn btn-success"><i class="glyphicon glyphicon-plus"></i>新增详细信息</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div class="col-sm-2 col-sm-offset-5 btn-back">
+        <a  class="btn btn-primary btn-block"  href="/health/knowledge/base/index">返回</a>
+    </div>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+    var table,knowledgeId,name;
+    $(function() {
+        knowledgeId = $("#knowledgeId").val();
+        name = $("#name").val();
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "名称", field: "title" },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "200px",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            },
+                            'click .remove': function(e, value, row, index) {
+                                remove(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
+                                '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+
+                        }
+                    }
+                ]
+            ],
+            url: '/health/knowledge/base/detail/find/page?knowledgeId='+knowledgeId,
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+    function add() {
+        window.location = '/health/knowledge/base/detail/add'+"?name="+name+"&knowledgeId="+knowledgeId;
+    }
+
+    function detail(row) {
+        window.location = '/health/knowledge/base/detail/info' + (row ? ('?id=' + row.id+"&name="+name+"&knowledgeId="+knowledgeId+"&title="+row.title) : '');
+    }
+
+    function remove(row) {
+        if (row) {
+            layer.confirm('确定删除吗?', function() {
+                $.getAjax('/health/knowledge/base/detail/delete?id=' + row.id, function() {
+                    $.successMessage("删除成功");
+                    table.refresh();
+                });
+            });
+        }
+    }
+
+    function getSelectRow(notShowError) {
+        var rows = table.getSelections();
+        var row = rows.length > 0 ? rows[0] : null;
+        if (!notShowError && !row) {
+            $.errorMessage("请选中一条业务数据");
+        }
+        return row;
+    }
+    </script>
+</body>
+
+</html>

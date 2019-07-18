@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+<tt:constant enumcode="knowledge-data-type" />
+    <section class="content-header">
+        <h1>知识库</h1>
+        <ol class="breadcrumb">
+            <li><a href="/health/knowledge/base/index"><i class="fa fa-list-alt"></i>信息列表</a></li>
+            <li class="active">基本信息详情</li>
+        </ol>
+    </section>
+    <section class="content">
+    </section>
+<div class="col-sm-2 col-sm-offset-5 btn-back">
+    <a  class="btn btn-primary btn-block"  href="/health/knowledge/base/index">返回</a>
+</div>
+
+    <input type="hidden" id="id" th:value="${id}"/>
+    <div th:include="/health/footer" />
+    <script type="text/javascript">
+
+    $(function() {
+    	var options = {
+	        id: "model",
+	        name: "基本信息详情",
+	        url:"/health/knowledge/base/update?id="+$("#id").val(),
+	        columns: [
+				{ title: "类型", name: "type", required: "required", inputType: "SELECT", enum:"knowledge-data-type" },
+				{ title: "名称", name: "name", required: "required", inputType: "TEXT" },
+                { title: "疾病或指标编码", name: "code", required: "required", inputType: "TEXT" },
+                { title: "所在科室", name: "department", required: "required", inputType: "TEXT" },
+				{ title: "检查目的", name: "inspectionPurpose", inputType: "TEXTAREA", dependency: ["type", "1"], colspan:2},
+				{ title: "疾病概述", name: "diseaseOverview", inputType: "TEXTAREA", dependency: ["type", "2"] , colspan:2},
+				{ title: "判定标准", name: "judgementStandard", inputType: "TEXT" , dependency: ["type", "1"], colspan:2},
+				{ title: "疾病分类", name: "diseaseClassification", inputType: "TEXT" , dependency: ["type", "2"], colspan:2}
+				]
+	    }
+    
+        $.getAjax("/health/knowledge/base/get?id="+$("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
+            $.initComponment();
+        });
+    });
+    </script>
+</body>
+
+</html>
