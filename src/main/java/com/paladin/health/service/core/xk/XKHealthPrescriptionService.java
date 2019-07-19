@@ -1,24 +1,16 @@
 package com.paladin.health.service.core.xk;
 
 import com.github.pagehelper.util.StringUtil;
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Image;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.Rectangle;
+import com.google.common.base.Strings;
+import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.paladin.common.core.ConstantsContainer;
 import com.paladin.common.core.TemporaryFileHelper;
 import com.paladin.common.core.TemporaryFileHelper.TemporaryFileOutputStream;
+import com.paladin.framework.common.Condition;
+import com.paladin.framework.common.QueryType;
 import com.paladin.framework.core.exception.BusinessException;
 import com.paladin.framework.utils.JsonUtil;
 import com.paladin.framework.utils.time.DateFormatUtil;
@@ -30,6 +22,8 @@ import com.paladin.health.core.knowledge.KnowledgeManageContainer.KnowledgeServi
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.model.diagnose.DiagnoseTarget;
 import com.paladin.health.model.diagnose.DiagnoseTargetFactor;
+import com.paladin.health.model.knowledge.KnowledgeBase;
+import com.paladin.health.model.knowledge.KnowledgeBaseDetail;
 import com.paladin.health.model.sms.SmsSendResponse;
 import com.paladin.health.service.core.HealthPrescriptionService;
 import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
@@ -42,8 +36,9 @@ import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 import com.paladin.health.service.diagnose.DiagnoseTargetFactorService;
 import com.paladin.health.service.diagnose.DiagnoseTargetService;
+import com.paladin.health.service.knowledge.KnowledgeBaseDetailService;
+import com.paladin.health.service.knowledge.KnowledgeBaseService;
 import com.paladin.health.service.sms.SendMsgWebService;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +51,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.*;
 
 @Service
@@ -76,6 +72,10 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	private XKKnowledgeServlet knowledgeServlet;
 	@Autowired
 	private MessageContainer messageContainer;
+	@Autowired
+	private KnowledgeBaseService knowledgeBaseService;
+	@Autowired
+	private KnowledgeBaseDetailService knowledgeBaseDetailService;
 
 	@Value("${xk.knowledge.url}")
 	private String knowledgeUrl;
@@ -85,7 +85,6 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 	@Value("${xk.tips.url}")
 	private String tipsUrl;
-
 	@Override
 	public String getKnowledgeServiceCode() {
 		return KnowledgeManageContainer.SERVICE_CODE_XK;
@@ -450,7 +449,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	 * @param code
 	 * @return
 	 */
-	public XKDiseaseKnowledge getKnowledge(String code) {
+/*	public XKDiseaseKnowledge getKnowledge(String code) {
 		String url = knowledgeUrl + code;
 		String diseaseName = ConstantsContainer.getTypeValue(ConstantsContainer.CONSTANT_DISEASE_TYPE, code);
 		if (diseaseName != null && diseaseName.length() > 0) {
@@ -469,7 +468,31 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		}
 
 		return null;
+	}*/
+
+
+	public XKDiseaseKnowledge getKnowledge(String code) {
+		if (Strings.isNullOrEmpty(code)) {
+			throw new BusinessException("请输入疾病或指标编码");
+		}
+		List<KnowledgeBase> bases = knowledgeBaseService.searchAll(new Condition(KnowledgeBase.COLUMN_CODE, QueryType.EQUAL, code));
+		if (bases == null || bases.size() == 0) {
+			throw new BusinessException("该编码的疾病或指标基本信息不存在");
+		}
+		if (bases.size() > 1) {
+			throw new BusinessException("该编码的疾病或指标基本信息存在多条记录");
+		}
+		XKDiseaseKnowledge xkDiseaseKnowledge = new XKDiseaseKnowledge();
+		KnowledgeBase base = bases.get(0);
+		xkDiseaseKnowledge.setBase(base);
+		String baseId = base.getId();
+		List<KnowledgeBaseDetail> details = knowledgeBaseDetailService.searchAll(new Condition(KnowledgeBaseDetail.COLUMN_KNOWLEDGE_ID, QueryType.EQUAL, baseId));
+		if (details != null && details.size() > 0) {
+			xkDiseaseKnowledge.setDetail(details);
+		}
+		return  xkDiseaseKnowledge;
 	}
+
 
 	/**
 	 * 获取评估

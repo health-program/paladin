@@ -1,11 +1,14 @@
 package com.paladin.health.service.core.xk.response;
 
+import com.paladin.health.model.knowledge.KnowledgeBase;
+import com.paladin.health.model.knowledge.KnowledgeBaseDetail;
+
 import java.util.List;
 
 @SuppressWarnings("rawtypes")
 public class XKDiseaseKnowledge {
 
-	public static final String TYPE_DISEASE = "disease";
+/*	public static final String TYPE_DISEASE = "disease";
 	public static final String TYPE_INDE = "index";
 
 	private String code;
@@ -25,38 +28,25 @@ public class XKDiseaseKnowledge {
 		this.name = name;
 		this.type = type;
 		this.knowledge = knowledge;
+	}*/
+
+ 	private KnowledgeBase base;
+
+ 	private List<KnowledgeBaseDetail> detail;
+
+	public KnowledgeBase getBase() {
+		return base;
 	}
 
-	public String getCode() {
-		return code;
+	public void setBase(KnowledgeBase base) {
+		this.base = base;
 	}
 
-	public void setCode(String code) {
-		this.code = code;
+	public List<KnowledgeBaseDetail> getDetail() {
+		return detail;
 	}
 
-	public String getName() {
-		return name;
+	public void setDetail(List<KnowledgeBaseDetail> detail) {
+		this.detail = detail;
 	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public List getKnowledge() {
-		return knowledge;
-	}
-
-	public void setKnowledge(List knowledge) {
-		this.knowledge = knowledge;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 }

@@ -57,12 +57,97 @@ function search_menu() {
     }
 
     $.post("/xk/symptom", { code: currentSymptom }, function(data) {
-        showEvaluateResult(data.result);
+        showKnowledge(data.result)
     });
 
 }
 
-function showEvaluateResult(result) {
+function showKnowledge(result) {
+    let base = result.base;
+    let detail = result.detail;
+    let type = base.type;
+    var html = '<div class="box box-solid"><div class="box-body">';
+    if (type === 1) {
+        html += '<dl class="dl-horizontal" style="padding:20px;">' +
+            '<dt>指标名称：</dt><dd id="dn">' + base.name + '</dd>' +
+            '<dt>所在科室：</dt><dd id="ad">' + base.department + '</dd>' +
+            '<dt>检查目的：</dt><dd id="dm">' + base.inspectionPurpose + '</dd>' +
+            '<dt>判定标准：</dt><dd id="dc">' + base.judgementStandard + '</dd>' +
+            '</dl>';
+
+    } else {
+        html += '<dl class="dl-horizontal" style="padding:20px;">' +
+            '<dt>疾病名称：</dt><dd id="dn">' + base.name + '</dd>' +
+            '<dt>所在科室：</dt><dd id="ad">' + base.department + '</dd>' +
+            '<dt>疾病概述：</dt><dd id="dm">' + base.diseaseOverview + '</dd>' +
+            '<dt>疾病分类：</dt><dd id="dc">' + base.diseaseClassification + '</dd>' +
+            '</dl>';
+    }
+
+    html += "</div></div>";
+
+    $("#summary").html(html);
+
+    html = '<ul class="nav nav-tabs">';
+    var htmlNode = '<div class="tab-content">';
+
+    for (var i = 0; i < detail.length; i++) {
+        html += '<li ' + (i === 0 ? 'class="active"' : '') + '><a href="#tab' + i + '" data-toggle="tab" aria-expanded="' + (i === 0 ? 'true' : 'false') + '">' + detail[i].title + '</a></li>';
+
+        htmlNode += '<div class="tab-pane ' + (i === 0 ? 'active' : '') + '" id="tab' + i + '">';
+        htmlNode += getEvaluateItemHtml((type === 1 ? '可能原因：' : '病因：'), detail[i].cause);
+        htmlNode += getEvaluateItemHtml('症状：', detail[i].symptom);
+        htmlNode += getEvaluateItemHtml((type === 1 ? '可能存在的风险或疾病：' : '风险或并发症：'), detail[i].risk);
+        htmlNode += getEvaluateItemHtml('生活方式：', detail[i].lifestyle);
+        htmlNode += getEvaluateItemHtml('饮食建议：', detail[i].dietaryAdvice);
+        htmlNode += getEvaluateItemHtml('饮食宜吃：', detail[i].dietaryShouldEat);
+        htmlNode += getEvaluateItemHtml('饮食忌吃：', detail[i].dietaryAvoidEat);
+        htmlNode += getEvaluateItemHtml('运动建议：', detail[i].sportsAdvice);
+        htmlNode += getEvaluateItemHtml('运动宜做：', detail[i].sportsShouldDo);
+        htmlNode += getEvaluateItemHtml('运动忌做：', detail[i].sportsAvoidDo);
+        htmlNode += getEvaluateItemHtml('医疗保健：', detail[i].medicalInsurance);
+        htmlNode += getEvaluateItemHtml('就医复查指南：', detail[i].medicalReviewGuide);
+        htmlNode += getEvaluateItemHtml('生活常识：', detail[i].lifeCommonSense);
+        htmlNode += '</div>';
+    }
+
+    htmlNode += "</div>";
+    html += "</ul>";
+
+    $("#detail").html(html + htmlNode);
+
+}
+
+function getEvaluateItemHtml(name, data) {
+    if (!data) {
+        return '';
+    }
+
+    return '<dl class="dl-horizontal" style="padding:20px;">' +
+        '    <dt>' + name + '</dt>' +
+        parseContent(data) +
+        '</dl>';
+}
+
+function parseContent(content) {
+    var s = "";
+    if (content) {
+        var arr = JSON.parse(content);
+        if (arr && arr.length > 0) {
+            arr.forEach(function(a) {
+                if (a.value) {
+                    s += "<dd style='color:orange'>" + a.key + "</dd>" + "<dd>" + a.value + "</dd>";
+                } else {
+                    s += "<dd>" + a.key + "</dd>"
+                }
+            });
+        }
+    }
+    return s;
+}
+
+
+/*function showEvaluateResult(result) {
     var data = result.knowledge;
     var type = result.type;
     if (!data) {
@@ -85,7 +170,7 @@ function showEvaluateResult(result) {
             '<dt>疾病概述：</dt><dd id="dm">' + data[0].dm + '</dd>' +
             '<dt>疾病分类：</dt><dd id="dc">' + data[0].dc + '</dd>' +
             '</dl>';
-        /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
+        /!* +'<dt class="dl-horizontal">疾病详情</dt>';*!/
     }
 
     html += "</div></div>";
@@ -122,22 +207,12 @@ function showEvaluateResult(result) {
     html += "</ul>";
 
     $("#detail").html(html + htmlNode);
-}
+}*/
 
 
 
 
-function getEvaluateItemHtml(name, data) {
-    if (!data) {
-        return '';
-    }
-
-    return '<dl class="dl-horizontal" style="padding:20px;">' +
-        '    <dt>' + name + '</dt>' +
-        parseContent(data) +
-        '</dl>';
-}
-
+/*
 function parseContent(content) {
     var arr = content.split("@#");
     var s = "";
@@ -151,4 +226,4 @@ function parseContent(content) {
     });
 
     return s;
-}
+}*/
