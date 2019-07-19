@@ -136,6 +136,8 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		model.addAttribute("preMessage", preMessage);
 		model.addAttribute("nextMessage", nextMessage);
 		model.addAttribute("messageList", messageList);
+		
+		
 		return "/health/open/message_display_index";
 	}
 

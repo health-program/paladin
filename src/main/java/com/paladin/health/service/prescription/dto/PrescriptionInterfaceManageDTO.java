@@ -9,11 +9,13 @@ public class PrescriptionInterfaceManageDTO {
 	// 授权关键字
 	private String appKey;
 
-	@Length(min = 1,max = 5,message = "应输入0~50个字符")
+	@Length(min = 1,max = 50,message = "应输入0~50个字符")
 	private String name;
 
 	// 
 	private Date createTime;
+	
+	private Integer enabled;
 
 	public String getAppKey() {
 		return appKey;
@@ -37,6 +39,14 @@ public class PrescriptionInterfaceManageDTO {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public Integer getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Integer enabled) {
+		this.enabled = enabled;
 	}
 
 }

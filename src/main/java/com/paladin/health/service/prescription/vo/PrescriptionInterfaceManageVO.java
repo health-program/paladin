@@ -12,6 +12,8 @@ public class PrescriptionInterfaceManageVO {
 
 	// 
 	private Date createTime;
+	
+	private Integer enabled;
 
 	public String getAppKey() {
 		return appKey;
@@ -35,6 +37,14 @@ public class PrescriptionInterfaceManageVO {
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+
+	public Integer getEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(Integer enabled) {
+		this.enabled = enabled;
 	}
 
 }

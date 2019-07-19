@@ -4,87 +4,44 @@
 <head th:include="/health/header" />
 
 <body>
-    
+    <tt:constant enumcode="enabled-type," />
     <section class="content-header">
-        <h1>处方接口管理</h1>
+        <h1>接口管理</h1>
         <ol class="breadcrumb">
             <li><a href="/health/prescription/interface/manage/index"><i class="fa fa-list-alt"></i>列表</a></li>
             <li class="active">详情</li>
         </ol>
     </section>
     <section class="content">
-        <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-list"></i>
-                <h3 class="box-title">详情</h3>
-                <div class="box-tools pull-right">
-                    <a class="btn" id="model_edit_btn" href="javascript:void(0)"><i class="fa fa-edit"></i>编辑</a>
-                </div>
-            </div>
-            <div id="model_view" class="box-body">
-                <form class="form-horizontal">
-                    <div class="form-group">
-                        <label for="appKey" class="col-sm-3 control-label">appKey：</label>
-                        <div class="col-sm-3">
-                            <p name="appKey" class="form-control-static description"></p>
-                        </div>
-                        <label for="name" class="col-sm-2 control-label">第三方名称：</label>
-                        <div class="col-sm-3">
-                            <p name="name" class="form-control-static description"></p>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div id="model_edit" class="box-body" style="display: none">
-                <form id="model_form"
-                      action="/health/prescription/interface/manage/update"
-                      method="post" class="form-horizontal edit-body" novalidate="novalidate">
-                    <input type="hidden" id="id" name="appKey" th:value="${id}"/>
-                    <div class="form-group">
-                        <label for="appKey" class="col-sm-3 control-label">appKey：</label>
-                        <div class="col-sm-3">
-                            <input name="appKey" placeholder="请输入appKey" type="text" disabled class="form-control">
-                        </div>
-                        <label for="name" class="col-sm-2 control-label">第三方名称：</label>
-                        <div class="col-sm-3">
-                            <input name="name" placeholder="请输入第三方名称" type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-2 col-sm-offset-3">
-                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存
-                            </button>
-                        </div>
-                        <div class="col-sm-2 col-sm-offset-1">
-                            <button type="button" id="model_form_cancel_btn" class="btn btn-default btn-block">取消
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
     </section>
+    <input id="id" th:value="${id}"  type="hidden"/>
     <div class="col-sm-2 col-sm-offset-5 btn-back">
-    	<a href="/health/prescription/interface/manage/index" class="btn btn-primary btn-block">返回</a>
+        <a href="/health/prescription/interface/manage/index" class="btn btn-primary btn-block">返回</a>
     </div>
     <div th:include="/health/footer" />
     <script type="text/javascript">
-        $(function () {
-            var options = {
-                id: "model",
-                name: "详情",
-                url: "/health/prescription/interface/manage/update?appKey=" + $("#id").val(),
-                columns: [
-                    {title: "appKey", name: "appKey", required: "required", inputType: "TEXT"},
-                    {title: "第三方名称", name: "name", required: "required", inputType: "TEXT"}
-                ]
-            };
-            $.getAjax("/health/prescription/interface/manage/get?id=" + $("#id").val(), function (data) {
-                var model = new tonto.Model("model", options.columns);
-                model.setData(data);
-                $.initComponment($(".content"));
-            });
+    $(function() {
+        var options = {
+            id: "model",
+            name: "详情",
+            url: "/health/prescription/interface/manage/update?appKey=" + $("#id").val(),
+            columns: [
+                { title: "appKey", name: "appKey", required: "required", inputType: "TEXT", editable: false },
+                { title: "第三方名称", name: "name", required: "required", inputType: "TEXT" },
+                { title: "是否启用", name: "enabled", required: "required", inputType: "RADIO", enum: "enabled-type" }
+            ]
+        };
+
+
+        $.getAjax("/health/prescription/interface/manage/get?id=" + $("#id").val(), function(data) {
+            var html = generateHtml(options);
+            $(".content").html(html);
+            $.initComponment($(".content"));
+
+            var model = new tonto.Model("model", options.columns);
+            model.setData(data);
         });
+    });
     </script>
 </body>
 

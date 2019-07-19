@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport" />
     <link rel="stylesheet" href="/static/assets/bootstrap3/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="/static/css/font-awesome.min.css"/>
-    <link rel="stylesheet" href="/static/css/ionicons.min.css"/>
-    <link rel="stylesheet" href="/static/css/iconfont.css"/>
-    <link rel="stylesheet" href="/static/css/AdminLTE.min.css"/>
-    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css"/>
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/static/css/ionicons.min.css" />
+    <link rel="stylesheet" href="/static/css/iconfont.css" />
+    <link rel="stylesheet" href="/static/css/AdminLTE.min.css" />
+    <link rel="stylesheet" href="/static/css/skins/skin-green-light.min.css" />
 </head>
 
 <body class="layout-top-nav skin-green-light">
@@ -29,19 +29,29 @@
                                         <h2 th:text="${message.title}" style="text-align: center"></h2>
                                         <p th:text="|发布时间：  ${#dates.format(message.publishTime,'yyyy-MM-dd')}|" style="color: #999;text-align: right"></p>
                                         <!-- <h5>信息内容:</h5>-->
-                                        <div style="text-align: center" class="media-object" th:utext="${message.content}"></div>
-                                        <p th:text="|标签：${message.label != null ? message.label:'暂无'}|" style="color: #999;"></p>
+                                        <div class="media-object" th:utext="${message.content}"></div>
                                     </div>
-                                    <div>
-                                        <p th:if="${preMessage != null}">
-                                            <a th:href="${'/open/health/message/center/display/index?id='+ preMessage.id}" th:text="|上一篇：${preMessage.title}|"></a>
-                                        </p>
-                                        <p th:if="${preMessage == null}" th:text="上一篇：到顶了"></p>
-                                        <p th:if="${nextMessage != null}">
-                                            <a  th:href="${'/open/health/message/center/display/index?id='+ nextMessage.id}" th:text="|下一篇：${nextMessage.title}|"></a>
-                                        </p>
-                                        <p th:if="${nextMessage == null}" th:text="下一篇：到底了"></p>
-                                    </div>
+                                    <p th:text="|标签：${message.label != null ? message.label:'暂无'}|" style="color: #999;"></p>
+                                </div>
+                                <div class="box-footer" th:if="${message.attachmentFiles!=null}">
+                                    附件：
+                                    <ul class="list-unstyled" th:each="file,iter: ${message.attachmentFiles}">
+                                        <li>
+                                            <a target="_blank" th:href="@{'/file/'+${file.pelativePath}}">
+                                                <i class="fa fa-download"></i><span style="margin-left:5px" th:text="${file.name}"></span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="box-footer">
+                                    <p th:if="${preMessage != null}">
+                                        <a th:href="${'/open/health/message/center/display/index?id='+ preMessage.id}" th:text="|上一篇：${preMessage.title}|"></a>
+                                    </p>
+                                    <p th:if="${preMessage == null}" th:text="上一篇：到顶了"></p>
+                                    <p th:if="${nextMessage != null}">
+                                        <a th:href="${'/open/health/message/center/display/index?id='+ nextMessage.id}" th:text="|下一篇：${nextMessage.title}|"></a>
+                                    </p>
+                                    <p th:if="${nextMessage == null}" th:text="下一篇：到底了"></p>
                                 </div>
                             </div>
                         </div>
@@ -51,13 +61,13 @@
                                     <ul class="products-list product-list-in-box">
                                         <li class="item" th:each="message,iter: ${messageList}">
                                             <div class="product-img">
-                                            	<img th:if="${message.thumbnailUrl!=null}" th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT">
-                            					<img  th:if="${message.thumbnailUrl==null}" src="/static/image/health/article.png" alt="ATTACHMENT">
-                            					</div>
-                                                <div class="product-info">
-                                                    <a  th:href="${'/open/health/message/center/display/index?id='+ message.id}" th:text="${message.title}"></a>
-                                                    <span class="product-description" th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span>
-                                                </div>
+                                                <img th:if="${message.thumbnailUrl!=null}" th:src="@{'/file/'+${message.thumbnailUrl.thumbnailPelativePath}}" alt="ATTACHMENT">
+                                                <img th:if="${message.thumbnailUrl==null}" src="/static/image/health/article.png" alt="ATTACHMENT">
+                                            </div>
+                                            <div class="product-info">
+                                                <a th:href="${'/open/health/message/center/display/index?id='+ message.id}" th:text="${message.title}"></a>
+                                                <span class="product-description" th:text="${#dates.format(message.publishTime, 'yyyy-MM-dd')}"></span>
+                                            </div>
                                         </li>
                                     </ul>
                                 </div>

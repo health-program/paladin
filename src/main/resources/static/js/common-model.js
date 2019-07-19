@@ -1853,6 +1853,7 @@ var _attachmentFieldBuilder = new _FieldBuilder("ATTACHMENT", {
             layoutTemplates: {
                 actionUpload: '' //去除上传预览缩略图中的上传图片；
             },
+            allowedPreviewTypes:['image'],
             uploadAsync: false,
             maxFileCount: column.maxFileCount || 5,
             allowedFileExtensions: column.allowedFileExtensions || ["jpeg", "jpg", "png", "gif"],

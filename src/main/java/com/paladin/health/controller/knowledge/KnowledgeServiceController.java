@@ -70,6 +70,7 @@ public class KnowledgeServiceController extends ControllerSupport {
 			return validErrorHandler(bindingResult);
 		}
 		KnowledgeService model = beanCopy(knowledgeServiceDTO, new KnowledgeService());
+		model.setEnabled(0);
 		if (knowledgeServiceService.save(model) > 0) {
 			KnowledgeManageContainer.updateData();
 			return CommonResponse.getSuccessResponse(beanCopy(knowledgeServiceService.get(model.getServiceCode()), new KnowledgeServiceVO()));

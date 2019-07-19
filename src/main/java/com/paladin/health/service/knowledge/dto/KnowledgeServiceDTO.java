@@ -12,8 +12,6 @@ public class KnowledgeServiceDTO {
 	// 备注
 	private String note;
 
-	// 是否启用
-	private Integer enabled;
 
 	public String getServiceCode() {
 		return serviceCode;
@@ -37,14 +35,6 @@ public class KnowledgeServiceDTO {
 
 	public void setNote(String note) {
 		this.note = note;
-	}
-
-	public Integer getEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(Integer enabled) {
-		this.enabled = enabled;
 	}
 
 

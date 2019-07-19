@@ -5,7 +5,6 @@ import com.paladin.health.model.knowledge.KnowledgeBaseDetail;
 
 import java.util.List;
 
-@SuppressWarnings("rawtypes")
 public class XKDiseaseKnowledge {
 
 /*	public static final String TYPE_DISEASE = "disease";

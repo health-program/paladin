@@ -27,13 +27,13 @@
                     <div class="form-group">
                         <label for="title" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>标题：</label>
                         <div class="col-sm-3">
-                            <input name="title" placeholder="请输入标题" type="text" class="form-control" required="required"/>
+                            <input name="title" placeholder="请输入标题" type="text" class="form-control" required="required" />
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="publishTime" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发布时间：</label>
                         <div class="col-sm-3">
-                            <input name="publishTime" placeholder="请输入发布时间" type="text" autocomplete="off" class="form-control tonto-datepicker-date" required="required"/>
+                            <input name="publishTime" placeholder="请输入发布时间" type="text" autocomplete="off" class="form-control tonto-datepicker-date" required="required" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -44,7 +44,7 @@
                     <div class="form-group">
                         <label for="sendHour" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>发送时间：</label>
                         <div class="col-sm-3">
-                            <input name="sendHour" placeholder="请输入几点开始发送" type="number" class="form-control" required="required" min="0" max="24"/>
+                            <input name="sendHour" placeholder="请输入几点开始发送" type="number" class="form-control" required="required" min="0" max="24" />
                         </div>
                     </div>
                     <div class="form-group">
@@ -118,7 +118,14 @@
             { title: "开始发送时间", name: "sendHour", inputType: "NUMBER", dependency: ["type", "3"] },
             { title: "内容", name: "content", inputType: "TEXT" },
             { title: "标签", name: "label", inputType: "TEXT", dependency: ["type", "2"] },
-            { title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles", dependency: ["type", "1", "2"] }
+            {
+                title: "附件",
+                name: "attachments",
+                inputType: "ATTACHMENT",
+                fileName: "attachmentFiles",
+                dependency: ["type", "1", "2"],
+                allowedFileExtensions: ["jpeg", "jpg", "png", "gif", "txt", "pdf", "xlsx", "xls", "doc", "docx", "rar", "zip","mp4"]
+            }
         ]
     }
 
@@ -179,12 +186,12 @@
             return;
         }
 
-        if ( type == 2) {
+        if (type == 2) {
             editor.setShow();
             messageInput.hide();
             messageInput.attr("disabled", true);
             $("#publishTargetGroup").hide();
-        } else if (type == 1 ) {
+        } else if (type == 1) {
             editor.setHide();
             messageInput.show();
             messageInput.attr("disabled", false);

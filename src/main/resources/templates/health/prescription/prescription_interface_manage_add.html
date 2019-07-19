@@ -4,45 +4,17 @@
 <head th:include="/health/header" />
 
 <body>
-    
+    <tt:constant enumcode="enabled-type," />
     <section class="content-header">
-        <h1>处方接口管理</h1>
+        <h1>接口管理</h1>
         <ol class="breadcrumb">
             <li><a href="/health/prescription/interface/manage/index"><i class="fa fa-table"></i>列表</a></li>
             <li class="active">新增</li>
         </ol>
     </section>
-    <section class="content">
-        <div class="box box-solid">
-            <div class="box-header with-border">
-                <i class="fa fa-list"></i>
-                <h3 class="box-title">新增</h3>
-                <div class="box-tools pull-right">
-                </div>
-            </div>
-            <div id="model_edit" class="box-body">
-                <form id="model_form" action="/health/prescription/interface/manage/save" method="post"
-                      class="form-horizontal edit-body" novalidate="novalidate">
-                    <div class="form-group">
-                        <label for="appKey" class="col-sm-3 control-label">appKey：</label>
-                        <div class="col-sm-3">
-                            <input name="appKey" id="appKey" type="text" class="form-control" disabled th:value="${appKey}">
-                        </div>
-                        <label for="name" class="col-sm-2 control-label">第三方名称：</label>
-                        <div class="col-sm-3">
-                            <input name="name" placeholder="请输入第三方名称" required type="text" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-2 col-sm-offset-5">
-                            <button type="submit" id="model_form_submit_btn" class="btn btn-primary btn-block">保存
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
+    <section class="content">      
     </section>
+    <input id="appKey" th:value="${appKey}" type="hidden"/>
     <div class="col-sm-2 col-sm-offset-5 btn-back">
     	<a href="/health/prescription/interface/manage/index" class="btn btn-primary btn-block">返回</a>
     </div>
@@ -50,28 +22,32 @@
     <script type="text/javascript">
     var options = {
         id: "model",
+        cancelBtn: false,
         name: "新增",
         url: "/health/prescription/interface/manage/save",
         columns: [
             {title: "appKey", name: "appKey", required: "required", inputType: "TEXT"},
-            {title: "第三方名称", name: "name", required: "required", inputType: "TEXT"}
+            {title: "第三方名称", name: "name", required: "required", inputType: "TEXT"},
+            {title: "是否启用", name: "enabled", required: "required", inputType: "RADIO", enum: "enabled-type"}
         ]
     };
 
     $(function () {
+        var html = generateEditHtml(options);
+        $(".content").html(html);
+        $.initComponment($(".content"));
+
         var model = new tonto.Model("model", options.columns, {
             pattern: "edit",
-            extraParam: {
-                appKey: $("#appKey").val()
-            },
-            successCallback: function () {
-                $.successAlert("保存成功", function () {
+            successCallback: function() {
+                $.successAlert("保存成功", function() {
                     window.location = "/health/prescription/interface/manage/index";
                 });
             }
         });
-        model.setData(data);
-        $.initComponment($(".content"));
+        model.setData({
+            appKey: $("#appKey").val()
+        });
     });
     </script>
 </body>

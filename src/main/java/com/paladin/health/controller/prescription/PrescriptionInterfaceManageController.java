@@ -100,4 +100,26 @@ public class PrescriptionInterfaceManageController extends ControllerSupport {
 		return CommonResponse.getResponse(effect);
 	}
 
+	@RequestMapping(value = "/start", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Object start(@RequestParam String id) {
+		boolean effect = prescriptionInterfaceManageService.start(id);
+		if (effect) {
+			authKeyContainer.updateData();
+		}
+
+		return CommonResponse.getResponse(effect);
+	}
+
+	@RequestMapping(value = "/stop", method = { RequestMethod.GET, RequestMethod.POST })
+	@ResponseBody
+	public Object stop(@RequestParam String id) {
+		boolean effect = prescriptionInterfaceManageService.stop(id);
+		if (effect) {
+			authKeyContainer.updateData();
+		}
+
+		return CommonResponse.getResponse(effect);
+	}
+
 }

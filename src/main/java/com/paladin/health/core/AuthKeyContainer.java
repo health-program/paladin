@@ -30,7 +30,13 @@ public class AuthKeyContainer implements VersionContainer {
 	}
 
 	public boolean hasAccessKey(String accessKey) {
-		return interfaceMap.containsKey(accessKey);
+		PrescriptionInterfaceManage pim = interfaceMap.get(accessKey);
+		if (pim != null) {
+			Integer i = pim.getEnabled();
+			return i != null && i == 1;
+		}
+
+		return false;
 	}
 
 	public String getAccessKeyName(String accessKey) {
