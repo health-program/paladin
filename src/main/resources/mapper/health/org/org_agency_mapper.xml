@@ -5,10 +5,10 @@
 		UPDATE org_agency t1,
 		  (SELECT count(1) AS c
 		   FROM org_user
-		   WHERE agency_id=#{id}) t2 ,
+		   WHERE agency_id=#{id} AND is_delete=0) t2 ,
 		  (SELECT count(1) AS c
 		   FROM org_agency
-		   WHERE parent_id =#{id}) t3
+		   WHERE parent_id =#{id} AND is_delete=0) t3
 		SET t1.is_delete=1
 		WHERE t1.id=#{id}
 		  AND t2.c =0
