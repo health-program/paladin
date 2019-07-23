@@ -130,11 +130,11 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		PublicityMessageVO message = publicityMessageService.getMessage(id);
 		List<PublicityMessageVO> messageList = publicityMessageService.showDisplayMessage();
 
-		PublicityMessageVO preMessage = publicityMessageService.showPreMessage(id, message.getPublishTime());
-		PublicityMessageVO nextMessage = publicityMessageService.showNextMessage(id, message.getPublishTime());
+	/*	PublicityMessageVO preMessage = publicityMessageService.showPreMessage(id, message.getPublishTime());
+		PublicityMessageVO nextMessage = publicityMessageService.showNextMessage(id, message.getPublishTime());*/
 		model.addAttribute("message", message);
-		model.addAttribute("preMessage", preMessage);
-		model.addAttribute("nextMessage", nextMessage);
+	/*	model.addAttribute("preMessage", preMessage);
+		model.addAttribute("nextMessage", nextMessage);*/
 		model.addAttribute("messageList", messageList);
 		
 		

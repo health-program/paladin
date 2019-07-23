@@ -177,18 +177,18 @@
             if (total > limit) {
                 var totalPage = Math.ceil(total / limit);
                 var html = '<div class="text-center"><ul class="pagination">';
-                html += page > 1 ? '<li><a href="/open/health/message/center/video/index?offset=' + ((page - 2) * limit) + '">&laquo;</a></li>' : '<li><a href="javascript:void(0)">&laquo;</a></li>';
+                html += page > 1 ? '<li><a href="/open/health/message/center/message/index?offset=' + ((page - 2) * limit) + '">&laquo;</a></li>' : '<li><a href="javascript:void(0)">&laquo;</a></li>';
 
                 var i = page - Math.floor(t / 2);
                 if (i < 1) i = 1;
                 if (i > totalPage) i = totalPage;
 
                 for (var k = 0; i <= totalPage && k < t; k++) {
-                    html += '<li ' + (i == page ? 'class="active"' : '') + '><a href="/open/health/message/center/video/index?offset=' + ((i - 1) * limit) + '">' + i + '</a></li>';
+                    html += '<li ' + (i == page ? 'class="active"' : '') + '><a href="/open/health/message/center/message/index?offset=' + ((i - 1) * limit) + '">' + i + '</a></li>';
                     i++;
                 }
 
-                html += page < totalPage ? '<li><a href="/open/health/message/center/video/index?offset=' + (page * limit) + '">&raquo;</a></li>' : '<li><a href="javascript:void(0)">&raquo;</a></li>';
+                html += page < totalPage ? '<li><a href="/open/health/message/center/message/index?offset=' + (page * limit) + '">&raquo;</a></li>' : '<li><a href="javascript:void(0)">&raquo;</a></li>';
                 html += '</ul></div>';
                 $("#body").append(html);
             }
