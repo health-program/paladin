@@ -224,7 +224,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		
 		PublicityMessageQueryDTO query = new PublicityMessageQueryDTO();
 		query.setOffset(offset);
-		query.setLimit(10);
+		query.setLimit(5);
 		
 		PageResult<PublicityMessageVO> result = publicityMessageService.findPublishedMessages(query);
 		
@@ -259,7 +259,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 		
 		VideoQueryDTO query = new VideoQueryDTO();
 		query.setOffset(offset);
-		query.setLimit(3);
+		query.setLimit(5);
 		
 		PageResult<VideoShowVO> result = videoService.findPlayVideoPage(query);
 		
