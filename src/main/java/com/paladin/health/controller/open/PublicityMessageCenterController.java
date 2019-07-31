@@ -171,12 +171,7 @@ public class PublicityMessageCenterController extends ControllerSupport {
 	@RequestMapping("/play")
 	public String play(@RequestParam String id, Model model) {
 		VideoVO videoVO = videoService.getVideo(id);
-		VideoQueryDTO queryDTO = new VideoQueryDTO();
-		queryDTO.setLimit(5);
-		queryDTO.setOffset(0);
-		PageResult<VideoShowVO> videosAll = videoService.findPlayVideoPage(queryDTO);
 		model.addAttribute("video", videoVO);
-		model.addAttribute("videosAll", videosAll.getData());
 		return "/health/open/video_play";
 	}
 

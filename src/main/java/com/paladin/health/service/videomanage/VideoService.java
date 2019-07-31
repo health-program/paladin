@@ -33,6 +33,12 @@ public class VideoService extends ServiceSupport<Video> {
 		return new PageResult<>(page);
 	}
 
+	public PageResult<VideoShowVO> findShowVideoPage(VideoQueryDTO query) {
+		Page<VideoShowVO> page = PageHelper.offsetPage(query.getOffset(), query.getLimit());
+		videoMapper.findShowVideoPage(query);
+		return new PageResult<>(page);
+	}
+
 	public PageResult<VideoShowVO> findPlayVideoPage(VideoQueryDTO pages) {
 		Page<VideoShowVO> page = PageHelper.offsetPage(pages.getOffset(), pages.getLimit());
 		videoMapper.findPlayVideo(pages);
@@ -127,5 +133,4 @@ public class VideoService extends ServiceSupport<Video> {
 	public boolean upVideo(String id) {
 		return videoMapper.upVideo(id) >0;
 	}
-
 }
