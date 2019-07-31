@@ -13,21 +13,23 @@ import java.util.List;
 
 public interface VideoMapper extends CustomMapper<Video> {
 
-      public List<VideoVO> findSelfVideo(VideoQueryDTO query);
+    public List<VideoVO> findSelfVideo(VideoQueryDTO query);
 
-      public List<VideoShowVO> findTopPlayVideo();
+    public List<VideoShowVO> findTopPlayVideo();
 
-      public List<VideoShowVO> findPlayVideo(VideoQueryDTO query);
+    public List<VideoShowVO> findPlayVideo(VideoQueryDTO query);
 
-      public List<VideoVO> findExamineVideo(VideoExamineQueryVO query);
+    public List<VideoVO> findExamineVideo(VideoExamineQueryVO query);
 
-      public int updateExamineStatus(@Param("id") String id, @Param("status") Integer status, @Param("examinerId") String examinerId);
+    public int updateExamineStatus(@Param("id") String id, @Param("status") Integer status, @Param("examinerId") String examinerId);
 
-      public VideoVO getVideo(@Param("id") String id);
+    public VideoVO getVideo(@Param("id") String id);
 
-      List<VideoShowVO> findSearchVideo(@Param("query") VideoMessageQuery query);
+    List<VideoShowVO> findSearchVideo(@Param("query") VideoMessageQuery query);
 
-	public int upVideo(@Param("id") String id);
-	
-	public int offVideo(@Param("id") String id);
+    public int upVideo(@Param("id") String id);
+
+    public int offVideo(@Param("id") String id);
+
+    List<VideoShowVO> findShowVideoPage(@Param("query") VideoQueryDTO query);
 }

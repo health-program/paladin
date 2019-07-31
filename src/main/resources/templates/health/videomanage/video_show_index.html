@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:include="/health/header" />
+
+<body>
+<tt:constant enumcode="boolean,publicity-video-status" />
+<section class="content-header">
+    <h1>视频播放</h1>
+</section>
+<section class="content">
+    <div class="box box-solid">
+        <div class="box-body">
+            <form id="searchbar" class="form-horizontal form-search">
+                <div class="form-group">
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="name" th:value="${query?.name}" placeholder="请输入视频名称" />
+                    </div>
+                    <div class="col-md-2">
+                        <input type="text" class="form-control" name="label" th:value="${query?.label}" placeholder="请输入标签" />
+                    </div>
+                    <div class="col-md-8">
+                        <div class="pull-right">
+                            <button type="button" style="width:100px" class="btn btn-primary tonto-btn-search" onclick="table.refresh()"><i class="fa fa-search"></i>查询</button>
+                            <button type="button" style="width:100px" class="btn btn-default" onclick="$('form')[0].reset()"><i class="fa fa-repeat"></i>重置</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 表单仅有一个text-input时回车会提交表单，这里添加一个无用的防止回车提交 -->
+                <input type="text" style="display:none">
+            </form>
+            <input type="hidden" id="pageLimit" th:value="${query?.limit}" />
+            <input type="hidden" id="pageOffset" th:value="${query?.offset}" />
+        </div>
+    </div>
+    <div class="box box-solid" style="margin-top:20px">
+        <div id="result" class="box-body">
+            <table id="dataGrid"></table>
+            <div id="toolbar">
+            </div>
+        </div>
+    </div>
+</section>
+<div th:include="/health/footer" />
+<script type="text/javascript">
+    var table;
+    $(function() {
+        initDataGrid();
+    });
+
+    function initDataGrid() {
+        var limit = $("#pageLimit").val();
+        var offset = $("#pageOffset").val();
+        var page = (limit && offset) ? offset / limit + 1 : 1;
+
+        table = $.createTable("#dataGrid", {
+            idField: "id",
+            columns: [
+                [
+                    { title: "视频名称", align: "center", field: "name" },
+                    { title: "标签", align: "center", field: "label", width: "10%" },
+                    {
+                        title: "视频地址",
+                        align: "center",
+                        field: "url",
+                        formatter: function(value, row, index) {
+                            return ['<a  href= " ' + row.url + ' "  >' + row.url + '</a>'];
+                        }
+                    },
+                    {
+                        title: "操作",
+                        align: "center",
+                        width: "5%",
+                        events: {
+                            'click .detail': function(e, value, row, index) {
+                                detail(row);
+                            },
+                            'click .play': function(e, value, row, index) {
+                                play(row);
+                            }
+                        },
+                        formatter: function operateFormatter(value, row, index) {
+                            var  html =  '<button class="play btn btn-xs btn-success"><i class="fa  fa-play-circle-o"></i>播放</button>';
+                            return html;
+                        }
+                    }
+                ]
+            ],
+            url: '/health/video/show/find/page',
+            searchbar: '#searchbar',
+            showColumns: true,
+            pageSize: limit || undefined,
+            pageNumber: page || 1,
+            pagination: true,
+            clickToSelect: true,
+            toolbar: "#toolbar",
+            showRefresh: true
+        });
+    }
+
+
+    function detail(row) {
+        window.location = '/health/video/show/detail' + (row ? ('?id=' + row.id) : '');
+    }
+    function play(row) {
+        window.location = '/open/health/message/center/play' + (row ? ('?id=' + row.id) : '');
+    }
+
+</script>
+</body>
+
+</html>

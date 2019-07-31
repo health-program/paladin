@@ -127,5 +127,25 @@
 		</if>
 		ORDER BY publish_time DESC
 	</select>
+	<select id="findShowVideoPage" resultType="com.paladin.health.service.videomanage.vo.VideoShowVO">
+		SELECT
+		id,
+		show_image AS showImage,
+		summary,
+		url,
+		`name`,
+		label,
+		publish_time AS publishTime
+		FROM
+		video
+		WHERE status = 9 AND now() > publish_time
+		<if test="query.name != null and query.name != '' ">
+			AND `name` LIKE CONCAT ('%',#{query.name},'%')
+		</if>
+		<if test="query.label != null and query.label != ''">
+			AND label LIKE CONCAT ('%',#{query.label},'%')
+		</if>
+		ORDER BY publish_time DESC
+	</select>
 
 </mapper>

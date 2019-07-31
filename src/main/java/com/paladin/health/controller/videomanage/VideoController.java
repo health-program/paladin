@@ -41,10 +41,21 @@ public class VideoController extends ControllerSupport {
 		return "/health/videomanage/video_index";
 	}
 
+	@RequestMapping("/show/index")
+	public String showIndex() {
+		return "/health/videomanage/video_show_index";
+	}
+
 	@RequestMapping("/find/page")
 	@ResponseBody
 	public Object findPage(VideoQueryDTO query) {
 		return CommonResponse.getSuccessResponse(videoService.findSelfVideoPage(query));
+	}
+
+	@RequestMapping("/show/find/page")
+	@ResponseBody
+	public Object showFindPage(VideoQueryDTO query) {
+		return CommonResponse.getSuccessResponse(videoService.findShowVideoPage(query));
 	}
 
 	@RequestMapping("/get")
@@ -62,6 +73,12 @@ public class VideoController extends ControllerSupport {
 	public String detailInput(@RequestParam String id, Model model) {
 		model.addAttribute("id", id);
 		return "/health/videomanage/video_detail";
+	}
+
+	@RequestMapping("/show/detail")
+	public String showDetailInput(@RequestParam String id, Model model) {
+		model.addAttribute("id", id);
+		return "/health/videomanage/video_show_detail";
 	}
 
 	@RequestMapping("/save")
