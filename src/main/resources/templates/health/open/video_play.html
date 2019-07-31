@@ -8,7 +8,7 @@
         <section class="content">
             <input type="hidden" id="url" th:value="${video.url}">
             <input type="hidden" id="id" th:value="${video.id}">
-            <input type="hidden" id="showImageUrl" th:value="${video.showImageFile.pelativePath}">
+            <input type="hidden" id="showImageUrl" th:value="${video.showImageFile?.pelativePath}">
             <div class="box box-solid">
                 <div class="box-body" id="videoBody" style="text-align: center;">
                     <h3 th:text="${video.name}"></h3>
