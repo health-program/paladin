@@ -394,7 +394,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		if (createPDF) {
 			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
 			try {
-				createPDF(evaluationResultList, target, output, new Date(), confirmer);
+				createPDF(evaluationResultList, target, output, new Date(), confirmer,hospitalName);
 				return output.getFileRelativeUrl();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -563,7 +563,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		}
 	}
 
-	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer)
+	public void createPDF(List<XKEvaluation> evaluationResultList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer,String hospitalName)
 			throws Exception {
 
 		// 1.创建PDF文件
@@ -609,19 +609,22 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			Integer sex = target.getSex();
 
 			SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
-
+			String hospital="";
+			if(StringUtil.isNotEmpty(hospitalName)){
+			    hospital= "("+hospitalName+")";
+			}
 			Paragraph info = new Paragraph();
 			info.add(Chunk.NEWLINE);
 			info.add(new Phrase("姓名：", fontt));
 			info.add(new Phrase(name != null ? name : "", font));
-			info.add("          ");
+			info.add("    ");
 			info.add(new Phrase("性别：", fontt));
 			info.add(new Phrase(sex != null ? (sex == 1 ? "男" : "女") : "", font));
-			info.add("          ");
-			info.add(new Phrase("确认医生：", fontt));
-			info.add(new Phrase(confirmer != null ? confirmer : "", font));
-			info.add("          ");
-			info.add(new Phrase("评估时间：", fontt));
+			info.add("    ");
+			info.add(new Phrase("医生：", fontt));
+			info.add(new Phrase(confirmer != null ? confirmer+hospital : "", font));
+			info.add("    ");
+			info.add(new Phrase("时间：", fontt));
 			info.add(new Phrase(createTime != null ? formatter.format(createTime) : "", font));
 			info.add(Chunk.NEWLINE);
 			info.add(Chunk.NEWLINE);
