@@ -17,7 +17,7 @@ import com.paladin.health.model.knowledge.KnowledgeEvaluate;
 import com.paladin.health.model.knowledge.KnowledgeService;
 import com.paladin.health.service.core.HealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
-import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
+import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
@@ -152,12 +152,12 @@ public class KnowledgeManageContainer implements VersionContainer {
 			return null;
 		}
 
-		public void confirmSimpleEvaluation(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey) {
+		public void confirmSimpleEvaluation(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey) {
 			throw new BusinessException("无法调取相关服务");
 		}
 
 		@Override
-		public String confirmSimpleEvaluationAndCreatePDF(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
+		public String confirmSimpleEvaluationAndCreatePDF(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
 			return null;
 		}
 

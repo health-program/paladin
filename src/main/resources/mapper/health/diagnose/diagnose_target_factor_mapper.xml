@@ -7,9 +7,9 @@
 
 
 	<insert id="insertByBatch">
-		INSERT INTO diagnose_target_factor (target_id,factor_code,factor_type,factor_level,create_time,create_by) VALUES
+		INSERT INTO diagnose_target_factor (target_id,factor_name,factor_code,factor_type,factor_level,create_time,create_by) VALUES
 		<foreach collection="coll" item="item" index="index" separator=",">
-			(#{item.targetId}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime}, #{item.createBy})
+			(#{item.targetId}, #{item.factorName}, #{item.factorCode}, #{item.factorType}, #{item.factorLevel}, #{item.createTime}, #{item.createBy})
 		</foreach>
 	</insert>
 
@@ -22,7 +22,7 @@
 		dt.sex,
 		dt.birthday,
 		dt.cellphone,
-		GROUP_CONCAT( CONCAT_WS('-',dtf.factor_code,dtf.factor_type,dtf.factor_level)) as factors
+		GROUP_CONCAT( CONCAT_WS('-',dtf.factor_name,dtf.factor_code,dtf.factor_type,dtf.factor_level)) as factors
 		FROM
 		diagnose_target AS dt
 		LEFT JOIN diagnose_target_factor AS dtf ON dt.id = dtf.target_id

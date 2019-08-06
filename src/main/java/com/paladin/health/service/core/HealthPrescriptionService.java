@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.paladin.health.core.knowledge.KnowledgeManageContainer.KnowledgeServiceBean;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
-import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
+import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
@@ -48,7 +48,7 @@ public interface HealthPrescriptionService {
 	 * @param searchId
 	 * @param accessKey
 	 */
-	public default void confirmSimpleEvaluation(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey) {
+	public default void confirmSimpleEvaluation(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey) {
 		confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey, false);
 	}
 
@@ -60,7 +60,7 @@ public interface HealthPrescriptionService {
 	 * @param accessKey
 	 * @param createPDF
 	 */
-	public String confirmSimpleEvaluationAndCreatePDF(ConfirmEvaluationDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF);
+	public String confirmSimpleEvaluationAndCreatePDF(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF);
 
 	/**
 	 * 获取评估

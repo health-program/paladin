@@ -8,4 +8,6 @@ import com.paladin.framework.core.ServiceSupport;
 @Service
 public class KnowledgeBaseService extends ServiceSupport<KnowledgeBase> {
 
+	
+	
 }

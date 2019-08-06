@@ -5,7 +5,10 @@ import com.paladin.framework.common.BaseModel;
 import javax.persistence.Id;
 
 public class KnowledgeBase extends BaseModel {
-	public static String COLUMN_CODE="code";
+	
+	public final static String COLUMN_CODE="code";
+	public final static String COLUMN_NAME="name";
+	
 	// 
 	@Id
 	private String id;

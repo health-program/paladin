@@ -3,6 +3,7 @@ package com.paladin.health.service.core.xk;
 import java.util.Date;
 import java.util.List;
 
+import com.paladin.health.service.core.xk.request.XKDisease;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 
 public class XKPeopleCondition {
@@ -23,7 +24,7 @@ public class XKPeopleCondition {
 	
 	private String hospitalName;
 	
-	private List<String> diseases;
+	private List<XKDisease> diseases;
 	
 	private XKEvaluateCondition condition;
 
@@ -49,14 +50,6 @@ public class XKPeopleCondition {
 
 	public void setCellphone(String cellphone) {
 		this.cellphone = cellphone;
-	}
-
-	public List<String> getDiseases() {
-		return diseases;
-	}
-
-	public void setDiseases(List<String> diseases) {
-		this.diseases = diseases;
 	}
 
 	public XKEvaluateCondition getCondition() {
@@ -105,6 +98,14 @@ public class XKPeopleCondition {
 
 	public void setHospitalName(String hospitalName) {
 		this.hospitalName = hospitalName;
+	}
+
+	public List<XKDisease> getDiseases() {
+		return diseases;
+	}
+
+	public void setDiseases(List<XKDisease> diseases) {
+		this.diseases = diseases;
 	}
 
 	

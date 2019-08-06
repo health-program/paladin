@@ -6,16 +6,14 @@ import javax.persistence.Id;
 
 public class DiagnoseTargetFactor {
 
-	public static final int FACTOR_TYPE_DISEASE = 1;
-	public static final int FACTOR_TYPE_INDEX = 2;
-	public static final int FACTOR_TYPE_RISK = 3;
-	
-	public static final int DEFAULT_FACTOR_LEVEL_HAVE = 1;
-		
+	// 疾病等级都会9
+	public static final int DEFAULT_FACTOR_LEVEL_HAVE = 9;
+
 	@Id
 	private String targetId;
 	@Id
 	private String factorCode;
+	private String factorName;
 	private Integer factorType;
 	private Integer factorLevel;
 	private Date createTime;
@@ -25,9 +23,10 @@ public class DiagnoseTargetFactor {
 
 	}
 
-	public DiagnoseTargetFactor(String targetId, String code, Integer type, Integer level, Date createTime, String createBy) {
+	public DiagnoseTargetFactor(String targetId, String name, String code, Integer type, Integer level, Date createTime, String createBy) {
 		this.targetId = targetId;
 		this.factorCode = code;
+		this.factorName = name;
 		this.factorType = type;
 		this.factorLevel = level;
 		this.createTime = createTime;
@@ -80,6 +79,14 @@ public class DiagnoseTargetFactor {
 
 	public void setCreateBy(String createBy) {
 		this.createBy = createBy;
+	}
+
+	public String getFactorName() {
+		return factorName;
+	}
+
+	public void setFactorName(String factorName) {
+		this.factorName = factorName;
 	}
 
 }

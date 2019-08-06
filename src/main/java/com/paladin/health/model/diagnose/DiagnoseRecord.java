@@ -23,6 +23,8 @@ public class DiagnoseRecord {
 
 	private String factors;
 
+	private String targetDisease;
+	
 	@IgnoreInMultipleResult
 	private String targetCondition;
 	@IgnoreInMultipleResult
@@ -206,6 +208,14 @@ public class DiagnoseRecord {
 
 	public void setHospitalName(String hospitalName) {
 		this.hospitalName = hospitalName;
+	}
+
+	public String getTargetDisease() {
+		return targetDisease;
+	}
+
+	public void setTargetDisease(String targetDisease) {
+		this.targetDisease = targetDisease;
 	}
 
 }

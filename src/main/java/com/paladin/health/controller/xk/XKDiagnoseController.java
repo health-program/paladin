@@ -7,7 +7,7 @@ import com.paladin.health.core.AuthKeyContainer;
 import com.paladin.health.core.knowledge.KnowledgeManageContainer;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
-import com.paladin.health.service.core.xk.dto.ConfirmEvaluationDTO;
+import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.diagnose.DiagnoseRecordService;
 
@@ -115,7 +115,7 @@ public class XKDiagnoseController {
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@PostMapping("/evaluate/simple/confirm")
 	@ResponseBody
-	public Object confirmSimpleEvaluation(@RequestBody ConfirmEvaluationDTO confirmEvaluation, @RequestParam("searchId") String searchId,
+	public Object confirmSimpleEvaluation(@RequestBody ConfirmPrescriptionDTO confirmEvaluation, @RequestParam("searchId") String searchId,
 			@RequestParam String accessKey) {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
@@ -127,7 +127,7 @@ public class XKDiagnoseController {
 	@ApiOperation(value = "熙康健康评估记录接口")
 	@PostMapping("/evaluate/simple/confirm2pdf")
 	@ResponseBody
-	public Object confirmSimpleEvaluation2pdf(@RequestBody ConfirmEvaluationDTO confirmEvaluation, @RequestParam("searchId") String searchId,
+	public Object confirmSimpleEvaluation2pdf(@RequestBody ConfirmPrescriptionDTO confirmEvaluation, @RequestParam("searchId") String searchId,
 			@RequestParam String accessKey) {
 		if (!validAccessKey(accessKey)) {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
