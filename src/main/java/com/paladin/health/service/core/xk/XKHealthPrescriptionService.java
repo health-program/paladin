@@ -148,26 +148,33 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			// ICD10分析
 			for (XKDisease disease : diseases) {
 				String code = disease.getCode();
+				String name = disease.getName();
 				if (code == null || code.length() == 0) {
 					continue;
 				}
 
 				if (!hasDiabetes) {
 					// 是否有糖尿病
-					if (diabetesICD10Pattern.matcher(code).matches()) {
-						diseases.add(new XKDisease("糖尿病", "E10.00"));
+					if ("糖尿病".equals(name) || diabetesICD10Pattern.matcher(code).matches()) {
 						hasDiabetes = true;
 					}
 				}
 
 				if (!hasHypertension) {
 					// 是否高血压
-					if (hypertensionICD10Pattern.matcher(code).matches()) {
-						diseases.add(new XKDisease("高血压", "I10.00"));
+					if ("高血压".equals(name) || hypertensionICD10Pattern.matcher(code).matches()) {
 						hasHypertension = true;
 					}
 				}
 			}
+		}
+
+		if (hasDiabetes) {
+			diseases.add(new XKDisease("糖尿病", "E10.00"));
+		}
+
+		if (hasHypertension) {
+			diseases.add(new XKDisease("高血压", "I10.00"));
 		}
 
 		// 进行诊断疾病指导建议
@@ -228,20 +235,26 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					}
 
 					String suggest = (String) riskResult.get("suggest");
+					if (suggest == null) {
+						continue;
+					}
 
-					// 已诊断糖尿病则不需要评估结果
+					suggest = suggest.trim();
+					if (suggest.length() == 0) {
+						continue;
+					}
+
 					if (hasDiabetes && XKPrescription.CODE_DIABETES.equals(code)) {
-						continue;
+						// 已诊断糖尿病则不需要评估结果
+						prescriptionMap.remove("糖尿病");
+						riskLevel = XKPrescription.LEVEL_HAS;
+					} else if (hasHypertension && XKPrescription.CODE_HYPERTENSION.equals(code)) {
+						// 已诊断高血压则不需要评估结果
+						prescriptionMap.remove("高血压");
+						riskLevel = XKPrescription.LEVEL_HAS;
 					}
 
-					// 已诊断高血压则不需要评估结果
-					if (hasHypertension && XKPrescription.CODE_HYPERTENSION.equals(code)) {
-						continue;
-					}
-
-					if (!prescriptionMap.containsKey(name)) {
-						prescriptionMap.put(name, new XKPrescription(name, code, XKPrescription.TYPE_RISK, riskLevel, suggest));
-					}
+					prescriptionMap.put(name, new XKPrescription(name, code, XKPrescription.TYPE_RISK, riskLevel, suggest));
 				}
 			}
 		}
@@ -490,10 +503,10 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				if (level > XKPrescription.LEVEL_MIDDLE) {
 					if (XKPrescription.CODE_DIABETES.equals(code)) {
 						messages = getTips(XKPrescription.CODE_DIABETES);
-						source = "糖尿病";
+						source = "糖尿病小贴士";
 					} else if (XKPrescription.CODE_HYPERTENSION.equals(code)) {
 						messages = getTips(XKPrescription.CODE_HYPERTENSION);
-						source = "高血压";
+						source = "高血压小贴士";
 					}
 				}
 			}
@@ -504,7 +517,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			if (birthday != null) {
 				if (DateTimeUtil.getAge(birthday) > 60) {
 					messages = getTips("aged");
-					source = "老年人";
+					source = "老年人小贴士";
 				}
 			}
 		}
@@ -513,15 +526,13 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			String message = messageContainer.getOneFestivalMessage();
 			messages = new ArrayList<>();
 			messages.add(message);
-			source = "节气";
+			source = "节气小贴士";
 		}
 
 		List<XKMessage> xkMsgs = new ArrayList<>();
 
-		if (messages != null) {
-			for (String msg : messages) {
-				xkMsgs.add(new XKMessage(source, msg));
-			}
+		if (messages != null && messages.size() > 0) {
+			xkMsgs.add(new XKMessage(source, messages.get(0)));
 		}
 
 		xkMessages.addAll(xkMsgs);
@@ -540,7 +551,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				name = name.trim();
 				if (name.length() > 0) {
 					DiseasePrescriptionPackage packg = XKDiseasePrescriptionContainer.getPrescriptionPackage(name, disease.getCode());
-					if(packg != null) {
+					if (packg != null) {
 						messages.add(packg.getMessage());
 						return packg.getPrescription();
 					}
@@ -726,7 +737,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					color = new BaseColor(255, 165, 0);
 				} else {
 					color = new BaseColor(0, 166, 90);
-				}	
+				}
 
 				Font fontColor = new Font(sfTTF1, 11, Font.NORMAL, color);
 				Font font1 = new Font(sfTTF1, 12);
@@ -737,15 +748,15 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				info1.add(new Phrase("评估内容：", font1));
 				info1.add(new Phrase(prescription.getName(), font111));
 				info1.add(Chunk.NEWLINE);
-				
-				if(prescription.getType() == XKPrescription.TYPE_RISK) {
+
+				if (prescription.getType() == XKPrescription.TYPE_RISK) {
 					info1.add(new Phrase("风险等级：", font1));
-					info1.add(new Phrase(XKPrescription.levelNameMap.get(riskLevel), fontColor));				
+					info1.add(new Phrase(XKPrescription.levelNameMap.get(riskLevel), fontColor));
 				} else {
 					info1.add(new Phrase("风险等级：", font1));
-					info1.add(new Phrase("已经确诊", fontColor));				
+					info1.add(new Phrase("已经确诊", fontColor));
 				}
-				
+
 				info1.add(Chunk.NEWLINE);
 				info1.add(new Phrase("分析建议：", font1));
 				document.add(info1);
@@ -762,11 +773,12 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 						info11.setFirstLineIndent(21);
 						info11.setIndentationLeft(78);
 						info11.setLeading(16f);
-						info11.setSpacingAfter(12f);
+						info11.setSpacingAfter(3);
+						info11.setSpacingBefore(0);
 						document.add(info11);
 					}
 				}
-				
+
 				// num++;
 				/*
 				 * if(evaluationResultList.size() != num){ info1.add(Chunk.NEWLINE);

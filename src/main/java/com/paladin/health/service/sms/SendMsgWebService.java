@@ -51,12 +51,12 @@ public class SendMsgWebService {
 			// SmsService4XMLImplServiceClient();
 			// try {
 			// ISmsService4XML sms = service.getSmsService4XMLImplPort(url);
-			LOGGER.info("**********发送短信***Begin************");
+			//LOGGER.info("**********发送短信***Begin************");
 			String message = convertToXmlForSubmit(phone, content); // 使用document 对象封装XML
-			LOGGER.info("**短信**请求内容:" + message);
+			//LOGGER.info("**短信**请求内容:" + message);
 			String res = getSmsService().submit(message);
-			LOGGER.info("**********发送短信***End************");
-			LOGGER.info("**短信**响应内容:" + res);
+			//LOGGER.info("**********发送短信***End************");
+			//LOGGER.info("**短信**响应内容:" + res);
 			return MessageConvert.xmlToBean(res, SmsSendResponse.class);
 		} catch (Exception e) {
 			LOGGER.error("短信发送异常:" + e.getMessage());

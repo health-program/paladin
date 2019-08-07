@@ -119,6 +119,13 @@ function load() {
 
     record.createTime = record.createTime ? dateFormat(record.createTime * 1) : ''
     $("#content").html(createHtml());
+
+
+    $("#messageSelect").change(function(){
+        var i = $(this).val();
+        $("#messageInput").text(record.message[i].message); 
+    });
+
 }
 
 function evaluationFilter(data) {
@@ -161,14 +168,27 @@ function createHtml(isPrint) {
     html += createMessageHtml(record.message);
     html += createEvaluateHtml(record.prescription, isPrint);
     html += "</table>";
+
     return html;
 }
 
 function createMessageHtml(message) {
+    if (!message || message.length == 0) {
+        return '';
+    }
+
+    var html = '<select style="width:150px;" disabled="disabled" id="messageSelect">';
+    for (var i = 0; i < message.length; i++) {
+        html += '<option value="' + i + '">' + message[i].source + '</option>';
+        //html += '<input type="radio" name="message" value="' + k + '">' + message[i].source + '<textarea id="messageInput' + k + '" rows="3" style="width:99%">' + message[i].message + '</textarea>';
+    }
+
+    html += '</select>';
+    html += '<textarea id="messageInput" disabled="disabled" rows="3" style="width:99%">' + message[0].message + '</textarea>'
+
     return '<tr>' +
         '    <td><input type="checkbox" onclick="checkMessage(this)"/>短信提醒</td>' +
-        '    <td colspan="3" style="text-align:left">' +
-        '    <textarea id="messageInput" disabled rows="3" style="width:99%">' + message[0] + '</textarea>' +
+        '    <td colspan="3" style="text-align:left">' + html +
         '    </td>' +
         '</tr>';
 }
@@ -177,6 +197,7 @@ var messageChecked = false;
 
 function checkMessage(checkbox) {
     messageChecked = checkbox.checked;
+    $("#messageSelect").attr("disabled", !messageChecked);
     $("#messageInput").attr("disabled", !messageChecked);
 }
 
@@ -266,7 +287,6 @@ function preview() {
     //     }
     // }
 
-
     window.print();
     window.document.body.innerHTML = bdhtml;
 }
@@ -334,7 +354,11 @@ function getRequest() {
 
     if (!prescription) return null;
 
-    var message = messageChecked ? $("#messageInput").val() : null;
+    var message = null;
+    if (messageChecked) {      
+        message = $("#messageInput").val();   
+    }
+
     var cellphone = $("#cellphone").val();
     //var confirmer = $("#confirmer").val();
     //if (!confirmer) throw "请输入确认医师姓名！";
@@ -372,7 +396,7 @@ function update2pdf() {
             dataType: "json",
             success: function(response) {
                 if (response && response.status == 1) {
-                	var pdfUrl = "/file" + response.result;
+                    var pdfUrl = "/file" + response.result;
                     window.open(pdfUrl); // 先打开页面
                     return;
                 }

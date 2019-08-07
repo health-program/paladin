@@ -118,7 +118,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 						if (val != null) {
 							val = val.trim();
 							if (val.length() > 0) {
-								sb.append(index).append("）").append(key).append("：").append(val);
+								sb.append(index).append(")").append(key).append("：").append(val);
 								index++;
 							}
 						}
