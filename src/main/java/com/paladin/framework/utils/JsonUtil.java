@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.paladin.framework.core.exception.SystemException;
 
@@ -39,8 +39,8 @@ public class JsonUtil {
 		objectMapper.writeValue(writer, value);
 	}
 
-	
 	public static <T> List<T> parseJsonList(String json, Class<T> valueType) throws IOException {
-		return objectMapper.readValue(json, new TypeReference<List<T>>() { });	
+		JavaType collectionType = objectMapper.getTypeFactory().constructParametricType(List.class, valueType);
+		return objectMapper.readValue(json, collectionType);
 	}
 }

@@ -26,12 +26,12 @@ import com.paladin.health.model.knowledge.KnowledgeBase;
 import com.paladin.health.model.knowledge.KnowledgeBaseDetail;
 import com.paladin.health.model.sms.SmsSendResponse;
 import com.paladin.health.service.core.HealthPrescriptionService;
+import com.paladin.health.service.core.xk.XKDiseasePrescriptionContainer.DiseasePrescriptionPackage;
 import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.message.MessageContainer;
 import com.paladin.health.service.core.xk.request.XKDisease;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
-import com.paladin.health.service.core.xk.response.XKEvaluation;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.core.xk.response.XKMessage;
 import com.paladin.health.service.core.xk.response.XKPrescription;
@@ -221,7 +221,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					String riskLevelName = (String) riskResult.get("riskLevel");
 
 					// 熙康返回的是中文危险等级名称，这里对其归纳总结给出等级
-					Integer riskLevel = XKEvaluation.nameLevelMap.get(riskLevelName);
+					Integer riskLevel = XKPrescription.nameLevelMap.get(riskLevelName);
 					if (riskLevel == null) {
 						logger.error("评估[" + name + "]时出现未知风险等级：" + riskLevelName);
 						continue;
@@ -230,12 +230,12 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					String suggest = (String) riskResult.get("suggest");
 
 					// 已诊断糖尿病则不需要评估结果
-					if (hasDiabetes && XKEvaluation.CODE_DIABETES.equals(code)) {
+					if (hasDiabetes && XKPrescription.CODE_DIABETES.equals(code)) {
 						continue;
 					}
 
 					// 已诊断高血压则不需要评估结果
-					if (hasHypertension && XKEvaluation.CODE_HYPERTENSION.equals(code)) {
+					if (hasHypertension && XKPrescription.CODE_HYPERTENSION.equals(code)) {
 						continue;
 					}
 
@@ -487,12 +487,12 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				String code = eval.getCode();
 				int level = eval.getRiskLevel();
 
-				if (level > XKEvaluation.LEVEL_MIDDLE) {
-					if (XKEvaluation.CODE_DIABETES.equals(code)) {
-						messages = getTips(XKEvaluation.CODE_DIABETES);
+				if (level > XKPrescription.LEVEL_MIDDLE) {
+					if (XKPrescription.CODE_DIABETES.equals(code)) {
+						messages = getTips(XKPrescription.CODE_DIABETES);
 						source = "糖尿病";
-					} else if (XKEvaluation.CODE_HYPERTENSION.equals(code)) {
-						messages = getTips(XKEvaluation.CODE_HYPERTENSION);
+					} else if (XKPrescription.CODE_HYPERTENSION.equals(code)) {
+						messages = getTips(XKPrescription.CODE_HYPERTENSION);
 						source = "高血压";
 					}
 				}
@@ -539,20 +539,10 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			if (name != null) {
 				name = name.trim();
 				if (name.length() > 0) {
-					List<KnowledgeBase> bases = knowledgeBaseService.searchAll(new Condition(KnowledgeBase.COLUMN_NAME, QueryType.EQUAL, name));
-					if (bases != null && bases.size() == 1) {
-						String baseId = bases.get(0).getId();
-						List<KnowledgeBaseDetail> details = knowledgeBaseDetailService
-								.searchAll(new Condition(KnowledgeBaseDetail.COLUMN_KNOWLEDGE_ID, QueryType.EQUAL, baseId));
-						if (details != null && details.size() == 1) {
-							KnowledgeBaseDetail detail = details.get(0);
-							
-							
-							// TODO
-							
-							
-							return null;
-						}
+					DiseasePrescriptionPackage packg = XKDiseasePrescriptionContainer.getPrescriptionPackage(name, disease.getCode());
+					if(packg != null) {
+						messages.add(packg.getMessage());
+						return packg.getPrescription();
 					}
 				}
 			}
@@ -634,12 +624,12 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 	static {
 		referenceMap = new HashMap<>();
-		referenceMap.put(XKEvaluation.CODE_AF, "基于Wang, Massaro, Levy et al于2003年在JAMA上发表的文章《通过社区新发作的AF预测中风或者死亡的风险分数》");
-		referenceMap.put(XKEvaluation.CODE_CHD, "基于D Agostino Russe Mw. Huse DM等人在2000年美国心脏期刊发表的《原发性和继发性冠心病评估:从 Framingham研究中获得的新结果》");
-		referenceMap.put(XKEvaluation.CODE_CVD, "基于2型糖尿病患者未来5年内发生CVD事件的评分模型");
-		referenceMap.put(XKEvaluation.CODE_DIABETES, "基于芬兰Undstrom高危糖尿病人群预测模型");
-		referenceMap.put(XKEvaluation.CODE_HYPERTENSION, "基于中国35-64岁人群15年高血压发生风险预测研究");
-		referenceMap.put(XKEvaluation.CODE_ICVD, "基于国家“十五“攻关课题‘冠心病、脑卒中综合危险度评估及干预方案的研究《课题组在此开发的用于评估个体10年ICVD发病危险的工具》");
+		referenceMap.put(XKPrescription.CODE_AF, "基于Wang, Massaro, Levy et al于2003年在JAMA上发表的文章《通过社区新发作的AF预测中风或者死亡的风险分数》");
+		referenceMap.put(XKPrescription.CODE_CHD, "基于D Agostino Russe Mw. Huse DM等人在2000年美国心脏期刊发表的《原发性和继发性冠心病评估:从 Framingham研究中获得的新结果》");
+		referenceMap.put(XKPrescription.CODE_CVD, "基于2型糖尿病患者未来5年内发生CVD事件的评分模型");
+		referenceMap.put(XKPrescription.CODE_DIABETES, "基于芬兰Undstrom高危糖尿病人群预测模型");
+		referenceMap.put(XKPrescription.CODE_HYPERTENSION, "基于中国35-64岁人群15年高血压发生风险预测研究");
+		referenceMap.put(XKPrescription.CODE_ICVD, "基于国家“十五“攻关课题‘冠心病、脑卒中综合危险度评估及干预方案的研究《课题组在此开发的用于评估个体10年ICVD发病危险的工具》");
 		// referenceMap.put(XKEvaluation.CODE_OSTEOPOROSIS, "骨质疏松症风险评估");
 	}
 
@@ -750,7 +740,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				
 				if(prescription.getType() == XKPrescription.TYPE_RISK) {
 					info1.add(new Phrase("风险等级：", font1));
-					info1.add(new Phrase(XKEvaluation.levelNameMap.get(riskLevel), fontColor));				
+					info1.add(new Phrase(XKPrescription.levelNameMap.get(riskLevel), fontColor));				
 				} else {
 					info1.add(new Phrase("风险等级：", font1));
 					info1.add(new Phrase("已经确诊", fontColor));				

@@ -62,6 +62,7 @@ public class XKPrescription {
 	private String code;
 	private Integer type;
 	private Integer riskLevel;
+	private String riskLevelName;
 	private String suggest;
 
 	public XKPrescription() {
@@ -73,6 +74,14 @@ public class XKPrescription {
 		this.code = code;
 		this.type = type;
 		this.riskLevel = riskLevel;
+		if(riskLevel != null) {
+			this.riskLevelName = levelNameMap.get(riskLevel);
+		}
+		
+		if(this.riskLevelName == null) {
+			this.riskLevelName = "";
+		}
+		
 		this.suggest = suggest;
 	}
 
@@ -114,6 +123,14 @@ public class XKPrescription {
 
 	public void setRiskLevel(Integer riskLevel) {
 		this.riskLevel = riskLevel;
+	}
+
+	public String getRiskLevelName() {
+		return riskLevelName;
+	}
+
+	public void setRiskLevelName(String riskLevelName) {
+		this.riskLevelName = riskLevelName;
 	}
 
 }

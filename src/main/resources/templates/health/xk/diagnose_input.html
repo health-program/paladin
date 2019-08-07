@@ -4,15 +4,16 @@
 <head th:include="/health/header" />
 <style>
     .tab-content>.tab-pane, .pill-content>.pill-pane {
-	display: block;
-	height: 0;
-	overflow-y: hidden;
+    display: block;
+    height: 0;
+    overflow-y: hidden;
 }
 
 .tab-content>.active, .pill-content>.active {
-	height: auto;
+    height: auto;
 }
 </style>
+
 <body>
     <tt:constant enumcode="boolean,sex-type,family-hypertension-type,xk-disease-type,xk-index-type" />
     <div class="container">
@@ -68,7 +69,8 @@
             { name: "cellphone", title: "手机号码", inputType: "TEXT" },
             { name: "birthday", title: "出生日期", inputType: "DATE" },
             { name: "hospitalName", title: "医院·社区名称", inputType: "TEXT" },
-            { name: "doctorName", title: "医师姓名", inputType: "TEXT" }
+            { name: "doctorName", title: "医师姓名", inputType: "TEXT" },
+            { name: "searchId", title: "Search ID", inputType: "TEXT" }     
         ]
     }
 
@@ -110,7 +112,7 @@
             { name: "vegOrFruits", title: "每天是否吃水果或蔬菜", inputType: "RADIO", enum: "boolean" },
             { name: "dyazide", title: "是否服用降压药", inputType: "RADIO", enum: "boolean" },
             { name: "hormone", title: "是否连续6个月以上服用激素类药品", inputType: "RADIO", enum: "boolean" },
-            { name: "menopause", title: "45岁前是否绝经", inputType: "RADIO", enum: "boolean",dependency:["sex","0"] },
+            { name: "menopause", title: "45岁前是否绝经", inputType: "RADIO", enum: "boolean", dependency: ["sex", "0"] },
             { name: "diarrhea", title: "腹泻、腹痛或大便习惯", inputType: "RADIO", enum: "boolean" },
             { name: "rarelyBask", title: "经常晒太阳", inputType: "RADIO", enum: "boolean" },
             { name: "rarelysports", title: "经常参加运动锻炼", inputType: "RADIO", enum: "boolean" },
@@ -197,11 +199,14 @@
             name: "周如",
             sex: 1,
             identificationId: "320583198806119617",
-            cellphone: "13584950680"
+            cellphone: "13584950680",
+            searchId:"0000001",
+            doctorName:"王向阳",
+            hospitalName:"丽华社区服务中心"
         });
 
         $("#disease").html(generateHtml(disease_options));
-         $.initComponment($("#disease"));
+        $.initComponment($("#disease"));
         diseaseModel = new tonto.Model("disease", disease_options.columns, {
             submitClick: function(model) {
                 var jsonData = model.formBody.serializeArray();
@@ -243,12 +248,12 @@
         let d = diseaseModel.data;
         let ds = d && d.disease || [];
         let is = d && d.index || [];
-        if ( ds.length === 0 && is.length === 0  ) {
+        if (ds.length === 0 && is.length === 0) {
             $.errorMessage("请勾选疾病或指标");
             return false
         }
         let codes = ds.concat(is);
-        $.postAjax("/xk/demo/diagnose/disease",{"code":codes},function (data) {
+        $.postAjax("/xk/demo/diagnose/disease", { "code": codes }, function(data) {
             var html = createKnowledgeHtml(data.evaluation);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
@@ -259,8 +264,33 @@
     function diagnoseEvaluation() {
         let request = jQuery.extend({}, baseModel.data);
         request.condition = evaluateModel.data;
+
+
+        let d = diseaseModel.data;
+        let ds = d && d.disease || [];
+        let is = d && d.index || [];
+
+        var diseases = [];
+        ds.forEach(function(code) {
+            var name = $.getConstantEnumValue("xk-disease-type", code);
+            diseases.push({
+                name: name,
+                code: code
+            });
+        });
+
+        is.forEach(function(code) {
+            var name = $.getConstantEnumValue("xk-index-type", code);
+            diseases.push({
+                name: name,
+                code: code
+            });
+        });
+
+        request.diseases = diseases;
+
         $.postJsonAjax("/xk/demo/diagnose/evaluation", request, function(data) {
-            let html = createEvaluateHtml(data.evaluation);
+            let html = createEvaluateHtml(data.prescription);
             html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
             $.openPageLayer(html);
         }, $("#diagnoseBtn1"))
@@ -308,9 +338,10 @@
 
         return s;
     }
-    
-    
-    var count=0;
+
+
+    var count = 0;
+
     function createKnowledgeHtml(data) {
         var html = "";
 
@@ -323,53 +354,53 @@
     }
 
     function createKnowledgeItemHtml(result) {
-        		var data=result.knowledge;
-        		var type=result.type;
-        		if (!data) {
-        	        return '';
-        	    }
-        	    var html = "";
-        	    if(type=='index'){
-        	    	  html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-        	    		    +'<dt>指标名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
-        	    		    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
-        	    		    +'<dt>检查目的：</dt><dd id="dm">'+data[0].dm+'</dd>'
-        	    		    +'<dt>判定标准：</dt><dd id="dc">'+data[0].dc+'</dd>'
-        	    		    +'</dl>'
-        	    		    +'<ul class="nav nav-tabs">'
-        	    		    +'<li class=""><a href="#tab0'+count+'"data-toggle="tab" aria-expanded="true">'+data[0].cr+'</a></li>'
-        	    		    +'<li class=""><a href="#tab1'+count+'"data-toggle="tab" aria-expanded="false">'+data[1].cr+'</a></li>'
-        	                +'</ul>'
-        	    }else{
-        	    html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">'
-        	    +'<dt>疾病名称：</dt><dd id="dn">'+data[0].dn+'</dd>'
-        	    +'<dt>所在科室：</dt><dd id="ad">'+data[0].ad +'</dd>'
-        	    +'<dt>疾病概述：</dt><dd id="dm">'+data[0].dm+'</dd>'
-        	    +'<dt>疾病分类：</dt><dd id="dc">'+data[0].dc+'</dd>'
-        	    +'</dl>';
-        	   /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
-        	    }
-        	    var htmlNode=''; 
-        	    for(var i in data){
-        	    	htmlNode += '<div class="tab-pane '+(i==0?'active':'')+'" id="tab'+i+count+'">';
-        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能原因':'病因'), data[i].dd_c);
-        	    	htmlNode += parseKnowledgeContent('症状', data[i].dd_s);
-        	    	htmlNode += parseKnowledgeContent((type=='index'?'可能存在的风险或疾病':'风险或并发症'), data[i].dd_r);
-        	    	htmlNode += parseKnowledgeContent('生活方式', data[i].dd_l);
-        	    	htmlNode += parseKnowledgeContent('饮食建议', data[i].dd_d);
-        	    	htmlNode += parseKnowledgeContent('饮食宜吃', data[i].dd_d_s);
-        	    	htmlNode += parseKnowledgeContent('饮食忌吃', data[i].dd_d_a);
-        	    	htmlNode += parseKnowledgeContent('运动建议', data[i].dd_sa);
-        	    	htmlNode += parseKnowledgeContent('运动宜做', data[i].dd_sa_s);
-        	    	htmlNode += parseKnowledgeContent('运动忌做', data[i].dd_sa_a);
-        	    	htmlNode += parseKnowledgeContent('医疗保健', data[i].dd_m);
-        	    	htmlNode += parseKnowledgeContent('就医复查指南', data[i].dd_g);
-        	    	htmlNode += parseKnowledgeContent('生活常识', data[i].dd_n);
-        	    	htmlNode+='</div>';
-        	    	
-        	    }
-        	    return html+'<div class="tab-content">'+htmlNode+'</div>';
-        	}
+        var data = result.knowledge;
+        var type = result.type;
+        if (!data) {
+            return '';
+        }
+        var html = "";
+        if (type == 'index') {
+            html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">' +
+                '<dt>指标名称：</dt><dd id="dn">' + data[0].dn + '</dd>' +
+                '<dt>所在科室：</dt><dd id="ad">' + data[0].ad + '</dd>' +
+                '<dt>检查目的：</dt><dd id="dm">' + data[0].dm + '</dd>' +
+                '<dt>判定标准：</dt><dd id="dc">' + data[0].dc + '</dd>' +
+                '</dl>' +
+                '<ul class="nav nav-tabs">' +
+                '<li class=""><a href="#tab0' + count + '"data-toggle="tab" aria-expanded="true">' + data[0].cr + '</a></li>' +
+                '<li class=""><a href="#tab1' + count + '"data-toggle="tab" aria-expanded="false">' + data[1].cr + '</a></li>' +
+                '</ul>'
+        } else {
+            html += '<dl class="dl-horizontal" style="padding-bottom:20px;border-bottom: 1px solid #eee">' +
+                '<dt>疾病名称：</dt><dd id="dn">' + data[0].dn + '</dd>' +
+                '<dt>所在科室：</dt><dd id="ad">' + data[0].ad + '</dd>' +
+                '<dt>疾病概述：</dt><dd id="dm">' + data[0].dm + '</dd>' +
+                '<dt>疾病分类：</dt><dd id="dc">' + data[0].dc + '</dd>' +
+                '</dl>';
+            /* +'<dt class="dl-horizontal">疾病详情</dt>';*/
+        }
+        var htmlNode = '';
+        for (var i in data) {
+            htmlNode += '<div class="tab-pane ' + (i == 0 ? 'active' : '') + '" id="tab' + i + count + '">';
+            htmlNode += parseKnowledgeContent((type == 'index' ? '可能原因' : '病因'), data[i].dd_c);
+            htmlNode += parseKnowledgeContent('症状', data[i].dd_s);
+            htmlNode += parseKnowledgeContent((type == 'index' ? '可能存在的风险或疾病' : '风险或并发症'), data[i].dd_r);
+            htmlNode += parseKnowledgeContent('生活方式', data[i].dd_l);
+            htmlNode += parseKnowledgeContent('饮食建议', data[i].dd_d);
+            htmlNode += parseKnowledgeContent('饮食宜吃', data[i].dd_d_s);
+            htmlNode += parseKnowledgeContent('饮食忌吃', data[i].dd_d_a);
+            htmlNode += parseKnowledgeContent('运动建议', data[i].dd_sa);
+            htmlNode += parseKnowledgeContent('运动宜做', data[i].dd_sa_s);
+            htmlNode += parseKnowledgeContent('运动忌做', data[i].dd_sa_a);
+            htmlNode += parseKnowledgeContent('医疗保健', data[i].dd_m);
+            htmlNode += parseKnowledgeContent('就医复查指南', data[i].dd_g);
+            htmlNode += parseKnowledgeContent('生活常识', data[i].dd_n);
+            htmlNode += '</div>';
+
+        }
+        return html + '<div class="tab-content">' + htmlNode + '</div>';
+    }
 
     function parseKnowledgeContent(name, data) {
         var html = "";
@@ -391,8 +422,7 @@
                                     n = ii[++i];
                                 if (m == '综述') {
                                     h += "<b style='color:red'>" + m + "：</b><span style='color:#aaa'>" + n + "</span>";
-                                }
-                                else {
+                                } else {
                                     h += "<b>" + m + "：</b>" + n;
                                 }
                             } else {

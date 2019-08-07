@@ -323,6 +323,9 @@ function getRequest() {
                 request.push({
                     code: p.code,
                     riskLevel: p.riskLevel,
+                    riskLevelName: p.riskLevelName,
+                    type: p.type,
+                    name: p.name,
                     suggest: editedPrescription[i]
                 });
             }
@@ -340,7 +343,7 @@ function getRequest() {
         //confirmer: confirmer,
         cellphone: cellphone,
         sendMessage: message,
-        evaluationItems: request
+        prescriptions: request
     }
 
     return request;

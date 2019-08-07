@@ -132,16 +132,17 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 
 	private String getOverview(List<Item> items) {
 		if (items != null) {
-			for (Item item : items) {
-				if ("综述".equals(item.getKey())) {
-					String val = item.getValue();
-					if (val != null) {
-						val = val.trim();
-						if (val.length() > 0) {
-							return val;
+			for (Item item: items) {
+					if ("综述".equals(item.getKey())) {
+						String val = item.getValue();
+						if (val != null) {
+							val = val.trim();
+							if (val.length() > 0) {
+								return val;
+							}
 						}
 					}
-				}
+				
 			}
 		}
 		return "";
