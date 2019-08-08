@@ -21,38 +21,16 @@
             <h1>健康处方获取DEMO</h1>
         </section>
         <section class="content">
-            <div class="nav-tabs-custom">
-                <ul class="nav nav-tabs">
-                    <li class="active">
-                        <a href="#tab_1" data-toggle="tab" aria-expanded="true">健康百科</a>
-                    </li>
-                    <li>
-                        <a href="#tab_2" data-toggle="tab" aria-expanded="true">风险评估</a>
-                    </li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane active" id="tab_1">
-                        <section class="content">
-                            <div id="disease"></div>
-                        </section>
-                        <section class="content-end">
-                            <div class="col-sm-2 col-sm-offset-5 btn-back">
-                                <a href="javascript:diagnoseDisease()" id="diagnoseBtn" class="btn btn-primary btn-block">提交</a>
-                            </div>
-                        </section>
-                    </div>
-                    <div class="tab-pane" id="tab_2">
-                        <section class="content">
-                            <div id="base"></div>
-                            <div id="evaluate"></div>
-                        </section>
-                        <section class="content-end">
-                            <div class="col-sm-2 col-sm-offset-5 btn-back">
-                                <a href="javascript:diagnoseEvaluation()" id="diagnoseBtn1" class="btn btn-primary btn-block">提交</a>
-                            </div>
-                        </section>
-                    </div>
-                </div>
+            <div id="base"></div>
+            <div id="disease"></div>
+            <div id="evaluate"></div>
+        </section>
+        <section class="content-end">
+            <div class="col-sm-2 col-sm-offset-4 btn-back">
+                <a href="javascript:diagnoseEvaluation()" name="diagnoseBtn1" class="btn btn-primary btn-block">提交并打开确认页面</a>
+            </div>
+            <div class="col-sm-2 btn-back">
+                <a href="javascript:diagnoseEvaluation(1)" name="diagnoseBtn1" class="btn btn-primary btn-block">提交并打开查看页面</a>
             </div>
         </section>
     </div>
@@ -70,7 +48,7 @@
             { name: "birthday", title: "出生日期", inputType: "DATE" },
             { name: "hospitalName", title: "医院·社区名称", inputType: "TEXT" },
             { name: "doctorName", title: "医师姓名", inputType: "TEXT" },
-            { name: "searchId", title: "Search ID", inputType: "TEXT" }     
+            { name: "searchId", title: "Search ID", inputType: "TEXT" }
         ]
     }
 
@@ -122,6 +100,7 @@
     }
 
     var submitData, evaluateModel, baseModel, diseaseModel;
+    var accessKey = "demo";
 
     $(function() {
         $("#evaluate").html(generateHtml(evaluate_options));
@@ -196,13 +175,13 @@
         });
 
         baseModel.setData({
-            name: "周如",
+            name: "Ashlee",
             sex: 1,
-            identificationId: "320583198806119617",
+            identificationId: "320583198806110001",
             cellphone: "13584950680",
-            searchId:"0000001",
-            doctorName:"王向阳",
-            hospitalName:"丽华社区服务中心"
+            searchId: "0000001",
+            doctorName: "Tonto",
+            hospitalName: "网进科技"
         });
 
         $("#disease").html(generateHtml(disease_options));
@@ -227,44 +206,9 @@
         });
     });
 
-    // function diagnose() {
-    //     var request = jQuery.extend({}, baseModel.data);
-    //     request.condition = evaluateModel.data;
-    //     var d = diseaseModel.data;
-    //     var ds = d && d.disease || [];
-    //     var is = d && d.index || [];
-    //     request.diseases = ds.concat(is);
-
-    //     $.postJsonAjax("/xk/diagnose", request, function(data) {
-    //         console.log(data);
-    //         var html = createEvaluateHtml(data.evaluation) + createKnowledgeHtml(data.knowledge);
-    //         html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-    //         $.openPageLayer(html);
-
-    //     }, $("#diagnoseBtn"))
-    // }
-
-    function diagnoseDisease() {
-        let d = diseaseModel.data;
-        let ds = d && d.disease || [];
-        let is = d && d.index || [];
-        if (ds.length === 0 && is.length === 0) {
-            $.errorMessage("请勾选疾病或指标");
-            return false
-        }
-        let codes = ds.concat(is);
-        $.postAjax("/xk/demo/diagnose/disease", { "code": codes }, function(data) {
-            var html = createKnowledgeHtml(data.evaluation);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
-        }, $("#diagnoseBtn"))
-    }
-
-
-    function diagnoseEvaluation() {
+    function diagnoseEvaluation(isView) {
         let request = jQuery.extend({}, baseModel.data);
         request.condition = evaluateModel.data;
-
 
         let d = diseaseModel.data;
         let ds = d && d.disease || [];
@@ -288,12 +232,18 @@
         });
 
         request.diseases = diseases;
+        var searchId = request.searchId,
+            identificationId = request.identificationId;
 
-        $.postJsonAjax("/xk/demo/diagnose/evaluation", request, function(data) {
-            let html = createEvaluateHtml(data.prescription);
-            html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
-            $.openPageLayer(html);
-        }, $("#diagnoseBtn1"))
+
+        $.postJsonAjax("/evaluate/simple?accessKey=" + accessKey, request, function(data) {
+            // let html = createEvaluateHtml(data.prescription);
+            // html = "<div style='padding:40px;padding-right:55px'>" + html + "</div>";
+            // $.openPageLayer(html);
+            var url = isView ? ("/evaluate/simple/record/view?identificationId=" + identificationId + "&accessKey=" + accessKey) :
+                ("/evaluate/simple/record/page?searchId=" + searchId + "&accessKey=" + accessKey);
+            window.open(url);
+        }, $("[name='diagnoseBtn1']"));
     }
 
 

@@ -24,7 +24,7 @@ public class ExportUtil {
 		String fileType = condition.getFileType();
 
 		if (ExportCondition.FILE_TYPE_EXCEL.equals(fileType)) {
-			try (TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".xlsx")) {
+			try (TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, "xlsx")) {
 				exportExcel(condition, data, exportClass, output);
 				return output.getFileRelativeUrl();
 			}

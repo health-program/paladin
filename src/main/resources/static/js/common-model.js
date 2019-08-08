@@ -2245,6 +2245,7 @@ var _subModelFieldBuilder = new _FieldBuilder("SUB-MODEL", {
             firstLabelSize: 3,
             inputSize: 8,
             labelSize: 3,
+            formPaddingLeft: 10,
             formButtonBar: [{
                 id: subOp.id + '_edit_cancel_btn',
                 type: 'button',
@@ -2256,7 +2257,7 @@ var _subModelFieldBuilder = new _FieldBuilder("SUB-MODEL", {
 
         var subOp = $.extend(defaultSubOp, subOp);
         var html = generateEditFormHtml(subOp, false);
-        html = "<div style='padding:50px'>" + html + "</div>";
+        html = "<div style='padding-top:50px;padding-bottom:50px;padding-right:10px;padding-left:10px'>" + html + "</div>";
         var layerOption = subOp.layerOption || {};
         layerOption = $.extend({
                 success: function(layero, index) {

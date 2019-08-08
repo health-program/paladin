@@ -23,7 +23,7 @@
         <h1>健康处方历史</h1>
         <ol class="breadcrumb no-margin">
             <li><a href="/health/diagnose/target/index"><i class="fa fa-list-alt"></i>病人列表</a></li>
-            <li><a class="text-muted"  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${#strings.substring(targetName,0,2)})}"  th:text="${targetName}"></a></li>
+            <li><a class="text-muted"  th:href="@{/health/diagnose/record/index(targetId=${targetId},targetName=${targetName})}"  th:text="${targetName}"></a></li>
             <li class="active" th:text="${time}"></li>
         </ol>
     </section>

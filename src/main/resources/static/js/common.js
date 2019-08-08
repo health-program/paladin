@@ -1,6 +1,69 @@
 (function($) {
 
     // --------------------------------------
+    // IE 兼容
+    // --------------------------------------
+
+    if (typeof String.prototype.trim !== 'function') {
+        String.prototype.trim = function() {
+            return this.replace(/(^\s*)|(\s*$)/g, "");
+        }
+    };
+    
+    if (typeof String.prototype.ltrim !== 'function') {
+
+        String.prototype.ltrim = function() {
+            return this.replace(/(^\s*)/g, "");
+        }
+
+    };
+
+    if (typeof String.prototype.rtrim !== 'function') {
+
+        String.prototype.rtrim = function() {
+            return this.replace(/(\s*$)/g, "");
+        }
+    };
+
+    if (typeof String.prototype.startsWith !== 'function') {
+        String.prototype.startsWith = function(prefix) {
+            return this.slice(0, prefix.length) === prefix;
+        };
+    };
+
+    if (typeof String.prototype.endsWith !== 'function') {
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+    };
+
+    if (!Array.prototype.forEach) {
+        Array.prototype.forEach = function forEach(callback, thisArg) {
+            var T, k;
+            if (this == null) {
+                throw new TypeError("this is null or not defined");
+            }
+            var O = Object(this);
+            var len = O.length >>> 0;
+            if (typeof callback !== "function") {
+                throw new TypeError(callback + " is not a function");
+            }
+            if (arguments.length > 1) {
+                T = thisArg;
+            }
+            k = 0;
+            while (k < len) {
+                var kValue;
+                if (k in O) {
+                    kValue = O[k];
+                    callback.call(T, kValue, k, O);
+                }
+                k++;
+            }
+        };
+    };
+
+    // --------------------------------------
     // common
     // --------------------------------------
 
@@ -259,7 +322,7 @@
 
             $.errorAlert(errorHtml);
         },
-        ajaxUnLoginHandler: function(callback) {
+        ajaxUnLoginHandler: function() {
             // ajax请求返回未登录状态处理
             // 暂时跳转主页面到登录页面，有时间可以做弹出登录窗口登录，成功后继续执行ajax请求处理
             $.failAlert("请先登录", function() {
@@ -274,7 +337,7 @@
                 status = _RESPONSE_STATUS;
 
             if (status.NO_LOGIN === resStatus) {
-                $.ajaxUnLoginHandler(callback);
+                $.ajaxUnLoginHandler();
             } else if (status.NO_PERMISSION === resStatus) {
                 $.errorMessage(response.message || "您没有权限访问该页面或执行该操作");
             } else if (status.ERROR === resStatus) {
@@ -839,8 +902,8 @@ function _initCommon(container) {
                     });
                 }
             });
-    
-            com.removeBtn.click(function(){
+
+            com.removeBtn.click(function() {
                 com.setCurrent(null);
             });
 
@@ -2070,7 +2133,7 @@ function _initAttachment() {
                 }
             });
         },
-        parseAttachmentData(data) {
+        parseAttachmentData: function(data) {
             if (data) {
                 if ($.isArray(data)) {
                     var result = [];

@@ -33,7 +33,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 	public void init() {
 		Map<String, DiseasePrescriptionPackage> nameMap = new HashMap<>();
 		Map<String, DiseasePrescriptionPackage> codeMap = new HashMap<>();
-
+		
 		List<KnowledgeBase> kbs = knowledgeBaseService.findAll();
 		for (KnowledgeBase kb : kbs) {
 
@@ -82,7 +82,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 				if (suggestion != null && suggestion.length() > 0) {
 					XKMessage message = new XKMessage(kb.getName(), overview);
 					XKPrescription prescription = new XKPrescription(name, code, XKPrescription.TYPE_DISEASE, XKPrescription.LEVEL_HAS, suggestion);
-
+					
 					DiseasePrescriptionPackage packagz = new DiseasePrescriptionPackage();
 					packagz.setMessage(message);
 					packagz.setPrescription(prescription);
@@ -92,7 +92,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 				}
 			}
 		}
-
+		
 		XKDiseasePrescriptionContainer.nameMap = nameMap;
 		XKDiseasePrescriptionContainer.codeMap = codeMap;
 	}

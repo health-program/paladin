@@ -467,7 +467,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, cellphone, confirmer);
 
 		if (createPDF) {
-			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, ".pdf");
+			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, "pdf");
 			try {
 				createPDF(prescriptionItems, target, output, new Date(), confirmer, hospitalName);
 				return output.getFileRelativeUrl();

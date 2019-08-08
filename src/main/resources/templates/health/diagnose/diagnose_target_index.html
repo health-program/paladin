@@ -107,9 +107,10 @@
 
             factorstrs.forEach(function(factorstr, index) {
                 let factors = factorstr.split("-");
-                let factorCode = factors[0];
-                let factorType = factors[1];
-                let factorLevel = factors[2] * 1;
+                let factorName = factors[0];
+                let factorCode = factors[1];
+                let factorType = factors[2];
+                let factorLevel = factors[3] * 1;
 
                 if (factorType == '1' || factorType == '2') {
                     disease.push(getFactorCodeValue(factorCode, factorType));

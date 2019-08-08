@@ -80,12 +80,13 @@ dd {
     </div>
 </body>
 <script type="text/javascript" src="/static/assets/jquery/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="/static/js/json2.js"></script>
 <script type="text/javascript">
 var record;
 
 function load() {
-    var dom = document.getElementById("prescription");
-    record = JSON.parse(dom.textContent);
+    var jsonStr = $("#prescription").text();
+    record = JSON.parse(jsonStr);
     record.targetCondition = JSON.parse(record.targetCondition);
 
     if (record.correctPrescription) {
