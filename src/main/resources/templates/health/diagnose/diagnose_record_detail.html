@@ -72,8 +72,8 @@
             { name: "sex", title: "性别", inputType: "RADIO", enum: "sex-type", colspan: 2 },
             { name: "cellphone", title: "手机号码", inputType: "TEXT" },
             { name: "birthday", title: "出生日期", inputType: "DATE" },
-            { name: "sendMessage", title: "是否发送短信", inputType: "RADIO", enum: "boolean" },
-            { name: "senderName", title: "发短信者姓名", inputType: "TEXT" }
+            { name: "doctorName", title: "医生", inputType: "TEXT" },
+            { name: "hospitalName", title: "医院·社区", inputType: "TEXT" }
         ]
     }
 
@@ -154,22 +154,23 @@
                 }
             });
             $("#base").html(generateViewHtml(base_options));
+            $("#disease").html(generateViewHtml(disease_options));
+            $("#evaluate").html(generateViewHtml(evaluate_options));
+            $.initComponment($(".content"));
+
             baseModel = new tonto.Model("base", base_options.columns, {
                 pattern: "view"
             });
-            baseModel.setData(baseData);
-            $("#disease").html(generateViewHtml(disease_options));
+            baseModel.setData(baseData);            
             diseaseModel = new tonto.Model("disease", disease_options.columns, {
                 pattern: "view"
             });
             diseaseModel.setData(diseaseData);
-            $("#evaluate").html(generateViewHtml(evaluate_options));
             evaluateModel = new tonto.Model("evaluate", evaluate_options.columns, {
                 pattern: "view"
             });
             evaluateModel.setData(evaluateData);
-            $.initComponment($(".content"));
-
+            
             var html = createEvaluateHtml(prescriptionData);
             var html2 = correctPrescription ? createEvaluateHtml(correctPrescription) : '';
             $("#info").html(html);

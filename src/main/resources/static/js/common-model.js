@@ -1948,10 +1948,8 @@ var _radioFieldBuilder = new _FieldBuilder("RADIO", {
         var colspan = column.colspan || 1,
             required = column.required === 'required';
         var html = '<label for="' + column.name + '" class="col-sm-' + options.labelSize + ' control-label">' + this.getRequiredIcon(column, options) + column.title + '：</label>\n';
-        html += '<div class="col-sm-' + this.getEditColSize(column, colspan, options) + '">\n';
         var attrHtml = column.attr ? generateTagAttribute(column.attr) : "";
-        html += '<div name="' + column.name + '" class="tonto-radio-constant" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
-        html += '</div>\n';
+        html += '<div class="tonto-radio-constant col-sm-' + this.getEditColSize(column, colspan, options) + '" name="' + column.name + '" ' + (required ? 'required="required"' : '') + ' enumcode="' + column.enum + '" ' + attrHtml + '></div>\n';
         return {
             colspan: colspan,
             html: html
