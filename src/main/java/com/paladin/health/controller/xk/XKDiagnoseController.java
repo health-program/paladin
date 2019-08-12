@@ -6,6 +6,7 @@ import com.paladin.framework.web.response.CommonResponse;
 import com.paladin.health.core.AuthKeyContainer;
 import com.paladin.health.core.knowledge.KnowledgeManageContainer;
 import com.paladin.health.model.diagnose.DiagnoseRecord;
+import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
@@ -133,8 +134,24 @@ public class XKDiagnoseController {
 			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
 		}
 
-		String path = KnowledgeManageContainer.getCurrentHealthPrescriptionService().confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey,
-				true);
+		String path = KnowledgeManageContainer.getCurrentHealthPrescriptionService().confirmSimpleEvaluationAndCreatePDFOrDoc(confirmEvaluation, searchId, accessKey, XKHealthPrescriptionService.CREATE_PDF);
+		if (path == null || path.length() == 0) {
+			return CommonResponse.getFailResponse("无法调取相关服务");
+		} else {
+			return CommonResponse.getSuccessResponse("success", path);
+		}
+	}
+
+	@ApiOperation(value = "熙康健康评估记录接口")
+	@PostMapping("/evaluate/simple/confirm2doc")
+	@ResponseBody
+	public Object confirmSimpleEvaluation2doc(@RequestBody ConfirmPrescriptionDTO confirmEvaluation, @RequestParam("searchId") String searchId,
+											  @RequestParam String accessKey) {
+		if (!validAccessKey(accessKey)) {
+			return CommonResponse.getNoPermissionResponse("请传入AccessKey");
+		}
+
+		String path = KnowledgeManageContainer.getCurrentHealthPrescriptionService().confirmSimpleEvaluationAndCreatePDFOrDoc(confirmEvaluation, searchId, accessKey, XKHealthPrescriptionService.CREATE_DOC);
 		if (path == null || path.length() == 0) {
 			return CommonResponse.getFailResponse("无法调取相关服务");
 		} else {

@@ -87,7 +87,8 @@ dd {
         <div>
             <!-- <a href="javascript:void(0);" style="margin-right: 20px" onclick="preview();">打印</a> -->
             <a href="javascript:void(0);" style="margin-right: 20px" id="updateBtn" onclick="update();">确认</a>
-            <a href="javascript:void(0);" id="update2pdfBtn" onclick="update2pdf();">确认并获取PDF</a>
+            <a href="javascript:void(0);" style="margin-right: 20px" id="update2pdfBtn" onclick="update2pdf();">确认并获取PDF</a>
+            <a href="javascript:void(0);" id="update2docBtn" onclick="update2doc();">确认并获取DOC</a>
         </div>
         <div id="content"></div>
     </div>
@@ -391,6 +392,46 @@ function update2pdf() {
         $.ajax({
             type: "POST",
             url: "/evaluate/simple/confirm2pdf?searchId=" + searchId + "&accessKey=" + accessKey,
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(request),
+            dataType: "json",
+            success: function(response) {
+                if (response && response.status == 1) {
+                    var pdfUrl = "/file" + response.result;
+                    window.open(pdfUrl); // 先打开页面
+                    return;
+                }
+                alert(response.message);
+            },
+            error: function(result) {
+                alert(result);
+            },
+            complete: function() {
+                updating = false;
+            }
+        });
+    }
+}
+
+
+function update2doc() {
+    if (updating === true) {
+        return;
+    }
+
+    var request;
+    try {
+        request = getRequest();
+    } catch (err) {
+        alert(err);
+        return;
+    }
+
+    if (request) {
+        updating = true;
+        $.ajax({
+            type: "POST",
+            url: "/evaluate/simple/confirm2doc?searchId=" + searchId + "&accessKey=" + accessKey,
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(request),
             dataType: "json",

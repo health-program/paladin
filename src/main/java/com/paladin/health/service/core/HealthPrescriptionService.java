@@ -1,14 +1,15 @@
 package com.paladin.health.service.core;
 
-import java.util.List;
-import java.util.Map;
-
 import com.paladin.health.core.knowledge.KnowledgeManageContainer.KnowledgeServiceBean;
+import com.paladin.health.service.core.xk.XKHealthPrescriptionService;
 import com.paladin.health.service.core.xk.XKPeopleCondition;
 import com.paladin.health.service.core.xk.dto.ConfirmPrescriptionDTO;
 import com.paladin.health.service.core.xk.request.XKEvaluateCondition;
 import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * 健教处方接口，按照熙康标准规则制定（熙康提供的接口不是很标准，如果有其他知识库服务，并不能按照一样的标准接入，这里只是应付）
@@ -49,7 +50,7 @@ public interface HealthPrescriptionService {
 	 * @param accessKey
 	 */
 	public default void confirmSimpleEvaluation(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey) {
-		confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey, false);
+		confirmSimpleEvaluationAndCreatePDFOrDoc(confirmEvaluation, searchId, accessKey, XKHealthPrescriptionService.CREATE_DO_NOTHING);
 	}
 
 	/**
@@ -60,7 +61,7 @@ public interface HealthPrescriptionService {
 	 * @param accessKey
 	 * @param createPDF
 	 */
-	public String confirmSimpleEvaluationAndCreatePDF(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF);
+	public String confirmSimpleEvaluationAndCreatePDFOrDoc(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, int createType);
 
 	/**
 	 * 获取评估

@@ -1,5 +1,4 @@
 package com.paladin.health.service.core.xk;
-
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.base.Strings;
 import com.itextpdf.text.*;
@@ -41,6 +40,8 @@ import com.paladin.health.service.diagnose.DiagnoseTargetService;
 import com.paladin.health.service.knowledge.KnowledgeBaseDetailService;
 import com.paladin.health.service.knowledge.KnowledgeBaseService;
 import com.paladin.health.service.sms.SendMsgWebService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,12 @@ import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @SuppressWarnings("rawtypes")
@@ -89,9 +92,27 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	@Value("${xk.tips.url}")
 	private String tipsUrl;
 
+	public static final int CREATE_DO_NOTHING = 0;
+	public static final int CREATE_PDF = 1;
+	public static final int CREATE_DOC = 2;
+
 	@Override
 	public String getKnowledgeServiceCode() {
 		return KnowledgeManageContainer.SERVICE_CODE_XK;
+	}
+
+	private final static Configuration TEMPLATE_CONFIG;
+
+	private final  static Template TEMPLATE;
+
+	 static {
+		TEMPLATE_CONFIG = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
+		TEMPLATE_CONFIG.setClassForTemplateLoading(XKHealthPrescriptionService.class, "/com/paladin/health/service/core/xk/");
+		try {
+			TEMPLATE = TEMPLATE_CONFIG.getTemplate("/prescription.ftl");
+		} catch (IOException e) {
+			throw new RuntimeException("获取DOC模板失败", e);
+		}
 	}
 
 	private List<EvaluateConfig> evaluatableds = new ArrayList<>();
@@ -394,7 +415,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	 * @param accessKey
 	 */
 	public void confirmSimpleEvaluation(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey) {
-		confirmSimpleEvaluationAndCreatePDF(confirmEvaluation, searchId, accessKey, false);
+		confirmSimpleEvaluationAndCreatePDFOrDoc(confirmEvaluation, searchId, accessKey, CREATE_DO_NOTHING);
 	}
 
 	/**
@@ -405,7 +426,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	 * @param accessKey
 	 * @param createPDF
 	 */
-	public String confirmSimpleEvaluationAndCreatePDF(ConfirmPrescriptionDTO confirmPrescription, String searchId, String accessKey, boolean createPDF) {
+	public String confirmSimpleEvaluationAndCreatePDFOrDoc(ConfirmPrescriptionDTO confirmPrescription, String searchId, String accessKey, int createType) {
 		DiagnoseRecord record = diagnoseRecordService.getRecordBySearchId(searchId, accessKey);
 		String id = record.getId();
 		String identificationId = record.getTargetId();
@@ -466,7 +487,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 		diagnoseRecordService.updateCorrectPrescription(id, correctPrescription, sendMessage, sendStatus, sendError, cellphone, confirmer);
 
-		if (createPDF) {
+		if (createType == CREATE_PDF) {
 			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, "pdf");
 			try {
 				createPDF(prescriptionItems, target, output, new Date(), confirmer, hospitalName);
@@ -474,6 +495,15 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new BusinessException("创建PDF失败");
+			}
+		} else if (createType == CREATE_DOC) {
+			TemporaryFileOutputStream output = TemporaryFileHelper.getFileOutputStream(null, "doc");
+			try {
+				createDoc(prescriptionItems, target, output, new Date(), confirmer, hospitalName);
+				return output.getFileRelativeUrl();
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new BusinessException("创建DOC失败");
 			}
 		}
 
@@ -790,6 +820,45 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		}
 		document.close();
 	}
+
+
+	public void createDoc(List<XKPrescription> prescriptionList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer,
+						  String hospitalName) throws Exception {
+		if (target != null) {
+			HashMap<String, Object> content = new HashMap<>(4);
+			String name = target.getName();
+			Integer sex = target.getSex();
+			SimpleDateFormat formatter = DateFormatUtil.getThreadSafeFormat("yyyy-MM-dd");
+			String hospital = "";
+			if (StringUtil.isNotEmpty(hospitalName)) {
+				hospital = "(" + hospitalName + ")";
+			}
+
+			content.put("name",name != null ? name : "");
+			content.put("sex",sex != null ? (sex == 1 ? "男" : "女") : "");
+			content.put("docName",confirmer != null ? confirmer + hospital : "");
+			content.put("time",createTime != null ? formatter.format(createTime) : "");
+			List<Map<String, Object>> contents = new ArrayList<>(prescriptionList.size());
+			List<String> advices;
+			HashMap<String, Object> params;
+			for (XKPrescription xkPrescription : prescriptionList) {
+				params = new HashMap<>(3);
+				params.put("evaluationContent",xkPrescription.getName());
+				params.put("riskLevel",XKPrescription.levelNameMap.get(xkPrescription.getRiskLevel()));
+				String suggest = xkPrescription.getSuggest();
+                advices = Arrays.stream(Optional.ofNullable(suggest).orElse("暂无处方建议").split("\\n"))
+                .filter(s -> !Strings.isNullOrEmpty(s))
+                .map(String::trim)
+                .collect(Collectors.toList());
+				params.put("advices",advices);
+				contents.add(params);
+			}
+			content.put("contents",contents);
+			TEMPLATE.process(content, new OutputStreamWriter(output));
+		}
+
+	}
+
 
 	class PdfPageHelper extends PdfPageEventHelper {
 		@Override

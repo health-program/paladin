@@ -1,14 +1,5 @@
 package com.paladin.health.core.knowledge;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.paladin.framework.core.VersionContainer;
 import com.paladin.framework.core.VersionContainerManager;
 import com.paladin.framework.core.exception.BusinessException;
@@ -23,6 +14,10 @@ import com.paladin.health.service.core.xk.response.XKDiseaseKnowledge;
 import com.paladin.health.service.core.xk.response.XKHealthPrescription;
 import com.paladin.health.service.knowledge.KnowledgeEvaluateService;
 import com.paladin.health.service.knowledge.KnowledgeServiceService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class KnowledgeManageContainer implements VersionContainer {
@@ -157,7 +152,7 @@ public class KnowledgeManageContainer implements VersionContainer {
 		}
 
 		@Override
-		public String confirmSimpleEvaluationAndCreatePDF(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, boolean createPDF) {
+		public String confirmSimpleEvaluationAndCreatePDFOrDoc(ConfirmPrescriptionDTO confirmEvaluation, String searchId, String accessKey, int createType) {
 			return null;
 		}
 
