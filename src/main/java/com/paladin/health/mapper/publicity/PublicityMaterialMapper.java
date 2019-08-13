@@ -14,4 +14,6 @@ public interface PublicityMaterialMapper extends CustomMapper<PublicityMaterial>
 	public PublicityMaterialVO getOne(String id);
 
     int updateCountById(@Param("id") String id, @Param("count") int count);
+
+	int increaseCountById(@Param("id") String id, @Param("count") int count);
 }

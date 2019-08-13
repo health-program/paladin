@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import com.paladin.framework.core.ServiceSupport;
 import com.paladin.framework.core.copy.SimpleBeanCopier;
 import com.paladin.framework.core.exception.BusinessException;
-import com.paladin.framework.utils.uuid.UUIDUtil;
+import com.paladin.health.mapper.publicity.PublicityMaterialGrantMapper;
 import com.paladin.health.mapper.publicity.PublicityMaterialMapper;
 import com.paladin.health.model.publicity.PublicityMaterial;
 import com.paladin.health.service.publicity.dto.PublicityMaterialGrantDTO;
@@ -21,7 +21,10 @@ public class PublicityMaterialService extends ServiceSupport<PublicityMaterial> 
 	
 	@Autowired
 	private PublicityMaterialMapper publicityMaterialMapper;
-	
+
+	@Autowired
+	private PublicityMaterialGrantMapper publicityMaterialGrantMapper;
+
 	public List<PublicityMaterialVO> selectByQuery(PublicityMaterialQueryDTO query) {
 		return publicityMaterialMapper.selectByQuery(query);
 	}
@@ -30,8 +33,8 @@ public class PublicityMaterialService extends ServiceSupport<PublicityMaterial> 
 		return publicityMaterialMapper.getOne(id);
 	}
 
-	@Transactional
-	public int saveTargetMaterial(PublicityMaterialGrantDTO publicityMaterialGrantDTO) {
+	@Transactional(rollbackFor = Exception.class)
+	public int saveTargetMaterial(PublicityMaterialGrantDTO publicityMaterialGrantDTO, String receiveMaterialId) {
 		String materialId = publicityMaterialGrantDTO.getMaterialId();
 		if (Strings.isNullOrEmpty(materialId)) {
 			throw new BusinessException("发放的宣传资料不存在");
@@ -51,7 +54,7 @@ public class PublicityMaterialService extends ServiceSupport<PublicityMaterial> 
 		}
 		materialVO.setAgencyId(publicityMaterialGrantDTO.getGrantTarget());
 		materialVO.setCount(count);
-		materialVO.setId(UUIDUtil.createUUID());
+		materialVO.setId(receiveMaterialId);
 		PublicityMaterial publicityMaterial = new PublicityMaterial();
 		SimpleBeanCopier.SimpleBeanCopyUtil.simpleCopy(materialVO,publicityMaterial);
 		return save(publicityMaterial);
@@ -59,4 +62,22 @@ public class PublicityMaterialService extends ServiceSupport<PublicityMaterial> 
 
 	@Transactional
 	  public int updateCountById(String id, int count) { return  publicityMaterialMapper.updateCountById(id,count);}
+
+	@Transactional
+	public int increaseCountById(String id, int count) { return  publicityMaterialMapper.increaseCountById(id,count);}
+
+	public int removeMaterialById(String id) {
+		PublicityMaterial publicityMaterial = get(id);
+		int count = publicityMaterialGrantMapper.countMaterialRecordById(id);
+		if (count > 0) {
+			Integer materialCount= publicityMaterial.getCount();
+			if (materialCount == 0) {
+				throw new BusinessException("该资料发送数量已为0,且发放记录存在该资料");
+			}else {
+			    return updateCountById(id, materialCount);
+			}
+		}else {
+		    return removeByPrimaryKey(id);
+		}
+	}
 }

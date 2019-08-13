@@ -11,6 +11,8 @@ public class PublicityMaterialGrantDTO {
 	private Integer workCycle;
 	//名称
 	private String materialId;
+
+	private String receiveMaterialId;
 	//类型
 	private Integer materialType;
 	//数量
@@ -125,5 +127,13 @@ public class PublicityMaterialGrantDTO {
 
 	public void setAttachments(String attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getReceiveMaterialId() {
+		return receiveMaterialId;
+	}
+
+	public void setReceiveMaterialId(String receiveMaterialId) {
+		this.receiveMaterialId = receiveMaterialId;
 	}
 }

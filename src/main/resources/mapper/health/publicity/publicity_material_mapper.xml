@@ -58,4 +58,7 @@
     <update id="updateCountById">
 		UPDATE  publicity_material  SET  count = count - #{count} WHERE  id = #{id}  AND  count >= #{count}
 	</update>
+	<update id="increaseCountById">
+		UPDATE  publicity_material  SET  count = count + #{count} WHERE  id = #{id}
+	</update>
 </mapper>

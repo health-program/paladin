@@ -76,4 +76,7 @@ resultType="com.paladin.health.service.publicity.vo.PublicityMaterialGrantVO">
 	(SELECT SUM(count) as reduce FROM publicity_material_grant  WHERE material_id = #{id})a,
 	(SELECT count as total FROM publicity_material WHERE id = #{id})b
 </select>
+	<select id="countMaterialRecordById" resultType="int">
+		SELECT  count(0) FROM health3.publicity_material_grant WHERE  material_id = #{id} or receive_material_id = #{id}
+	</select>
 </mapper>

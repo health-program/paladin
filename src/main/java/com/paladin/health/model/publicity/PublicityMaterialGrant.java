@@ -6,12 +6,17 @@ import javax.persistence.Id;
 import java.util.Date;
 
 public class PublicityMaterialGrant extends BaseModel{
+
+	public static final String COLUMN_FIELD_MATERIAL_ID = "materialId";
+
 	@Id
     private String id;
 	//年度
     private Integer workCycle;
     //名称
     private String materialId;
+
+    private String receiveMaterialId;
     //类型
     private Integer materialType;
     //数量
@@ -122,5 +127,13 @@ public class PublicityMaterialGrant extends BaseModel{
 
 	public void setAttachments(String attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getReceiveMaterialId() {
+		return receiveMaterialId;
+	}
+
+	public void setReceiveMaterialId(String receiveMaterialId) {
+		this.receiveMaterialId = receiveMaterialId;
 	}
 }

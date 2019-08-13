@@ -106,9 +106,11 @@
                             }
                         },
                         formatter: function operateFormatter(value, row, index) {
-                            return '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>' +
-                                '<button class="share btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-share"></i>发放</button>' +
-                                '<button class="remove btn btn-xs btn-danger"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+                            let html = "";
+                                html += '<button class="detail btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-edit"></i>详情</button>';
+                                html +=  '<button class="remove btn btn-xs btn-danger" style="margin-right:10px"><i class="glyphicon glyphicon-remove"></i>删除</button>';
+                                html +=  row.count !== 0 ?   '<button class="share btn btn-xs btn-info" style="margin-right:10px"><i class="glyphicon glyphicon-share"></i>发放</button>' : ''
+                            return html;
                         }
                     }
                 ]

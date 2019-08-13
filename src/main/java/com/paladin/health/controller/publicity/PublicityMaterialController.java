@@ -107,6 +107,6 @@ public class PublicityMaterialController extends ControllerSupport {
     @RequestMapping("/delete")
     @ResponseBody
     public Object delete(@RequestParam String id) {
-        return CommonResponse.getResponse(publicityMaterialService.removeByPrimaryKey(id));
+        return CommonResponse.getResponse(publicityMaterialService.removeMaterialById(id));
     }
 }

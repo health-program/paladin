@@ -96,7 +96,8 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
-        int i =  publicityMaterialService.saveTargetMaterial(publicityMaterialGrantDTO);
+		String receiveMaterialId = UUIDUtil.createUUID();
+        int i =  publicityMaterialService.saveTargetMaterial(publicityMaterialGrantDTO, receiveMaterialId);
         if (i <= 0) {
             throw  new BusinessException("发送宣传资料失败");
         }
@@ -108,29 +109,19 @@ public class PublicityMaterialGrantController extends ControllerSupport {
 		PublicityMaterialGrant model = beanCopy(publicityMaterialGrantDTO, new PublicityMaterialGrant());
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
+        Integer type = model.getGrantTargetType();
+        if (type == 1) {
+            model.setReceiveMaterialId(receiveMaterialId);
+        }
         if (publicityMaterialGrantService.save(model) > 0) {
 			return CommonResponse.getSuccessResponse(publicityMaterialGrantService.get(id));
 		}
 		return CommonResponse.getFailResponse();
 	}
 
-/*    @RequestMapping("/update")
-	@ResponseBody
-    public Object update(@Valid PublicityMaterialGrantDTO publicityMaterialGrantDTO, BindingResult bindingResult) {
-		if (bindingResult.hasErrors()) {
-			return validErrorHandler(bindingResult);
-		}
-		String id = publicityMaterialGrantDTO.getId();
-		PublicityMaterialGrant model = beanCopy(publicityMaterialGrantDTO, publicityMaterialGrantService.get(id));
-		if (publicityMaterialGrantService.update(model) > 0) {
-			return CommonResponse.getSuccessResponse(publicityMaterialGrantService.get(id));
-		}
-		return CommonResponse.getFailResponse();
-	}*/
-
     @RequestMapping("/delete")
     @ResponseBody
     public Object delete(@RequestParam String id) {
-        return CommonResponse.getResponse(publicityMaterialGrantService.removeByPrimaryKey(id));
+        return CommonResponse.getResponse(publicityMaterialGrantService.removeRecordById(id));
     }
 }

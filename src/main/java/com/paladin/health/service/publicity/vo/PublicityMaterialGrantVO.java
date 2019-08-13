@@ -12,6 +12,8 @@ public class PublicityMaterialGrantVO {
 	private Integer workCycle;
 	//名称
 	private String materialId;
+
+	private String receiveMaterialId;
 	//名称
 	private String materialName;
 	//类型
@@ -157,5 +159,13 @@ public class PublicityMaterialGrantVO {
 
 	public void setAttachments(String attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getReceiveMaterialId() {
+		return receiveMaterialId;
+	}
+
+	public void setReceiveMaterialId(String receiveMaterialId) {
+		this.receiveMaterialId = receiveMaterialId;
 	}
 }
