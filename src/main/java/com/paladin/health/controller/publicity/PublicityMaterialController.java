@@ -1,5 +1,7 @@
 package com.paladin.health.controller.publicity;
 
+import com.paladin.common.model.syst.SysAttachment;
+import com.paladin.common.service.syst.SysAttachmentService;
 import com.paladin.framework.core.ControllerSupport;
 import com.paladin.framework.core.query.QueryInputMethod;
 import com.paladin.framework.core.query.QueryOutputMethod;
@@ -19,9 +21,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Calendar;
+import java.util.List;
 
 @Controller
 @RequestMapping("/health/publicity/material")
@@ -32,6 +36,9 @@ public class PublicityMaterialController extends ControllerSupport {
 
     @Autowired
     private OrgAgencyService orgAgencyService;
+
+    @Autowired
+    private SysAttachmentService attachmentService;
 
     @RequestMapping("/index")
     @QueryInputMethod(queryClass = PublicityMaterialQueryDTO.class)
@@ -64,7 +71,6 @@ public class PublicityMaterialController extends ControllerSupport {
     	model.addAttribute("workCycle",Calendar.getInstance().get(Calendar.YEAR));
     	HealthUserSession userSession = HealthUserSession.getCurrentUserSession();
 		model.addAttribute("agencyId", userSession.getAgencyId());
-		model.addAttribute("agencyList", orgAgencyService.findAll());
         return "/health/publicity/publicity_material_add";
     }
 
@@ -77,10 +83,15 @@ public class PublicityMaterialController extends ControllerSupport {
     
     @RequestMapping("/save")
 	@ResponseBody
-    public Object save(@Valid PublicityMaterialDTO publicityMaterialDTO, BindingResult bindingResult) {
+    public Object save(@Valid PublicityMaterialDTO publicityMaterialDTO, BindingResult bindingResult, @RequestParam(required = false) MultipartFile[] attachmentFiles) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
+        List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMaterialDTO.getAttachments(), attachmentFiles);
+        if (attachments != null && attachments.size() > 4) {
+            return CommonResponse.getErrorResponse("附件数量不能超过4张");
+        }
+        publicityMaterialDTO.setAttachments(attachmentService.splicingAttachmentId(attachments));
         PublicityMaterial model = beanCopy(publicityMaterialDTO, new PublicityMaterial());
 		String id = UUIDUtil.createUUID();
 		model.setId(id);
@@ -92,10 +103,15 @@ public class PublicityMaterialController extends ControllerSupport {
 
     @RequestMapping("/update")
 	@ResponseBody
-    public Object update(@Valid PublicityMaterialDTO publicityMaterialDTO, BindingResult bindingResult) {
+    public Object update(@Valid PublicityMaterialDTO publicityMaterialDTO, BindingResult bindingResult, @RequestParam(required = false) MultipartFile[] attachmentFiles) {
 		if (bindingResult.hasErrors()) {
 			return validErrorHandler(bindingResult);
 		}
+        List<SysAttachment> attachments = attachmentService.checkOrCreateAttachment(publicityMaterialDTO.getAttachments(), attachmentFiles);
+        if (attachments != null && attachments.size() > 4) {
+            return CommonResponse.getErrorResponse("附件数量不能超过4张");
+        }
+        publicityMaterialDTO.setAttachments(attachmentService.splicingAttachmentId(attachments));
 		String id = publicityMaterialDTO.getId();
 		PublicityMaterial model = beanCopy(publicityMaterialDTO, publicityMaterialService.get(id));
 		if (publicityMaterialService.update(model) > 0) {

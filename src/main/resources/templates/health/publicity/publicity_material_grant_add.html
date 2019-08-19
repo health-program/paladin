@@ -103,6 +103,7 @@
 							<input type="file" name="attachmentFiles" multiple>
 						</div>
 					</div>
+					<input type="hidden" id="attachments" th:value="${material.attachments}">
 					<div class="form-group">
 						<div class="col-sm-2 col-sm-offset-3">
 							<button type="submit" id="model_form_submit_btn"
@@ -169,7 +170,8 @@
 			model.setData({
 				workCycle : $("#workCycle").val(),
 				materialName : $("#materialName").val(),
-				materialType : $("#type").val()
+				materialType : $("#type").val(),
+				attachments : $("#attachments").val()
 			})
 		}
 

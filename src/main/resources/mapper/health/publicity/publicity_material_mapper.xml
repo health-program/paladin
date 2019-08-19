@@ -50,7 +50,8 @@
 		pm.compile_issue_unit as compileIssueUnit,
 		pm.count,
 		pm.date,
-		pm.remarks
+		pm.remarks,
+		pm.attachments
 		FROM publicity_material pm
 		LEFT JOIN org_agency oa ON pm.agency_id = oa.id
 		WHERE oa.is_delete = 0 AND pm.id = #{id}

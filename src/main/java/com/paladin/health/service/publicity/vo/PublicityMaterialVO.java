@@ -1,6 +1,10 @@
 package com.paladin.health.service.publicity.vo;
 
+import com.paladin.common.core.AttachmentContainer;
+import com.paladin.common.model.syst.SysAttachment;
+
 import java.util.Date;
+import java.util.List;
 
 public class PublicityMaterialVO {
 
@@ -33,18 +37,15 @@ public class PublicityMaterialVO {
 	// 备注
 	private String remarks;
 
-	// 创建时间
-	private Date createTime;
+	private String attachments;
 
-	// 创建人
-	private String createUserId;
-
-	// 更新时间
-	private Date updateTime;
-
-	// 更新人
-	private String updateUserId;
-
+	// 获取附件文件
+	public List<SysAttachment> getAttachmentFiles() {
+		if (attachments != null && attachments.length() != 0) {
+			return AttachmentContainer.getAttachments(attachments.split(","));
+		}
+		return null;
+	}
 	public String getId() {
 		return id;
 	}
@@ -101,38 +102,6 @@ public class PublicityMaterialVO {
 		this.remarks = remarks;
 	}
 
-	public Date getCreateTime() {
-		return createTime;
-	}
-
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
-
-	public String getCreateUserId() {
-		return createUserId;
-	}
-
-	public void setCreateUserId(String createUserId) {
-		this.createUserId = createUserId;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
-	}
-
-	public String getUpdateUserId() {
-		return updateUserId;
-	}
-
-	public void setUpdateUserId(String updateUserId) {
-		this.updateUserId = updateUserId;
-	}
-
 	public String getAgencyName() {
 		return agencyName;
 	}
@@ -155,5 +124,13 @@ public class PublicityMaterialVO {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
 	}
 }

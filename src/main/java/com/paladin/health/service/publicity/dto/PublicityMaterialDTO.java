@@ -38,6 +38,8 @@ public class PublicityMaterialDTO {
 	// 备注
 	private String remarks;
 
+	private String attachments;
+
 	public String getId() {
 		return id;
 	}
@@ -110,4 +112,11 @@ public class PublicityMaterialDTO {
 		this.remarks = remarks;
 	}
 
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
+	}
 }

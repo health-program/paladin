@@ -27,8 +27,9 @@
 						<label for="workCycle" class="col-sm-3 control-label" ><i class="required-label fa fa-asterisk"></i>工作周期：</label>
 						<div class="col-sm-3">
 						 <input name="workCycle" required="required" type="text" placeholder="请输入工作周期"
-						 class="form-control tonto-datepicker-year" autocomplete="off" th:value="${workCycle}"/>
+						 class="form-control tonto-datepicker-year" autocomplete="off"/>
 						</div>
+						<input id="workCycle" type="hidden" th:value="${workCycle}" >
 						<label for="date" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>日期：</label>
 						<div class="col-sm-3">
 							<input name="date" required="required" type="text" placeholder="请输入日期"
@@ -36,14 +37,12 @@
 						</div>
 					</div>
 					<div class="form-group">
-						<label for="agencyId" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>所属机构：</label>
-						<div class="col-sm-3">
-							   <select name="agencyId" class="form-control" th:value="${agencyId}">
-                                   <option th:each="agency : ${agencyList}" th:value="${agency.Id}"
-                                   th:selected="${agencyId == agency.Id}"
-                                   th:text="${agency.name}"></option>
-                               </select>
+						<label for="agencyId"  id="targetOrgLabel" class="col-sm-3 control-label"><i class="required-label fa fa-asterisk"></i>所属机构：</label>
+						<div class="col-sm-3" id="targetOrg" >
+							<div class="input-group"><input name="agencyId" placeholder="请选择所属机构" class="form-control" autocomplete="off" readonly="readonly" style="background: rgb(255, 255, 255);" required="required">
+								<span class="input-group-addon" id="tonto-tree-select-remove-agencyId" style="cursor:pointer"><i class="glyphicon glyphicon-remove"></i></span></div>
 						</div>
+						<input id="agencyId" type="hidden" th:value="${agencyId}" >
 						<label for="count" class="col-sm-2 control-label"><i class="required-label fa fa-asterisk"></i>数量：</label>
 						<div class="col-sm-3">
 							<input name="count" required="required" placeholder="请输入数量" type="number"
@@ -74,7 +73,12 @@
 							<input name="remarks" placeholder="请输入备注" type="text"
 								class="form-control" autocomplete="off">
 						</div>
-
+					</div>
+					<div class="form-group">
+						<label for="attachmentFiles" class="col-sm-3 control-label">附件：</label>
+						<div class="col-sm-8" name="attachments">
+							<input type="file" name="attachmentFiles" multiple>
+						</div>
 					</div>
 					<div class="form-group">
 						<div class="col-sm-2 col-sm-offset-3">
@@ -98,14 +102,15 @@
         columns: [
 				{ title: "工作周期", name: "workCycle", inputType: "TEXT" },
 				{ title: "日期", name: "date", inputType: "DATE" },
-				{ title: "所属机构", name: "agencyId", inputType: "TEXT" },
+				{ title: "所属机构", name: "agencyId",inputType: "SELECT-TREE-SERVER", url: "/health/org/agency/find/own/tree" },
 				{ title: "数量", name: "count", inputType: "TEXT" },
 				{ title: "健康教育宣传资料类型", name: "type", enum: "publicity-material-type", inputType: "SELECT" },
 				{ title: "编发单位", name: "compileIssueUnit", inputType: "TEXT" },
 				{ title: "健康教育宣传资料名称", name: "name", inputType: "TEXT" },
-				{ title: "备注", name: "remarks", inputType: "TEXT" }
+				{ title: "备注", name: "remarks", inputType: "TEXT" },
+				{ title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles" }
 				]
-    }
+    };
 
     $(function() {
 		$("#reply_btn").click(function () {
@@ -119,6 +124,10 @@
                 });
             }
         });
+        model.setData({
+			workCycle : $("#workCycle").val(),
+			agencyId : $("#agencyId").val()
+		})
     });
     </script>
 </body>

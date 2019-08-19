@@ -1,8 +1,9 @@
 package com.paladin.health.model.publicity;
 
 import com.paladin.framework.common.BaseModel;
-import java.util.Date;
+
 import javax.persistence.Id;
+import java.util.Date;
 
 public class PublicityMaterial extends BaseModel {
 
@@ -33,6 +34,8 @@ public class PublicityMaterial extends BaseModel {
 
 	// 备注
 	private String remarks;
+
+	private String attachments;
 
 	public String getId() {
 		return id;
@@ -106,4 +109,11 @@ public class PublicityMaterial extends BaseModel {
 		this.remarks = remarks;
 	}
 
+	public String getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(String attachments) {
+		this.attachments = attachments;
+	}
 }
