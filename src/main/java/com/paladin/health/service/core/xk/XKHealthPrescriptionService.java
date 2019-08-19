@@ -108,6 +108,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	 static {
 		TEMPLATE_CONFIG = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 		TEMPLATE_CONFIG.setClassForTemplateLoading(XKHealthPrescriptionService.class, "/com/paladin/health/service/core/xk/");
+		TEMPLATE_CONFIG.setDefaultEncoding("UTF-8");
 		try {
 			TEMPLATE = TEMPLATE_CONFIG.getTemplate("/prescription.ftl");
 		} catch (IOException e) {
