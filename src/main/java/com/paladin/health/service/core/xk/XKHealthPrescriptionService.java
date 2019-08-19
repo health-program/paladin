@@ -845,7 +845,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			for (XKPrescription xkPrescription : prescriptionList) {
 				params = new HashMap<>(3);
 				params.put("evaluationContent",xkPrescription.getName());
-				params.put("riskLevel",XKPrescription.levelNameMap.get(xkPrescription.getRiskLevel()));
+				params.put("riskLevel", XKPrescription.levelNameMap.get(xkPrescription.getRiskLevel()));
 				String suggest = xkPrescription.getSuggest();
                 advices = Arrays.stream(Optional.ofNullable(suggest).orElse("暂无处方建议").split("\\n"))
                 .filter(s -> !Strings.isNullOrEmpty(s))
@@ -855,7 +855,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				contents.add(params);
 			}
 			content.put("contents",contents);
-			TEMPLATE.process(content, new OutputStreamWriter(output));
+			TEMPLATE.process(content, new OutputStreamWriter(output, "UTF-8"));
 		}
 
 	}

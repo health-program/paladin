@@ -153,6 +153,7 @@
 	<input type="hidden" id="id" th:value="${id}" />
 	<div th:include="/health/footer" />
 	<script type="text/javascript">
+	var allowedFileExtensions = ["jpeg", "jpg", "png", "gif", "rar", "zip", "pdf", "xls", "txt", "xlsx", "doc", "docx"];
 	var options = {
 			id : "model",
 			name : "详情",
@@ -167,7 +168,7 @@
 			            {title : "编发单位", name : "compileIssueUnit", inputType : "TEXT"}, 
 			            {title : "健康教育宣传资料名称", name : "name", inputType : "TEXT"},
 			            {title : "备注", name : "remarks", inputType : "TEXT"},
-						{ title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles" }
+						{ title: "附件", name: "attachments", inputType: "ATTACHMENT", fileName: "attachmentFiles", allowedFileExtensions: allowedFileExtensions }
 			           ]
 					}
 			$(function() {
