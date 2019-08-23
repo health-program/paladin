@@ -169,7 +169,9 @@
     function parseHtml(arr, name, style) {
         var html = "";
         arr.forEach(function(a) {
-            html += (a.endsWith('风险评估') ? a.substring(0, a.length - 4) : a) + ' | '; //'<span class="label ' + style + '">' + a + '</span>';
+        	if(a) {
+                html +=  (a.endsWith('风险评估') ? a.substring(0, a.length - 4) : a) + ' | '; //'<span class="label ' + style + '">' + a + '</span>';
+        	}
         });
         return '<dt>' + name + '：</dt><dd style="text-align:left">' + html + '</dd>';
     }

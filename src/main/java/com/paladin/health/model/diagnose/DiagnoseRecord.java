@@ -15,7 +15,8 @@ public class DiagnoseRecord {
 	public final static String COLUMN_FIELD_TARGET_ID = "targetId";
 	public final static String COLUMN_FIELD_SEARCH_ID = "searchId";
 	public final static String COLUMN_FIELD_CREATE_BY = "createBy";
-
+	public final static String COLUMN_FIELD_CREATE_TIME = "createTime";
+	
 	@Id
 	private String id;
 

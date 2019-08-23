@@ -25,7 +25,8 @@ public class DiagnoseRecordService extends ServiceSupport<DiagnoseRecord> {
 		if (targetId == null || targetId.length() == 0) {
 			throw new BusinessException("必须传入查询目标ID");
 		}
-
+		query.setOrder("desc");
+		query.setSort(DiagnoseRecord.COLUMN_FIELD_CREATE_TIME);
 		return searchPage(query);
 	}
 

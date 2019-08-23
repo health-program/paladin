@@ -71,7 +71,7 @@ public class ConstantsContainer implements VersionContainer {
 			String name = kb.getName();
 			Integer type = kb.getType();
 
-			String enumType = type == 1 ? CONSTANT_INDEX_TYPE : CONSTANT_DISEASE_TYPE;
+			String enumType = type == 2 ? CONSTANT_INDEX_TYPE : CONSTANT_DISEASE_TYPE;
 
 			List<KeyValue> kvList = enumConstantMap.get(enumType);
 			if (kvList == null) {

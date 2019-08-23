@@ -115,7 +115,7 @@
                 [
                     { title: "机构名称", align: "center", field: "agencyName" },
                     { title: "观看总人数", align: "center", field: "visitorCount" },
-                    { title: "观看总时长", align: "center", field: "durations", formatter: function getDuration(value, row, index) { return value.toFixed(2) + '小时'; } }
+                    { title: "观看总时长", align: "center", field: "durations", formatter: function getDuration(value, row, index) { return value ? value.toFixed(2) + '小时' : '-'; } }
                 ]
             ],
             url: '/platform/video/play/agency',

@@ -33,12 +33,14 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 	public void init() {
 		Map<String, DiseasePrescriptionPackage> nameMap = new HashMap<>();
 		Map<String, DiseasePrescriptionPackage> codeMap = new HashMap<>();
-		
+
 		List<KnowledgeBase> kbs = knowledgeBaseService.findAll();
 		for (KnowledgeBase kb : kbs) {
 
 			String name = kb.getName();
 			String code = kb.getCode();
+			Integer type = kb.getType();
+
 			List<KnowledgeBaseDetail> details = knowledgeBaseDetailService
 					.searchAll(new Condition(KnowledgeBaseDetail.COLUMN_KNOWLEDGE_ID, QueryType.EQUAL, kb.getId()));
 
@@ -81,8 +83,8 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 				String suggestion = sb.toString();
 				if (suggestion != null && suggestion.length() > 0) {
 					XKMessage message = new XKMessage(kb.getName(), overview);
-					XKPrescription prescription = new XKPrescription(name, code, XKPrescription.TYPE_DISEASE, XKPrescription.LEVEL_HAS, suggestion);
-					
+					XKPrescription prescription = new XKPrescription(name, code, type, XKPrescription.LEVEL_HAS, suggestion);
+
 					DiseasePrescriptionPackage packagz = new DiseasePrescriptionPackage();
 					packagz.setMessage(message);
 					packagz.setPrescription(prescription);
@@ -92,7 +94,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 				}
 			}
 		}
-		
+
 		XKDiseasePrescriptionContainer.nameMap = nameMap;
 		XKDiseasePrescriptionContainer.codeMap = codeMap;
 	}
@@ -108,41 +110,62 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 
 	private String getContent(List<Item> items) {
 		if (items != null && items.size() > 0) {
-			StringBuilder sb = new StringBuilder();
-			int index = 1;
-			for (Item item : items) {
-				String key = item.getKey();
-				if (key != null) {
-					if (!"综述".equals(item.getKey())) {
-						String val = item.getValue();
-						if (val != null) {
-							val = val.trim();
-							if (val.length() > 0) {
-								sb.append(index).append(")").append(key).append("：").append(val);
-								index++;
+			if (items.size() == 1) {
+				Item item = items.get(0);
+				if (!"综述".equals(item.getKey())) {
+					String val = item.getValue();
+					if (val != null) {
+						val = val.trim();
+						if (val.length() > 0) {
+							return val;
+						}
+					}
+
+					String key = item.getKey();
+					if (key != null) {
+						key = key.trim();
+						if (key.length() > 0) {
+							return key;
+						}
+					}
+				}
+			} else {
+				StringBuilder sb = new StringBuilder();
+				int index = 1;
+				for (Item item : items) {
+					String key = item.getKey();
+					if (key != null) {
+						if (!"综述".equals(item.getKey())) {
+							String val = item.getValue();
+							if (val != null) {
+								val = val.trim();
+								if (val.length() > 0) {
+									sb.append(index).append(")").append(key).append("：").append(val);
+									index++;
+								}
 							}
 						}
 					}
 				}
+				return sb.toString();
 			}
-			return sb.toString();
 		}
 		return "";
 	}
 
 	private String getOverview(List<Item> items) {
 		if (items != null) {
-			for (Item item: items) {
-					if ("综述".equals(item.getKey())) {
-						String val = item.getValue();
-						if (val != null) {
-							val = val.trim();
-							if (val.length() > 0) {
-								return val;
-							}
+			for (Item item : items) {
+				if ("综述".equals(item.getKey())) {
+					String val = item.getValue();
+					if (val != null) {
+						val = val.trim();
+						if (val.length() > 0) {
+							return val;
 						}
 					}
-				
+				}
+
 			}
 		}
 		return "";
@@ -162,7 +185,7 @@ public class XKDiseasePrescriptionContainer implements VersionContainer {
 
 	public static DiseasePrescriptionPackage getPrescriptionPackage(String name, String code) {
 		DiseasePrescriptionPackage packagz = nameMap.get(name);
-		return packagz == null ?codeMap.get(code): packagz;
+		return packagz == null ? codeMap.get(code) : packagz;
 	}
 
 	public static class Item {
