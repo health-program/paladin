@@ -458,7 +458,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				}
 
 				if (cellphone != null && cellphone.length() > 0) {
-					sendMessage += "——" + hospitalName + "·" + confirmer;
+					sendMessage += "【" + hospitalName + "·" + confirmer + "】";
 					try {
 						SmsSendResponse resp = sendMsgWebService.sendSms(cellphone, sendMessage);
 						if (resp != null) {
