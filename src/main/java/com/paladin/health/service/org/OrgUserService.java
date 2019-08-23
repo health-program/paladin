@@ -21,6 +21,7 @@ import com.paladin.health.service.org.vo.OrgUserVO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 
@@ -36,6 +37,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 	@Autowired
 	private OrgRoleService orgRoleService;
 
+	@Transactional
 	public OrgUser createUser(OrgUserDTO orgUserDTO) {
 		OrgUser model = new OrgUser();
 		SimpleBeanCopyUtil.simpleCopy(orgUserDTO, model);
@@ -49,6 +51,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 		return null;
 	}
 
+	@Transactional
 	public OrgUser updateUser(@Valid OrgUserDTO orgUserDTO) {
 		String id = orgUserDTO.getId();
 		if (id == null || id.length() == 0) {
@@ -152,6 +155,7 @@ public class OrgUserService extends ServiceSupport<OrgUser> {
 		return orgRoleService.getOwnGrantRoles(roleLevel);
 	}
 
+	@Transactional
 	public int deleteUserById(String id) {
 		List<SysUser> sysUsers = sysUserService.searchAll(new Condition(SysUser.COLUMN_FIELD_USER_ID, QueryType.EQUAL, id));
 		int i = 0;
