@@ -113,7 +113,7 @@
                 let factorLevel = factors[3] * 1;
 
                 if (factorType == '1' || factorType == '2') {
-                    disease.push(getFactorCodeValue(factorCode, factorType));
+                    disease.push(factorName);
                 } else {
                     if (factorLevel == 3) {
                         risk3.push(getFactorCodeValue(factorCode, factorType));
@@ -121,6 +121,8 @@
                         risk4.push(getFactorCodeValue(factorCode, factorType));
                     } else if (factorLevel == 5) {
                         risk5.push(getFactorCodeValue(factorCode, factorType));
+                    } else if (factorLevel == 9) {
+                    	disease.push(getFactorCodeValue(factorCode, 3));
                     }
                 }
 
