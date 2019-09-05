@@ -1,5 +1,4 @@
 package com.paladin.health.service.core.xk;
-
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.base.Strings;
 import com.itextpdf.text.*;
@@ -104,9 +103,9 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 	private final static Configuration TEMPLATE_CONFIG;
 
-	private final static Template TEMPLATE;
+	private final  static Template TEMPLATE;
 
-	static {
+	 static {
 		TEMPLATE_CONFIG = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 		TEMPLATE_CONFIG.setClassForTemplateLoading(XKHealthPrescriptionService.class, "/com/paladin/health/service/core/xk/");
 		TEMPLATE_CONFIG.setDefaultEncoding("UTF-8");
@@ -861,16 +860,23 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			List<Map<String, Object>> contents = new ArrayList<>(prescriptionList.size());
 			List<String> advices;
 			HashMap<String, Object> params;
+			String ref;
 			for (XKPrescription xkPrescription : prescriptionList) {
-				params = new HashMap<>(3);
+				if (xkPrescription.getType() == XKPrescription.TYPE_RISK) {
+					ref = referenceMap.get(xkPrescription.getCode());
+				} else {
+					ref = diseaseReference;
+				}
+				params = new HashMap<>(4);
 				params.put("evaluationContent", xkPrescription.getName());
 				params.put("riskLevel", XKPrescription.levelNameMap.get(xkPrescription.getRiskLevel()));
 				String suggest = xkPrescription.getSuggest();
 				advices = Arrays.stream(Optional.ofNullable(suggest).orElse("暂无处方建议").split("\\n")).filter(s -> !Strings.isNullOrEmpty(s)).map(String::trim)
 						.collect(Collectors.toList());
 				params.put("advices", advices);
+				params.put("ref", "（"+ref+"）");
 				contents.add(params);
-			}
+				}
 			content.put("contents", contents);
 			TEMPLATE.process(content, new OutputStreamWriter(output, "UTF-8"));
 		}
