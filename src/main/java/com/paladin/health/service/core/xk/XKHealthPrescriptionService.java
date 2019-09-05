@@ -1,4 +1,5 @@
 package com.paladin.health.service.core.xk;
+
 import com.github.pagehelper.util.StringUtil;
 import com.google.common.base.Strings;
 import com.itextpdf.text.*;
@@ -54,7 +55,6 @@ import org.springframework.util.FileCopyUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.*;
@@ -104,9 +104,9 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 
 	private final static Configuration TEMPLATE_CONFIG;
 
-	private final  static Template TEMPLATE;
+	private final static Template TEMPLATE;
 
-	 static {
+	static {
 		TEMPLATE_CONFIG = new Configuration(Configuration.DEFAULT_INCOMPATIBLE_IMPROVEMENTS);
 		TEMPLATE_CONFIG.setClassForTemplateLoading(XKHealthPrescriptionService.class, "/com/paladin/health/service/core/xk/");
 		TEMPLATE_CONFIG.setDefaultEncoding("UTF-8");
@@ -664,6 +664,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 	}
 
 	private static Map<String, String> referenceMap;
+	private static String diseaseReference = "来源于东软熙康健康科技有限公司体检百科数据";
 
 	static {
 		referenceMap = new HashMap<>();
@@ -699,7 +700,7 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		Rectangle pageSize = new Rectangle(PageSize.A4);
 		// pageSize.setBackgroundColor(new BaseColor(245,245,245));//设置背景颜色
 		document.setPageSize(pageSize);
-		document.setMargins(0, 0, 25, 25);// 边距
+		document.setMargins(0, 0, 22, 25);// 边距
 		// 2.创建书写器（Writer）对象
 
 		PdfWriter writer = PdfWriter.getInstance(document, output);
@@ -709,6 +710,8 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		// 中文字体,解决中文不能显示问题
 		BaseFont titleFont = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		BaseFont contentFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		BaseFont referenceFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+		BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 
 		Paragraph paragraph = new Paragraph();
 		paragraph.setIndentationLeft(24);
@@ -759,7 +762,6 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			document.add(info);
 			// int num = 0;
 			for (XKPrescription prescription : prescriptionList) {
-				BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 				BaseColor color = null;
 
 				int riskLevel = prescription.getRiskLevel();
@@ -781,12 +783,16 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				info1.add(new Phrase(prescription.getName(), font111));
 				info1.add(Chunk.NEWLINE);
 
+				String ref = null;
+
 				if (prescription.getType() == XKPrescription.TYPE_RISK) {
 					info1.add(new Phrase("风险等级：", font1));
 					info1.add(new Phrase(XKPrescription.levelNameMap.get(riskLevel), fontColor));
+					ref = referenceMap.get(prescription.getCode());
 				} else {
 					info1.add(new Phrase("风险等级：", font1));
 					info1.add(new Phrase("已经确诊", fontColor));
+					ref = diseaseReference;
 				}
 
 				info1.add(Chunk.NEWLINE);
@@ -803,12 +809,25 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					if (StringUtil.isNotEmpty(each)) {
 						info11.add(new Phrase(each, font11));
 						info11.setFirstLineIndent(21);
-						info11.setIndentationLeft(78);
+						info11.setIndentationLeft(58);
 						info11.setLeading(16f);
 						info11.setSpacingAfter(3);
 						info11.setSpacingBefore(0);
 						document.add(info11);
 					}
+				}
+
+				if (ref != null) {
+					Font refFont = new Font(contentFont, 11, Font.NORMAL, new BaseColor(105, 105, 105));
+					Paragraph refP = new Paragraph();
+					refP.add(new Phrase("（" + ref + "）", refFont));
+					refP.setFirstLineIndent(21);
+					refP.setIndentationLeft(58);
+					refP.setIndentationRight(21);
+					refP.setLeading(16f);
+					refP.setSpacingAfter(3);
+					refP.setSpacingBefore(0);
+					document.add(refP);
 				}
 
 				// num++;
@@ -823,9 +842,8 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		document.close();
 	}
 
-
 	public void createDoc(List<XKPrescription> prescriptionList, DiagnoseTarget target, OutputStream output, Date createTime, String confirmer,
-						  String hospitalName) throws Exception {
+			String hospitalName) throws Exception {
 		if (target != null) {
 			HashMap<String, Object> content = new HashMap<>(4);
 			String name = target.getName();
@@ -836,31 +854,28 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 				hospital = "(" + hospitalName + ")";
 			}
 
-			content.put("name",name != null ? name : "");
-			content.put("sex",sex != null ? (sex == 1 ? "男" : "女") : "");
-			content.put("docName",confirmer != null ? confirmer + hospital : "");
-			content.put("time",createTime != null ? formatter.format(createTime) : "");
+			content.put("name", name != null ? name : "");
+			content.put("sex", sex != null ? (sex == 1 ? "男" : "女") : "");
+			content.put("docName", confirmer != null ? confirmer + hospital : "");
+			content.put("time", createTime != null ? formatter.format(createTime) : "");
 			List<Map<String, Object>> contents = new ArrayList<>(prescriptionList.size());
 			List<String> advices;
 			HashMap<String, Object> params;
 			for (XKPrescription xkPrescription : prescriptionList) {
 				params = new HashMap<>(3);
-				params.put("evaluationContent",xkPrescription.getName());
+				params.put("evaluationContent", xkPrescription.getName());
 				params.put("riskLevel", XKPrescription.levelNameMap.get(xkPrescription.getRiskLevel()));
 				String suggest = xkPrescription.getSuggest();
-                advices = Arrays.stream(Optional.ofNullable(suggest).orElse("暂无处方建议").split("\\n"))
-                .filter(s -> !Strings.isNullOrEmpty(s))
-                .map(String::trim)
-                .collect(Collectors.toList());
-				params.put("advices",advices);
+				advices = Arrays.stream(Optional.ofNullable(suggest).orElse("暂无处方建议").split("\\n")).filter(s -> !Strings.isNullOrEmpty(s)).map(String::trim)
+						.collect(Collectors.toList());
+				params.put("advices", advices);
 				contents.add(params);
 			}
-			content.put("contents",contents);
-			TEMPLATE.process(content, new OutputStreamWriter(output, StandardCharsets.UTF_8));
+			content.put("contents", contents);
+			TEMPLATE.process(content, new OutputStreamWriter(output, "UTF-8"));
 		}
 
 	}
-
 
 	class PdfPageHelper extends PdfPageEventHelper {
 		@Override
@@ -873,9 +888,14 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 			try {
 				BaseFont footer = BaseFont.createFont("/ttf/STSONG.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 				cb.setFontAndSize(footer, 10);
-				float y = document.bottom(0);
+				float y = document.bottom(-4);
 				cb.setColorFill(new BaseColor(105, 105, 105));
-				cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "温馨提示:为了您和您家人的健康,请到辖区内的社区卫生服务机构进行相关的健康咨询", (document.right() + document.left()) / 2, y, 0);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER,
+						"温馨提示:为了您和您家人的健康,请到辖区内的社区卫生服务机构进行相关的健康咨询。",
+						(document.right() + document.left()) / 2, y, 0);
+				cb.showTextAligned(PdfContentByte.ALIGN_CENTER,
+						"本健教处方基于您的部分生活习惯、医生现场就诊情况、可获取到的90天内医院或社区卫生服务机构实验室检查数据。",
+						(document.right() + document.left()) / 2, y -11, 0);
 				cb.endText();
 				cb.restoreState();
 			} catch (DocumentException e) {
