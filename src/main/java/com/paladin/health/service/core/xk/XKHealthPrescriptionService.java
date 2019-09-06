@@ -709,8 +709,6 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 		// 中文字体,解决中文不能显示问题
 		BaseFont titleFont = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 		BaseFont contentFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		BaseFont referenceFont = BaseFont.createFont("/ttf/STKAITI.TTF", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-		BaseFont sfTTF1 = BaseFont.createFont("/ttf/arialuni.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
 
 		Paragraph paragraph = new Paragraph();
 		paragraph.setIndentationLeft(24);
@@ -772,9 +770,9 @@ public class XKHealthPrescriptionService implements HealthPrescriptionService {
 					color = new BaseColor(0, 166, 90);
 				}
 
-				Font fontColor = new Font(sfTTF1, 11, Font.NORMAL, color);
-				Font font1 = new Font(sfTTF1, 12);
-				Font font111 = new Font(sfTTF1, 11);
+				Font fontColor = new Font(titleFont, 11, Font.NORMAL, color);
+				Font font1 = new Font(titleFont, 12);
+				Font font111 = new Font(titleFont, 11);
 				Paragraph info1 = new Paragraph();
 				info1.setIndentationLeft(24);
 				// info1.add(Chunk.NEWLINE);
